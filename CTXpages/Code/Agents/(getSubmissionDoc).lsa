@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(getSubmissionDoc)' alias='getSubmissionDoc' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3'
+ publicaccess='false' designerversion='7'>
+<noteinfo noteid='4ce' unid='C4353DDB8F605B98CA257F7700070AA8' sequence='14'>
+<created><datetime dst='true'>20160315T121654,80+11</datetime></created>
+<modified><datetime>20160628T151506,35+10</datetime></modified>
+<revised><datetime>20160628T151506,34+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,34+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,00+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151506,41+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+Option Declare
+Use "DraftToJSON"  'for the GetWebVariable function
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	On Error Goto errHandler
+	Dim sess As New NotesSession
+	Dim db As NotesDatabase
+	Dim view As NotesView
+	Dim docContext As NotesDocument
+	Dim appdoc As NotesDocument
+	Dim subdoc As NotesDocument
+	
+	Set docContext = sess.DocumentContext
+	Set db = sess.CurrentDatabase
+	Set view = db.GetView("lkupSubmissionByAppId")
+	
+	Dim strQueryString As String
+	Dim strDocID As String
+	Dim appID As String, appver As String
+	Dim subUNID As String
+	Dim ErrorMessage As String
+	Dim printURL As String
+	
+	strQueryString = docContext.Query_String_Decoded(0)
+	strDocID = Trim(GetWebVariable(strQueryString, "docid"))
+	
+	Set appdoc = db.GetDocumentByUNID(strDocId)
+	If Not appdoc Is Nothing Then
+		appID = ""
+		If appdoc.HasItem("ApplicationId") Then
+			appID = appdoc.getfirstitem("ApplicationId").text
+		End If
+		appVer=""
+		If appdoc.HasItem("ApplicationVersion") Then
+			appVer = appdoc.getfirstitem("ApplicationVersion").text
+		End If
+		If appID &lt;&gt; ""  And AppVer &lt;&gt; "" Then
+			Set subdoc = view.GetDocumentByKey(appId+"~"+appver, True)
+			If Not subdoc Is Nothing Then
+				subUNID = subdoc.UniversalID
+				If subUNID &lt;&gt; "" Then
+					printURL = db.FilePath +"/printinvoice?openagent&amp;docid=" + subUNID
+					Print "[" + printURL  + "]"
+				Else
+					Print "&lt;br /&gt;"
+					Print "Invalid Biological Submission Document (4)"
+				End If
+			Else
+				Print "&lt;br /&gt;"
+				Print "Biological Application's Submission Document cannot be found (3)"
+			End If
+		Else
+			Print "&lt;br /&gt;"
+			Print "Invalid Biological Application (2)"
+		End If
+	Else
+		Print "&lt;br /&gt;"
+		Print "Biological Application Not Found (1)"
+	End If
+	
+exitGracefully:
+	Exit Sub
+	
+errHandler:
+	ErrorMessage = "Agent: (getSubmissionDoc)(Initialize) Number:" + Cstr(Err()) +" ErrorMsg: " + Error() + " on line #:" + Cstr(Erl()) + "\n"
+	Msgbox ErrorMessage
+	Print |Invalid Arguments passed|
+	Resume exitGracefully
+	
+End Sub</lotusscript></code>
+<item name='$POID'><datetime>20160620T120206,92+10</datetime></item></agent>
+

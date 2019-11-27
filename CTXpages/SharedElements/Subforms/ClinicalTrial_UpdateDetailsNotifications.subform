@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='utf-8'?>
+<subform name='ClinicalTrial_UpdateDetailsNotifications' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' designerversion='8.5.3'
+ renderpassthrough='true'>
+<noteinfo noteid='252' unid='664BF6F843B4EA8CCA257FD8000B2772' sequence='14'>
+<created><datetime>20160620T120149,94+10</datetime></created>
+<modified><datetime>20160628T151504,04+10</datetime></modified>
+<revised><datetime>20160628T151504,03+10</datetime></revised>
+<lastaccessed><datetime>20160628T151504,03+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152009,43+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1' leftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='1'><run><font color='green'/>&lt;!-- BL ADDED 09FEB2015:  fields in spec for CTN --&gt;</run></par>
+<par def='1'>&lt;tr&gt;</par>
+<pardef id='2' leftmargin='1.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='2'>&lt;td class="n1"&gt;Protocol Number&lt;/td&gt;&lt;td&gt;</par>
+<pardef id='3' leftmargin='1.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='3'>&lt;div dojoType="dijit.form.ValidationTextBox" id="UpdateDetails_ProtocolNumber" class="_data_UpdateDetails__ProtocolNumber" style="width:300px;" invalidMessage="Requires a minimum of 4 characters and a maximum of 20" maxLength="20"&gt;&lt;/div&gt;</par>
+<par def='2'>&lt;/td&gt;</par>
+<pardef id='4' leftmargin='1.2500in' firstlineleftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='4'>&lt;/tr&gt;</par>
+<par def='4'>&lt;tr&gt;</par>
+<par def='2'>&lt;td class="n1"&gt;Potential use of restricted goods&lt;/td&gt;</par>
+<par def='2'>&lt;td valign="top"&gt;</par>
+<par def='3'>&lt;span id="UpdateDetails_IsPotentialRestrictedGoodUsed"&gt;</par>
+<pardef id='5' leftmargin='1.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='5'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="UpdateDetails_IsPotentialRestrictedGoodUsed" id="UpdateDetails_IsPotentialRestrictedGoodUsed1" class="_data_UpdateDetails__IsPotentialRestrictedGoodUsed" value="Yes" label="Yes" /&gt;</par>
+<par def='5'>&lt;label for="UpdateDetails_IsPotentialRestrictedGoodUsed1" id="UpdateDetails_IsPotentialRestrictedGoodUsed1_label"&gt;Yes&lt;/label&gt;</par>
+<par def='5'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="UpdateDetails_IsPotentialRestrictedGoodUsed" id="UpdateDetails_IsPotentialRestrictedGoodUsed0" class="_data_UpdateDetails__IsPotentialRestrictedGoodUsed" value="No" label="No" checked /&gt;</par>
+<par def='5'>&lt;label for="UpdateDetails_IsPotentialRestrictedGoodUsed0" id="UpdateDetails_IsPotentialRestrictedGoodUsed0_label"&gt;No&lt;/label&gt;</par>
+<par def='3'>&lt;/span&gt;</par>
+<par def='2'>&lt;/td&gt;</par>
+<par def='1'>&lt;/tr&gt;</par>
+<pardef id='6' leftmargin='1.7500in' tabs='L1in'/>
+<par def='6'/>
+<par def='1'><run><font color='green'/>&lt;!-- end ADDED 09FEB2015:  fields in spec for CTN --&gt;</run></par></richtext></body>
+<item name='$$ScriptName' summary='false' sign='true'><text>ClinicalTrial_Part1Notifications</text></item></subform>
+

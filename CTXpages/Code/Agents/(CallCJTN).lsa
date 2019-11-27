@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(CallCJTN)' xmlns='http://www.lotus.com/dxl' version='9.0' maintenanceversion='1.0'
+ replicaid='CA257FDB001B5780' hide='v3' publicaccess='false' designerversion='8.5.3'
+ runonbehalfof='CN=eBS Administrator/O=TGASYSWEB' restrictions='fulladminunrestricted'>
+<noteinfo noteid='44a' unid='4117715BA0DE8C14CA257F7700070CE8' sequence='14'>
+<created><datetime dst='true'>20160315T121700,56+11</datetime></created>
+<modified><datetime>20160628T151506,00+10</datetime></modified>
+<revised><datetime>20160628T151505,99+10</datetime></revised>
+<lastaccessed><datetime>20160628T151505,99+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,74+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151506,06+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>%REM
+	Agent CallCJTN
+	Created Jul 13, 2015 by Srinivas Prasad/DEVELOPER/TGASYS
+	Description: This agent is used to create the associated missing documents for the submitted application
+				 from the JSON file associated with the CT application.
+				 Input to this agent is the application ID which in turn calls the agent CJTN to run on server to create all the missing documents.	
+%END REM
+Option Public
+Option Declare
+
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	On Error Goto ErroHandler
+	Dim s As New NotesSession
+	Dim db As NotesDatabase
+	Dim doc As NotesDocument
+	Dim agent As NotesAgent
+	Dim view As NotesView
+	Dim strAppID As String
+	Set db = s.CurrentDatabase
+	REM Create document containing data to be passed
+	Set view = db.GetView("lkupBySubmissiionId")
+	strAppID = Inputbox$("Please enter the Application Submission ID")
+	Set doc = view.GetDocumentByKey(strAppID,True)
+	If Not doc Is Nothing Then
+		
+		Set agent = db.GetAgent("CJTN")
+		
+		If agent.RunOnServer(doc.Noteid) = 0 Then
+			Messagebox "Agent ran",, "Success"
+		Else
+			Messagebox "Agent did not run",, "Failure"
+		End If
+	Else
+		Messagebox "Could not find the document",, "Failure"
+	End If
+	Exit Sub
+ErroHandler:
+	Dim ErrorMessage As String 
+	ErrorMessage = "CallCJTN agent " + Cstr(Err()) +" ErrorMsg: " + Error() + " on line #:" + Cstr(Erl()) + "\n"
+	Msgbox ErrorMessage
+	Error Err, ErrorMessage
+	Exit Sub
+End Sub</lotusscript></code>
+<item name='$POID'><datetime>20160620T120210,08+10</datetime></item></agent>
+

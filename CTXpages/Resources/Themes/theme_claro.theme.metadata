@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?><note class="form" maintenanceversion="1.0" replicaid="CA257FDB001B5780" version="9.0" xmlns="http://www.lotus.com/dxl">
+<noteinfo noteid="62a" sequence="1" unid="3ECE149EF05B848BCA257FDB001DB6AC">
+<created><datetime>20160623T152433,08+10</datetime></created>
+<modified><datetime>20160623T152433,08+10</datetime></modified>
+<revised><datetime>20160623T152433,07+10</datetime></revised>
+<lastaccessed><datetime>20160623T152433,07+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152433,07+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Alex Elliot/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<item name="$TITLE" sign="true"><text>theme_claro.theme</text></item>
+<item name="$Flags"><text>34567Cg~`</text></item>
+<item name="$$ScriptName" sign="true" summary="false"><text>theme_claro.theme</text></item>
+<item name="$DesignerVersion"><text>8.5.3</text></item>
+
+
+<item name="$FileNames" sign="true"><text>theme_claro.theme</text></item>
+<item name="$CSSFiles"><text>/.ibmxspres/dojoroot/dijit/themes/claro/claro.css</text></item></note>

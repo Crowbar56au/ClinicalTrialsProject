@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<subform name='MedicineTextforProcessingProductStrength' alias='mTpP' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' designerversion='8.5.3'
+ comment='Shows if product strength data requires further manual processing i.e. if text present'
+ renderpassthrough='true'>
+<noteinfo noteid='362' unid='6D4FEEE780648D77CA257FD8000B26CF' sequence='14'>
+<created><datetime>20160620T120148,31+10</datetime></created>
+<modified><datetime>20160628T151505,04+10</datetime></modified>
+<revised><datetime>20160628T151505,03+10</datetime></revised>
+<lastaccessed><datetime>20160628T151505,03+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,12+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1' leftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='1'>&lt;tr id="medicine_details_row2"&gt;</par>
+<par def='1'>&lt;td  style="color:red;overflow:hidden;padding-right:13px;text-align:right;vertical-align:top;width:190px"&gt;Product Strength Text&lt;/td&gt;</par>
+<par def='1'>&lt;td&gt;&lt;div style="background-color:#e1efbb; width:400px; height:100px;" dojoType="dijit.form.SimpleTextarea" id="dialog_Medicine_ProductStrengthDataToProcess" <run
+><font color='blue'/> readonly</run>&gt;&lt;/div&gt;&lt;/td&gt;</par>
+<par def='1'>&lt;/tr&gt;</par></richtext></body>
+<item name='$$ScriptName' summary='false' sign='true'><text>mTpP</text></item></subform>
+

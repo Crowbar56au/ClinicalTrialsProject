@@ -1,0 +1,67 @@
+'++LotusScript Development Environment:2:5:(Options):0:74
+Option Public
+Option Declare 
+Use "GetDatabases" 
+
+'++LotusScript Development Environment:2:5:(Forward):0:1
+Declare Function HandleError( sErrorDatabase As String, sErrorElement As String, sErrorLevel As String, sErrorDescription As String ) As Integer
+
+'++LotusScript Development Environment:2:5:(Declarations):0:10
+%REM ....................................CLASS Information: ErrorLog
+'Created By Andrew Tetlaw
+'Creation Date: 19 Sep 2001
+'PURPOSE: A way of returning an error log as an object. Why, I have no idea...
+%END REM
+%REM
+Class ErrorLog
+     Public date As Variant
+     Public database As String
+     Public element As String
+     Public level As String
+     Public description As String
+     Public stored As Integer '// did I get written successfully to the error log db
+     
+     Sub new(thedate As Variant,thedatabase As String,theelement As String,thelevel As String,description As String)
+          Me.date = Now
+          Me.database = thedatabase
+          Me.element = theelement
+          Me.level = thelevel
+          Me.description = description
+          Me.stored = HandleError(thedate ,thedatabase,theelement,thelevel,description)        
+     End Sub
+End Class
+%ENDREM
+'++LotusScript Development Environment:2:1:HandleError:9:8
+'Created By Robert Connaughton
+'Creation Date: 10 Aug 2001
+'PURPOSE: To receive inputs from any script when an error occurs and produce an error report document
+'// Modified:
+' 27/09/2001 Andrew Tetlaw
+'// Modified:
+' 19/06/2003 Paul Burch - For inclusion in Work Management
+
+Function HandleError( sErrorDatabase As String, sErrorElement As String, sErrorLevel As String, sErrorDescription As String ) As Integer
+     'Report the error to the current database
+	Dim Session As New NotesSession
+	Dim dbCurrent As NotesDatabase
+	Set dbCurrent = fdbGetDWM 'Session.CurrentDatabase
+	Dim docProfile As NotesDocument
+	Dim docError As NotesDocument
+	If dbCurrent.IsOpen = False Then
+		Messagebox "The following Error has been raised but the Error Log cannot be accessed to report it :" + Chr$(13) + Chr$(13) + "Database: " + sErrorDatabase + Chr$(13) + "Element: " + sErrorElement + Chr$(13) + "Descriptions: " + sErrorDescription + Chr$(13) + Chr$(13) + "Please copy this information down and report it to the administrator.",16,"Work Management Error Report"
+		HandleError = False
+	Else
+          'Create Error Report Document
+		Set docError = dbCurrent.CreateDocument
+		docError.Form = "ErrorReport"          
+		docError.ErrorDate = Now
+		docError.ErrorDescription = sErrorDescription
+		docError.ErrorLevel = sErrorLevel
+		docError.ErrorElement = sErrorElement
+		docError.ErrorDatabase = sErrorDatabase
+		'Call docError.ComputeWithForm(True,True)
+		Call docError.Save(True,False)
+		Print "The following Error has been raised and reported to Trials Error Logging : " + docError.ErrorNumber(0) + Chr$(13) + sErrorDescription, 16, "Trials Error Report"
+		HandleError = True
+	End If
+End Function

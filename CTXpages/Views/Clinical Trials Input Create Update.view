@@ -1,0 +1,284 @@
+<?xml version='1.0' encoding='utf-8'?>
+<view name='Clinical Trials Input Create Update' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' showinmenu='false'
+ publicaccess='false' designerversion='8.5.3' unreadmarks='none' onopengoto='lastopened'
+ onrefresh='displayindicator' headers='flat' opencollapsed='false' showresponsehierarchy='true'
+ showmargin='true' shrinkrows='false' extendlastcolumn='false' showhierarchies='false'
+ unreadcolor='black' rowlinecount='1' headerlinecount='2' rowspacing='1' bgcolor='white'
+ totalscolor='black' headerbgcolor='#e0e0ff' boldunreadrows='false' evaluateactions='false'
+ allownewdocuments='false' allowcustomizations='true' hidemarginborder='false'
+ marginwidth='0px' marginbgcolor='white' uniquekeys='false'>
+<noteinfo noteid='21a' unid='D8BF429ED8F8E4E5CA257F770006FCD4' sequence='14'>
+<created><datetime dst='true'>20160315T121619,40+11</datetime></created>
+<modified><datetime>20160628T151503,90+10</datetime></modified>
+<revised><datetime>20160628T151503,89+10</datetime></revised>
+<lastaccessed><datetime>20160628T151503,89+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152009,24+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='selection'><formula>SELECT Form = "Clinical Trials Input"</formula></code>
+<actionbar bgcolor='#e0e0ff' bordercolor='black'>
+<actionbuttonstyle bgcolor='#f0f0f0' displayborder='always' internalmargin='3px'/><font
+ size='9pt' style='bold italic' name='Verdana' pitch='variable' truetype='true'
+ familyid='20' color='system'/><border style='solid' width='0px 0px 1px'/>
+<action title='XSubmit to WorkMan' showinmenu='false' hide='notes web'><code
+ event='options'><lotusscript>Use "Clinical Trials Input"
+Option Declare
+</lotusscript></code><code event='click'><lotusscript>Sub Click(Source As Button)
+	
+%REM
+1. Call Agent (CreateSubmission) --&gt; calls JSON to NotesDocuments
+Create the application (form = application instead of ct ?) and create the Notes Documents for all the embedded docs we have
+
+Have to get documents into the view "(vwPaymentProcessed)"
+So that they are picked up by the agent "Create New CT Reviews" in the Workman Database
+
+2. The Set the flag as if the fees have been paid for the application
+SELECT ApplicationStatus="Payment Processed" &amp; INWORKMAN != "Y"
+%END REM
+	
+	Dim ws As New NotesUIWorkspace
+	Dim uiview As NotesUIView
+	Dim dc As NotesDocumentCollection
+	Dim inputDoc As NotesDocument
+	Dim JSONApplicationDoc As notesDocument
+	
+	Set uiview = ws.CurrentView
+	Set dc = uiview.Documents
+	Set inputDoc = dc.GetFirstDocument
+	
+	If dc.Count &lt;&gt; 1 Then
+		Messagebox("Please select only one document at a time")
+		Exit Sub
+	End If
+	
+	Do Until inputDoc Is Nothing
+		
+		
+		If inputDoc.ClientUserID(0) = "" Or inputDoc.SponsorID(0) = "" Or inputDoc.sponsorAddressID(0) = "" Or InputDoc.ApplicationID(0) = "" Then
+			Messagebox("We require all fields on the Application tab in the Clinical Trials Input form populated")
+			Goto nextOne
+		Elseif(inputDoc.Submitted(0) = "Y") Then
+			Messagebox("You can't submit twice")
+			Goto nextOne
+		Elseif(inputDoc.LastUploaded(0) = "") Then
+			Messagebox("Please upload the document to eBS first")
+			Exit Sub
+		Else
+			Dim askme As Integer
+			askme = ws.Prompt (2, "Submit to Workman", "Have you Uploaded your latest changes to eBS? If not any changes since last upload will not be submitted. Continue?")
+			If askme = 1 Then
+			Else
+				Print "Exiting ....."
+				Exit Sub
+			End If
+		End If
+		
+		If createSubmission(inputDoc) Then
+			inputDoc.Submitted = "Y"
+			Call inputDoc.Save(True, False)
+			
+			Dim applicationView As NotesView
+			Dim applicationDoc As NotesDocument
+			
+			Set applicationView = db.Getview("AppsByApplicationId")
+			Call applicationView.Refresh()
+			Set applicationDoc = applicationView.Getdocumentbykey(InputDoc.ApplicationID(0), True)
+			If applicationDoc Is Nothing Then
+				Messagebox("Ooops")
+			Else
+				applicationDoc.ApplicationStatus ="Payment Processed"
+				While applicationDoc.Hasitem("INWORKMAN")
+					Call applicationDoc.removeItem("INWORKMAN")
+				Wend
+				
+				Call applicationDoc.Save(True, False)
+			End If
+		Else
+			Messagebox("Err Could not create the submission")
+		End If
+nextOne:
+		Set inputDoc = dc.GetNextDocument(inputDoc)
+	Loop
+	
+	Call uiview.DeselectAll()
+	Call ws.ViewRefresh()
+	
+	
+End Sub
+</lotusscript></code></action>
+<action title='XWrite to Repository' showinmenu='false' hide='notes web'><code
+ event='options'><lotusscript>Use "Clinical Trials Input"
+</lotusscript></code><code event='click'><lotusscript>Sub Click(Source As Button)
+	
+%REM
+1. Call Agent (CreateSubmission) --&gt; calls JSON to NotesDocuments
+Create the application (form = application instead of ct ?) and create the Notes Documents for all the embedded docs we have
+
+Have to get documents into the view "(vwPaymentProcessed)"
+So that they are picked up by the agent "Create New CT Reviews" in the Workman Database
+
+2. The Set the flag as if the fees have been paid for the application
+SELECT ApplicationStatus="Payment Processed" &amp; INWORKMAN != "Y"
+%END REM
+	
+	Dim ws As New NotesUIWorkspace
+	Dim uiview As NotesUIView
+	Dim dc As NotesDocumentCollection
+	Dim inputDoc As NotesDocument
+	Dim JSONApplicationDoc As notesDocument
+	
+	Set uiview = ws.CurrentView
+	Dim applicationView As NotesView
+	Dim applicationDoc As NotesDocument
+	
+	Set applicationView = db.Getview("AppsByApplicationId")
+	Call applicationView.Refresh()
+	
+	Set dc = uiview.Documents
+	If dc.Count &lt;&gt; 1 Then
+		Messagebox("You can only select one document")
+	End If
+	
+	Set inputDoc = dc.GetFirstDocument
+	
+	Do Until inputDoc Is Nothing
+		If inputDoc.ApplicationStatus(0) = "Pending Write to Repository" Then
+			Messagebox("You can't Write to Repository twice !")
+			Goto nextOne
+		Elseif(inputDoc.Submitted(0) &lt;&gt; "Y") Then
+			Messagebox("You can't Write to Repository twice unless a document has been submitted")
+			Goto nextOne
+		Else
+			Set applicationDoc = applicationView.Getdocumentbykey(InputDoc.ApplicationID(0), True)
+			If applicationDoc Is Nothing Then
+				Messagebox("Ooops")
+			Else
+				inputDoc.ApplicationStatus ="Pending Write to Repository"
+				Call inputDoc.Save(True, False)
+				applicationDoc.ApplicationStatus ="Pending Write to Repository"
+				Call applicationDoc.Save(True, False)
+			End If
+		End If
+		
+nextOne:
+		Set inputDoc = dc.GetNextDocument(inputDoc)
+	Loop
+	
+	Call uiview.DeselectAll()
+	Call ws.ViewRefresh()
+	
+	
+End Sub
+</lotusscript></code></action>
+<action title='XUpload to eBS' showinmenu='false' hide='notes web'><code event='options'><lotusscript
+>Use "Clinical Trials Input"
+</lotusscript></code><code event='click'><lotusscript>Sub Click(Source As Button)
+	
+	Dim ws As New NotesUIWorkspace
+	Dim uiview As NotesUIView
+	Dim dc As NotesDocumentCollection
+	Dim doc As NotesDocument
+	
+	Set uiview = ws.CurrentView
+	Set dc = uiview.Documents
+	If dc.Count &lt;&gt;1 Then
+		Messagebox("Please Select only one document at a time")
+		Exit Sub
+	End If
+	Set doc = dc.GetFirstDocument
+	
+	If doc.ApplicationID(0) = "" Then
+		Dim askme As Integer
+		askme = ws.Prompt (2, "Upload To Ebs", "You Have not Entered an Application ID. If you continue one will be created for you. Continue?")
+		If askme = 1 Then
+		Else
+			Print "Exiting ....."
+			Exit Sub
+		End If
+	End If
+	
+	If Doc.Submitted(0) = "Y" Or Doc.ApplicationStatus(0) ="Pending Write to Repository" Then
+		Messagebox("You cannot upload a Doc that has been Submitted or Written to the Repository")
+		Exit Sub
+	End If
+	
+	Do Until doc Is Nothing		
+		Call inputDoc(False, doc)
+		doc.LastUploaded = Now
+		Call doc.Save(True, False)
+		Set doc = dc.GetNextDocument(doc)
+	Loop
+	
+	Call uiview.DeselectAll()
+	Call ws.ViewRefresh()
+	
+End Sub
+</lotusscript></code></action>
+<action title='New CT Input' showinmenu='false'><code event='click'><formula
+>@Command([Compose]; "Clinical Trials Input")</formula></code></action></actionbar>
+<column sort='ascending' hidedetailrows='false' itemname='$4' width='14' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='false' sortnocase='true' showaslinks='false'
+ hidden='true'><font color='#0062e1' style='bold italic'/><columnheader title='NoteID'><font
+ size='9pt' style='bold'/></columnheader><datetimeformat show='datetime' date='yearmonthday'
+ fourdigityearfor21stcentury='true' time='hourminutesecond' zone='never' dateformat='weekdaydaymonthyear'
+ dayformat='twodigitday' monthformat='twodigitmonth' yearformat='fourdigityear'
+ weekdayformat='shortname' dateseparator1=' ' dateseparator2='/' dateseparator3='/'
+ timeseparator=':' preference='usersetting'/><numberformat format='general'
+ punctuated='false' parens='false' percent='false' bytes='false'/><code event='value'><formula
+>@Text(@NoteID)</formula></code></column>
+<column hidedetailrows='false' itemname='$5' width='14' resizable='true' separatemultiplevalues='false'
+ sortnoaccent='false' sortnocase='true' showaslinks='false' hidden='true'
+ showasicons='true'><font color='#0062e1' style='bold italic'/><columnheader
+ title='Uploaded'><font size='9pt' style='bold'/></columnheader><datetimeformat
+ show='datetime' date='yearmonthday' fourdigityearfor21stcentury='true' time='hourminutesecond'
+ zone='never' dateformat='weekdaydaymonthyear' dayformat='twodigitday' monthformat='twodigitmonth'
+ yearformat='fourdigityear' weekdayformat='shortname' dateseparator1=' ' dateseparator2='/'
+ dateseparator3='/' timeseparator=':' preference='usersetting'/><numberformat
+ format='general' punctuated='false' parens='false' percent='false' bytes='false'/><code
+ event='value'><formula>@If(LastUploaded = "" ; 81 ; 82)</formula></code></column>
+<column hidedetailrows='false' itemname='$3' width='10.2500' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='false' sortnocase='true' showaslinks='false'
+ hidden='true' showasicons='true'><font color='#0062e1' style='bold italic'/><columnheader
+ title='Submitted'><font size='9pt' style='bold'/></columnheader><datetimeformat
+ show='datetime' date='yearmonthday' fourdigityearfor21stcentury='true' time='hourminutesecond'
+ zone='never' dateformat='weekdaydaymonthyear' dayformat='twodigitday' monthformat='twodigitmonth'
+ yearformat='fourdigityear' weekdayformat='shortname' dateseparator1=' ' dateseparator2='/'
+ dateseparator3='/' timeseparator=':' preference='usersetting'/><numberformat
+ format='general' punctuated='false' parens='false' percent='false' bytes='false'/><code
+ event='value'><formula>@If(Submitted = "Y" ;  82 ; 81)</formula></code></column>
+<column hidedetailrows='false' itemname='$2' width='13.1250' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='false' sortnocase='true' showaslinks='false'
+ hidden='true' showasicons='true'><font color='#0062e1' style='bold italic'/><columnheader
+ title='Written to Repository'><font size='9pt' style='bold'/></columnheader><datetimeformat
+ show='datetime' date='yearmonthday' fourdigityearfor21stcentury='true' time='hourminutesecond'
+ zone='never' dateformat='weekdaydaymonthyear' dayformat='twodigitday' monthformat='twodigitmonth'
+ yearformat='fourdigityear' weekdayformat='shortname' dateseparator1=' ' dateseparator2='/'
+ dateseparator3='/' timeseparator=':' preference='usersetting'/><numberformat
+ format='general' punctuated='false' parens='false' percent='false' bytes='false'/><code
+ event='value'><formula>@If(ApplicationStatus = "Pending Write to Repository" ;  82 ; 81)</formula></code></column>
+<column sort='ascending' hidedetailrows='false' itemname='ApplicationID' width='19.7500'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='true' sortnocase='true'
+ showaslinks='false'><columnheader title='Application ID'><font size='9pt'
+ style='bold'/></columnheader></column>
+<column sort='ascending' hidedetailrows='false' itemname='SubmissionID' width='19.7500'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='true' sortnocase='true'
+ showaslinks='false'><columnheader title='Submission ID'><font size='9pt'
+ style='bold'/></columnheader></column>
+<column sort='ascending' hidedetailrows='false' itemname='SponsorName' width='19.7500'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='true' sortnocase='true'
+ showaslinks='false'><columnheader title='Sponsor Name'><font size='9pt' style='bold'/></columnheader></column>
+<column hidedetailrows='false' itemname='TitleOfStudy' width='12.8750' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='false' sortnocase='true' showaslinks='false'><columnheader
+ title='Title Of Study'><font size='9pt' style='bold'/></columnheader></column>
+<column sort='ascending' hidedetailrows='false' itemname='ClientReference'
+ width='14.6250' resizable='true' separatemultiplevalues='false' sortnoaccent='true'
+ sortnocase='true' showaslinks='false'><columnheader title='Client Reference'><font
+ size='9pt' style='bold'/></columnheader></column>
+<column hidedetailrows='false' itemname='dateSubmitted' width='14.3750' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='false' sortnocase='true' showaslinks='false'><columnheader
+ title='Date Submitted'><font size='9pt' style='bold'/></columnheader></column>
+<column hidedetailrows='false' itemname='dateWritten' width='10' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='false' sortnocase='true' showaslinks='false'><columnheader
+ title='Date Written'><font size='9pt' style='bold'/></columnheader></column></view>
+

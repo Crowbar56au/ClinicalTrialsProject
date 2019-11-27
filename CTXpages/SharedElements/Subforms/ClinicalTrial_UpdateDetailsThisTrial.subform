@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<subform name='ClinicalTrial_UpdateDetailsThisTrial' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' designerversion='8.5.3'
+ renderpassthrough='true'>
+<noteinfo noteid='25e' unid='42297AF0900FC261CA257FD8000B274A' sequence='14'>
+<created><datetime>20160620T120149,54+10</datetime></created>
+<modified><datetime>20160628T151504,07+10</datetime></modified>
+<revised><datetime>20160628T151504,06+10</datetime></revised>
+<lastaccessed><datetime>20160628T151504,06+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152009,46+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1' leftmargin='3.5431in' firstlineleftmargin='2.5000in' tabs='L1in'/>
+<par def='1'>&lt;tr&gt;</par>
+<pardef id='2' leftmargin='2.7500in' tabs='L1in'/>
+<par def='2'>&lt;td&gt;&lt;input type="checkbox" onClick="UpdateDetailsDisplay();" dojoType="dijit.form.CheckBox" class="_data_UpdateDetails__TrialClassification" name="UpdateDetails_TrialClassification" id="UpdateDetails_TrialClassification6" value="6" /&gt;&lt;/td&gt;</par>
+<pardef id='3' leftmargin='3.5431in' firstlineleftmargin='2.7500in' tabs='L1in'/>
+<par def='3'>&lt;td&gt;&lt;label for="UpdateDetails_TrialClassification6"&gt;Is placebo controlled&lt;/label&gt;&lt;/td&gt;</par>
+<par def='2'>&lt;td&gt;&lt;input type="checkbox" dojoType="dijit.form.CheckBox" class="_data_UpdateDetails__TrialClassification" name="UpdateDetails_TrialClassification" id="UpdateDetails_TrialClassification7" value="7" /&gt;&lt;/td&gt;</par>
+<par def='3'>&lt;td&gt;&lt;label for="UpdateDetails_TrialClassification7"&gt;Is comparator controlled&lt;/label&gt;&lt;/td&gt;</par>
+<par def='1'>&lt;/tr&gt;</par>
+<pardef id='4' leftmargin='3.2500in' firstlineleftmargin='2.5000in' tabs='L1in'/>
+<par def='4'/>
+<par def='4'/></richtext></body>
+<item name='$$ScriptName' summary='false' sign='true'><text>ClinicalTrial_Part1ThisTrial</text></item></subform>
+

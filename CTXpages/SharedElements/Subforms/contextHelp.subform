@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<subform name='contextHelp' xmlns='http://www.lotus.com/dxl' version='9.0'
+ maintenanceversion='1.0' replicaid='CA257FDB001B5780' designerversion='7'
+ renderpassthrough='true'>
+<noteinfo noteid='276' unid='3443A6B9BE8EB618CA257FD8000B26B7' sequence='14'>
+<created><datetime>20160620T120148,07+10</datetime></created>
+<modified><datetime>20160628T151504,13+10</datetime></modified>
+<revised><datetime>20160628T151504,12+10</datetime></revised>
+<lastaccessed><datetime>20160628T151504,12+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152009,53+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1' leftmargin='2.9521in' firstlineleftmargin='0.7500in' tabs='L1in'/>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='1' hidewhenexpanded='true' color='#ffe118' borderstyle='tabdiag'><text
+>dojo dijit.Tooltip - Context Help</text></sectiontitle>
+<pardef id='2' leftmargin='2.9521in' firstlineleftmargin='1in' tabs='L1in'/>
+<par def='2'><run><font color='blue'/>&lt;!-- Application Help --&gt;</run></par>
+<par def='2'>&lt;div dojoType="dijit.Tooltip" connectId="Application_ContactName" position="above"&gt;Contact Name help&lt;/div&gt;</par>
+<par def='2'>&lt;div dojoType="dijit.Tooltip" connectId="Application_SponsorName" position="above"&gt;</par>
+<pardef id='3' leftmargin='2.9521in' firstlineleftmargin='1.2500in' tabs='L1in'/>
+<par def='3'>Sponsor Name help&lt;br/&gt;</par>
+<par def='3'>Can be anything representable in HTML&lt;br /&gt;</par>
+<par def='3'>&lt;br /&gt;</par>
+<par def='3'>&lt;u&gt;&lt;b&gt;We can lookup the data from a help database&lt;/b&gt;&lt;/u&gt;</par>
+<par def='2'>&lt;/div&gt;</par>
+<par def='2'/>
+<par def='2'><run><font color='blue'/>&lt;!-- Product Help --&gt;</run></par>
+<par def='2'>&lt;div dojoType="dijit.Tooltip" connectId="IsMultiProduct0,IsMultiProduct0_label" position="above"&gt;Single Product help&lt;/div&gt;</par>
+<par def='2'>&lt;div dojoType="dijit.Tooltip" connectId="IsMultiProduct1,IsMultiProduct1_label" position="above"&gt;Multi Product help&lt;/div&gt;</par>
+<par def='2'/></section>
+<par def='2'><run><font style='bold'/></run></par></richtext></body>
+<item name='$$ScriptName' summary='false' sign='true'><text>contextHelp</text></item></subform>
+

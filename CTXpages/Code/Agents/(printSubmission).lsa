@@ -1,0 +1,136 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(printSubmission)' alias='printSubmission' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3'
+ publicaccess='false' designerversion='8.5.3'>
+<noteinfo noteid='596' unid='29485909BA2A15F7CA257F7700070A5E' sequence='14'>
+<created><datetime dst='true'>20160315T121654,06+11</datetime></created>
+<modified><datetime>20160628T151506,91+10</datetime></modified>
+<revised><datetime>20160628T151506,90+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,90+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,36+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151506,96+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+Option Declare
+Use "PrintApplication"
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	
+	On Error Goto errHandler
+	On Error 4091 Goto errInvalidUniversalID
+	
+	'PWB 08Oct07 - AOS Portal compatible update
+	
+	
+	
+	Dim strQueryString As String
+	Dim strUNID As String
+	Dim filenum As Integer
+	Dim nvKeywords As NotesView
+	Dim configurationDocTitle As NotesDocument
+	Dim configurationDocBody As NotesDocument
+	Dim strSubDocBody As String
+	
+	Set session = New NotesSession
+	Set dbCurrent = session.CurrentDatabase
+	Set cdoc = session.DocumentContext
+	Set nvKeywords = dbCurrent.GetView("Keywords")
+	Set configurationDocTitle = nvKeywords.GetDocumentByKey("SUBMISSIONDOCTITLE", True)
+	Set configurationDocBody = nvKeywords.GetDocumentByKey("SUBMISSIONDOCBODY", True)
+	strQueryString = cdoc.Query_String(0)
+	strUNID = GetWebVariable(strQueryString, "unid")
+	
+	bWebClient = True
+	
+     'initialize databases
+	Call InitializeDatabase()
+	
+	'/ INC 64344 - WP - 14/04/2015 - Print Submission required Contact Name and Phone
+	Dim vJSONPart1 As NotesView
+	Dim strKey As String, spAddress As String
+	Dim part1doc As notesdocument
+	Set vJSONPart1 = dbCurrent.GetView("JSONPart1")
+	
+	Set viewApplicationSubs = dbCurrent.GetView("LookupSubmittedByApplicationID")
+	Set cdoc = dbCurrent.GetDocumentByUNID(strUNID)
+	If cdoc Is Nothing Then
+          'can't find the application doc
+		Exit Sub
+	End If
+	
+	'/ INC 64344 - WP - 14/04/2015 - Print Submission required Contact Name and Phone
+	strKey = cdoc.ApplicationId(0) + "~" + cdoc.ApplicationVersion(0)
+	Set part1doc = vJSONPart1.Getdocumentbykey(strKey, True)
+	If cdoc.Hasitem("SponsorAddress_Label") Then
+		spAddress = cdoc.SponsorAddress_Label(0)	
+	End If
+	 
+	
+	'Print the header details
+	strTitle = "Application ID: " &amp; cdoc.ApplicationID(0)
+	toprint="&lt;html&gt;&lt;head&gt;" &amp; Header(strTitle) &amp; "&lt;/head&gt;&lt;body&gt;"
+	gstrPrint = gstrPrint + toPrint
+	
+	strApplicationForm = configurationDocTitle.KeywordDesc(0)
+	strSubDocBody = configurationDocBody.KeywordDesc(0)
+	
+	toPrint = |&lt;table style="width:100%"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;| &amp;_
+	|&lt;span style="font-size: 1.6em; font-weight: bold; line-height: 2em;"&gt;|&amp; strApplicationForm &amp;|&lt;/span&gt;| &amp;_
+	|&lt;/td&gt;&lt;td style="width:1%"&gt;&lt;img src="/|&amp;gstrGraphicsPath &amp;|/smTGAeBS.png"| &amp;|&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;| &amp;_
+	|&lt;br /&gt;&lt;br /&gt;&lt;table width=100%&gt;&lt;tbody&gt;|
+	
+	toPrint = toPrint &amp; |&lt;tr&gt;&lt;td width=25%&gt;&lt;b&gt;Application No:&lt;/b&gt;&lt;/td&gt;&lt;td&gt;| &amp; cdoc.ApplicationID(0) &amp; |&lt;/td&gt;&lt;/tr&gt;| &amp;_ 
+	|&lt;tr&gt;&lt;td&gt;&lt;b&gt;Submission No:&lt;/b&gt;&lt;/td&gt;&lt;td&gt;| &amp; cdoc.submissionid(0) &amp; |&lt;/td&gt;&lt;/tr&gt;| &amp;_
+	|&lt;tr&gt;&lt;td&gt;&lt;b&gt;Sponsor Name:&lt;/b&gt;&lt;/td&gt;&lt;td&gt;| &amp; cdoc.sponsorname(0) &amp; |&lt;/td&gt;&lt;/tr&gt;| &amp;_
+	|&lt;tr&gt;&lt;td&gt;&lt;b&gt;Sponsor Address:&lt;/b&gt;&lt;/td&gt;&lt;td&gt;| &amp; spAddress  &amp; |&lt;/td&gt;&lt;/tr&gt;| &amp;_
+	|&lt;tr&gt;&lt;td&gt;&lt;b&gt;Contact Name:&lt;/b&gt;&lt;/td&gt;&lt;td&gt;| &amp; part1doc.ContactName(0) &amp; |&lt;/td&gt;&lt;/tr&gt;| &amp;_
+	|&lt;tr&gt;&lt;td&gt;&lt;b&gt;Contact Phone:&lt;/b&gt;&lt;/td&gt;&lt;td&gt;| &amp; part1doc.ContactPhone(0) &amp; |&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;| &amp;_
+	|&lt;br /&gt;&lt;br /&gt;&lt;table width=100%&gt;&lt;tbody&gt;&lt;br /&gt;&lt;br /&gt;|
+
+%REM
+	'/ Old Contact Name and Phone before INC 64344
+	|&lt;tr&gt;&lt;td&gt;&lt;b&gt;Sponsor Address:&lt;/b&gt;&lt;/td&gt;&lt;td&gt;| &amp; cdoc.SponsorAddress_Label(0)  &amp; |&lt;/td&gt;&lt;/tr&gt;| &amp;_
+	|&lt;tr&gt;&lt;td&gt;&lt;b&gt;Contact Name:&lt;/b&gt;&lt;/td&gt;&lt;td&gt;__________________________&lt;/td&gt;&lt;/tr&gt;| &amp;_
+	|&lt;tr&gt;&lt;td&gt;&lt;b&gt;Contact Phone:&lt;/b&gt;&lt;/td&gt;&lt;td&gt;__________________________&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;| &amp;_
+	
+%END REM	
+	toPrint = toPrint &amp; |&lt;tr&gt;&lt;td&gt;| &amp; strSubDocBody &amp; |&lt;/td&gt;&lt;/tr&gt;|
+	
+printStep:
+	toPrint = toPrint &amp; |&lt;/tbody&gt;&lt;/table&gt;&lt;br /&gt;&lt;/body&gt;&lt;/html&gt;|
+	gstrPrint = gstrPrint + toPrint
+	
+	If bWebClient Then
+		Print "Content-Type:text/html"
+		Print gstrPrint
+	Else
+		Print #fileNum, gstrPrint
+	End If
+	
+exitGracefully:
+	Exit Sub
+	
+errInvalidUniversalID:
+	Call returnResponse(False, "Refresh", "The document you wish to print could not be found.")
+	Resume exitGracefully
+errHandler:
+	Call returnResponse(False, "", "There was an unexpected error while attempting to print the document requested: Error " &amp; Err &amp; " at line " &amp; Erl &amp; " - " &amp; Error)
+	Resume exitGracefully
+	
+End Sub
+
+</lotusscript></code><code event='GetWebVariable'><lotusscript>Function GetWebVariable (querystring As String, argname As String) As String
+	Dim tmpstr As String	
+	GetWebVariable = ""
+	tmpstr = Strright(querystring, argname + "=")
+	
+	If (Instr(tmpstr, "&amp;") &lt;&gt; 0) Then
+		GetWebVariable = Strleft(tmpstr, "&amp;")
+	Else
+		GetWebVariable = tmpstr
+	End If
+End Function</lotusscript></code>
+<item name='$POID'><datetime>20160620T120206,54+10</datetime></item></agent>
+

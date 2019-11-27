@@ -1,0 +1,205 @@
+<?xml version='1.0' encoding='utf-8'?>
+<subform name='ClinicalTrial_Part2' xmlns='http://www.lotus.com/dxl' version='9.0'
+ maintenanceversion='1.0' replicaid='CA257FDB001B5780' designerversion='8.5.3'
+ renderpassthrough='true'>
+<noteinfo noteid='24e' unid='12008E802986562ECA257FD8000B277A' sequence='14'>
+<created><datetime>20160620T120150,02+10</datetime></created>
+<modified><datetime>20160628T151504,03+10</datetime></modified>
+<revised><datetime>20160628T151504,02+10</datetime></revised>
+<lastaccessed><datetime>20160628T151504,02+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152009,42+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1' leftmargin='1in' tabs='L1in'/>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='1' hidewhenexpanded='true' color='#c0e1ff' borderstyle='tabdiag'><text
+>Tab: Part 2</text></sectiontitle>
+<pardef id='2' leftmargin='1.2500in' tabs='L1in'/>
+<par def='2'>&lt;div dojoType="dijit.layout.ContentPane" title="Part 2" id="djtabs_Part2"&gt;</par>
+<pardef id='3' leftmargin='1.5000in' tabs='L1in'/>
+<par def='3'>&lt;table width="100%"&gt;</par>
+<pardef id='4' leftmargin='1.7500in' tabs='L1in'/>
+<par def='4'>&lt;tr&gt;</par>
+<pardef id='5' leftmargin='2in' tabs='L1in'/>
+<par def='5'>&lt;td class="n1"&gt;Contact Name&lt;/td&gt;&lt;td&gt;&lt;input type="text" dojoType="dijit.form.ValidationTextBox" id="Part2_ContactName" class="_data_Part2__ContactName" style="width:300px;" maxLength="150" placeHolder="Joan Johnson"/&gt;&lt;/td&gt;</par>
+<par def='4'>&lt;/tr&gt;</par>
+<par def='4'>&lt;tr&gt;</par>
+<par def='5'>&lt;td class="n1"&gt;Contact Phone Number&lt;/td&gt;&lt;td&gt;&lt;input type="text" dojoType="dijit.form.ValidationTextBox" id="Part2_ContactPhone" class="_data_Part2__ContactPhone" maxLength="10" placeHolder="091234 5678" regExp="^\(?[\d\s]{2,4}\)?[\d\s-]{6,10}$" /&gt;&lt;/td&gt;</par>
+<par def='4'>&lt;/tr&gt;</par>
+<par def='4'>&lt;tr&gt;</par>
+<par def='5'>&lt;td class="n1"&gt;Contact Email&lt;/td&gt;&lt;td&gt;&lt;input type="text" dojoType="dijit.form.ValidationTextBox" style="width:300px;" id="Part2_ContactEmail" class="_data_Part2__ContactEmail" placeHolder="email.address@domain.com.au" required=true/&gt;&lt;/td&gt;</par>
+<par def='4'>&lt;/tr&gt;</par>
+<pardef id='6' leftmargin='2.7021in' rightmargin='100%' firstlineleftmargin='1.7500in'/>
+<par def='6'>&lt;tr&gt;</par>
+<pardef id='7' leftmargin='2in' rightmargin='100%'/>
+<par def='7'>&lt;td nowrap class="n1"&gt;Confirm Email&lt;/td&gt;&lt;td&gt;&lt;div dojoType="dijit.form.ValidationTextBox" style="width:300px;" id="Part2_ConfirmEmail" name="Part2_ConfirmEmail" class="_data_Part2__ConfirmEmail" placeHolder="email.address@domain.com.au" required=true&gt;&lt;/div&gt;&lt;/td&gt;</par>
+<par def='6'>&lt;/tr&gt;</par>
+<par def='4'>&lt;tr&gt;</par>
+<pardef id='8' leftmargin='2.9521in' rightmargin='100%' firstlineleftmargin='2in'/>
+<par def='8'>&lt;td colspan=2&gt;</par>
+<pardef id='9' leftmargin='3.2021in' rightmargin='100%' firstlineleftmargin='2.2500in'/>
+<par def='9'>&lt;hr /&gt;</par>
+<par def='8'>&lt;/td&gt;</par>
+<par def='6'>&lt;/tr<run><font color='blue'/>&gt;</run></par>
+<par def='6'>&lt;tr&gt;</par>
+<pardef id='10' leftmargin='2.5000in' firstlineleftmargin='2in' tabs='L1in'/>
+<par def='10'>&lt;td colspan="2" style="text-align:left; font-weight:bold;"&gt;Trial Details&lt;/td&gt;</par>
+<par def='4'>&lt;/tr&gt;</par>
+<par def='4'>&lt;tr&gt;</par>
+<par def='5'>&lt;td class="n1"&gt;Protocol Number&lt;/td&gt;&lt;td&gt;&lt;input type="text" dojoType="dijit.form.ValidationTextBox" id="Part2_ProtocolNumber" class="_data_Part2__ProtocolNumber" trim="true" invalidMessage="Requires a minimum of 4 characters and a maximum of 20" maxLength="20" required="true" style="width:300px;" /&gt;&lt;/td&gt;</par>
+<par def='4'>&lt;/tr&gt;</par>
+<par def='4'>&lt;tr&gt;</par>
+<par def='5'>&lt;td class="n1"&gt;Expected Trial Start Date&lt;/td&gt;&lt;td&gt;&lt;input type="text" dojoType="dijit.form.DateTextBox" id="Part2_StartDate" class="_data_Part2__StartDate" constraints={min:'<computedtext
+><code event='value'><formula>day := @Text(@Day(@Today));
+day := @If(@Length(day) = 1; "0" + day; day);
+month := @Text(@Month(@Today));
+month := @If(@Length(month) = 1; "0" + month; month);
+@Text(@Year(@Today))+"-"+ month +"-"+@Text(day)</formula></code></computedtext>',datePattern:'dd/MM/yyyy'} placeHolder="22/04/1931" promptMessage="Use the dd/MM/yyyy format if entering the date manually" style="width:75px;" onChange="var myDate = new Date(arguments[0]); dijit.byId('Part2_FinishDate').constraints.min = myDate.setDate(myDate.getDate()+1)"/&gt;&lt;/td&gt;</par>
+<par def='4'>&lt;/tr&gt;</par>
+<par def='4'>&lt;tr&gt;</par>
+<par def='5'>&lt;td class="n1"&gt;Expected Completion Date&lt;/td&gt;&lt;td&gt;&lt;input type="text" dojoType="dijit.form.DateTextBox" id="Part2_FinishDate" class="_data_Part2__FinishDate" constraints={datePattern:'dd/MM/yyyy'} placeHolder="19/12/1990" promptMessage="Use the dd/MM/yyyy format if entering the date manually" style="width:75px;"  /&gt;&lt;/td&gt;</par>
+<par def='4'>&lt;/tr&gt;</par>
+<par def='4'>&lt;tr&gt;</par>
+<par def='5'>&lt;td class="n1"&gt;Title of Study&lt;/td&gt;</par>
+<par def='5'>&lt;td&gt;&lt;div dojoType="dijit.form.TextBox" style="width:99%" id="Part2_TitleOfStudy" class="_data_Part2__TitleOfStudy" maxLength="250" wrap="soft" placeHolder="Enter the title of the study here ..." maxLength="250"/&gt;&lt;/td&gt;</par>
+<par def='4'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='5'>&lt;td class="n1"&gt;Trial Type&lt;/td&gt;</par>
+<par def='5'>&lt;td&gt;</par>
+<pardef id='11' leftmargin='2.2500in' tabs='L1in'/>
+<par def='11'>&lt;table style="border: 1px solid #ccc;"&gt;</par>
+<pardef id='12' leftmargin='2.5000in' tabs='L1in'/>
+<par def='12'>&lt;tr&gt;</par>
+<pardef id='13' leftmargin='2.7500in' tabs='L1in'/>
+<par def='13'>&lt;td&gt;&lt;input type="checkbox" onClick="addTrialTypeLabel()" dojoType="dijit.form.CheckBox" class="_data_Part2__TrialType" name="Part2_TrialType" id="Part2_TrialType1" value="1" label="Phase 1"/&gt;&lt;/td&gt;</par>
+<par def='13'>&lt;td&gt;&lt;label for="Part2_TrialType1"&gt;Phase 1&lt;/label&gt;&lt;/td&gt;</par>
+<par def='13'>&lt;td&gt;&lt;input type="checkbox" onClick="addTrialTypeLabel()" dojoType="dijit.form.CheckBox" class="_data_Part2__TrialType" name="Part2_TrialType" id="Part2_TrialType2" value="2" label="Phase 2" /&gt;&lt;/td&gt;</par>
+<par def='13'>&lt;td&gt;&lt;label for="Part2_TrialType2"&gt;Phase 2&lt;/label&gt;&lt;/td&gt;</par>
+<par def='13'>&lt;td&gt;&lt;input type="checkbox" onClick="addTrialTypeLabel()" dojoType="dijit.form.CheckBox" class="_data_Part2__TrialType" name="Part2_TrialType" id="Part2_TrialType3" value="3" label="Phase 3" /&gt;&lt;/td&gt;</par>
+<par def='13'>&lt;td&gt;&lt;label for="Part2_TrialType3"&gt;Phase 3&lt;/label&gt;&lt;/td&gt;</par>
+<par def='13'>&lt;td&gt;&lt;input type="checkbox" onClick="addTrialTypeLabel()" dojoType="dijit.form.CheckBox" class="_data_Part2__TrialType" name="Part2_TrialType" id="Part2_TrialType4" value="4" label="Phase 4" /&gt;&lt;/td&gt;</par>
+<par def='13'>&lt;td&gt;&lt;label for="Part2_TrialType4"&gt;Phase 4&lt;/label&gt;&lt;/td&gt;</par>
+<par def='13'>&lt;td&gt;&lt;input type="checkbox" onClick="addTrialTypeLabel()" dojoType="dijit.form.CheckBox" class="_data_Part2__TrialType" name="Part2_TrialType" id="Part2_TrialTypeB" value="B" label="Bioavailability/Bioequivalence" /&gt;&lt;/td&gt;</par>
+<par def='13'>&lt;td&gt;&lt;label for="Part2_TrialTypeB"&gt;Bioavailability/Bioequivalence&lt;/label&gt;&lt;/td&gt;</par>
+<par def='13'>&lt;td&gt;&lt;input type="checkbox" onClick="addTrialTypeLabel()" dojoType="dijit.form.CheckBox" class="_data_Part2__TrialType" name="Part2_TrialType" id="Part2_TrialTypeD" value="D" label="Device" /&gt;&lt;/td&gt;</par>
+<par def='13'>&lt;td&gt;&lt;label for="Part2_TrialTypeD"&gt;Device&lt;/label&gt;&lt;/td&gt;</par>
+<par def='12'>&lt;/tr&gt;</par>
+<par def='11'>&lt;/table&gt;</par>
+<par def='5'>&lt;/td&gt;</par>
+<par def='4'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='5'>&lt;td class="n1"&gt;Trial Type Description&lt;/td&gt;</par>
+<par def='5'>&lt;td&gt;</par>
+<par def='11'>&lt;textarea dojoType="dijit.form.Textarea" style="height:3.5em; width:100%" id="Part2_TrialTypeDescription" class="_data_Part2__TrialTypeDescription" wrap="soft" maxLength="1200"&gt;&lt;/textarea&gt;</par>
+<par def='5'>&lt;/td&gt;</par>
+<par def='4'>&lt;/tr&gt;</par>
+<par def='4'>&lt;tr&gt;&lt;td colspan="2"&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='4'>&lt;tr&gt;</par>
+<par def='5'>&lt;td class="n1"&gt;This Trial&lt;/td&gt;</par>
+<par def='5'>&lt;td&gt;</par>
+<par def='11'>&lt;table style="border:1px solid #ccc;"&gt;</par>
+<pardef id='14' leftmargin='3.5431in' firstlineleftmargin='2.5000in' tabs='L1in'/>
+<par def='14'>&lt;tr&gt;</par>
+<pardef id='15' leftmargin='3.5431in' firstlineleftmargin='2.7500in' tabs='L1in'/>
+<par def='15'>&lt;td&gt;&lt;input type="checkbox" onClick="Part2Display();" dojoType="dijit.form.CheckBox" class="_data_Part2__TrialClassification" name="Part2_TrialClassification" id="Part2_TrialClassification1" value="1" /&gt;&lt;/td&gt;&lt;td&gt;&lt;label for="Part2_TrialClassification1"&gt;Is placebo controlled&lt;/label&gt;&lt;/td&gt;</par>
+<par def='15'>&lt;td&gt;&lt;input type="checkbox" onClick="Part2Display();" dojoType="dijit.form.CheckBox" class="_data_Part2__TrialClassification" name="Part2_TrialClassification" id="Part2_TrialClassification3" value="3" /&gt;&lt;/td&gt;&lt;td&gt;&lt;label for="Part2_TrialClassification3"&gt;Is comparator controlled&lt;/label&gt;&lt;/td&gt;</par>
+<par def='14'>&lt;/tr&gt;</par>
+<par def='14'>&lt;tr&gt;</par>
+<par def='15'>&lt;td&gt;&lt;input type="checkbox" onClick="Part2Display();" dojoType="dijit.form.CheckBox" class="_data_Part2__TrialClassification" name="Part2_TrialClassification" id="Part2_TrialClassification2" value="2" /&gt;&lt;/td&gt;&lt;td&gt;&lt;label for="Part2_TrialClassification2"&gt;Is a multicentre trial&lt;/label&gt;&lt;/td&gt;</par>
+<par def='14'>&lt;/tr&gt;</par>
+<par def='11'>&lt;/table&gt;</par>
+<par def='5'>&lt;/td&gt;</par>
+<par def='4'>&lt;/tr&gt;</par>
+<par def='4'/>
+<par def='4'>&lt;tr&gt;&lt;td colspan="2"&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='4'>&lt;tr&gt;</par>
+<par def='5'>&lt;td class="n1"&gt;Trial Site Details&lt;/td&gt;</par>
+<par def='5'>&lt;td&gt;</par>
+<par def='11'>&lt;div dojoType="dijit.form.Button" label="Add Site" id="Part2_Button_AddSite"&gt;</par>
+<par def='12'>&lt;script type="dojo/method" event="onClick"&gt;</par>
+<par def='13'>Part2_Button_AddSite_onClick();</par>
+<par def='12'>&lt;/script&gt;</par>
+<par def='11'>&lt;/div&gt;</par>
+<par def='11'>&lt;div dojoType="dijit.form.Button" label="Remove Selected Site(s)" id="Part2_Button_RemoveSite"&gt;</par>
+<par def='12'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='13'>Part2_Button_RemoveSite_onClick();</par>
+<pardef id='16' leftmargin='2.7500in' firstlineleftmargin='2.5000in' tabs='L1in'/>
+<par def='16'>&lt;/script&gt;</par>
+<par def='11'>&lt;/div&gt;</par>
+<par def='5'>&lt;/td&gt;</par>
+<par def='4'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='5'>&lt;td colspan="2"&gt;</par>
+<pardef id='17' leftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='17'>&lt;div style="border:1px solid #8BA0BD"&gt;</par>
+<pardef id='18' leftmargin='2.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='18'>&lt;div dojoType="dojox.grid.EnhancedGrid" id="Part2_Sites" plugins="{indirectSelection:true}" style="height:140px; width:100%;"  structure="[{name:'Site', field:'TrialSite', width:'auto'}, {name:'Site Address', field:'TrialSiteAddress', width:'auto'}, {name:'State', field:'TrialSiteState_Label', width:'auto'},{name:'Principal Investigator', field:'PrincipalInvestigatorName', width:'auto'}, {name:'HREC Name', field:'HRECName', width:'auto'}, {name:'HREC Code', field:'HRECCode', width:'auto'}, {name:'Approving Authority', field:'ApprovingAuthorityName', width:'auto'}]" noDataMessage="Site Details"&gt;</par>
+<pardef id='19' leftmargin='2.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='19'>&lt;script type="dojo/method" event="onDblClick"&gt;</par>
+<pardef id='20' leftmargin='3in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='20'>Part2_Sites_onDblClick(this);</par>
+<par def='13'>&lt;/script&gt;</par>
+<par def='18'>&lt;/div&gt;</par>
+<par def='17'>&lt;/div&gt;</par>
+<pardef id='21' leftmargin='2in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='21'>&lt;/td&gt;</par>
+<pardef id='22' leftmargin='1.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='22'>&lt;/tr&gt;</par>
+<par def='4'>&lt;tr id="part2_placebo_row3" style="display:none"&gt;&lt;td colspan="2"&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='4'>&lt;tr id="part2_placebo_row1" style="display:none"&gt;</par>
+<par def='5'>&lt;td class="n1"&gt;Placebo Details&lt;/td&gt;</par>
+<par def='5'>&lt;td&gt;</par>
+<par def='11'>&lt;div dojoType="dijit.form.Button" label="Add Placebo" id="Part2_Button_AddPlacebo"&gt;</par>
+<par def='12'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='13'>Part2_Button_AddPlacebo_onClick();</par>
+<par def='12'>&lt;/script&gt;</par>
+<par def='11'>&lt;/div&gt;</par>
+<par def='11'>&lt;div dojoType="dijit.form.Button" label="Remove Selected Placebo(s)" id="Part2_Button_RemovePlacebo"&gt;</par>
+<par def='12'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='13'>Part2_Button_RemovePlacebo_onClick();</par>
+<par def='16'>&lt;/script&gt;</par>
+<par def='11'>&lt;/div&gt;</par>
+<par def='5'>&lt;/td&gt;</par>
+<par def='4'>&lt;/tr&gt;&lt;tr id="part2_placebo_row2" style="display:none"&gt;</par>
+<par def='5'>&lt;td colspan="2"&gt;</par>
+<par def='17'>&lt;div style="border:1px solid #8BA0BD"&gt;</par>
+<par def='18'>&lt;div dojoType="dojox.grid.EnhancedGrid" id="Part2_Placebos" structure="[{name: 'Product Name', field: 'ProductName', width: 'auto' },{name: 'Active Name', field: 'ActiveName', width: 'auto' },{name: 'Dosage Form', field: 'DosageForm_Label', width: 'auto' },{name: 'Strength', field: 'Strength', width: '4' },{name: 'Route of Administration', field: 'RouteOfAdmin_Label', width: 'auto' },{name: 'Dosage and Frequency', field: 'DoseFrequency', width: 'auto' }]" plugins="{indirectSelection:true}" style="height:140px; width:100%;" noDataMessage="Placebo Details"&gt;</par>
+<par def='19'>&lt;script type="dojo/method" event="onDblClick"&gt;</par>
+<par def='20'>Part2_Placebos_onDblClick(this);</par>
+<par def='13'>&lt;/script&gt;</par>
+<par def='18'>&lt;/div&gt;</par>
+<par def='17'>&lt;/div&gt;</par>
+<par def='21'>&lt;/td&gt;</par>
+<par def='22'>&lt;/tr&gt;</par>
+<par def='4'>&lt;tr id="part2_comparator_row3" style="display:none"&gt;&lt;td colspan="2"&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='4'>&lt;tr id="part2_comparator_row1" style="display:none"&gt;</par>
+<par def='5'>&lt;td class="n1"&gt;Comparator Details&lt;/td&gt;</par>
+<par def='5'>&lt;td&gt;</par>
+<par def='11'>&lt;div dojoType="dijit.form.Button" label="Add <run><font color='navy'/>Comparator</run>" id="Part2_Button_AddComparator"&gt;</par>
+<par def='12'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='13'>Part2_Button_AddComparator_onClick();</par>
+<par def='12'>&lt;/script&gt;</par>
+<par def='11'>&lt;/div&gt;</par>
+<par def='11'>&lt;div dojoType="dijit.form.Button" label="Remove Selected Comparator(s)" id="Part2_Button_RemoveComparator"&gt;</par>
+<par def='12'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='13'>Part2_Button_RemoveComparator_onClick();</par>
+<par def='16'>&lt;/script&gt;</par>
+<par def='11'>&lt;/div&gt;</par>
+<par def='5'>&lt;/td&gt;</par>
+<par def='4'>&lt;/tr&gt;</par>
+<par def='4'>&lt;tr id="part2_comparator_row2" style="display:none"&gt;</par>
+<par def='5'>&lt;td colspan="2"&gt;</par>
+<par def='17'>&lt;div style="border:1px solid #8BA0BD"&gt;</par>
+<par def='18'>&lt;div dojoType="dojox.grid.EnhancedGrid" id="Part2_Comparators" structure="[{name: 'Trade/Code Name', field: 'TradeCodeName', width: 'auto' },{name: 'Active Name', field: 'ActiveName', width: 'auto' },{name: 'Dosage Form', field: 'DosageForm_Label', width: 'auto' },{name: ' ', field:'ProductStrength', width: '3.5'},{name:'Product Strength',field: 'ProductStrengthUnit_Label', width:'auto'},{name: 'Route of Administration', field: 'RouteOfAdmin_Label', width: 'auto' },{name: 'Dosage and Frquency', field: 'DoseFrequency', width: 'auto' }]" plugins="{indirectSelection:true}" style="height:140px; width:100%;" noDataMessage="Comparator Details"&gt;</par>
+<par def='19'>&lt;script type="dojo/method"  event="onDblClick"&gt;</par>
+<par def='20'>Part2_Comparators_onDblClick(this);</par>
+<par def='13'>&lt;/script&gt;</par>
+<par def='18'>&lt;/div&gt;</par>
+<par def='17'>&lt;/div&gt;</par>
+<par def='21'>&lt;/td&gt;</par>
+<par def='22'>&lt;/tr&gt;</par>
+<pardef id='23' leftmargin='1.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='23'>&lt;/table&gt;</par>
+<par def='2'>&lt;/div&gt;</par></section>
+<par def='2'/></richtext></body>
+<item name='$HFFlags'><text>1</text></item>
+<item name='$$ScriptName' summary='false' sign='true'><text>ClinicalTrial_Part2</text></item></subform>
+

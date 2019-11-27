@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='utf-8'?>
+<view name='(Lookup\Unpaid Applications)' alias='LUUnpaidApplications' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' showinmenu='false'
+ publicaccess='false' designerversion='8.5.3' unreadmarks='none' onopengoto='top'
+ onrefresh='displayindicator' headers='beveled' opencollapsed='true' showresponsehierarchy='true'
+ showmargin='true' shrinkrows='true' extendlastcolumn='true' showhierarchies='false'
+ unreadcolor='black' rowlinecount='3' headerlinecount='1' rowspacing='1' bgcolor='white'
+ altrowcolor='#efefef' totalscolor='black' headerbgcolor='white' boldunreadrows='false'
+ evaluateactions='false' allownewdocuments='false' allowcustomizations='true'
+ hidemarginborder='false' marginwidth='0px' marginbgcolor='white' uniquekeys='false'>
+<noteinfo noteid='536' unid='6D70F5C72C095B29CA257F770006FE20' sequence='14'>
+<created><datetime dst='true'>20160315T121622,72+11</datetime></created>
+<modified><datetime>20160628T151506,62+10</datetime></modified>
+<revised><datetime>20160628T151506,61+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,61+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,19+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='selection'><formula>SELECT Form = "Application" &amp; @IsMember(ApplicationStatus; "Submitted")</formula></code>
+<actionbar bgcolor='navy' bordercolor='black'>
+<actionbuttonstyle showdropdown='true' bgcolor='#6260a1'/><font size='9pt'
+ color='white'/><border width='0px 0px 1px'/>
+<action title='Categori_ze' showinbar='false' systemcommand='categorize'/>
+<action title='Send Docu_ment' showinbar='false' systemcommand='send'/>
+<action title='_Forward' showinbar='false' systemcommand='forward'/>
+<action title='_Move To Folder...' showinbar='false' systemcommand='movetofolder'/>
+<action title='_Remove From Folder' showinbar='false' systemcommand='removefromfolder'/>
+<action title='Edit' showinmenu='false' hide='notes web' systemcommand='edit'/></actionbar>
+<column sort='ascending' hidedetailrows='false' itemname='$5' width='10' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='false' sortnocase='true' showaslinks='false'><columnheader
+ title='Doc Unique Id'><font size='9pt' style='bold'/></columnheader><numberformat
+ legacy='true' format='general' varying='true' punctuated='false' parens='false'
+ percent='false' bytes='false'/><code event='value'><formula>@Text( @DocumentUniqueID )</formula></code></column>
+<column sort='ascending' hidedetailrows='false' itemname='ApplicationID' width='14'
+ resizable='true' separatemultiplevalues='true' sortnoaccent='true' sortnocase='true'
+ showaslinks='false'><columnheader title='Application ID'><font size='9pt'
+ style='bold'/></columnheader><numberformat legacy='true' format='general'
+ varying='true' punctuated='false' parens='false' percent='false' bytes='false'/></column>
+<column sort='ascending' hidedetailrows='false' itemname='SubmissionId' width='9'
+ resizable='true' separatemultiplevalues='true' sortnoaccent='true' sortnocase='true'
+ showaslinks='false'><columnheader title='Submission ID'><font size='9pt'
+ style='bold'/></columnheader><numberformat legacy='true' format='general'
+ varying='true' punctuated='false' parens='false' percent='false' bytes='false'/></column>
+<column hidedetailrows='false' itemname='SponsorId' width='6' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='true' sortnocase='true' showaslinks='false'><columnheader
+ title='Sponsor'><font size='9pt' style='bold'/></columnheader><numberformat
+ legacy='true' format='general' varying='true' punctuated='false' parens='false'
+ percent='false' bytes='false'/></column>
+<column hidedetailrows='false' itemname='LabelName' width='18' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='true' sortnocase='true' showaslinks='false'><columnheader
+ title='Product Name'><font size='9pt' style='bold'/></columnheader><numberformat
+ legacy='true' format='general' varying='true' punctuated='false' parens='false'
+ percent='false' bytes='false'/></column>
+<column hidedetailrows='false' itemname='ApplicationType' width='8' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='true' sortnocase='true' showaslinks='false'><columnheader
+ title='Type'><font size='9pt' style='bold'/></columnheader><numberformat
+ legacy='true' format='general' varying='true' punctuated='false' parens='false'
+ percent='false' bytes='false'/></column>
+<column hidedetailrows='false' itemname='ApplicationFees' width='4' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='true' sortnocase='true' showaslinks='false'><columnheader
+ title='Fee'><font size='9pt' style='bold'/></columnheader><numberformat format='currency'
+ punctuated='false' parens='false' percent='false' bytes='false'/></column>
+<column align='right' hidedetailrows='false' itemname='SubmissionDate' width='9.3750'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='true' sortnocase='true'
+ showaslinks='false'><columnheader title='Submitted Date'><font size='9pt'
+ style='bold'/></columnheader><datetimeformat show='date' date='yearmonthday'
+ fourdigityearfor21stcentury='true' time='hourminutesecond' zone='never' dateformat='weekdaydaymonthyear'
+ dayformat='twodigitday' monthformat='twodigitmonth' yearformat='twodigityear'
+ weekdayformat='shortname' dateseparator1=' ' dateseparator2='/' dateseparator3='/'
+ timeseparator=':' timeformat24='true' preference='usersetting'/><numberformat
+ legacy='true' format='general' varying='true' punctuated='false' parens='false'
+ percent='false' bytes='false'/></column>
+<item name='$SCRIPTOBJ_12' sign='true'>
+<rawitemdata type='14'>
+AQAAAkxTT0IDABQIZW4AAAQAFAA4AAQAAAAUBmgCAAAAAAQAZANQBQAAAAAoANgAHAA8AP//9AAA
+AAAAAAAAAAIAAAAYAGwBAAAAAGwBbAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAGAAYAAEAAAAsAiwCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALAIsAgAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAYAAADMAFAFMARQBQAAAABwA3ADAAAAAKACoALMAMwAAAAAAAAAAAAAAAAA
+AAAAAMAEwAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAEABQBMb3R1cyBQcm9kdWN0AAAAVjAuMAAAAAAAAAAAAAAAAAAA
+AAAEAAAAOAAAAAAAAAAUBgAAaAIAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAAAA
+AAUAAABXMzJJvQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAwBsAgAAAABYAAoAJABWADUAQQBDAFQASQBPAE4AUwAAAAAAcAADAE4ARQBXAAAAhAAGAEQA
+RQBMAEUAVABFAAAAAACoAAoASQBOAEkAVABJAEEATABJAFoARQAAAAAAEAEJAFQARQBSAE0ASQBO
+AEEAVABFAAAA+AEGAE8AQgBKAEUAQwBUAAAAAACMAAAAAAAAAMQACwBIAGUAbABwAFMAYwByAGkA
+cAB0AHMAAAA4AQsASABFAEwAUABTAEMAUgBJAFAAVABTAAAA//8GAFMATwBVAFIAQwBFAAAAAAAk
+AQoAQgBJAE4ARABFAFYARQBOAFQAUwAAAAAASAELAE8AQgBKAEUAQwBUAE4AQQBNAEUAXwAAAGwB
+BgBCAFUAVABUAE8ATgAAAAAA//8GACUATABTAEkARABFAAAAAAC8AQUAQwBMAEkAQwBLAAAA0AEO
+AEcARQBUAFYASQBFAFcASABFAEwAUABEAE8AQwAAAAAAnAEUAEwATQBfAFYAXwBTAEEAUABfAEIA
+TQBVAF8ASQBuAF8AVAByAGEAeQAAAAAAMAINAE4ATwBUAEUAUwBEAEEAVABBAEIAQQBTAEUAAAAM
+AgYAJQBMAFMAWABCAEUAAAAAAP//EABOAE8AVABFAFMAVQBJAFcATwBSAEsAUwBQAEEAQwBFAAAA
+AAD//wYAJQBMAFMAWABVAEkAAAAAAP//DwBOAE8AVABFAFMAVQBJAEQATwBDAFUATQBFAE4AVAAA
+AEgCCQBOAE8AVABFAFMAVgBJAEUAVwAAAP//DQBOAE8AVABFAFMARABPAEMAVQBNAEUATgBUAAAA
+BQAYBgAAAABexkggGAAAAAAArABgWmgJAAAAAAAAAAAIAAAAbAEAANwAAAAAAAAAAgAAALAAXAEA
+AAAAAAAAAAAAAAAAAAAAsACwAAAAAAAAAAAAAAAAAAAAAAAAAAAAXAFcAQAAAAAAAAAAAQAAAAIA
+AAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAMAAQBcAQAA+AAGCAAAAAAaAAAAKAH//wAAAAAQAAAAoAIAABQBAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAARYTKe0uaRC/XQDdARGGtwAAAAAAAAAAAAAAAAAAAABkAAAAAAAAAAAAAAAAAAAAAgDAAAAA
+FAIAAAAAWgQBAP//AAADACAAAAAAAMgACQIAAMwACAAAAAAAAAA8AQAAAAAAAAEAAAAEAgQCAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQCBAIAAAAAAAAAAAEAAAAIAAAA
+KgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAADAAEAAAAAAMgACQIAAMwAEwAAADwBAADVAAAAAAAAACEABACQBAAACABAAAAA
+AABMAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAEACwAGAAkCoAIJAnADCQIwBAkCwAQJAlAFGQAaAMAAwAH//wAAAAAQAAAA
+cAMAAKABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAhQTKe0uaRC/XQDdARGGtwAAAAAAAAAAAAAAAAAAAABkAAAAAAAAAAAA
+AAAAAAAAAgCUAjADAADMAAAAAgABAP//AAASABQAAAAAAP//CQIAAAAAEgQAAAAAoAKUAv//AAAA
+AAYAAwAAAAkCoAIJAqACBggGCBkAGgCUAvwB//8AAAAAEAAAADAEAADUAQAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIVEynt
+LmkQv10A3QERhrcAAAAAAAAAAAAAAAAAAAAAZAAAAAAAAAAAAAAAAAAAAAIAZAMABAAAoAIAAAoA
+AQD//wAAEgAUAAAAAAD//wkCAAAAAAAGAAAAAHADZAP//wAAAAAEAAEAAAAJAnADCQJwAxkAEAAA
+AMAEUAUQAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAQVEyntLmkQv10A3QERhrcAAAAAAAAAAAAAAAAAAAAAZAAAAAAAAAAA
+AAAAAAAAAAIAZAMAAAAAcAMAAAoAAQD//wAAEAAAAFAFAAA0AgAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMUEyntLmkQv10A
+3QERhrcAAAAAAAAAAAAAAAAAAAAAZAAAAAAAAAAAAAAAAAAAAAIAlAIAAAAAMAQAAAIAAQD//wAA
+EAAEAAAAAABMAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAQUEyntLmkQv10A3QERhrcuFBMp7S5pEL9dAN0BEYa3ZAAAAAAA
+AAAAAAAAAAAAAAIAlALgBQAAwAQAAAIAAQD//wAAEgAUAAAAAAD//wkCAAAAAI0EAAAAAFAFlAL/
+/wAAAAAGAAIAAAAJAlAFCQJQBQkCoAIZAAQAPAAAAAAAOgAAGgMA0pAAHQAAGgwAW1wBSbAAyswA
+phoNAEdcAcvVAAAAbAEaDgAdGhIAKSwCfXABIxoTAB0CAAAAEQAYAAAAAAD//wEAAwAEAAAABwDc
+AAkAPAEQAAoAAAA=
+</rawitemdata></item></view>
+

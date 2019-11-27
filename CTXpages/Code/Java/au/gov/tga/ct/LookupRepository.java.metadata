@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?><note class="form" maintenanceversion="1.0" replicaid="CA257FDB001B5780" version="9.0" xmlns="http://www.lotus.com/dxl">
+<noteinfo noteid="1de" sequence="30" unid="29EFF8548532E425CA257FD8000B2CE8">
+<created><datetime>20160620T120203,92+10</datetime></created>
+<modified><datetime dst="true">20181206T113912,22+11</datetime></modified>
+<revised><datetime dst="true">20181206T113912,20+11</datetime></revised>
+<lastaccessed><datetime dst="true">20181206T113912,20+11</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152008,96+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<item name="$TITLE"><text>au/gov/tga/ct/LookupRepository.java</text></item>
+<item name="$Flags"><text>34567Cg~[</text></item>
+
+
+
+<item name="$DesignerVersion"><text>8.5.3</text></item>
+
+
+<item name="$FileNames" sign="true"><text>au/gov/tga/ct/LookupRepository.java</text></item>
+
+</note>

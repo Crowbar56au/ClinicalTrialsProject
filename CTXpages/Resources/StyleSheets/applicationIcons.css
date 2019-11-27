@@ -1,0 +1,57 @@
+.appIcon {
+	width: 16px;
+	height: 16px;
+	background-image: url("applicationIcons.png");
+	background-repeat: no-repeat;
+	text-align: center;
+	padding: 0px;
+	overflow: hidden;
+}
+
+.appIconSave {
+	background-position: 0px -112px;	
+}
+
+.appIconValidate {
+	background-position: -48px -48px;	
+}
+
+.appIconClose {
+	background-position: -16px -224px;
+}
+
+.appIconPrint {
+	background-position: -80px -32px;	
+}
+
+.appIconSubmit {
+	background-position: 0px -224px;	
+}
+
+.appIconHelp {
+	background-position: -128px -32px;	
+}
+
+.appIconSearch {
+	background-position: -128px -32px;	
+}
+
+.appIconStartOver {
+	background-position: -80px -112px;	
+}
+
+.appIconAdd {
+	background-position: -128px -32px;	
+}
+
+.appIconRemove {
+	background-position: -96px -28px;	
+}
+
+.appIconLeft {
+	background-position: -176px -128px;
+}
+
+.appIconRight {
+	background-position: -160px -32px;
+}

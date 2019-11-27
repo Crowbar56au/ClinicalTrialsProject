@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='utf-8'?>
+<subform name='HTMLBegin' xmlns='http://www.lotus.com/dxl' version='9.0' maintenanceversion='1.0'
+ replicaid='CA257FDB001B5780' designerversion='7' renderpassthrough='true'>
+<noteinfo noteid='2d6' unid='C3C21CC2526EA33DCA257FD8000B270C' sequence='14'>
+<created><datetime>20160620T120148,92+10</datetime></created>
+<modified><datetime>20160628T151503,87+10</datetime></modified>
+<revised><datetime>20160628T151503,86+10</datetime></revised>
+<lastaccessed><datetime>20160628T151503,86+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152009,77+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1' leftmargin='1in' hide='web' tabs='L1.1438in L1.5375in L1.9313in L2.3250in L2.7188in L3.1125in L3.5063in L3.9000in L4.2938in L4.6875in L5.0813in L5.4750in L5.8688in L6.2625in L6.6563in L7.0500in L7.4438in L7.8375in L8.2313in L8.6250in'/>
+<par def='1'><run><font color='green'/>readers: </run><run><font color='green'/><field
+ type='readers' allowmultivalues='true' kind='computed' name='readers' listinputseparators='comma'
+ listdisplayseparator='comma'><code event='defaultvalue'><formula>@Unique(@Author:"[TGA]":"[System Profile]":"LocalDomainServers":"LocalDomainAdmins":"Sime Administrator":"$Notes Support")</formula></code></field></run><run
+><font color='green'/>, authors: </run><run><font color='green'/><field type='authors'
+ allowmultivalues='true' kind='computed' name='authors' listinputseparators='comma'
+ listdisplayseparator='comma'><code event='defaultvalue'><formula>@Unique(@Author:"[TGA]":"[System Profile]":"LocalDomainServers":"LocalDomainAdmins":"Sime Administrator":"$Notes Support")</formula></code></field></run><run
+><font color='green'/>, SaveOptions: </run><run><font color='green'/><field
+ type='text' kind='computedfordisplay' name='SaveOptions'><code event='defaultvalue'><formula
+>"0"</formula></code></field></run><run><font color='green'/>, Query_String: </run><run
+><font color='green'/><field type='text' kind='computedfordisplay' name='query_string'
+ htmlid='query_string'><code event='defaultvalue'><formula>query_string</formula></code></field></run><run
+><font color='green'/>, Used for File Attachment Repository: </run><run><font
+ color='green'/><field type='text' kind='computedfordisplay' name='Server_Protocol_Name'><code
+ event='defaultvalue'><formula>@If(@Contains(HTTP_Referer;"/"); @Left(HTTP_Referer;"/"); HTTP_Referer)</formula></code></field></run><run
+><font color='green'/>, query_string_decoded:</run><run><font color='green'/><field
+ type='text' kind='computedfordisplay' name='query_string_decoded'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><run><font color='green'/></run></par>
+<pardef id='2' leftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='2'><run><font color='green'/>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"&gt;&lt;html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"&gt;&lt;head&gt;&lt;title&gt;</run></par></richtext></body>
+<item name='$$ScriptName' summary='false' sign='true'><text>HTMLBegin</text></item></subform>
+

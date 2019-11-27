@@ -1,0 +1,97 @@
+'++LotusScript Development Environment:2:5:(Options):0:74
+Option Public
+Option Declare
+
+Use "ErrorLog"
+Use "GetDatabases"
+'++LotusScript Development Environment:2:5:(Forward):0:1
+Declare Function InitiateOracleWrite(PDoc As NotesDocument, strAppType As String) As Integer
+Declare Function fintWriteReportMessage(ndReport As notesdocument, strMessage As String) As Integer
+Declare Function InitialiseProcessReport(docApplication As NotesDocument)
+
+'++LotusScript Development Environment:2:5:(Declarations):0:10
+  'AOS Single Write
+Dim ndbApplications As notesdatabase	
+Dim strNdDocUNID As String
+Dim ndProcessReport As notesdocument
+' Dim lngARTGID As Long VN 13/05/2009 Redundant code as lngARTGID is not used anywhere
+Dim lngPRODUCTID As Long
+Dim VComponentID As String
+Dim  rtitemReport  As notesrichtextitem
+
+' eBS SB 15 April 08 secure email
+Const csUNCLASSIFIED = " [SEC=UNCLASSIFIED]"
+Const csIVD_TYPE = "IVD"
+'++LotusScript Development Environment:2:1:InitiateOracleWrite:1:8
+Function InitiateOracleWrite(PDoc As NotesDocument, strAppType As String) As Integer
+	Dim dbConfig As NotesDatabase, dbInterim As NotesDatabase
+	Dim Agent As NotesAgent
+	Dim ndRef As NotesDocument, ndLSXLog As notesdocument	
+	Dim strRefId As String,strStatus As String, strProcessunid As String
+	
+	Set dbConfig= fdbGetCFG
+	Set dbInterim = fdbgetInt()    ' lsx interim database
+	Set ndRef = dbconfig.CreateDocument
+	ndRef.form = "Reference"
+	ndRef.srcDatabase = ndbApplications.FilePath
+	ndRef.DocUNID = PDoc.UniversalID
+	ndRef.ApplicationType=strAppType
+	Call InitialiseProcessReport(PDoc )  'initialising processing report
+	
+	Call ndRef.ComputeWithForm(False,False)
+	Call ndRef.Save(True,False)
+	strRefId = ndRef.NoteID
+	Set Agent = dbConfig.GetAgent("WriteToOracle")
+	Call Agent.Run(strRefId) 
+	Delete ndRef
+	Set ndRef = dbConfig.GetDocumentByID(strRefId)
+	strStatus = ndRef.GetItemValue("ProcessStatus")(0)
+	strProcessunid= ndRef.GetItemValue("ProcessReportUNID")(0) ' getting Process report unid from Ref. doc
+	Set ndLSXLog  = dbInterim.GetDocumentByUNID(strProcessunid)  ' getting handle on process doc from interim database
+	If(strStatus = "Success")Then
+		Call fintWriteReportMessage(ndProcessReport,"Successfully Written To Oracle...")
+		If Not(ndLSXLog Is Nothing)Then			
+			Call  rtitemReport.AppendDocLink(ndLSXLog,"Click here to see further detail","Click here to see further detail")
+			Call rtitemReport.AddNewline(1)
+			ndProcessReport.Status = "** Success **"
+			Call ndProcessReport.Save(True,False)
+		End If
+		
+		InitiateOracleWrite = True
+	Else
+		Call fintWriteReportMessage(ndProcessReport,"Write To Oracle Failed...")
+		If Not(ndLSXLog Is Nothing)Then
+			Call  rtitemReport.AppendDocLink(ndLSXLog,"Click here to see further detail","Click here to see further detail")
+			Call  rtitemReport.AddNewline(1)
+			Call ndProcessReport.Save(True,False)
+		End If
+		Print "Write To Oracle Failed..."
+		InitiateOracleWrite = False
+	End If
+End Function
+'++LotusScript Development Environment:2:1:fintWriteReportMessage:1:8
+Function fintWriteReportMessage(ndReport As notesdocument, strMessage As String) As Integer
+	
+     'Purpose:
+     'Write a message to the report document for the current run.
+	
+	
+	If Not(rtitemReport Is Nothing) Then
+		Call rtitemReport.AppendText(Cstr(Now) + ":" + Chr$(9) + strMessage)
+		Call rtitemReport.AddNewLine(1)
+	End If
+	
+End Function
+'++LotusScript Development Environment:2:1:InitialiseProcessReport:1:8
+Function InitialiseProcessReport(docApplication As NotesDocument)
+		'Processing Report -create one and set some simple values...
+	Set ndProcessReport= ndbApplications.createdocument
+	ndProcessReport.Form = "ProcessingReport"
+	ndProcessReport.ReportDateTime = Now()
+	ndProcessReport.ApplicationSubType = docApplication.ApplicationType(0)
+	ndProcessReport.DeviceDescription_T = docApplication.DeviceDescription_T(0)	'dev apps
+	ndProcessReport.CertificationDescription_T = docApplication.CertificationDescription_T(0)	'man certs
+	ndProcessReport.ApplicationIdentifier = docApplication.ApplicationIdentifier(0)
+	Call ndProcessReport.save(True,False)
+	Set rtitemReport = ndProcessReport.CreateRichTextItem("ReportDetails")
+End Function

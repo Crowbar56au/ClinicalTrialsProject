@@ -1,0 +1,510 @@
+'++LotusScript Development Environment:2:5:(Options):0:74
+Option Public
+Option Explicit
+
+'++LotusScript Development Environment:2:5:(Forward):0:1
+Declare Function fdbGetRulesOther As NotesDatabase
+Declare Function fdbGetCases As NotesDatabase
+Declare Function fdbGetReporter As NotesDatabase
+Declare Function fdbGetCodeTables As NotesDatabase
+Declare Function fdbGetHelp As NotesDatabase
+Declare Function fdbGetGraphics As NotesDatabase
+Declare Function fdbGetFeedback As NotesDatabase
+Declare Function fdbGetDatabase(strDBPathFieldName As String) As NotesDatabase
+Declare Function fdbGetLodgement As NotesDatabase
+Declare Function fdbGetDCTCodeTables As NotesDatabase
+Declare Function fdbGetClient As NotesDatabase
+Declare Function fdbGetClientWeb As NotesDatabase
+Declare Function fdbGetDCTWeb As NotesDatabase
+Declare Function fdbGetDCT As NotesDatabase
+Declare Sub RefreshProfileDocument(dbThis As NotesDatabase)
+Declare Sub CheckProfileDocumentAge
+Declare Function fdbGetSuppDocumentsArchive As NotesDatabase
+Declare Function fdbGetFeeSchedule As NotesDatabase
+Declare Function fdbGetSuppDocuments As NotesDatabase
+Declare Function fdbGetSIT As NotesDatabase
+Declare Function fdbGetPCT As NotesDatabase
+Declare Function fdbGetWorkflowApplications As NotesDatabase
+Declare Function fdbGetArchive As NotesDatabase
+Declare Function fdbGetTRD As NotesDatabase
+Declare Function fdbGetERROR As NotesDatabase
+Declare Function fdbGetBIR As NotesDatabase
+Declare Function fdbGetIng As NotesDatabase
+Declare Function fdbGetCFG As NotesDatabase
+Declare Function fdbGetBucket As NotesDatabase
+Declare Function fdbGetStoredProc As NotesDatabase
+Declare Function fdbGetInt As NotesDatabase
+Declare Function fdbGetLock As NotesDatabase
+Declare Function fdbGetClientAccess As NotesDatabase
+Declare Function fdbGetTRDArchive As NotesDatabase
+Declare Function fdbGetXtran As NotesDatabase
+Declare Function fdbGetRulesMfr
+Declare Function fdbGetWAB
+Declare Function fdbGetLEI
+Declare Function fdbGetTransfer
+Declare Function fdbGetIngTransfer
+Declare Function fdbGetRegister
+Declare Function fdbGetSequencer
+Declare Function fdbGetNab
+Declare Function fdbGetClientInternal As NotesDatabase
+Declare Function fdbGetUserMgt
+Declare Function fdbGetWorkManagement
+Declare Function fdbGetWorkManagementArchive
+Declare Function fdbGetBatchBroker As NotesDatabase
+Declare Function fdbGetLVT As NotesDatabase
+Declare Function fdbGetDWM
+Declare Function fdbGetValRules
+Declare Function fdbGetDevices
+Declare Function fdbGetClientRegister
+
+'++LotusScript Development Environment:2:5:(Declarations):0:10
+Const csDBDIRECTORY = "SIME\simedir.nsf"
+Const csSYSPROFILENAME = "System Profile Document"
+'++LotusScript Development Environment:2:1:fdbGetRulesOther:1:8
+Function fdbGetRulesOther As NotesDatabase
+     'Get rules (other) database 
+	Set fdbGetRulesOther = fdbGetDatabase("SUM_Path")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetCases:1:8
+Function fdbGetCases As NotesDatabase
+    'Get rules (ingredients) database 
+	Set fdbGetCases = fdbGetDatabase("CAS_Path")
+	
+End Function
+
+'++LotusScript Development Environment:2:1:fdbGetReporter:1:8
+Function fdbGetReporter As NotesDatabase
+     'Get reporter database 
+	Set fdbGetReporter = fdbGetDatabase("RPT_Path")
+	
+End Function
+
+
+'++LotusScript Development Environment:2:1:fdbGetCodeTables:1:8
+Function fdbGetCodeTables As NotesDatabase
+     'Get code tables database
+	Set fdbGetCodeTables = fdbGetDatabase("COD_Path")
+	
+End Function
+
+'++LotusScript Development Environment:2:1:fdbGetHelp:1:8
+Function fdbGetHelp As NotesDatabase
+     'Get help database 
+	Set fdbGetHelp = fdbGetDatabase("SHL_Path")
+	
+End Function
+
+'++LotusScript Development Environment:2:1:fdbGetGraphics:1:8
+Function fdbGetGraphics As NotesDatabase
+     'Get graphics database 
+	Set fdbGetGraphics = fdbGetDatabase("GRA_Path")
+	
+End Function
+
+'++LotusScript Development Environment:2:1:fdbGetFeedback:1:8
+Function fdbGetFeedback As NotesDatabase
+	'This function call should not be used in TTRA.... remove this function after confirmation that SFB_Path points to the Feedback database
+	
+	
+	
+	
+     'Get feedback database
+'	Set fdbGetFeedback = fdbGetDatabase("SFB_Path")   
+	
+	Set fdbGetFeedback = Nothing	
+End Function
+
+'++LotusScript Development Environment:2:1:fdbGetDatabase:1:8
+Function fdbGetDatabase(strDBPathFieldName As String) As NotesDatabase
+	On Error Goto errHandler
+     'Routine to get a database based on provided field name. i.e. dbPath
+	'Input: strDBPath - the field name in the Database Directory profile document which contains the path (from root path) of the requested database
+     'Output: a database object if one is found and can be opened, nothing otherwise.
+	
+	'Process: 
+	'Open the Database Directory
+	'Get the dbPath field requested
+	'Get the database at the dbPath
+	'Return the database object or Nothing
+	
+	'Note: earlier designs expected a server location to be part of the dbPath value .e.g. servername!!dbpath
+	'This is no longer the case. dbPath will now only contain the path and filename of the database requested.
+	
+	Dim ns As New NotesSession
+	Dim docSysProfile As NotesDocument
+	Dim dbDirectory As NotesDatabase
+	Dim dbRequested As NotesDatabase	
+	Dim dbThis As NotesDatabase
+	Dim strDBPathFilename As String
+	
+	Set dbThis = ns.CurrentDatabase
+	Set docSysProfile = dbThis.GetProfileDocument("System Profile Document")
+	
+     'Get value from profile document
+	strDBPathFilename = docSysProfile.GetItemValue(strDBPathFieldName)(0)
+	
+	If ( Instr(strDBPathFilename, "!!") > 0 ) Then
+		'Old style server included in the path, but we just want the path and filename
+		strDBPathFilename = Strright(strDBPathFilename, "!!")
+	End If
+	
+     'Return rules (other) database
+	Set dbRequested = ns.GetDatabase(dbThis.Server, strDBPathFilename)
+	If dbRequested.IsOpen = True Then
+		Set fdbGetDatabase = dbRequested
+	Else
+		Set fdbGetDatabase = Nothing
+	End If
+	
+	Exit Function
+errHandler:
+	Set fdbGetDatabase = Nothing
+	Exit Function
+End Function
+'++LotusScript Development Environment:2:1:fdbGetLodgement:1:8
+Function fdbGetLodgement As NotesDatabase
+     'Get lodgement database 
+	Set fdbGetLodgement = fdbGetDatabase("LOD_Path")
+	
+End Function
+
+'++LotusScript Development Environment:2:1:fdbGetDCTCodeTables:1:8
+Function fdbGetDCTCodeTables As NotesDatabase
+	'Get code tables database
+	Set fdbGetDCTCodeTables = fdbGetDatabase("DCT_Path")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetClient:1:8
+Function fdbGetClient As NotesDatabase
+     'Get Client database
+	Set fdbGetClient = fdbGetDatabase("SCL_Path")   
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetClientWeb:1:8
+Function fdbGetClientWeb As NotesDatabase
+     'Get client web database
+	Set fdbGetClientWeb = fdbGetDatabase("SCW_Path")   
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetDCTWeb:1:8
+Function fdbGetDCTWeb As NotesDatabase
+	'// Get code tables database 
+	Set fdbGetDCTWeb = fdbGetDatabase("DCTWebPath")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetDCT:1:8
+Function fdbGetDCT As NotesDatabase
+	'// Get code tables database function added in response to WR1230
+	Set fdbGetDCT = fdbGetDatabase("DCT_Path")
+	
+End Function
+'++LotusScript Development Environment:2:2:RefreshProfileDocument:1:8
+Sub RefreshProfileDocument(dbThis As NotesDatabase)
+'This function will remove all copies of Profile documents in the current database 
+' and create one new one based on the dbDirectory profile document.
+	
+	Dim ns As New NotesSession
+	Dim colProfiles As NotesDocumentCollection
+	Dim docThisProfile As NotesDocument
+	Dim docDirectoryProfile As NotesDocument
+	Dim docNextProfile As NotesDocument
+	Dim dbDirectory As NotesDatabase
+	
+	Set colProfiles = dbThis.GetProfileDocCollection
+	Set docThisProfile = colProfiles.GetFirstDocument
+	
+	While Not docThisProfile Is Nothing
+		Set docNextProfile = colProfiles.GetNextDocument(docThisProfile)
+		If (docThisProfile.ProfileName(0) = csSYSPROFILENAME) Then
+			If dbThis.IsDocumentLockingEnabled Then 	Call docThisProfile.Lock ' Must lock the profile before deleting if locking is enabled
+			Call docThisProfile.Remove(True)
+			Print "Deleted old System Profile Document."
+		End If
+		Set docThisProfile = docNextProfile
+	Wend
+	
+	Set dbDirectory = ns.GetDatabase(dbThis.Server, csDBDIRECTORY, False)
+	
+	Set docDirectoryProfile = dbDirectory.GetProfileDocument(csSYSPROFILENAME) 'Get the master profile document
+	
+	Set docThisProfile = dbThis.GetProfileDocument(csSYSPROFILENAME) 'Create a new profile document for this database
+	
+	Call docDirectoryProfile.CopyAllItems(docThisProfile, True) 'Copy all items, overright as a precaution of cached document
+	
+	Call docThisProfile.Save(True, False)
+	Print "Created new System Profile Document."	
+	
+End Sub
+'++LotusScript Development Environment:2:2:CheckProfileDocumentAge:1:8
+Sub CheckProfileDocumentAge
+	
+	Dim ns As New NotesSession
+	Dim docSysProfile As NotesDocument
+	Dim dbDirectory As NotesDatabase
+	Dim dbRequested As NotesDatabase	
+	Dim strDBPathFilename As String
+	Dim dtNow As New NotesDateTime("Today")
+	Dim dbThis As NotesDatabase
+	Dim dtModified As New NotesDateTime("")
+	
+	Set dbThis = ns.CurrentDatabase
+	Set docSysProfile = dbThis.GetProfileDocument(csSYSPROFILENAME)
+	
+	If docSysProfile Is Nothing Then
+		Print "Recreating System Profile Document"
+		Call RefreshProfileDocument(dbThis)
+	Else
+		If (docSysProfile.ProfileName(0) <> csSYSPROFILENAME) Then
+			Print "System Profile Document is empty, updating..."
+			Call RefreshProfileDocument(dbThis)
+		Else
+			dtModified.LSLocalTime = docSysProfile.LastModified
+			If ( dtNow.TimeDifference(dtModified) > 0 ) Then  '1 day
+				Print "System Profile Document is older than 1 day, updating..."
+				Call RefreshProfileDocument(dbThis)
+			End If
+		End If
+	End If		
+	
+End Sub
+
+'++LotusScript Development Environment:2:1:fdbGetSuppDocumentsArchive:1:8
+Function fdbGetSuppDocumentsArchive As NotesDatabase
+	'Get Fee Schedule database 
+	Set fdbGetSuppDocumentsArchive = fdbGetDatabase("PSA_Path")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetFeeSchedule:1:8
+Function fdbGetFeeSchedule As NotesDatabase
+	'Get Fee Schedule database 
+	Set fdbGetFeeSchedule = fdbGetDatabase("PFS_Path")
+	
+End Function
+
+'++LotusScript Development Environment:2:1:fdbGetSuppDocuments:1:8
+Function fdbGetSuppDocuments As NotesDatabase
+	'Get Fee Schedule database 
+	Set fdbGetSuppDocuments = fdbGetDatabase("PSD_Path")
+	
+End Function
+
+
+'++LotusScript Development Environment:2:1:fdbGetSIT:1:8
+Function fdbGetSIT As NotesDatabase
+	'Get Fee Schedule database 
+	Set fdbGetSIT = fdbGetDatabase("PSI_Path")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetPCT:1:8
+Function fdbGetPCT As NotesDatabase
+	'Get Fee Premier Code Tables database 
+	Set fdbGetPCT = fdbGetDatabase("PCT_Path")
+	
+End Function
+
+
+'++LotusScript Development Environment:2:1:fdbGetWorkflowApplications:1:8
+Function fdbGetWorkflowApplications As NotesDatabase
+	'Get Workflow Applications database
+	' Andrew Tetlaw 03/09/2001
+	Set fdbGetWorkflowApplications = fdbGetDatabase("WFA_Path")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetArchive:1:8
+Function fdbGetArchive As NotesDatabase
+     'Get Archive database      
+	Set fdbGetArchive = fdbGetDatabase("WFR_Path")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetTRD:1:8
+Function fdbGetTRD As NotesDatabase
+     'Get Task Related Documents database      
+	Set fdbGetTRD = fdbGetDatabase("TRD_Path")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetERROR:1:8
+Function fdbGetERROR As NotesDatabase
+	'Get Task Related Documents database      
+	Set fdbGetERROR = fdbGetDatabase("Err_Path")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetBIR:1:8
+Function fdbGetBIR As NotesDatabase
+     'Get BIR database      
+	Set fdbGetBIR = fdbGetDatabase("BIR_Path")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetIng:1:8
+Function fdbGetIng As NotesDatabase
+	'Get Ingredients database      
+	Set fdbGetIng = fdbGetDatabase("ING_Path")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetCFG:1:8
+Function fdbGetCFG As NotesDatabase
+	'Get Lsx configuration database      
+	Set fdbGetCFG = fdbGetDatabase("CFG_Path")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetBucket:1:8
+Function fdbGetBucket As NotesDatabase
+	'Get Bucket database      
+	Set fdbGetBucket = fdbGetDatabase("BCT_Path")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetStoredProc:1:8
+Function fdbGetStoredProc As NotesDatabase
+	'Get Bucket database      
+	Set fdbGetStoredProc = fdbGetDatabase("SPR_Path")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetInt:1:8
+Function fdbGetInt As NotesDatabase
+	'Get LSX Interim database
+	Set fdbGetInt= fdbGetDatabase("INT_Path")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetLock:1:8
+Function fdbGetLock As NotesDatabase
+	'Get Record Locking database
+	Set fdbGetLock= fdbGetDatabase("LCK_Path")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetClientAccess:1:8
+Function fdbGetClientAccess As NotesDatabase
+	'Get Premier Client Access database... aka Premier Workflow Applications
+	Set fdbGetClientAccess = fdbGetDatabase("WCA_Path")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetTRDArchive:1:8
+Function fdbGetTRDArchive As NotesDatabase
+	'Get Task Related Documents Archive database
+	Set fdbGetTRDArchive = fdbGetDatabase("TDA_Path")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetXtran:1:8
+Function fdbGetXtran As NotesDatabase
+		'Get XML Translator Database
+	Set fdbGetXtran = fdbGetDatabase("XTran_Path")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetRulesMfr:1:8
+Function fdbGetRulesMfr
+     'Get rules (manufacturer) database 
+	
+	Set fdbGetRulesMfr = fdbGetDatabase("WAB_PATH")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetWAB:1:8
+Function fdbGetWAB
+     'Get Web Name & AddressBook database (names_web.nsf)
+	' To be used internally ONLY when you want the internal replica of the external domains NAB
+	Set fdbGetWAB = fdbGetDatabase("WAB_PATH")
+End Function
+'++LotusScript Development Environment:2:1:fdbGetLEI:1:8
+Function fdbGetLEI
+	
+	Set fdbGetLEI = fdbGetDatabase("LEI_PATH")
+End Function
+
+'++LotusScript Development Environment:2:1:fdbGetTransfer:1:8
+Function fdbGetTransfer
+     'Get Devices transfer database      
+	Set fdbGetTransfer = fdbGetDatabase("DTR_Path")
+End Function
+'++LotusScript Development Environment:2:1:fdbGetIngTransfer:1:8
+Function fdbGetIngTransfer
+	 'Get Ingredients transfer database      
+	Set fdbGetIngTransfer = fdbGetDatabase("INGT_Path")
+End Function
+
+'++LotusScript Development Environment:2:1:fdbGetRegister:1:8
+Function fdbGetRegister
+	'get the AOS Register database
+	Set fdbGetRegister = fdbGetDatabase("REG_")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetSequencer:1:8
+Function fdbGetSequencer
+	'Get theSequencer database, for sequential number generation
+	Set fdbGetSequencer = fdbGetDatabase("SEQ_PATH")
+End Function
+'++LotusScript Development Environment:2:1:fdbGetNab:1:8
+Function fdbGetNab
+	'Get Name & AddressBook database (names.nsf)
+	' To be used internally OR externally when you want the NAB for the current domain
+	
+	Set fdbGetNab = fdbGetDatabase("NAB_PATH")
+End Function
+'++LotusScript Development Environment:2:1:fdbGetClientInternal:1:8
+Function fdbGetClientInternal As NotesDatabase
+     'Get Client database
+	Set fdbGetClientInternal = fdbGetDatabase("CLI_Path")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetUserMgt:1:8
+Function fdbGetUserMgt
+		'Get User Management database 
+	Set fdbGetUserMgt = fdbGetDatabase("SUM_Path")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetWorkManagement:1:8
+Function fdbGetWorkManagement
+     'Get Devices Work Management database 
+	
+	Set fdbGetWorkManagement = fdbGetDatabase("DWM_PATH")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetWorkManagementArchive:1:8
+Function fdbGetWorkManagementArchive
+     'Get Devices Work Management Archive database 
+	
+	Set fdbGetWorkManagementArchive = fdbGetDatabase("DWMA_PATH")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetBatchBroker:1:8
+Function fdbGetBatchBroker As NotesDatabase
+	Set fdbGetBatchBroker = fdbGetDatabase("BBR_Path")
+End Function
+'++LotusScript Development Environment:2:1:fdbGetLVT:1:8
+Function fdbGetLVT As NotesDatabase
+	Dim s As New NotesSession
+	Set fdbGetLVT = fdbGetDatabase("LVT_Path")
+	If fdbGetLVT Is Nothing Then
+		Set fdbGetLVT = s.GetDatabase(s.CurrentDatabase.Server, "ebs\common\lvt.nsf")
+		If Not fdbGetLVT Is Nothing Then
+			If Not fdbGetLVT.IsOpen Then
+				fdbGetLVT.Open "", ""
+			End If
+		End If
+	End If
+End Function
+'++LotusScript Development Environment:2:1:fdbGetDWM:1:8
+Function fdbGetDWM
+     'Get Work Management database 
+	
+	Set fdbGetDWM = fdbGetDatabase("DWM_PATH")
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetValRules:1:8
+Function fdbGetValRules
+     'Get client database
+	
+	Set fdbGetValRules = fdbGetDatabase("VAL_Path")   
+	
+End Function
+'++LotusScript Development Environment:2:1:fdbGetDevices:1:8
+Function fdbGetDevices
+	     'Get Device database
+	Set fdbGetDevices = fdbGetDatabase("DevicesManufacturersPath")   
+	
+End Function
+
+'++LotusScript Development Environment:2:1:fdbGetClientRegister:1:8
+Function fdbGetClientRegister
+	
+	'Get Client Register database
+	Set fdbGetClientRegister = fdbGetDatabase("CTREG_Path")
+	
+End Function

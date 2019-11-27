@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<subform name='Sponsor Web Security' xmlns='http://www.lotus.com/dxl' version='9.0'
+ maintenanceversion='1.0' replicaid='CA257FDB001B5780' designerversion='7'>
+<noteinfo noteid='3a6' unid='5D1DF975E2E49415CA257FD8000B26CB' sequence='14'>
+<created><datetime>20160620T120148,27+10</datetime></created>
+<modified><datetime>20160628T151505,51+10</datetime></modified>
+<revised><datetime>20160628T151505,50+10</datetime></revised>
+<lastaccessed><datetime>20160628T151505,50+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,27+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1' leftmargin='1in' hide='notes web'/>
+<par def='1'><run><font size='8pt' color='red'/></run><run><font size='8pt'/><field
+ type='readers' allowmultivalues='true' kind='computed' name='WebReaders'
+ listinputseparators='comma semicolon newline' listdisplayseparator='newline'><code
+ event='defaultvalue'><formula>WebReaders</formula></code></field></run><run
+><font size='8pt' color='red'/></run><run><font size='8pt'/><field type='authors'
+ allowmultivalues='true' kind='computed' name='WebAuthors' listinputseparators='comma semicolon newline'
+ listdisplayseparator='newline'><code event='defaultvalue'><formula>WebAuthors</formula></code></field></run><run
+><font color='red'/></run></par></richtext></body>
+<item name='$$ScriptName' summary='false' sign='true'><text>Sponsor Web Security</text></item></subform>
+

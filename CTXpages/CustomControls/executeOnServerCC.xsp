@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xp:view
+	xmlns:xp="http://www.ibm.com/xsp/core">
+	
+	<xp:panel id="onRowDblClickEOS">
+		<xp:eventHandler event="onclick" submit="true"
+			refreshMode="partial" refreshId="refreshPanelEOS"
+			disableValidators="true">
+			<xp:this.action><![CDATA[#{javascript:try {
+	if(@Length(getComponent("dialogEOS").getValue()) > 0) {
+		if(@Length(getComponent("unidstoreL4EOS").getValue()) > 0) {
+			viewScope.put(getComponent("unidnameEOS").getValue(),getComponent("unidstoreL4EOS").getValue());
+			getComponent("unidstoreEOS").setValue(getComponent("unidstoreL4EOS").getValue());
+		} else if(@Length(getComponent("unidstoreL3EOS").getValue()) > 0) {
+			viewScope.put(getComponent("unidnameEOS").getValue(),getComponent("unidstoreL3EOS").getValue());
+			getComponent("unidstoreEOS").setValue(getComponent("unidstoreL3EOS").getValue());
+		} else if(@Length(getComponent("unidstoreL2EOS").getValue()) > 0) {
+			viewScope.put(getComponent("unidnameEOS").getValue(),getComponent("unidstoreL2EOS").getValue());
+			getComponent("unidstoreEOS").setValue(getComponent("unidstoreL2EOS").getValue());
+			//print("executeOnServerCC: unidnameEOS: " + getComponent("unidnameEOS").getValue());
+			//print("executeOnServerCC: unidstoreL2EOS: " + getComponent("unidstoreL2EOS").getValue());
+		} else if(@Length(getComponent("unidstoreL1EOS").getValue()) > 0) {
+			//print(getComponent("unidnameEOS").getValue());
+			//print(getComponent("unidstoreL1EOS").getValue());
+			viewScope.put(getComponent("unidnameEOS").getValue(),getComponent("unidstoreL1EOS").getValue());
+			getComponent("unidstoreEOS").setValue(getComponent("unidstoreL1EOS").getValue());
+		}
+		//bean stuff
+		if(@Contains(getComponent("unidnameEOS").getValue(), "siteUNID") == 1){
+			siteB.load(getComponent("unidstoreL1EOS").getValue());
+		}else if (@Contains(getComponent("unidnameEOS").getValue(), "biologicalUNID") == 1){
+			bioB.load(getComponent("unidstoreL1EOS").getValue());
+		}else if (@Contains(getComponent("unidnameEOS").getValue(), "biologicalIngredientUNID") == 1){
+			bioIngred.load(getComponent("unidstoreL2EOS").getValue());
+		}
+		
+		// Reset page scope variables
+		viewScope.put("SSJS_Return", "");
+		
+		var dialogName = getComponent("dialogEOS").getValue();
+		
+		getComponent(dialogName).show();
+		getComponent("unidstoreL2EOS").setValue("");
+		getComponent("unidstoreL3EOS").setValue("");
+		getComponent("unidstoreL4EOS").setValue("");
+		getComponent("dialogEOS").setValue("");
+		
+	}	 
+} catch (e) {
+	print("executeOnServer custom control onRowDblClickEOS onclick event handler error: " + e);
+}}]]></xp:this.action>
+		</xp:eventHandler>
+	</xp:panel>   
+	
+	<xp:panel id="refreshPanelEOS">
+		<xp:table>
+			<xp:tr>
+				<xp:td>
+					<xp:inputText
+						id="unidstoreEOS" styleClass="hiddenField">
+					</xp:inputText>
+				</xp:td>
+				<xp:td>
+					<xp:inputText
+						id="unidstoreL1EOS" styleClass="hiddenField">
+					</xp:inputText>
+				</xp:td>
+				<xp:td>
+					<xp:inputText
+						id="unidstoreL2EOS"
+						styleClass="hiddenField">
+					</xp:inputText>
+				</xp:td>
+				<xp:td>
+					<xp:inputText
+						id="unidstoreL3EOS"
+						styleClass="hiddenField">
+					</xp:inputText>
+				</xp:td>
+				<xp:td>
+					<xp:inputText
+						id="unidstoreL4EOS"
+						styleClass="hiddenField">
+					</xp:inputText>
+				</xp:td>
+				<xp:td>
+					<xp:inputText
+						id="unidnameEOS"
+						styleClass="hiddenField">
+					</xp:inputText>
+				</xp:td>
+				<xp:td>
+					<xp:inputText
+						id="dialogEOS"
+						styleClass="hiddenField">
+					</xp:inputText>
+				</xp:td>
+			</xp:tr>
+		</xp:table>
+	</xp:panel>
+	<xp:scriptBlock id="eosScriptBlock"
+			type="text/javascript">
+			<xp:this.value>
+				<![CDATA[function onGridDoubleClickEOS() {
+	try {		
+		var a = dojo.byId("#{id:onRowDblClickEOS}");
+		if (a)
+			a.click();
+	} catch (e) {
+		console.log("onGridDoubleClickEOS error: " + e);
+	}
+}]]>
+			</xp:this.value>
+		</xp:scriptBlock>
+</xp:view>

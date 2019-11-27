@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='utf-8'?>
+<subform name='ClinicalTrial_Part1StudyPatientsTrialType' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' designerversion='8.5.3'
+ renderpassthrough='true'>
+<noteinfo noteid='246' unid='112C0A3EC6F3021FCA257FD8000B278D' sequence='14'>
+<created><datetime>20160620T120150,21+10</datetime></created>
+<modified><datetime>20160628T151504,01+10</datetime></modified>
+<revised><datetime>20160628T151504,00+10</datetime></revised>
+<lastaccessed><datetime>20160628T151504,00+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152009,38+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1' leftmargin='1.7500in' tabs='L1in'/>
+<par def='1'>&lt;tr&gt;</par>
+<pardef id='2' leftmargin='2in' tabs='L1in'/>
+<par def='2'>&lt;td class="n1"&gt;Title of Study&lt;/td&gt;</par>
+<par def='2'>&lt;td&gt;&lt;div dojoType="dijit.form.TextBox" style="width:99%" id="Part1_TitleOfStudy" class="_data_Part1__TitleOfStudy" maxLength="500" wrap="soft" placeHolder="Enter the title of the study here ..."/&gt;&lt;/td&gt;</par>
+<par def='1'>&lt;/tr&gt;</par>
+<par def='1'>&lt;tr&gt;</par>
+<par def='2'>&lt;td class="n1"&gt;Trial Type&lt;/td&gt;</par>
+<par def='2'>&lt;td&gt;&lt;span id="Part1_TrialType"&gt;&lt;/span&gt;</par>
+<pardef id='3' leftmargin='2.2500in' tabs='L1in'/>
+<par def='3'>&lt;table style="border: 1px solid #ccc;"&gt;</par>
+<pardef id='4' leftmargin='2.5000in' tabs='L1in'/>
+<par def='4'>&lt;tr&gt;</par>
+<pardef id='5' leftmargin='2.7500in' tabs='L1in'/>
+<par def='5'>&lt;td&gt;&lt;input type="checkbox" onClick="addTrialTypeLabel()" dojoType="dijit.form.CheckBox" class="_data_Part1__TrialType" name="Part1_TrialType" id="Part1_TrialType1" value="1" label="Phase 1"/&gt;&lt;/td&gt;</par>
+<par def='5'>&lt;td&gt;&lt;label for="Part1_TrialType1"&gt;Phase 1&lt;/label&gt;&lt;/td&gt;</par>
+<par def='5'>&lt;td&gt;&lt;input type="checkbox" onClick="addTrialTypeLabel()" dojoType="dijit.form.CheckBox" class="_data_Part1__TrialType" name="Part1_TrialType" id="Part1_TrialType2" value="2" label="Phase 2" /&gt;&lt;/td&gt;</par>
+<par def='5'>&lt;td&gt;&lt;label for="Part1_TrialType2"&gt;Phase 2&lt;/label&gt;&lt;/td&gt;</par>
+<par def='5'>&lt;td&gt;&lt;input type="checkbox" onClick="addTrialTypeLabel()" dojoType="dijit.form.CheckBox" class="_data_Part1__TrialType" name="Part1_TrialType" id="Part1_TrialType3" value="3" label="Phase 3" /&gt;&lt;/td&gt;</par>
+<par def='5'>&lt;td&gt;&lt;label for="Part1_TrialType3"&gt;Phase 3&lt;/label&gt;&lt;/td&gt;</par>
+<par def='5'>&lt;td&gt;&lt;input type="checkbox" onClick="addTrialTypeLabel()" dojoType="dijit.form.CheckBox" class="_data_Part1__TrialType" name="Part1_TrialType" id="Part1_TrialType4" value="4" label="Phase 4" /&gt;&lt;/td&gt;</par>
+<par def='5'>&lt;td&gt;&lt;label for="Part1_TrialType4"&gt;Phase 4&lt;/label&gt;&lt;/td&gt;</par>
+<par def='5'>&lt;td&gt;&lt;input type="checkbox" onClick="addTrialTypeLabel()" dojoType="dijit.form.CheckBox" class="_data_Part1__TrialType" name="Part1_TrialType" id="Part1_TrialTypeB" value="B" label="Bioavailability/Bioequivalence" /&gt;&lt;/td&gt;</par>
+<par def='5'>&lt;td&gt;&lt;label for="Part1_TrialTypeB"&gt;Bioavailability/Bioequivalence&lt;/label&gt;&lt;/td&gt;</par>
+<par def='5'>&lt;td&gt;&lt;input type="checkbox" onClick="addTrialTypeLabel()" dojoType="dijit.form.CheckBox" class="_data_Part1__TrialType" name="Part1_TrialType" id="Part1_TrialTypeD" value="D" label="Device" /&gt;&lt;/td&gt;</par>
+<par def='5'>&lt;td&gt;&lt;label for="Part1_TrialTypeD"&gt;Device&lt;/label&gt;&lt;/td&gt;</par>
+<par def='4'>&lt;/tr&gt;</par>
+<par def='3'>&lt;/table&gt;</par>
+<par def='2'>&lt;/td&gt;</par>
+<par def='1'>&lt;/tr&gt;</par>
+<par def='1'>&lt;tr&gt;</par>
+<par def='2'>&lt;td class="n1"&gt;Brief Description of Trial&lt;/td&gt;</par>
+<par def='2'>&lt;td&gt;&lt;textarea dojoType="dijit.form.Textarea" style="height:3.5em; width:99%" id="Part1_TrialTypeDescription" class="_data_Part1__TrialTypeDescription" wrap="soft" maxLength="250"&gt;&lt;/textarea&gt;</par>
+<par def='2'>&lt;/td&gt;</par>
+<par def='1'>&lt;/tr&gt;</par></richtext></body>
+<item name='$$ScriptName' summary='false' sign='true'><text>ClinicalTrial_Part1StudyPatientsTrialType</text></item></subform>
+

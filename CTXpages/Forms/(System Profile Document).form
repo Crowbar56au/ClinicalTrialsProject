@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form name='(System Profile Document)' alias='System Profile Document' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='web'
+ nocompose='true' noquery='true' treatashtml='true' publicaccess='false' designerversion='7'
+ bgcolor='system' anonymous='true' nofieldexchange='true' conflictaction='donotcreateconflicts'>
+<noteinfo noteid='5b6' unid='2E2346BC6AB294D3CA257FD8000B2A25' sequence='14'>
+<created><datetime>20160620T120156,85+10</datetime></created>
+<modified><datetime>20160628T151506,97+10</datetime></modified>
+<revised><datetime>20160628T151506,96+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,96+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,42+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<globals><code event='options'><lotusscript>Option Public
+Option Declare
+
+
+</lotusscript></code></globals><code event='webqueryopen'><formula>@Command([ToolsRunMacro]; "(ProfileXMLValues)")</formula></code>
+<background allowoverride='false'/>
+<body><richtext>
+<pardef id='1' hide='web'/>
+<par def='1'><run><font size='24pt' name='Verdana' pitch='variable' truetype='true'
+ familyid='20' color='teal'/>Database Profile Document</run></par>
+<par def='1'/>
+<par def='1'/>
+<pardef id='2' leftmargin='1in' hide='web'/>
+<par def='2'>Select File - Document Properties and then click on the Field tab to examine the field variables and their values.</par>
+<par def='2'/>
+<par def='2'>This profile document is used to store references to all databases used in the SIME system. To modify these values you must update or create new Database Information documents in the SIME Database Directory database. These modifications will then be propagated through profile documents in all SIME databases via agents.</par>
+<pardef id='3' leftmargin='1in' hide='notes'/>
+<par def='3'><field type='text' kind='computedfordisplay' name='$$html'><code
+ event='defaultvalue'><formula>$$html</formula></code></field></par></richtext></body>
+<item name='$MimeCharSet' sign='true'><text>UTF-8</text></item>
+<item name='$$ScriptName' summary='false' sign='true'><text>System Profile Document</text></item></form>
+

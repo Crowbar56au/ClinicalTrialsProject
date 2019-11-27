@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<view name='SoftDeletions' xmlns='http://www.lotus.com/dxl' version='9.0'
+ maintenanceversion='1.0' replicaid='CA257FDB001B5780' showinmenu='false'
+ deleteddocs='true' publicaccess='false' designerversion='8.5.3' unreadmarks='none'
+ onopengoto='lastopened' onrefresh='displayindicator' headers='beveled' opencollapsed='false'
+ showresponsehierarchy='true' showmargin='true' shrinkrows='false' extendlastcolumn='false'
+ showhierarchies='false' unreadcolor='black' rowlinecount='1' headerlinecount='1'
+ rowspacing='1' bgcolor='white' totalscolor='black' headerbgcolor='white'
+ boldunreadrows='false' evaluateactions='false' allownewdocuments='false'
+ allowcustomizations='true' hidemarginborder='false' marginwidth='0px' marginbgcolor='white'
+ uniquekeys='false'>
+<noteinfo noteid='3a2' unid='8D92EB937E3BA572CA257F770006FB06' sequence='14'>
+<created><datetime dst='true'>20160315T121614,78+11</datetime></created>
+<modified><datetime>20160628T151505,48+10</datetime></modified>
+<revised><datetime>20160628T151505,47+10</datetime></revised>
+<lastaccessed><datetime>20160904T020405,55+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,26+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='selection'><formula>SELECT (@TextToNumber(@Version) &gt; 158)</formula></code>
+<column hidedetailrows='false' itemname='$0' width='10' resizable='true' separatemultiplevalues='false'
+ sortnoaccent='true' sortnocase='true' showaslinks='false'><columnheader title='#'><font
+ size='9pt' style='bold'/></columnheader><code event='value'><formula>@DocNumber</formula></code></column></view>
+

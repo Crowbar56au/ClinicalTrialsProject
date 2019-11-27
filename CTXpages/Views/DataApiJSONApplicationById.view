@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<view name='DataApiJSONApplicationById' alias='DataApiJSONApplicationById'
+ xmlns='http://www.lotus.com/dxl' version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780'
+ hide='web mobile' showinmenu='false' publicaccess='false' designerversion='8.5.3'
+ comment='All Applications' unreadmarks='none' onopengoto='lastopened' onrefresh='refresh'
+ headers='none' opencollapsed='true' showresponsehierarchy='false' showmargin='true'
+ shrinkrows='true' extendlastcolumn='true' showhierarchies='false' unreadcolor='black'
+ rowlinecount='8' headerlinecount='1' rowspacing='1' bgcolor='white' altrowcolor='#f7f7f7'
+ totalscolor='black' headerbgcolor='#b2b2b2' boldunreadrows='false' evaluateactions='false'
+ allownewdocuments='false' allowcustomizations='false' hidemarginborder='false'
+ marginwidth='0px' marginbgcolor='silver' uniquekeys='false' formatnoteid='0CC131B1AD9AB6BACA2577C00081ED37'>
+<noteinfo noteid='292' unid='225E4326206C31CDCA257F770006FCC6' sequence='18'>
+<created><datetime dst='true'>20160315T121619,26+11</datetime></created>
+<modified><datetime>20160628T151504,24+10</datetime></modified>
+<revised><datetime>20160628T151504,23+10</datetime></revised>
+<lastaccessed><datetime>20160628T151504,23+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152009,60+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='selection'><formula>SELECT Form="ct" &amp; Type="Application"</formula></code><code
+ event='form'><formula>Type</formula></code>
+<actionbar bgcolor='navy' bordercolor='black'><actionbarstyle height='4.4290ex'><font
+ size='9pt' name='Verdana' pitch='variable' truetype='true' familyid='20'/></actionbarstyle>
+<actionbuttonstyle bgcolor='system'/><font size='9pt' color='system'/><border
+ style='solid' width='0px 0px 1px' color='navy'/></actionbar>
+<column sort='ascending' hidedetailrows='false' itemname='$0' width='21.3750'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='true' sortnocase='true'
+ showaslinks='false'><columnheader align='center' title='lookupkey'/><code
+ event='value'><formula>ApplicationId + "~" + ApplicationVersion</formula></code></column>
+<column hidedetailrows='false' itemname='ApplicationStatus' width='25.2500'
+ resizable='false' separatemultiplevalues='false' sortnoaccent='true' sortnocase='true'
+ showaslinks='false'><columnheader align='center' title='application status'/><numberformat
+ legacy='true' format='general' varying='true' punctuated='false' parens='false'
+ percent='false' bytes='false'/></column></view>
+

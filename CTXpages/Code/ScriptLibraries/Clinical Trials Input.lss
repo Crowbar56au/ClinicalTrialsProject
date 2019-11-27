@@ -1,0 +1,3307 @@
+'++LotusScript Development Environment:2:5:(Options):0:74
+Option Public
+Option Declare
+
+Use "ls.snapps.JSONReader"
+Use "JSONToNotesDocument"
+Use "GetDatabases"
+Use "IDsAndSequences"
+
+
+'++LotusScript Development Environment:2:5:(Forward):0:1
+Declare Class CharArray
+Declare Sub Initialize
+Declare Sub Terminate
+Declare Sub AttachFile(docType As String)
+Declare Sub insertJSONTrialTypes(inputDoc As NotesDocument)
+Declare Sub SetDocumentAuditNSecurity(doc As NotesDocument, clientID As String)
+Declare Function InsertJSONBiologicals(bioDoc As NotesDocument) As String
+Declare Sub TestCharArray(iterations As Long)
+Declare Function ProcessHTTPPOSTRequest(docContext As NotesDocument)
+Declare Function setSponsors(clientID  As String) As Variant
+Declare Sub CreateMIMETextAttachment(doc As NotesDocument, stream As NotesStream, fileName As String)
+Declare Sub writeToRepository(inputDoc As NotesDocument)
+Declare Function getJSONApplicationDoc(inputDoc As NotesDocument) As NotesDocument
+Declare sub setClientID(userName As String, clientName As String, clientID As String)
+Declare Sub setSponsorAddresses(sponsorID As String, inputDoc As NotesDocument)
+Declare function writeTXTFile(JSONString As String) As String
+Declare Sub InputDoc(asSubmission As Boolean, inputDoc As NotesDocument)
+Declare Function InsertJSONMedicines(medDoc As NotesDocument) As String
+Declare Function urlDecode(encodedData As String) As String 
+Declare Sub createAttachment(filePath As String, docType As String, currentDoc As NotesDocument, parentDoc As notesDocument)
+Declare sub InsertJSONPrecedingTrials(inputDoc As NotesDocument)
+Declare Function InsertJSONPlacebos(placeboDoc As NotesDocument) As String
+Declare Function directJSONToNotesDocuments(JSONString As String, docList List As NotesDocument, aDB As NotesDatabase) As Variant
+Declare Function ReadJSONObjectDirect(JSONObj As Variant, SaveDocumentToDB As Boolean, docList List As NotesDocument, dbCTReg As NotesDatabase) As Long
+Declare sub getAppID(inputDoc As NotesDocument)
+Declare Sub initEscapedArray
+Declare Sub removeAttachment(inputDoc As NotesDocument, callingButton As String)
+Declare function InsertJSONSites(siteDoc As NotesDocument) As String
+Declare Function GetArrValues(arrayName As String) As Variant
+Declare Sub setApplicationIDInChildren(parentDoc As NotesDocument)
+Declare Function InsertJSONDevices(deviceDoc As NotesDocument) As String
+Declare Function InsertJSONComparators(compDoc As NotesDocument) As String
+Declare Function PickFile() As String
+Declare Sub clearFieldsAccordingToThisTrial(InputDoc As NotesDocument)
+Declare Function ProcessJSONSupportData(JSONString As String, otherDb As NotesDatabase) As NotesDocument 
+Declare Function StringStuffReplaceString(ByVal strArg As String,ByVal strSrc As String,ByVal strDst As String) As String
+Declare Function getSponsor(sponsorName As String, sponsorID As string)
+Declare Public Function urlEncode(decodedData As String) As String
+Declare function createSubmission(inputDoc As NotesDocument) As Boolean
+Declare Function EncodeJSONData(JSONDataValue As String) As String 
+Declare Sub loadAttachments(InputDoc As NotesDocument)
+Declare Sub UploadData()
+Declare Sub getPreceedingTrials(inputDoc As NotesDocument)
+Declare Function getCTDoc(AppID As string) As NotesDocument
+Declare Function escapeString(strArg As string) As String
+Declare Function InsertJSONCountries(countryDoc As NotesDocument) As String
+Declare Sub setCodeTablesData()
+Declare Sub processEmbeddedDocs(inputDoc As notesDocument)
+Declare Function InsertJSONAnimals(animalDoc As NotesDocument) As String
+Declare Sub insertJSONThisTrial(inputDoc As notesDocument)
+
+'++LotusScript Development Environment:2:5:(Declarations):0:10
+'These all ProcessJSONSupportData Errors
+Const ERR_LOOKUPVIEW_ARGMISSING = 1001
+Const ERR_LOOKUPVIEW_ISNULL = 1002
+Const ERR_IDENTIFIER_ARGMISSING = 1003
+Const ERR_IDENTIFIER_ARGNOTDEFINED = 1004
+
+Const CMD_SUBMIT_APPLICATION = "SUBMITAPP"
+
+Dim listCount As Integer
+Dim EscapedArray(7,1)  As String 
+
+Public oldDocument As NotesDocument 
+Dim outputJS As Long
+
+Dim JSONString As String
+Dim SUPPORTString As String
+Dim db As NotesDatabase
+Dim session As notesSession
+Dim namesAndValues(0 To 26, 0 To 2) As String
+
+Declare Function NEMGetFile Lib "nnotesws" ( wUnk As Integer, ByVal FileName As String, ByVal Filter As String, ByVal Title As String ) As Integer
+
+Dim AOriginCode As Variant
+Dim APartsCode  As variant
+Dim AppAreaCode  As variant
+Dim APrepCode As variant
+Dim CompDetCode  As variant
+Dim CountryCode  As variant
+Dim CTCode as  variant
+Dim DosageCode  As variant
+Dim FuncCode  As variant
+Dim ROACode  As variant
+Dim StatesCode  As variant
+Dim StatesApprovedCode as  variant
+Dim StatesHRecCode as variant
+Dim TheAreaCode as variant
+Dim TotalPatientsCode as variant
+Dim UnitsPropCode as variant
+
+Dim AOriginDesc  As variant
+Dim APartsDesc  As variant
+Dim AppAreaDesc As variant
+Dim APrepDesc As variant
+Dim CompDetDesc As variant
+Dim CountryDesc As variant
+Dim CTDesc As variant
+Dim DosageDesc As variant
+Dim FuncDesc  As variant
+Dim ROADesc as variant
+Dim StatesDesc as variant
+Dim StatesApprovedDesc as variant
+Dim StatesHRecDesc As variant
+Dim TheAreaDesc As variant
+Dim TotalPatientsDesc as variant
+Dim UnitsPropDesc as variant
+
+
+
+%REM
+The CharArray class converts a string to a (virtual) character array.
+This can be useful if you need to step through a string character by
+character, because it's a LOT faster to feed the string into a CharArray
+and read it using getCharAt() than it is to use Mid() to go one
+character at a time. Here's how you use it:
+
+	Dim ca As New CharArray()
+	Call ca.appendString( someBigString )
+	For i = 1 To ca.getLength()
+		Print ca.getCharAt(i)
+	Next
+
+NOTE that the getCharAt() method is one-based, so that the first
+character will be at getCharAt(1). This is consistent with other LotusScript
+String handling functions like Instr, Left, Mid, etc.
+
+The way this works is, we have an internal buffer of 30,000 characters
+(well, actually 30,001 since it's zero-based), and if we add more
+characters than that, we just create a new CharArray internal to this
+class. If the internal CharArray needs more characters than it can hold,
+it creates it's own internal CharArray, and so forth. When we're reading
+characters back out, we just call the internal CharArray(s) recursively
+to get the position we need.
+
+version 1.0
+Julian Robichaux -- http://www.nsftools.com
+October 15, 2007
+%END REM
+
+Class CharArray
+	Private buffer(0 To 30000) As String*1
+	Private bufpos As Integer
+	Private maxpos As Integer
+	Private child As CharArray
+	Private hasChild As Integer
+	
+	
+	Public Sub New ()
+		maxpos = UBound(buffer)
+	End Sub
+	
+	
+	'** Use appendString to add the String that you want to turn into
+	'** a character array. You can also feed multiple Strings in to
+	'** build a longer String by calling appendString over and over.
+	Public Sub appendString (txt As String)
+		'** if we already filled our internal buffer, feed the extra text
+		'** into our internal CharArray
+		If (bufpos > maxpos) Then
+			If Not hasChild Then
+				Set child = New CharArray()
+				hasChild = True
+			End If
+			Call child.appendString(txt)
+			Exit Sub
+		End If
+		
+		Dim txtLength As Long
+		txtLength = Len(txt)
+		
+		'** I did a handful of tests, and 50 was the best number for me
+		If (txtLength > 50) Then
+			'** Strings longer than 50 chars get split in half (it's faster to
+			'** step through smaller strings)
+			Dim half As Long
+			half = Fix(txtLength / 2)
+			Me.appendString(Left(txt, half))
+			'			Me.appendString(Mid(txt, half+1))		' Right() is just a hair faster here
+			Me.appendString(Right(txt, txtLength - half))
+		Else
+			'** the String is small enough, so step through it and add each
+			'** character to our internal array (feeding to the internal CharArray
+			'** if we need to)
+			Dim i As Integer
+			For i = 1 To txtLength
+				If (bufpos > maxpos) Then
+					Call Me.appendString(Mid(txt, i))
+					Exit Sub
+				End If
+				
+				buffer(bufpos) = Mid(txt, i, 1)
+				bufpos = bufpos + 1
+			Next
+		End If
+	End Sub
+	
+	
+	'** Return the total number of the characters in this CharArray (along with
+	'** any child CharArrays we've also populated). This would be the size
+	'** of the array.
+	Public Function getLength () As Long
+		If Not hasChild Then
+			getLength = bufpos
+		Else
+			getLength = bufpos + child.getLength
+		End If
+	End Function
+	
+	
+	'** Return the character at the specified position. NOTE that even though
+	'** the internal array is zero-based, this function considers one to be the
+	'** first position in the array. This makes it consistent with native LotusScript
+	'** String functions like Instr, Left, Mid, etc.
+	Public Function getCharAt (i As Long) As String
+		'** it's a little faster to ignore errors here than to do
+		'** a lot of explicit bounds checking, because in almost
+		'** all cases we should be getting a valid request
+		On Error Resume Next
+		If (i <= bufpos) Then
+			getCharAt = buffer(i-1)
+		Else
+			getCharAt = child.getCharAt(i - bufpos)
+		End If
+	End Function
+	
+	
+	'** Return the internal character array (and all child arrays) as a String.
+	Public Function toString () As String
+		Dim fullString As String
+		fullString = Left( Join(buffer, ""), bufpos )
+		
+		If hasChild Then
+			fullString = fullString + child.toString()
+		End If
+		
+		toString = fullString
+	End Function
+	
+End Class
+'++LotusScript Development Environment:2:2:Initialize:1:10
+Sub Initialize
+	
+	Set session = New NotesSession
+	session.Convertmime = False
+	Set db = session.currentDatabase
+	Call initEscapedArray
+	'BackUP JSONString = JSONString = |{"label":"id","identifier":"id","items":{"Type":"Application","Form":"Application","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1"},"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1","RecordUNID":"!@#$ApplicationID!@#$~1","ClinicalTrialType":"CTN","IsActiveVersion":"1","ApplicantName":"","ApplicationStage":"1","ApplicationStageCode":"","ApplicationStatus":"Draft","ApplicationStatusCode":"DRAFT","AuditLog":{"label":"AuditMessage","items":[],"id":"!@#$ApplicationID!@#$~1~undefined","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~undefined"},"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1"},"BiologicalProductDescription":"","ChangeReport":"","Completion":{"Type":"Completion","Form":"Completion","id":"!@#$ApplicationID!@#$~1~Completion","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1"},"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","RecordUNID":"!@#$ApplicationID!@#$~1~Completion","DataSection":4,"CompletionDetails":"","CompletionReason":"","ContactEmail":"","ContactFax":"","ContactName":"","ContactPhone":"","ContactPosition":"","TrialCompletionDate":""},"CreatedBy":"","CreatedOn":"","ErrorReport":"","ExpectedCompletionDate":"","InvoiceDate":"","InvoiceNumber":"","IsExportedToGP":"","IsPaymentReceived":"","IsReceiptImportedFromGP":"","IsSubmitted":"","IsValidated":"0","IsWorkMgmtEntryCreatedCompletion":"","LastEdited":"","LastEditor":"","Part1":{"Type":"Part1","Form":"Part1","id":"!@#$ApplicationID!@#$~1~Part1","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part1","DataSection":1},"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","RecordUNID":"!@#$ApplicationID!@#$~1~Part1","DataSection":1,"SponsorAttachment":"","SponsorAttachment_Label":"","BiologicalProductDescription":"","CertificationFileAttachmentFileNames":"","CertificationFileAttachmentIds":"","ContactEmail":"!@#$ContactEmail!@#$","ContactFax":"!@#$ContactFaxNumber!@#$","ContactName":"!@#$ContactName!@#$","ContactPhone":"!@#$ContactPhoneNumber!@#$","ExpectedCompletionDate":"!@#$ExpectedTrialCompletionDate!@#$T14:00:00.000Z","IsPotentialRestrictedGoodUsed":"!@#$IsPotentialRestrictedGoodUsed!@#$","DataDetails":"","PotentialRestrictedGoodDesc":"","ProtocolNumber":"!@#$ProtocolNumber!@#$","TotalPatients":"!@#$NumberOfPatientsEnrolled!@#$","TitleOfStudy":"!@#$TitleOfStudy!@#$","TrialTherapeuticArea":"!@#$TherapeuticArea!@#$","TrialStartDate":"","TrialTypeDescription":"!@#$TrialType!@#$","IsWorkMgmtEntryCreated":"","WorkMgmtEntryCreateDate":"","WorkMgmtProcessId":"","TrialClassification":[!@#$InsertThisTrialHere!@#$],"PrecedingTrials":[!@#$InsertPrecedingTrialsHere!@#$],"TrialType":[!@#$InsertTrialTypesHere!@#$],"AnimalExcipients":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~Part1~AnimalExcipients","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part1~AnimalExcipients","DataSection":"1"},"items":[!@#$InsertAnimalExipientsHere!@#$]},"Biologicals":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~Part1~Biologicals","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part1~Biologicals","DataSection":"1"},"items":[!@#$InsertBiologicalsHere!@#$]},"Medicines":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~Part1~Medicines","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part1~Medicines","DataSection":"1"},"items":[!@#$InsertMedicinesHere!@#$]},"Devices":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~Part1~Devices","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part1~Devices","DataSection":"1"},"items":[!@#$InsertDevicesHere!@#$]},"Placebos":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~Part1~Placebos","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part1~Placebos","DataSection":"1"},"items":[!@#$InsertPlacebosHere!@#$]},"Comparators":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~Part1~Comparators","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part1~Comparators","DataSection":"1"},"items":[!@#$InsertComparatorsHere!@#$]},"Sites":{"identifier":"id","label":"TrialSite","id":"!@#$ApplicationID!@#$~1~Part1~Sites","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part1~Sites","DataSection":"1"},"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","DataSection":"1","items":[!@#$InsertSitesHere!@#$]},"TrialConductedInCountries":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~Part1~TrialConductedInCountries","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part1~TrialConductedInCountries","DataSection":"1"},"items":[!@#$InsertCountriesHere!@#$]},"GMO":"!@#$InsertGMOHere!@#$","Nanoparticles":"!@#$InsertNanoParticlesHere!@#$","StartDate":"!@#$ExpectedTrialStartDate!@#$T13:00:00.000Z","PotentialRestrictedGood":"!@#$PotentialUseOfRestrictedGoods!@#$"},"Part2":{"identifier":"RecordUNID","Type":"Part2","Form":"Part2","id":"!@#$ApplicationID!@#$~1~Part2","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part2","DataSection":2},"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","RecordUNID":"!@#$ApplicationID!@#$~1~Part2","DataSection":2,"ContactName":"","ContactPhone":"","ContactFax":"","ContactEmail":"","StartDate":"","FinishDate":"","NotificationType":"","NotificationType_Label":"","TrialType":[],"TrialTypeDescription":"","TitleOfStudy":"","TrialClassification":[],"ProtocolNumber":"","GMO":"","Nanoparticles":"","Placebos":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~Part2~Placebos","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part2~Placebos","DataSection":"2"},"items":[]},"Comparators":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~Part2~Comparators","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part2~Comparators","DataSection":"2"},"items":[]},"Sites":{"identifier":"id","label":"TrialSite","id":"!@#$ApplicationID!@#$~1~Part2~Sites","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part2~Sites","DataSection":"2"},"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","DataSection":"2","items":[]}},"PaymentReceiptDate":"","PaymentReceiptNumber":"","PaymentExemption":"0","PaymentExemptionNo":"","SponsorAddress":"!@#$SponsorAddressID!@#$","SponsorAddress_Id":"!@#$SponsorAddressID!@#$","SponsorID":"!@#$SponsorID!@#$","SponsorName":"!@#$SponsorName!@#$","SubmissionDate":"","SubmissionId":"","TitleOfStudy":"","UpdateDetails":{"identifier":"RecordUNID","Type":"UpdateDetails","Form":"UpdateDetails","id":"!@#$ApplicationID!@#$~1~UpdateDetails","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~UpdateDetails","DataSection":3},"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","RecordUNID":"!@#$ApplicationID!@#$~1~UpdateDetails","DataSection":3,"ChangeApprovalStatus":"","ChangeDateTime":"","ChangeId":"","ChangeInitiatedBy":"","Comments":"","ContactEmail":"","ContactFax":"","ContactName":"","ContactPhone":"","TrialStartDate":"","TrialFinishDate":"","TotalPatients":"","Sites":{"identifier":"id","label":"TrialSite","id":"!@#$ApplicationID!@#$~1~UpdateDetails~Sites","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~UpdateDetails~Sites","DataSection":"3"},"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","DataSection":"3","items":[]},"Biologicals":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~UpdateDetails~Biologicals","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~UpdateDetails~Biologicals","DataSection":"3"},"items":[]},"Medicines":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~UpdateDetails~Medicines","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~UpdateDetails~Medicines","DataSection":"3"},"items":[]},"Devices":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~UpdateDetails~Devices","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~UpdateDetails~Devices","DataSection":"3"},"items":[]}},"ValidationLog":4,"ValidationStatus":"0","WorkMgmtEntryCreateDateCompletion":"","WorkMgmtProcessIdCompletion":"","WMID_Review":"","WMID_Application":"","IsPushBackTriggered":"0","IsPushBackSubmittedBack":"0","PushBackTriggerDates":[],"PushBackSubmittedBackDates":[],"VariationNonFeeList":[],"ClientName":"!@#$SponsorName!@#$","ClientId":"!@#$SponsorID!@#$","LabelName":"","SponsorAddress_Label":"!@#$SponsorAddress!@#$","ClientReference":"!@#$ClientReference!@#$"}}|
+	JSONString = |{"label":"id","identifier":"id","items":{"Type":"Application","Form":"Application","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1"},"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1","RecordUNID":"!@#$ApplicationID!@#$~1","ClinicalTrialType":"CTN","IsActiveVersion":"1","ApplicantName":"","ApplicationStage":"1","ApplicationStageCode":"","ApplicationStatus":"Draft","ApplicationStatusCode":"DRAFT","AuditLog":{"label":"AuditMessage","items":[],"id":"!@#$ApplicationID!@#$~1~undefined","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~undefined"},"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1"},"BiologicalProductDescription":"","ChangeReport":"","Completion":{"Type":"Completion","Form":"Completion","id":"!@#$ApplicationID!@#$~1~Completion","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1"},"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","RecordUNID":"!@#$ApplicationID!@#$~1~Completion","DataSection":4,"CompletionDetails":"","CompletionReason":"","ContactEmail":"","ContactFax":"","ContactName":"","ContactPhone":"","ContactPosition":"","TrialCompletionDate":""},"CreatedBy":"","CreatedOn":"","ErrorReport":"","ExpectedCompletionDate":"","InvoiceDate":"","InvoiceNumber":"","IsExportedToGP":"","IsPaymentReceived":"","IsReceiptImportedFromGP":"","IsSubmitted":"","IsValidated":"0","IsWorkMgmtEntryCreatedCompletion":"","LastEdited":"","LastEditor":"","Part1":{"Type":"Part1","Form":"Part1","id":"!@#$ApplicationID!@#$~1~Part1","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part1","DataSection":1},"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","RecordUNID":"!@#$ApplicationID!@#$~1~Part1","DataSection":1,"SponsorAttachment":"","SponsorAttachment_Label":"","BiologicalProductDescription":"!@#$InsertBIOProductDescHere!@#$","CertificationFileAttachmentFileNames":"","CertificationFileAttachmentIds":"","ContactEmail":"!@#$ContactEmail!@#$","ContactFax":"!@#$ContactFaxNumber!@#$","ContactName":"!@#$ContactName!@#$","ContactPhone":"!@#$ContactPhoneNumber!@#$","ExpectedCompletionDate":"!@#$ExpectedTrialCompletionDate!@#$T13:00:00.000Z","IsPotentialRestrictedGoodUsed":"!@#$IsPotentialRestrictedGoodUsed!@#$","DataDetails":"","PotentialRestrictedGoodDesc":"","ProtocolNumber":"!@#$ProtocolNumber!@#$","TotalPatients":"!@#$NumberOfPatientsEnrolled!@#$","TitleOfStudy":"!@#$TitleOfStudy!@#$","TrialTherapeuticArea":"!@#$TherapeuticArea!@#$","TrialStartDate":"","TrialTypeDescription":"!@#$TrialType!@#$","IsWorkMgmtEntryCreated":"","WorkMgmtEntryCreateDate":"","WorkMgmtProcessId":"","TrialClassification":[!@#$InsertThisTrialHere!@#$],"PrecedingTrials":[!@#$InsertPrecedingTrialsHere!@#$],"TrialType":[!@#$InsertTrialTypesHere!@#$],"AnimalExcipients":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~Part1~AnimalExcipients","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part1~AnimalExcipients","DataSection":"1"},"items":[!@#$InsertAnimalExipientsHere!@#$]},"Biologicals":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~Part1~Biologicals","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part1~Biologicals","DataSection":"1"},"items":[!@#$InsertBiologicalsHere!@#$]},"Medicines":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~Part1~Medicines","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part1~Medicines","DataSection":"1"},"items":[!@#$InsertMedicinesHere!@#$]},"Devices":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~Part1~Devices","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part1~Devices","DataSection":"1"},"items":[!@#$InsertDevicesHere!@#$]},"Placebos":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~Part1~Placebos","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part1~Placebos","DataSection":"1"},"items":[!@#$InsertPlacebosHere!@#$]},"Comparators":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~Part1~Comparators","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part1~Comparators","DataSection":"1"},"items":[!@#$InsertComparatorsHere!@#$]},"Sites":{"identifier":"id","label":"TrialSite","id":"!@#$ApplicationID!@#$~1~Part1~Sites","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part1~Sites","DataSection":"1"},"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","DataSection":"1","items":[!@#$InsertSitesHere!@#$]},"TrialConductedInCountries":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~Part1~TrialConductedInCountries","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part1~TrialConductedInCountries","DataSection":"1"},"items":[!@#$InsertCountriesHere!@#$]},"GMO":"!@#$InsertGMOHere!@#$","Nanoparticles":"!@#$InsertNanoParticlesHere!@#$","StartDate":"!@#$ExpectedTrialStartDate!@#$T13:00:00.000Z","PotentialRestrictedGood":"!@#$PotentialUseOfRestrictedGoods!@#$"},"Part2":{"identifier":"RecordUNID","Type":"Part2","Form":"Part2","id":"!@#$ApplicationID!@#$~1~Part2","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part2","DataSection":2},"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","RecordUNID":"!@#$ApplicationID!@#$~1~Part2","DataSection":2,"ContactName":"","ContactPhone":"","ContactFax":"","ContactEmail":"","StartDate":"","FinishDate":"","NotificationType":"","NotificationType_Label":"","TrialType":[],"TrialTypeDescription":"","TitleOfStudy":"","TrialClassification":[],"ProtocolNumber":"","GMO":"","Nanoparticles":"","Placebos":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~Part2~Placebos","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part2~Placebos","DataSection":"2"},"items":[]},"Comparators":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~Part2~Comparators","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part2~Comparators","DataSection":"2"},"items":[]},"Sites":{"identifier":"id","label":"TrialSite","id":"!@#$ApplicationID!@#$~1~Part2~Sites","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~Part2~Sites","DataSection":"2"},"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","DataSection":"2","items":[]}},"PaymentReceiptDate":"","PaymentReceiptNumber":"","PaymentExemption":"0","PaymentExemptionNo":"","SponsorAddress":"!@#$SponsorAddressID!@#$","SponsorAddress_Id":"!@#$SponsorAddressID!@#$","SponsorID":"!@#$SponsorID!@#$","SponsorName":"!@#$SponsorName!@#$","SubmissionDate":"","SubmissionId":"","TitleOfStudy":"","UpdateDetails":{"identifier":"RecordUNID","Type":"UpdateDetails","Form":"UpdateDetails","id":"!@#$ApplicationID!@#$~1~UpdateDetails","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~UpdateDetails","DataSection":3},"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","RecordUNID":"!@#$ApplicationID!@#$~1~UpdateDetails","DataSection":3,"ChangeApprovalStatus":"","ChangeDateTime":"","ChangeId":"","ChangeInitiatedBy":"","Comments":"","ContactEmail":"","ContactFax":"","ContactName":"","ContactPhone":"","TrialStartDate":"","TrialFinishDate":"","TotalPatients":"","Sites":{"identifier":"id","label":"TrialSite","id":"!@#$ApplicationID!@#$~1~UpdateDetails~Sites","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~UpdateDetails~Sites","DataSection":"3"},"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","DataSection":"3","items":[]},"Biologicals":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~UpdateDetails~Biologicals","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~UpdateDetails~Biologicals","DataSection":"3"},"items":[]},"Medicines":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~UpdateDetails~Medicines","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~UpdateDetails~Medicines","DataSection":"3"},"items":[]},"Devices":{"identifier":"id","id":"!@#$ApplicationID!@#$~1~UpdateDetails~Devices","Key":{"ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","id":"!@#$ApplicationID!@#$~1~UpdateDetails~Devices","DataSection":"3"},"items":[]}},"ValidationLog":4,"ValidationStatus":"0","WorkMgmtEntryCreateDateCompletion":"","WorkMgmtProcessIdCompletion":"","WMID_Review":"","WMID_Application":"","IsPushBackTriggered":"0","IsPushBackSubmittedBack":"0","PushBackTriggerDates":[],"PushBackSubmittedBackDates":[],"VariationNonFeeList":[],"ClientName":"!@#$SponsorName!@#$","ClientId":"!@#$SponsorID!@#$","LabelName":"","SponsorAddress_Label":"!@#$SponsorAddress!@#$","ClientReference":"!@#$ClientReference!@#$"}}|
+	SUPPORTString = |{"dbpath":"","identifierlookupview":"LookupByApplicationID","identifier":"lookupkey","items":{"form":"ct","type":"Application","lookupkey":"!@#$ApplicationID!@#$~1","ClientName":"!@#$SponsorName!@#$","ApplicantName":"!@#$SponsorName!@#$","ClientId":"!@#$SponsorID!@#$","ApplicantId":"!@#$SponsorID!@#$","ClinicalTrialType":"CTN","ApplicationStatus":"Draft","ValidationStatus":"0","ApplicationStage":"1","ApplicationId":"!@#$ApplicationID!@#$","ApplicationVersion":"1","SponsorName":"!@#$SponsorName!@#$","SponsorId":"!@#$SponsorID!@#$","SponsorAddress":"!@#$SponsorAddressID!@#$","SponsorAddress_Label":"!@#$SponsorAddress!@#$","ClientReference":"!@#$ClientReference!@#$","TitleOfStudy":"!@#$TitleOfStudy!@#$","LabelName":[""]}}|
+	'namesAndValues(x, 0) = ct InputForm fieldname (The form that will be used in the Notes Client to Input Applications at various stages)
+	'namesAndValues(x, 1) = ct (Notes) fieldName (The form that is saved in NotesDatabase after submit from WEB)
+	'namesAndValues(x,2) = search String In JSON.txt (the Strings we do a search and replace on with JSON.txt and create the attachment)
+
+	namesAndValues(0,0) = "ApplicationID"
+	namesAndValues(0,1) = "ApplicationID"
+	namesAndValues(0,2) = "!@#$ApplicationID!@#$"
+	
+	namesAndValues(1,0) = "SponsorName"
+	namesAndValues(1,1) = "SponsorName"
+	namesAndValues(1,2) = "!@#$SponsorName!@#$"
+	
+	namesAndValues(2,0) = "SponsorAddress"
+	namesAndValues(2,1) = "SponsorAddress_Label"
+	namesAndValues(2,2) = "!@#$SponsorAddress!@#$"
+	
+	namesAndValues(3,0) = "SponsorAddressID"
+	namesAndValues(3,1) = "SponsorAddress"
+	namesAndValues(3,2) = "!@#$SponsorAddressID!@#$"
+	
+	namesAndValues(4,0) = "ClientReference"
+	namesAndValues(4,1) = ""
+	namesAndValues(4,2) = "!@#$ClientReference!@#$"
+	
+	namesAndValues(5,0) = "ContactName"
+	namesAndValues(5,1) = ""
+	namesAndValues(5,2) = "!@#$ContactName!@#$"
+	
+	namesAndValues(6,0) = "ContactPhoneNumber"
+	namesAndValues(6,1) = ""
+	namesAndValues(6,2) = "!@#$ContactPhoneNumber!@#$"
+	
+	namesAndValues(8,0) = "ContactFaxNumber"
+	namesAndValues(8,1) = ""
+	namesAndValues(8,2) = "!@#$ContactFaxNumber!@#$"
+	
+	namesAndValues(9,0) = "ContactEmail"
+	namesAndValues(9,1) = ""
+	namesAndValues(9,2) = "!@#$ContactEmail!@#$"
+	
+	namesAndValues(10,0) = "ProtocolNumber"
+	namesAndValues(10,1) = ""
+	namesAndValues(10,2) = "!@#$ProtocolNumber!@#$"
+	
+	namesAndValues(11,0) = "ExpectedStartDate"
+	namesAndValues(11,1) = ""
+	namesAndValues(11,2) = "!@#$ExpectedStartDate!@#$"
+	
+	namesAndValues(12,0) = "ExpectedCompletionDate"
+	namesAndValues(12,1) = ""
+	namesAndValues(12,2) = "!@#$ExpectedCompletionDate!@#$"
+	
+	namesAndValues(13,0) = "RestrictedGoodsDescription"
+	namesAndValues(13,1) = ""
+	namesAndValues(13,2) = "!@#$PotentialUseOfRestrictedGoods!@#$"
+	
+	namesAndValues(14,0) = "TitleOfStudy"
+	namesAndValues(14,1) = ""
+	namesAndValues(14,2) = "!@#$TitleOfStudy!@#$"
+	
+	namesAndValues(7,0) = "TrialTypeDescription"
+	namesAndValues(7,1) = ""
+	namesAndValues(7,2) = "!@#$TrialType!@#$"
+	
+	namesAndValues(15,0) = "TherapeuticArea"
+	namesAndValues(15,1) = ""
+	namesAndValues(15,2) = "!@#$TherapeuticArea!@#$"
+	
+	namesAndValues(16,0) = "SponsorID"
+	namesAndValues(16,1) = "SponsorID"
+	namesAndValues(16,2) = "!@#$SponsorID!@#$"
+	
+	namesAndValues(17,0) = "ExpectedCompletionDate"
+	namesAndValues(17,1) = ""
+	namesAndValues(17,2) = "!@#$ExpectedTrialCompletionDate!@#$"
+	
+	namesAndValues(18,0) = "ExpectedStartDate"
+	namesAndValues(18,1) = ""
+	namesAndValues(18,2) = "!@#$ExpectedTrialStartDate!@#$"
+	
+	namesAndValues(19,0) = "GeneticallyModifiedOrganism"
+	namesAndValues(19,1) = ""
+	namesAndValues(19,2) = "!@#$InsertGMOHere!@#$"
+	
+	namesAndValues(20,0) = "DetailsOfNanoParticles"
+	namesAndValues(20,1) = ""
+	namesAndValues(20,2)= "!@#$InsertNanoParticlesHere!@#$"
+	
+	namesAndValues(21,0) = "ClientUserID"
+	namesAndValues(21,1) = "ClientID"
+	namesAndValues(21,2) = ""
+	
+	namesAndValues(22,0) = "ClientName"
+	namesAndValues(22,1) = "ClientName"
+	namesAndValues(22,2)= ""
+	
+	namesAndValues(23,0) = "ClientName"
+	namesAndValues(23,1) = "ApplicantName"
+	namesAndValues(23,2)= ""
+	
+	namesAndValues(24,0) = "PotentialUseRestrictedGoods"
+	namesAndValues(24,1) = ""
+	namesAndValues(24,2) = "!@#$IsPotentialRestrictedGoodUsed!@#$"
+	
+	namesAndValues(25,0) = "NumberOfPatientsEnrolled"
+	namesAndValues(25,1) = ""
+	namesAndValues(25,2) = "!@#$NumberOfPatientsEnrolled!@#$"
+	
+	namesAndValues(26,0) = "BioProductDescription"
+	namesAndValues(26,1) = ""
+	namesAndValues(26,2) = "!@#$InsertBIOProductDescHere!@#$"
+	
+	
+	reDim AOriginCode(0 To 100) As String
+	reDim APartsCode(0 To 100) As String
+	reDim AppAreaCode(0 To 100) As String
+	reDim APrepCode(0 To 100) As String
+	reDim CompDetCode(0 To 100) As String
+	reDim CountryCode(0 To 300) As String
+	reDim CTCode(0 To 100) As String
+	reDim DosageCode(0 To 300) As String
+	reDim FuncCode(0 To 100) As String
+	reDim ROACode(0 To 100) As String
+	reDim StatesCode(0 To 100) As String
+	reDim StatesApprovedCode(0 To 100) As String
+	reDim StatesHRecCode(0 To 100) As String
+	reDim TheAreaCode(0 To 100) As String
+	reDim TotalPatientsCode(0 To 100) As String
+	reDim UnitsPropCode(0 To 300) As String
+
+	reDim AOriginDesc(0 To 100) As String
+	reDim APartsDesc(0 To 100) As String
+	reDim AppAreaDesc(0 To 100) As String
+	reDim APrepDesc(0 To 100) As String
+	reDim CompDetDesc(0 To 100) As String
+	reDim CountryDesc(0 To 300) As String
+	reDim CTDesc(0 To 100) As String
+	reDim DosageDesc(0 To 300) As String
+	reDim FuncDesc(0 To 100) As String
+	reDim ROADesc(0 To 100) As String
+	reDim StatesDesc(0 To 100) As String
+	reDim StatesApprovedDesc(0 To 100) As String
+	reDim StatesHRecDesc(0 To 100) As String
+	reDim TheAreaDesc(0 To 100) As String
+	reDim TotalPatientsDesc(0 To 100) As String
+	reDim UnitsPropDesc(0 To 300) As String
+	
+End Sub
+
+
+
+'++LotusScript Development Environment:2:2:Terminate:1:10
+Sub Terminate
+	session.Convertmime = true
+End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'++LotusScript Development Environment:2:2:AttachFile:5:8
+%REM
+	Sub attachFile
+	Description: Create an Attachment in CT File Repository
+%END REM
+Sub AttachFile(docType As String)
+	
+	Dim ws As New NotesUIWorkspace
+	Dim tempDoc As NotesDocument
+	Dim fileAttachment As String
+	Dim uidoc As NotesUIDocument
+	Dim currentDoc As NotesDocument
+	Dim parentDoc As NotesDocument
+	
+	Set uidoc = ws.Currentdocument
+	Set currentDoc = uidoc.Document
+	
+	If  currentDoc.Isnewnote Then
+		Call currentDoc.Save(True, False)
+		'MessageBox (currentDoc.Universalid)
+	End If
+	
+	Set tempDoc = db.Createdocument()
+	
+	If currentDoc.ParentUNID(0) <> "" Then
+		Set parentDoc = db.Getdocumentbyunid(currentDoc.parentUNID(0))
+	Else 
+		Set ParentDoc = Nothing
+	End If
+	
+	If  ws.DialogBox("Clinical Trials Input Attach", True, True, True, False, False, False, "Upload A Document", tempDoc, True, True, False) Then
+		If tempDoc.Hasitem("Attachment") Then
+			FileAttachment = tempDoc.Attachment(0)
+		Else
+			Exit sub
+		End If
+	Else
+		Exit sub
+	End If
+	Call currentDoc.Save(True, False)
+	Call createAttachment(FileAttachment, docType, currentDoc, parentDoc)
+	
+End sub
+
+'++LotusScript Development Environment:2:2:insertJSONTrialTypes:5:8
+%REM
+	Sub insertJSONTrialTypes
+	Description: Comments for Sub
+%END REM
+Sub insertJSONTrialTypes(inputDoc As NotesDocument)
+	
+	Dim JSONStr As String
+	Dim var As Variant
+
+	JSONStr = ""
+	var = inputDoc.TrialType
+	If IsArray(var) Then
+		If var(0) <> "" Then
+			ForAll Trial In var
+				If JSONStr = "" Then
+					JSONStr = |"| & EscapeString(CStr(Trial)) & |"|
+				Else
+					JSONStr = JSONStr & |,"| & EscapeString(CStr(Trial)) & |"|
+				End If
+			End ForAll
+		End If
+	End If
+	
+	JSONString = StringStuffReplaceString(JSONString, "!@#$InsertTrialTypesHere!@#$", JSONStr)
+	
+End Sub
+
+'++LotusScript Development Environment:2:2:SetDocumentAuditNSecurity:2:8
+
+Sub SetDocumentAuditNSecurity(doc As NotesDocument, clientID As String)
+	'Update UpdateAudit Log
+	Dim itmCreatedBy As NotesItem 
+	Dim itmCreatedOn As NotesItem
+	Dim itmUpdatedBy As NotesItem 
+	Dim itmUpdatedOn As NotesItem
+	
+	Dim temp As Variant 
+	'Dim UserManagerDBName As String
+
+	Dim itmReaders As NotesItem
+	Dim itmAuthors As NotesItem 
+	Dim SecurityEntries As Variant 
+	
+	With doc
+		If .hasItem("LastEditor") Then
+			Set itmUpdatedBy = .getFirstItem("LastEditor")
+		Else
+			Set itmUpdatedBy = New NotesItem(doc, "LastEditor", "", NAMES)
+		End If
+		
+		If .hasItem("LastEdited") Then
+			Set itmUpdatedOn = .getFirstItem("LastEdited")
+		Else
+			Set itmUpdatedOn = New NotesItem(doc, "LastEdited", "")
+		End If
+		
+		If  (.IsNewNote) Then
+			Set itmCreatedBy = New NotesItem(doc, "CreatedBy", Evaluate(|@UserName|, doc), NAMES)
+			Set itmCreatedOn = New NotesItem(doc, "CreatedOn", Now)
+		Else
+			itmUpdatedBy.Values = Evaluate(|@Trim(@UserName : LastEditor)|, doc)
+			itmUpdatedOn.Values = Evaluate(|@If(@IsNull(LastEdited);@Now;@Now : LastEdited)|, doc)
+		End If
+
+%REM
+	secNames(0) = "SIME" + formfields("clientid")
+	secNames(1) = "[Admin]"
+	secNames(2) = "[TGA]"
+	secNames(3) = "[SIMEReader]"
+	secNames(4) = "LocalDomainServers"
+	secNames(5) = "OtherDomainServers"
+%END REM
+
+		If clientID <> "" Then
+			clientID = "SIME" + clientID
+		End If
+		
+		'Add the 
+		SecurityEntries = Evaluate(|@Trim("|+clientID+|":"[Admin]" : "[TGA]" : "[SIMEReader]" : "LocalDomainServers" : "OtherDomainServers")|)
+		While doc.Hasitem("WebReaders") 
+			Call doc.Removeitem("WebReaders")
+		Wend
+		While doc.Hasitem("WebAuthors") 
+			Call doc.Removeitem("WebAuthors")
+		Wend
+		Set itmReaders = New NotesItem(doc, "WebReaders", SecurityEntries, READERS)
+		Set itmAuthors = New NotesItem(doc, "WebAuthors", SecurityEntries, AUTHORS)
+		'End If
+	End With
+End Sub
+
+'++LotusScript Development Environment:2:1:InsertJSONBiologicals:1:8
+Function InsertJSONBiologicals(bioDoc As NotesDocument) As String
+	
+	Dim JSONStr As String
+	Dim countryLabelStr As String
+	Dim countryIDStr As String
+	
+	JSONStr = |{"id":["!@#$ApplicationID!@#$~1~Part1~Biologicals~!@#$BIODocUnid!@#$"],"identifier":["RecordUNID"],"label":["ProductName"],"Type":["Biological"],"Form":["Biological"],"ApplicationId":["!@#$ApplicationID!@#$"],"ApplicationVersion":["1"],"DataSection":["1"],"RecordUNID":["!@#$ApplicationID!@#$~1~Part1~Biologicals~!@#$BIODocUnid!@#$"],"AnimalOrigin":["!@#$BIOSpeciesOfOriginCode!@#$"],"AnimalOrigin_Label":["!@#$BIOSpeciesOfOriginDesc!@#$"],"DosageForm_Label":["!@#$BIODosageFormDesc!@#$"],"DosageForm":["!@#$BIODosageFormCode!@#$"],"LabelName":["!@#$BIOLabelName!@#$"],"ProductName":["!@#$BIOProductName!@#$"],"RouteOfAdmin":["!@#$BIORouteOfAdminCode!@#$"],"RouteOfAdmin_Label":["!@#$BIORouteOfAdminDesc!@#$"],"CountryList":["!@#$BIOCountryOfOriginCode!@#$"],"CountryList_Label":["!@#$BIOCountryOfOriginDesc!@#$"]}|
+	
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ApplicationID!@#$", escapeString(BioDoc.ApplicationID(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$BIODocUnid!@#$", escapeString(BioDoc.universalID))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$BIOProductName!@#$", escapeString(BioDoc.BiologicalProductName(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$BIOLabelName!@#$", escapeString(BioDoc.BiologicalLabelName(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$BIODosageFormDesc!@#$", escapeString(BioDoc.BiologicalDosageForm(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$BIODosageFormCode!@#$", escapeString(BioDoc.BiologicalDosageFormID(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$BIOSpeciesOfOriginDesc!@#$", escapeString(BioDoc.BiologicalSpeciesOfOrigin(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$BIOSpeciesOfOriginCode!@#$", escapeString(BioDoc.BiologicalSpeciesOfOriginID(0)))
+	
+	ForAll coun In BioDoc.BiologicalCountry
+		If countryLabelStr = "" Then
+			countryLabelStr = coun
+		Else
+			countryLabelStr = countryLabelStr & |","| & coun
+		End If
+	End ForAll
+
+	ForAll ID In BioDoc.BiologicalCountryID
+		If countryIDStr = "" Then
+			countryIDStr = ID
+		Else
+			countryIDStr = countryIDStr & |","| & ID
+		End If
+	End ForAll
+	
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$BIOCountryOfOriginDesc!@#$", countryLabelStr)
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$BIOCountryOfOriginCode!@#$", countryIDStr)
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$BIORouteOfAdminDesc!@#$", escapeString(BioDoc.BiologicalROA(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$BIORouteOfAdminCode!@#$", escapeString(BioDoc.BiologicalROAID(0)))
+	
+	InsertJSONBiologicals = JSONStr
+	
+End Function
+
+'++LotusScript Development Environment:2:2:TestCharArray:3:8
+
+
+Sub TestCharArray(iterations As Long)
+	Dim txt As String
+	Dim i As Long
+	Dim bigString As String
+	Dim startTime As Single
+	Dim ca As New CharArray()
+	
+	Print "==================================================="
+	
+	txt = "This is a sentence. "			' ASCII
+	'	txt = "Iñtërnâtiônàlizætiøn "		' accented characters
+	'	txt = "  "	' high end of Unicode
+	iterations = 5000
+	
+	Print "Base string length = " & Len(txt) & "; Total size should be " & (Len(txt) * iterations)
+	
+	
+	'** First, we'll build the CharArray up with multiple calls to appendString,
+	'** to see how long it takes to build a long string that way.
+	startTime = Timer
+	Set ca = New CharArray()
+	For i = 1 To iterations
+		Call ca.appendString(txt)
+	Next
+	
+	Print "BUILDING THE CHARARRAY IN A LOOP"
+	Print "ca length = " & ca.getLength()
+	Print "last char = '" & ca.getCharAt(ca.getLength()) & "'"
+	Print "Elapsed time = " & (Timer - startTime)
+	
+	
+	'** Next, we'll take that big String we just created and dump it into the
+	'** CharArray in one big chunk
+	bigString = ca.toString()
+	startTime = Timer
+	Set ca = New CharArray()
+	Call ca.appendString(bigString)
+	
+	Print "BUILDING THE CHARARRAY ALL AT ONCE"
+	Print "ca length = " & ca.getLength()
+	Print "last char = '" & ca.getCharAt(ca.getLength()) & "'"
+	Print "Elapsed time = " & (Timer - startTime)
+	
+	
+	'** Sanity check -- look at the first bit of characters, as well as some of
+	'** the characters at our boundary between the base CharArray and its
+	'** internal CharArray
+	Dim printString As String
+	For i = 1 To 55
+		printString = printString + ca.getCharAt(i)
+	Next
+	Print printString
+	
+	printString = ""
+	For i = 29995 To 30005
+		printString = printString + ca.getCharAt(i)
+	Next
+	Print printString
+	
+	
+	'** Now see how long it takes to read the characters out of the array.
+	startTime = Timer
+	Dim j As Long
+	Dim char As String*1
+	For i = 1 To ca.getLength()
+		char = ca.getCharAt(i)
+		j = j + 1
+	Next
+	
+	Print "READING CHARACTERS"
+	Print "count = " & j & "; Elapsed time = " & (Timer - startTime)
+	
+End Sub
+
+
+
+
+'++LotusScript Development Environment:2:1:ProcessHTTPPOSTRequest:1:8
+Function ProcessHTTPPOSTRequest(docContext As NotesDocument)
+	On Error GoTo errorhandler
+
+	Dim dbThis As NotesDatabase
+	Dim docJSON As NotesDocument 
+	Dim dc As NotesDocumentCollection, doc As NotesDocument, success As Boolean
+	Dim JSONDataFieldName As String , JSONSupportDataFieldName As String 
+	Dim dataBuffer As String, dataTemp As Variant 
+	Dim JSONSupportDataBuffer As String 
+	Dim stream As NotesStream
+	Dim ItemValuePairs As Variant 
+	Dim DataValuePair As Variant
+	Dim ctr As Integer 
+	Dim fieldStr As String , fieldName As String , fieldlistULimit As Integer
+	Dim temp As Variant, totalbytes As Long, nextampersand As Long, querystring As String
+	Dim JSONstring As String, qsCMD As String, strReason As String
+	
+	If Not (docContext.HasItem("REQUEST_CONTENT") Or docContext.HasItem("REQUEST_CONTENT_000")) Then
+		Error 1000, "Invalid Document Type - Its is not a Web Document"
+	End If
+	
+	Set stream = session.CreateStream
+	
+	'Build the Field List
+	ctr = 0
+	If docContext.HasItem("REQUEST_CONTENT") Then
+		dataTemp = docContext.GetItemValue( "REQUEST_CONTENT")
+		dataBuffer = dataTemp(0)
+	Else
+		Do While True
+			fieldStr = Format(ctr,"000")
+			fieldName = "REQUEST_CONTENT_" + fieldStr
+			If docContext.HasItem(fieldName) Then
+				dataTemp = docContext.GetItemValue(fieldName)
+				dataBuffer = dataBuffer + dataTemp(0)
+			Else
+				Exit Do
+			End If
+			ctr = ctr + 1
+			If ctr>999 Then Exit Do
+		Loop
+	End If	
+
+	JSONDataFieldName = "MultiPart32KJSONData_"
+	JSONSupportDataFieldName  = "SupportingFieldDataSet"
+	
+	Set dbThis = session.CurrentDatabase
+	
+	Call CreateMIMETextAttachment(docJSON, stream, "JSON.txt")
+	
+	'is this for submission?
+	qsCMD = StrRight(docContext.GetFirstItem("query_string").text,"&CMD=")
+	If InStr(qsCMD,"&")>0 Then qsCMD = StrLeft(qsCMD,"&")
+	Select Case qsCMD
+		Case CMD_SUBMIT_APPLICATION
+			stream.Position = 1
+			Do Until stream.IsEOS
+				JSONstring = JSONstring + stream.ReadText
+			Loop
+			Call stream.Truncate
+			Call stream.Close
+			
+			Set dc = JSONToNotesDocuments(JSONstring, True)
+			If dc.count > 0 Then
+				Set doc = dc.GetFirstDocument
+				Do While Not doc Is Nothing
+					success = doc.Save(True, False, False)
+					If success = False Then Exit Do
+					Set doc = dc.GetNextDocument(doc)
+				Loop
+				If success Then
+					strReason = "successful creation of collection"
+				Else
+					strReason = |failed to save one of the documents: | + doc.GetFirstItem("type").text
+				End If
+			Else	'nothing to save
+				Print |{"key":0, "reason":"failed to create notes documents"}|
+			End If
+		Case Else		'or just for saving, draft docs, etc
+			Call stream.Truncate
+			Call stream.Close
+			success = docJSON.Save(True, False)
+			If success Then
+				strReason = "success"
+			Else
+				strReason = "failed to save document"
+			End If
+	End Select
+	
+errorresume:
+	On Error Resume Next
+	temp=""
+	If outputJS Then temp = |var result='|
+	temp=temp + |{"key":|
+	If success Then
+		temp=temp + "1"
+	Else
+		temp=temp + "0"
+	End If
+	temp=temp + |, "reason":"| + strReason + |"}|
+	If outputJS Then
+		temp=temp+|';|
+		querystring = docContext.GetFirstItem("query_string").text
+		qsCMD = StrRight(querystring, "&ONCOMPLETE=")
+		If Len(qsCMD) > 0 Then	'has a function name been provided?
+			If InStr(qsCMD, "&") > 0 Then qsCMD = StrLeft(qsCMD, "&")
+			querystring = Join(Split(querystring, "'"), "`")
+			strReason = Join(Split(strReason, "'"), "`")
+			Print |<html><head><script type="text/javascript">|
+			Print |//try {|
+			'Print temp
+			Print |parent.| + qsCMD + |(| + CStr(Val(success)) + |, '| + strReason + |', '| + querystring + |');|
+			Print |//} catch (e) {console.log('error processing `post submit` functions');}|
+			Print |</script></head><body></body></html>|
+		End If
+	Else
+		Print temp
+	End If
+	Exit Function
+errorhandler:
+	success = 0
+	strReason = CStr(Err) + "=" + CStr(Error) + | at line | + CStr(Erl)
+	MsgBox strReason
+	Resume ErrorResume
+End Function
+
+'++LotusScript Development Environment:2:1:setSponsors:5:8
+%REM
+	Function setSponsors
+	Description: Comments for Function
+%END REM
+Function setSponsors(clientID  As String) As Variant
+	
+	Dim view As NotesView
+	Dim vec As NotesViewEntryCollection
+	Dim entry As NotesViewEntry
+	Dim values As Variant
+	Dim clientDoc As NotesDocument
+	Dim userData List As String
+	Dim isSponsor As Boolean
+	Dim instrVar As Variant
+
+	Dim clientWebDb As NotesDatabase
+	
+	Set clientWebDb = fdbGetClientWeb
+	Set view = clientWebDb.getView("LUClientType")
+	isSponsor = false
+	
+	UserData("name") = "Error"
+	UserData("id") = "None"
+	Set clientDoc = view.getDocumentByKey(clientID, true)
+	
+	If Not clientDoc Is Nothing Then
+	 	ForAll theValue In clientDoc.ClientType
+	 		If LCase(theValue) = "sponsor" Then
+		 		UserData("name") = clientDoc.ClientName(0)
+		 		UserData("id") = clientDoc.ClientID(0)
+	 		Else
+		 		instrVar = InStr(LCase(theValue), "sponsor")
+		 		If Not IsNull(instrVar) Then
+		 			If instrVar > 0 Then
+			 			UserData("name") = clientDoc.ClientName(0)
+			 			UserData("id") = clientDoc.ClientID(0)
+		 			End If
+		 		End If
+	 		End If
+	 	End ForAll
+	 End If
+
+	setSponsors = UserData
+	
+End Function
+
+'++LotusScript Development Environment:2:2:CreateMIMETextAttachment:1:8
+Sub CreateMIMETextAttachment(doc As NotesDocument, stream As NotesStream, fileName As String)
+
+	Dim mime As NotesMIMEEntity, header As NotesMIMEHeader 
+	Dim child As NotesMIMEEntity
+	Dim blankStream As NotesStream
+	Dim expectedHeaderVal As String, headerVal As String 
+	
+	expectedHeaderVal = LCase(|attachment; filename="| + fileName + |"|)
+
+	Set mime = doc.GetMIMEEntity("JSONMIMEFILE")
+	If mime Is Nothing Then
+		Set mime = doc.CreateMIMEEntity("JSONMIMEFILE")
+	Else
+		'For Existing Documents
+		Set child = mime.GetFirstChildEntity
+		Do While Not (child Is Nothing)
+			Set header = child.GetNthHeader("Content-Disposition")
+			headerVal = LCase(header.GetHeaderValAndParams())
+			If headerVal = expectedHeaderVal Then
+				Exit Do
+			End If
+			
+			Set child = child.GetNextEntity()
+		Loop
+	End If
+	
+	Set header = mime.GetNthHeader("Content-Type")    
+	If header Is Nothing Then
+		Set header = mime.CreateHeader("Content-Type")
+		Call header.SetHeaderVal("multipart/mixed")
+	End If
+	
+	If child Is Nothing Then
+		Set child = mime.CreateChildEntity
+		Set header = child.CreateHeader("Content-Type")
+		Call header.SetHeaderValAndParams("text/plain; charset=UTF-8")
+		
+		Set header = child.CreateHeader("Content-Description")
+		Call header.SetHeaderVal(|"| + fileName + |"|)
+		
+		Set header = child.CreateHeader("Content-Disposition")
+		Call header.SetHeaderValAndParams(|attachment; filename="| + fileName + |"|)	
+	End If
+	
+	Call child.SetContentFromText(stream, "text/plain; charset=UTF-8; name=" + fileName, 1728)
+	Call doc.CloseMIMEEntities(True, "JSONMIMEFILE")
+	
+	'The Calling Routine should take the resposibility to close/flush the stream
+End Sub
+
+'++LotusScript Development Environment:2:2:writeToRepository:5:8
+%REM
+	Sub writeToRepository
+	Description: Comments for Sub
+%END REM
+Sub writeToRepository(inputDoc As NotesDocument)
+	
+	Dim x As Integer
+	Dim y As Integer
+	Dim ReplaceValue As String
+	Dim docJSON As NotesDocument
+	Dim dc As NotesDocumentCollection
+	Dim doc As NotesDocument
+	Dim success As Boolean
+	Dim strReason As String
+	Dim replaceDate As Variant
+	Dim yearStr As String
+	Dim monthStr As String
+	Dim dayStr As String
+	Dim dbCTReg As NotesDatabase
+	Dim appVer As String
+	Dim appID As String
+	Dim subID As String
+	Dim stream As NotesStream
+	
+	Set db = session.currentDatabase
+	Set stream = session.createStream
+	Set dbCTReg = fdbGetDatabase("CTR_Path")
+	
+	%REM
+	If inputDoc.ApplicationID(0) = "" Then
+		Call getAPPid(inputDoc)
+	End If
+	%END REM
+	
+	For x = 0 To UBound(namesAndValues,1)	
+		replaceValue = inputDoc.getItemValue(namesAndValues(x, 0))(0)	
+		If IsDate(replaceValue) Then
+			'replaceValue = Format(replaceValue, "yyyy-mm-dd")
+			replaceDate = CDat(replaceValue)
+			Set replaceDate = New NotesDateTime(replaceValue)
+			'Call replaceDate.Adjustday(-1)
+			'Now build the weird string like "2013-08-22T14:00:00.000Z
+			yearStr = CStr(Year(replaceDate.Lslocaltime))
+			monthStr = CStr(Month(replaceDate.Lslocaltime))
+			Do Until Len(monthStr) = 2
+				monthStr = "0" & monthStr
+			Loop
+			dayStr = CStr(Day(replaceDate.Lslocaltime))
+			Do Until Len(dayStr) = 2
+				dayStr = "0" & dayStr
+			Loop
+			replaceValue = yearStr & "-" & monthStr & "-" & dayStr
+		End If	
+		If namesAndValues(x,2) <> "" Then
+			JSONString = StringStuffReplaceString(JSONString, namesAndValues(x, 2), escapeString(replaceValue))
+			SUPPORTString = StringStuffReplaceString(SUPPORTString, namesAndValues(x, 2), escapeString(replaceValue))
+		End If
+	Next
+	
+	Set docJSON = ProcessJSONSupportData(SUPPORTString, db) ' Matt 18/06/2012
+	
+	For x = 0 To UBound(namesAndValues,1)	
+		replaceValue = inputDoc.getItemValue(namesAndValues(x, 0))(0)	
+		If IsDate(replaceValue) Then
+			replaceValue = Format(replaceValue, "yyyy-mm-dd")
+			Set replaceDate = New NotesDateTime(replaceValue)
+			Call replaceDate.Adjustday(-1)
+			replaceValue = Format(replaceDate.Lslocaltime, "yyyy-mm-dd")
+		End If	
+		If namesAndValues(x, 1) <> "" Then
+			Call docJSON.Replaceitemvalue(namesAndValues(x, 1), replaceValue)
+		End If
+	Next
+	
+	Call SetDocumentAuditNSecurity(docJSON, inputDoc.ClientUserID(0))
+	
+	Call insertJSONPrecedingTrials(inputDoc)
+	Call insertJSONTrialTypes(inputDoc)
+	Call insertJSONThisTrial(inputDoc)
+	Call processEmbeddedDocs(inputDoc)
+
+
+	Call stream.WriteText(JSONString,5)	
+	Call CreateMIMETextAttachment(docJSON, stream, "JSON.txt")
+	Call stream.Truncate
+	Call stream.Close
+
+	Dim docList List As NotesDocument
+	Call directJSONToNotesDocuments(JSONstring, docList, dbCTReg)
+	Set docList("Application") = docJSON
+
+	appVer = CStr(docJSON.ApplicationVersion(0)) 'DFS May 2013 - allow for numeric value
+	appID = docJSON.ApplicationId(0)
+	subid = GetID(CT_SUBMISSION_SEQUENCE_KEY, "", CT_GENERAL_LISTING_APPTYPE) 'BW01
+	'subid = GetID(BOP_SUBMISSION_SEQUENCE_KEY, "", BOP_GENERAL_LISTING_APPTYPE)
+	docJSON.ReplaceItemValue "SubmissionId", subid
+	
+	ForAll theDoc In docList
+		If theDoc.HasItem("Type") Then
+			If LCase(theDoc.getfirstitem("Type").text) = "application" Or LCase(theDoc.getfirstitem("Type").text) = "part 1" Or LCase(theDoc.getfirstitem("Type").text) = "part 2" Then
+				
+				theDoc.ReplaceItemValue "SubmissionID", docJSON.getfirstitem("SubmissionID")
+				theDoc.ReplaceItemValue "ApplicationID", docJSON.getfirstitem("ApplicationID")
+				theDoc.ReplaceItemValue "SubmissionDate", docJSON.getfirstitem("SubmissionDate")
+				theDoc.ReplaceItemValue "TitleofStudy", docJSON.getfirstitem("TitleofStudy")
+				theDoc.ReplaceItemValue "StartDate", docJSON.getfirstitem("StartDate")
+				theDoc.ReplaceItemValue "ExpectedCompletionDate", docJSON.getfirstitem("ExpectedCompletionDate")
+				If LCase(theDoc.getfirstitem("type").text) = "application" Then
+					theDoc.ReplaceItemValue "InvoiceCreatedDTStamp", ""
+					theDoc.ReplaceItemValue "SubmitterName", docJSON.GetFirstItem("SubmitterName")
+					theDoc.ReplaceItemValue "IsExportedToGP", False
+					theDoc.ReplaceItemValue "IsReceiptImportedFromGP", False
+					theDoc.ReplaceItemValue "IsPaymentReceived", False
+					theDoc.ReplaceItemValue "PaymentReceiptDate", ""
+					theDoc.ReplaceItemValue "PaymentReceiptNumber", ""
+					theDoc.ReplaceItemValue "IsWorkMgmtEntriesCreated", False 		
+				End If		
+			End If
+		End If
+		Call theDoc.ReplaceItemValue("ApplicationStatus", "Active")
+		Call theDoc.Replaceitemvalue("IsActiveVersion", "1")
+		Call theDoc.ReplaceItemValue("WriteStatus", "1")
+		Call SetDocumentAuditNSecurity(theDoc, inputDoc.ClientUserID(0))
+		Call theDoc.Save( True ,False)
+	End ForAll
+	
+	inputDoc.SubmissionID = docJSON.SubmissionID
+	Call docJSON.Save(True, False)
+	Print("Finished .....  " & strReason)
+	
+End Sub
+
+'++LotusScript Development Environment:2:1:getJSONApplicationDoc:5:8
+%REM
+	Function getJSONApplicationDoc
+	Description: Comments for Function
+%END REM
+Function getJSONApplicationDoc(inputDoc As NotesDocument) As NotesDocument
+	
+	Dim Ses As New NotesSession
+	Dim vResults As Variant
+	Dim jsonReader As JSONReader
+	Dim JSONEntries As Variant, subJSONEntries As Variant
+	Dim ObjType As String , subObjType As String 
+	Dim lkupView As NotesView
+	Set jsonReader = New JSONReader
+	Dim doc As NotesDocument
+	Dim keyValue As String
+	Dim x As Integer
+	Dim replaceValue As String
+	Dim replaceDate As notesDateTime
+	
+	For x = 0 To UBound(namesAndValues,1)	
+		replaceValue = inputDoc.getItemValue(namesAndValues(x, 0))(0)	
+		If IsDate(replaceValue) Then
+			replaceValue = Format(replaceValue, "yyyy-mm-dd")
+			Set replaceDate = New NotesDateTime(replaceValue)
+			Call replaceDate.Adjustday(-1)
+			replaceValue = Format(replaceDate.Lslocaltime, "yyyy-mm-dd")
+		End If	
+		If namesAndValues(x,2) <> "" Then
+			SUPPORTString = StringStuffReplaceString(SUPPORTString, namesAndValues(x, 2), escapeString(replaceValue))
+		End If
+	Next
+	
+	
+	Set vResults = jsonReader.Parse(JSONString)	'This is a JSONObject created using the ls.snapps.JSONReader library
+	
+	JSONEntries = vResults.Items		'This would return the top level entries, containing DBPath, identifierLookupView and identifier
+	subJSONEntries = JSONEntries("items").Items 'This would represent the Items Structure, which maintain the Field Value pairs to be created within the NotesDocument
+	
+	If IsElement(JSONEntries("dbpath")) Then
+		'For Local Debugging
+		If JSONEntries("dbpath") <> "" Then
+			'Set db = New NotesDatabase(Ses.CurrentDatabase.Server,JSONEntries("DBPath"))
+			Set db = New NotesDatabase("",JSONEntries("dbpath"))
+		Else
+			Set db = Ses.CurrentDatabase	
+		End If
+	Else
+		Set db = Ses.CurrentDatabase
+	End If
+	
+	If IsElement(JSONEntries("identifierlookupview")) Then
+		Set lkupView = db.GetView(JSONEntries("identifierlookupview"))
+		If lkupView Is Nothing Then
+			Error ERR_LOOKUPVIEW_ISNULL, "Supporting JSON Data strucure identifierLookupView:" + JSONEntries("identifierlookupview") + " does not exist in DB: " + db.FilePath
+		End If
+	Else
+		Error ERR_LOOKUPVIEW_ARGMISSING, "Supporting JSON Data structure does not defines a lookup view attribute"
+	End If
+	
+	If IsElement(JSONEntries("identifier")) Then
+		If IsElement(subJSONEntries(JSONEntries("identifier"))) Then
+			keyValue = subJSONEntries(JSONEntries("identifier"))
+		Else
+			Error ERR_IDENTIFIER_ARGNOTDEFINED, "Supporting JSON Data structure does not defines the identifier attribute:" + JSONEntries("identifier") + " value."
+		End If
+	Else
+		Error ERR_IDENTIFIER_ARGMISSING, "Supporting JSON Data structure does not defines a identifier attribute"
+	End If
+	
+	'Now we have the Base values for Identifying or creating a NotesDocument
+	Set doc = lkupView.GetDocumentByKey(keyValue, True)
+	
+	Set getJSONApplicationDoc = doc
+	
+	
+End Function
+
+'++LotusScript Development Environment:2:2:setClientID:5:8
+%REM
+	Function getClientID
+	Description: Comments for Function
+%END REM
+sub setClientID(userName As String, clientName As String, clientID As String)
+	
+	Dim UserManagerDB As NotesDatabase 
+	Dim workspace As New NotesUIWorkspace
+	Dim picklist As Variant
+	'Update Security
+	'If .IsNewNote Then
+	'temp = Evaluate(|@ReplaceSubstring(@Word(@GetProfileField("System Profile Document";"SUM_Path");"!!";2); "\\"; "/")|)
+	'UserManagerDBName = temp(0)
+	'If UserManagerDBName="" Then UserManagerDBName = "ebs/UserMgt.nsf"
+
+	'clientID = Evaluate(|@Text(@DbLookup( "" : "NoCache" ; "" : "| + UserManagerDBName + |" ; "LULM" ; @Name( [CN] ; @UserName ) ; "ClientID" ;[FAILSILENT]))|)
+
+	Set userManagerDb = fdbGetUserMgt
+	picklist = workspace.PickListStrings(3, False, userManagerDb.Server, userManagerDb.Filepath, "LULM", "User ID", "Please select a User", 1)
+	
+	If IsArray(picklist) Then
+		If picklist(0) <> "" Then
+		Else
+			Exit sub
+		End If
+	Else
+		Exit sub
+	End If
+	userName = picklist(0)
+	
+	
+	Dim lookupView As NotesView
+	Dim lookupEntry As NotesViewEntry
+	Set lookupView = UserManagerDB.Getview("LULM")
+	Set lookupEntry = lookupView.getEntryByKey(picklist, True)
+	clientID = CStr(lookupEntry.Document.clientID(0))
+	clientName = CStr(lookupEntry.Document.clientName(0))
+End sub
+
+'++LotusScript Development Environment:2:2:setSponsorAddresses:5:8
+%REM
+	Sub setSponsorAddresses
+	Description: Comments for Sub
+%END REM
+Sub setSponsorAddresses(sponsorID As String, inputDoc As NotesDocument)
+	
+	
+	Dim view As NotesView
+	Dim vec As NotesViewEntryCollection
+	Dim entry As NotesViewEntry
+	Dim values As Variant
+
+	Dim clientDb As NotesDatabase
+	
+	Set clientDb = fdbGetClientWeb
+	'Set view = clientDb.Getview("LULocationPostalB$")
+	Set view = clientDb.Getview("LULocationPostalRA")
+	Set vec = view.Getallentriesbykey(sponsorID, True)
+	
+	If vec.Count <>0 Then
+	Else
+		MsgBox("No Addresses defined for this Sponsor")
+		Exit sub
+	End If
+	
+	Dim addresses() As String
+	Dim ids() As String
+	
+	ReDim addresses(0 To vec.Count)
+	ReDim ids(0 To vec.Count)
+	
+	Dim count As Integer
+	count = 0
+	Set entry = vec.Getfirstentry()
+	
+	Do Until entry Is Nothing
+		values = Split(entry.ColumnValues(1), "|")
+		addresses(count) = values(0)
+		ids(count) = values(1)
+		count = count + 1
+		Set entry = vec.Getnextentry(entry)
+	Loop
+	
+	inputDoc.SponsorAddresses = addresses
+	inputDoc.SponsorIds = ids
+	
+End Sub
+
+'++LotusScript Development Environment:2:1:writeTXTFile:5:8
+%REM
+	Sub createTXTFile
+	Description: Comments for Sub
+%END REM
+function writeTXTFile(JSONString As String) As String
+	
+	Dim fileNum As Integer
+	Dim fileName As String
+	
+	fileNum = FreeFile()
+	fileName$ = "U:\JSON.txt"
+
+	If Dir$( fileName, 0 ) = "" Then
+		REM Doesn't exist
+		Print "Doesn't Exist"
+	Else
+		REM Does exist
+		Print "Exists"
+	End If
+	
+	' Write But notes.ini information.
+	Open fileName$ For Output As fileNum%
+	Print #fileNum%, JSONString
+	Close fileNum%
+	writeTXTFile = fileName
+	
+End Function
+
+'++LotusScript Development Environment:2:2:InputDoc:6:8
+%REM
+	Sub ClinicalTrialsInput
+	Description: Takes the values in the Clinical Trials Input form and puts the form 
+	into the Db so it can be viewed in Drafts on eBSPortal
+%END REM
+Sub InputDoc(asSubmission As Boolean, inputDoc As NotesDocument)
+	
+	'Create a ct document
+	'Attach JSON.txt to this document using JSONString for Content
+	
+	'Dim inputDoc As notesDocument
+	'Dim uidoc As NotesUIDocument
+	'Dim ws As New NotesUIWorkspace
+	Dim x As Integer
+	Dim y As Integer
+	Dim ReplaceValue As String
+	Dim docJSON As NotesDocument
+	Dim stream As NotesStream
+	Dim dc As NotesDocumentCollection
+	Dim doc As NotesDocument
+	Dim success As Boolean
+	Dim strReason As String
+	Dim replaceDate As Variant
+	Dim yearStr As String
+	Dim monthStr As String
+	Dim dayStr As string
+	
+	Set db = session.currentDatabase
+	Set stream = session.createStream
+	
+	%REM
+	If inputDoc.ApplicationID(0) = "" Then
+		Call getAPPid(inputDoc)
+	End If
+	%END REM
+	
+	For x = 0 To UBound(namesAndValues,1)	
+		replaceValue = inputDoc.getItemValue(namesAndValues(x, 0))(0)	
+		If IsDate(replaceValue) Then
+			'replaceValue = Format(replaceValue, "yyyy-mm-dd")
+			replaceDate = CDat(replaceValue)
+			Set replaceDate = New NotesDateTime(replaceValue)
+			'Call replaceDate.Adjustday(-1)
+			'Now build the weird string like "2013-08-22T14:00:00.000Z
+			yearStr = CStr(Year(replaceDate.Lslocaltime))
+			monthStr = CStr(Month(replaceDate.Lslocaltime))
+			Do Until Len(monthStr) = 2
+				monthStr = "0" & monthStr
+			Loop
+			dayStr = CStr(Day(replaceDate.Lslocaltime))
+			Do Until Len(dayStr) = 2
+				dayStr = "0" & dayStr
+			Loop
+			replaceValue = yearStr & "-" & monthStr & "-" & dayStr
+		End If	
+		If namesAndValues(x,2) <> "" then
+			JSONString = StringStuffReplaceString(JSONString, namesAndValues(x, 2), escapeString(replaceValue))
+			SUPPORTString = StringStuffReplaceString(SUPPORTString, namesAndValues(x, 2), escapeString(replaceValue))
+		End if
+	Next
+	
+	Set docJSON = ProcessJSONSupportData(SUPPORTString, nothing)
+	
+	For x = 0 To UBound(namesAndValues,1)	
+		replaceValue = inputDoc.getItemValue(namesAndValues(x, 0))(0)	
+		If IsDate(replaceValue) Then
+			replaceValue = Format(replaceValue, "yyyy-mm-dd")
+			Set replaceDate = New NotesDateTime(replaceValue)
+			Call replaceDate.Adjustday(-1)
+			replaceValue = Format(replaceDate.Lslocaltime, "yyyy-mm-dd")
+		End If	
+		If namesAndValues(x, 1) <> "" Then
+			Call docJSON.Replaceitemvalue(namesAndValues(x, 1), replaceValue)
+		End If
+	Next
+	
+	Call SetDocumentAuditNSecurity(docJSON, inputDoc.ClientUserID(0))
+	
+	Call insertJSONPrecedingTrials(inputDoc)
+	Call insertJSONTrialTypes(inputDoc)
+	Call insertJSONThisTrial(inputDoc)
+	Call processEmbeddedDocs(inputDoc)
+
+	Call stream.WriteText(JSONString,5)	
+	Call CreateMIMETextAttachment(docJSON, stream, "JSON.txt")
+	
+	'is this for submission?
+	If asSubmission then
+		stream.Position = 1
+		Do Until stream.IsEOS
+			JSONstring = JSONstring + stream.ReadText
+		Loop
+		Call stream.Truncate
+		Call stream.Close
+		
+		Set dc = JSONToNotesDocuments(JSONstring, True)
+		If dc.count > 0 Then
+			Set doc = dc.GetFirstDocument
+			Do While Not doc Is Nothing
+				success = doc.Save(True, False, False)
+				If success = False Then Exit Do
+				Set doc = dc.GetNextDocument(doc)
+			Loop
+			If success Then
+				strReason = "successful creation of collection"
+			Else
+				strReason = |failed to save one of the documents: | + doc.GetFirstItem("type").text
+			End If
+		Else	'nothing to save
+			Print |{"key":0, "reason":"failed to create notes documents"}|
+		End If
+	Else		'or just for saving, draft docs, etc
+		Call stream.Truncate
+		Call stream.Close
+		success = docJSON.Save(True, False)
+		If success Then
+			strReason = "success"
+		Else
+			strReason = "failed to save document"
+		End If
+	End If
+	
+	Call docJSON.Save(True, False)
+	Call inputDoc.Save(True, False)
+	Print("Finished .....  " & strReason)
+	
+	
+End Sub
+
+'++LotusScript Development Environment:2:1:InsertJSONMedicines:1:8
+Function InsertJSONMedicines(medDoc As NotesDocument) As String
+	
+	Dim JSONStr As String
+	
+	'JSONStr = |{"id":["!@#$ApplicationID!@#$~1~Part1~Biologicals~!@#$BIODocUnid!@#$"],"identifier":["RecordUNID"],"label":["ProductName"],"Type":["Biological"],"Form":["Biological"],"ApplicationId":["!@#$ApplicationID!@#$"],"ApplicationVersion":["1"],"DataSection":["1"],"RecordUNID":["!@#$ApplicationID!@#$~1~Part1~Biologicals~!@#$BIODocUnid!@#$"],"AnimalOrigin":["!@#$BIOSpeciesOfOriginCode!@#$"],"AnimalOrigin_Label":["!@#$BIOSpeciesOfOriginDesc!@#$"],"DosageForm_Label":["!@#$BIODosageFormDesc!@#$"],"DosageForm":["!@#$BIODosageFormCode!@#$"],"LabelName":["!@#$BIOLabelName!@#$"],"ProductName":["!@#$BIOProductName!@#$"],"RouteOfAdmin":["!@#$BIORouteOfAdminCode!@#$"],"RouteOfAdmin_Label":["!@#$BIORouteOfAdminDesc!@#$"],"CountryList":["!@#$BIOCountryOfOriginCode!@#$"],"CountryList_Label":["!@#$BIOCountryOfOriginDesc!@#$"]}|
+	JSONStr = |{"id":["!@#$ApplicationID!@#$~1~Part1~Medicines~!@#$MedDocUnid!@#$"],"identifier":["RecordUNID"],"label":["ActiveName"],"Type":["Medicine"],"Form":["Medicine"],"ApplicationId":["!@#$ApplicationID!@#$"],"ApplicationVersion":["1"],"DataSection":["1"],"RecordUNID":["!@#$ApplicationID!@#$~1~Part1~Medicines~!@#$MedDocUnid!@#$"],"ActiveName":["!@#$MedicineActiveName!@#$"],"DosageForm":["!@#$MedicineDosageFormCode!@#$"],"DosageForm_Label":["!@#$MedicineDosageFormDesc!@#$"],"DoseFrequency":["!@#$MedicineDosageFrequency!@#$"],"TradeCodeName":["!@#$MedicineCodeName!@#$"],"RouteOfAdmin":["!@#$MedicineROACode!@#$"],"RouteOfAdmin_Label":["!@#$MedicineROADesc!@#$"],"ProductStrength":[!@#$MedicineQuantityStrength!@#$],"ProductStrengthUnit":["!@#$MedicineProductStrengthCode!@#$"],"Presentation":["!@#$MedicinePresentation!@#$"],"ProductStrengthUnit_Label":["!@#$MedicineProductStrengthDesc!@#$"]}|
+	
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ApplicationID!@#$", escapeString(medDoc.ApplicationID(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$MedDocUnid!@#$", escapeString(medDoc.universalID))
+	'JSONStr = StringStuffReplaceString(JSONStr, "!@#$ExpectedSiteStartDate!@#$",  Format(siteDoc.SiteExpectedStartDate(0), "yyyy-mm-dd"))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$MedicineActiveName!@#$", escapeString(medDoc.medicineActiveName(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$MedicineCodeName!@#$", escapeString(medDoc.MedicineCodeName(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$MedicineDosageFormDesc!@#$", escapeString(medDoc.MedicineDosageForm(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$MedicineDosageFormCode!@#$", escapeString(medDoc.MedicineDosageFormID(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$MedicineQuantityStrength!@#$", escapeString(medDoc.MedicineQuantityStrength(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$MedicineProductStrengthDesc!@#$", escapeString(medDoc.MedicineProductStrength(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$MedicineProductStrengthCode!@#$", escapeString(medDoc.MedicineProductStrengthID(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$MedicinePresentation!@#$", escapeString(medDoc.MedicinePresentation(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$MedicineROADesc!@#$", escapeString(MedDoc.MedicineROA(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$MedicineROACode!@#$", escapeString(MedDoc.MedicineROAID(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$MedicineDosageFrequency!@#$", escapeString(MedDoc.MedicineDosageFrequency(0)))
+	
+	InsertJSONMedicines = JSONStr
+	
+End Function
+
+'++LotusScript Development Environment:2:1:urlDecode:1:8
+Function urlDecode(encodedData As String) As String 
+	%REM
+	Dim ses As New NotesSession 
+	Dim dbThis As NotesDatabase, docTemp As NotesDocument 
+	Dim blocksize As Long, dataBlock As String  
+	Dim startPos As Long, endPos As Long 
+	Dim nextstartPos As Long, nextendPos As Long 
+	Dim DataLen As Long 
+	Dim lastChar As String, secondLastChar As String 
+	Dim retVal As String , temp As Variant 
+	Dim decodedData As Variant 
+	
+	urlDecode = ""
+	'Create a Temprory NotesDocument for @URLDecode
+	Set dbThis = Ses.CurrentDatabase
+	Set docTemp = New NotesDocument(dbThis)
+	
+	'Divide the data in 32k byte blocks
+	'This boundary/Block size should match what is defined in the JSONMIMEFileForm, Javascript
+	BlockSize = 32000
+	DataLen = Len(encodedData)
+	
+	If DataLen = 0 Then Exit Function
+	
+	StartPos = 1
+	EndPos = BlockSize
+	Do While True
+		'avoid the %00 boundaries
+		lastChar = Mid(encodedData, EndPos, 1)
+		secondLastChar = Mid(encodedData, (EndPos-1), 1)
+		
+		If secondLastChar = "%" Then
+			EndPos = EndPos - 2
+		ElseIf lastChar = "%" Then
+			EndPos = EndPos - 1
+		End If
+		
+		NextStartPos = (EndPos + 1)
+		NextEndPos = (EndPos + BlockSize)
+		
+		'Extract the Data block and Decode It
+		dataBlock =  Mid$(encodedData, StartPos, EndPos)
+		
+		Call docTemp.ReplaceItemValue("EncodedData", dataBlock)
+		
+		temp = Evaluate(|@SetField("EncodedData"; @ReplaceSubstring( EncodedData ; "+" ; " " ))|, docTemp)
+		temp = Evaluate(|@SetField("decodedData";@URLDecode("Domino" ; EncodedData))|, docTemp)
+		decodedData = docTemp.GetItemValue("decodedData")
+		ForAll decodedstr In decodedData
+			retVal = retVal + decodedstr
+		End ForAll
+		
+		'get the Boundaries for the next block
+		StartPos = NextStartPos
+		EndPos = NextEndPos
+		
+		docTemp.RemoveItem("EncodedData")
+		docTemp.RemoveItem("decodedData")
+		
+		If StartPos > DataLen Then
+			Exit Do
+		End If
+	Loop
+	
+	Set docTemp = Nothing
+	
+	urlDecode = retVal
+	%END REM
+	Dim v As Variant
+	Dim s As New NotesSession
+	Dim doc As NotesDocument 
+	Set	doc = s.CurrentDatabase.CreateDocument
+	doc.xml = EncodedData 
+
+
+	Dim EvalString As String
+	EvalString = {@URLDecode( "Domino"; xml)}
+	v = Evaluate(EvalString, doc)
+	urlDecode = v(0)
+	
+
+	
+End Function
+
+
+
+
+
+
+
+
+'++LotusScript Development Environment:2:2:createAttachment:5:8
+%REM
+	Sub createAttachment
+	Description: Comments for Sub
+%END REM
+Sub createAttachment(filePath As String, docType As String, currentDoc As NotesDocument, parentDoc As notesDocument)
+	
+	Dim s As New NotesSession, dbFileRepository As NotesDatabase, docAttachment As NotesDocument
+	Dim newQS As Variant, qspairs List As String, x As Long
+	Dim tmpstr As Variant
+	Dim rtitem As NotesRichTextItem
+	Dim object As NotesEmbeddedObject
+	
+	
+	Set dbFileRepository = fdbGetDatabase("CTF_Path")
+	%REM
+
+	Set dbFileRepository = New NotesDatabase("" , "")
+	If Not dbFileRepository.open(db.Server, StringStuffReplaceString(db.Filepath, db.Filename, "") & "filerepo.nsf") Then
+		MsgBox("Could not open the file repository , Bad !")
+	Else
+		Print "FileRepository Opened"
+	End If		
+	%END REM
+	If parentDoc Is Nothing Then
+		Set parentDoc = currentDoc
+	End If
+	
+	Set docAttachment = dbFileRepository.Createdocument()
+	Set rtitem = New NotesRichTextItem( docAttachment, "Attachment" )
+	Set object = rtitem.EmbedObject ( EMBED_ATTACHMENT, "", filePath)
+	docAttachment.ReplaceItemValue "Form","FileAttachment"
+	docAttachment.ReplaceItemValue "Type","FileAttachment"
+	docAttachment.ReplaceItemValue "AttachmentFileName",Evaluate(|@AttachmentNames|,docAttachment)
+	docAttachment.ReplaceItemValue "AttachmentAuthor",Evaluate(|@username|,docAttachment)
+	docAttachment.Save True, False
+	If docAttachment.HasItem("AttachmentID") Then
+		tmpstr= docAttachment.getFirstItem("AttachmentID").text
+	End If
+	If Len(tmpstr) < 1 Then tmpstr = Evaluate(|@NoteId|,docAttachment)
+	docAttachment.ReplaceItemValue "AttachmentID", tmpstr
+	docAttachment.ReplaceitemValue "SourceNotesDatabase", "ebs\trials\ct.nsf"
+	docAttachment.Replaceitemvalue "SourceReferenceID", parentDoc.ApplicationID(0)
+	docAttachment.Replaceitemvalue "LinkedSourceVersionNumbers", parentDoc.Version(0)
+	
+	Select Case docType
+		Case "Sponsor Declaration"
+			docAttachment.replaceItemValue "AttachmentLocation", "Part1_SponsorDeclaration"
+			docAttachment.Replaceitemvalue "AttachmentContext", parentDoc.ApplicationID(0) & "~" & parentDoc.Version(0) & "~" & "Part1"
+			'End Extra Fields we need ---> look for this to figure out what attachmentContext is "attachment_Context" just a way of grouping stuff ?
+			'Pretty sure it's just a way of grouping stuff, so giving the group documents a uniqueID to relate them with ?
+		Case "Site Sponsor Declaration"
+			docAttachment.replaceItemValue "AttachmentLocation", "dialog_Site_SponsorDeclaration"
+			docAttachment.Replaceitemvalue "AttachmentContext", parentDoc.ApplicationID(0) & "~" & parentDoc.Version(0) & "~" & "Part1~Sites~" & currentDoc.Universalid
+		Case "Site Investigator Declaration"
+			docAttachment.replaceItemValue "AttachmentLocation", "dialog_Site_PrincipalInvestigatorDeclaration"
+			docAttachment.Replaceitemvalue "AttachmentContext", parentDoc.ApplicationID(0) & "~" & parentDoc.Version(0) & "~" & "Part1~Sites~" & currentDoc.Universalid
+		Case "Site HREC Declaration"
+			docAttachment.replaceItemValue "AttachmentLocation", "dialog_Site_HRECDeclaration"
+			docAttachment.Replaceitemvalue "AttachmentContext", parentDoc.ApplicationID(0) & "~" & parentDoc.Version(0) & "~" & "Part1~Sites~" & currentDoc.Universalid
+		Case "Site Authority Declaration"
+			docAttachment.replaceItemValue "AttachmentLocation", "dialog_Site_ApprovingAuthorityDeclaration"
+			docAttachment.Replaceitemvalue "AttachmentContext", parentDoc.ApplicationID(0) & "~" & parentDoc.Version(0) & "~" & "Part1~Sites~" & currentDoc.Universalid
+	End Select
+
+	docAttachment.inputDocID = currentDoc.Universalid
+	docAttachment.Save True, False		
+	
+End Sub
+
+
+
+
+
+
+
+'++LotusScript Development Environment:2:2:InsertJSONPrecedingTrials:11:8
+%REM
+	Function InsertJSONPreceedingTrials
+	Description:
+	
+	'JSONString =       "PrecedingTrials": [
+	'"CT-2011-CTN-01292-1",
+	'"CT-2011-CTN-01282-1"
+	'],
+	
+%END REM
+sub InsertJSONPrecedingTrials(inputDoc As NotesDocument)
+	
+	Dim JSONStr As String
+	Dim var As Variant
+
+	JSONStr = ""
+	var = inputDoc.PreceedingTrialIDs
+	If IsArray(var) Then
+		If var(0) <> "" then
+			ForAll Trial In var
+				If JSONStr = "" Then
+					JSONStr = |"| & EscapeString(CStr(Trial)) & |"|
+				Else
+					JSONStr = JSONStr & |,"| & EscapeString(CStr(Trial)) & |"|
+				End If
+			End ForAll
+		End if
+	End If
+	
+	JSONString = StringStuffReplaceString(JSONString, "!@#$InsertPrecedingTrialsHere!@#$", JSONStr)
+	
+End Sub
+
+
+
+
+
+
+
+
+
+'++LotusScript Development Environment:2:1:InsertJSONPlacebos:1:8
+Function InsertJSONPlacebos(placeboDoc As NotesDocument) As String
+	
+	Dim JSONStr As String
+	
+	JSONStr = |{"id":["!@#$ApplicationID!@#$~1~Part1~Placebos~!@#$PlaceboDocUnid!@#$"],"identifier":["RecordUNID"],"label":["ProductName"],"Type":["Placebo"],"Form":["Placebo"],"ApplicationId":["!@#$ApplicationID!@#$"],"ApplicationVersion":["1"],"DataSection":["1"],"RecordUNID":["!@#$ApplicationID!@#$~1~Part1~Placebos~!@#$PlaceboDocUnid!@#$"],"ActiveName":["!@#$PlaceboActiveName!@#$"],"DosageForm":["!@#$PlaceboDosageFormCode!@#$"],"DosageForm_Label":["!@#$PlaceboDosageFormDesc!@#$"],"Dose":[""],"ProductName":["!@#$PlaceboProductName!@#$"],"RouteOfAdmin":["!@#$PlaceboRouteOfAdminCode!@#$"],"RouteOfAdmin_Label":["!@#$PlaceboRouteOfAdminDesc!@#$"],"Strength":["!@#$PlaceboStrength!@#$"],"DoseFrequency":["!@#$PlaceboDosageAndFreq!@#$"]}|
+	
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ApplicationID!@#$", escapeString(placeboDoc.ApplicationID(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$PlaceboDocUnid!@#$", escapeString(placeboDoc.universalID))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$PlaceboProductName!@#$", escapeString(placeboDoc.PlaceboProductName(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$PlaceboActiveName!@#$", escapeString(placeboDoc.PlaceboActiveName(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$PlaceboDosageFormDesc!@#$", escapeString(placeboDoc.PlaceboDosageForm(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$PlaceboDosageFormCode!@#$", escapeString(placeboDoc.PlaceboDosageFormID(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$PlaceboStrength!@#$", escapeString(placeboDoc.PlaceboStrength(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$PlaceboDosageAndFreq!@#$", escapeString(placeboDoc.PlaceboDosageAndFrequency(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$PlaceboRouteOfAdminDesc!@#$", escapeString(placeboDoc.PlaceboROA(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$PlaceboRouteOfAdminCode!@#$", escapeString(placeboDoc.PlaceboROAID(0)))
+	
+	InsertJSONPlacebos = JSONStr
+	
+End Function
+
+'++LotusScript Development Environment:2:1:directJSONToNotesDocuments:1:8
+Function directJSONToNotesDocuments(JSONString As String, docList List As NotesDocument, aDB As NotesDatabase) As Variant
+	Dim jsonReader As JSONReader
+	Dim vResults As Variant
+	Dim dbThis As NotesDatabase
+	Dim isDocumentsArrayInit As Boolean
+	'Dim dc As NotesDocumentCollection
+	Dim DocCount As Long
+	
+	'SaveDocumentToDB = CommitDocuments
+	isDocumentsArrayInit = False
+	
+	Set jsonReader = New JSONReader
+	Set vResults = jsonReader.Parse(JSONString)	'This is a JSONObject created using the ls.snapps.JSONReader library
+	
+	DocCount = ReadJSONObjectDirect(vResults, False, docList, aDB) 'Recursivly called
+	Print CStr(DocCount)
+	
+End Function
+
+'++LotusScript Development Environment:2:1:ReadJSONObjectDirect:1:8
+Function ReadJSONObjectDirect(JSONObj As Variant, SaveDocumentToDB As Boolean, docList List As NotesDocument, dbCTReg As NotesDatabase) As Long
+	'Dim s As New NotesSession
+	Dim JSONEntries As Variant, subJSONEntries As Variant
+	Dim ObjType As String , subObjType As String 
+	Dim doc As NotesDocument, isDocumentEntry As Boolean
+	
+	JSONEntries = JSONObj.Items
+	
+	isDocumentEntry=False
+	If IsElement(JSONEntries("RecordUNID")) And IsElement(JSONEntries("id"))  Then
+		'Create a Notes Document only in the case where the entry has UNID and ID JSON Elements, as according to the JSON every document Entry has to have a UNID, Id aswell as a TYPE element
+		Set doc = New NotesDocument(dbCTReg)
+		ReadJSONObjectDirect=ReadJSONObjectDirect+ 1
+		isDocumentEntry=True
+	End If
+	
+	ForAll JSONEntry In JSONEntries
+		ObjType = TypeName(JSONEntry)
+		If  objType = "JSONOBJECT" Then
+			'If this is an Object, its a Document/Document Collection entry call ReadJSONObjectDirect to process the nested document
+			ReadJSONObjectDirect=ReadJSONObjectDirect + ReadJSONObjectDirect(JSONEntry, SaveDocumentToDB, docList, dbCTReg)
+		ElseIf objType = "JSONARRAY" Then
+			'JSONEntry.Items would be of type EMPTY in cases where the Object has no entries in the ITEMS array of JSON where the Dummy EMPTY JSON objects have been created
+			If TypeName(JSONEntry.Items) <> "EMPTY" Then
+				subObjType = TypeName(JSONEntry.Items(0))
+				If subObjType <> "JSONOBJECT" Then	'THE REAL DATA ELEMENT / ENTRY Type MULTIVALUE
+					If isDocumentEntry Then
+						doc.ReplaceItemValue ListTag(JSONEntry), JSONEntry.Items
+					End If
+				Else	'Else This is a Collection of other Documents
+					ForAll JSONSubEntry In JSONEntry.Items
+						ReadJSONObjectDirect=ReadJSONObjectDirect + ReadJSONObjectDirect(JSONSubEntry, SaveDocumentToDB, docList, dbCTReg)
+					End ForAll
+				End If
+			Else
+				If isDocumentEntry Then
+					doc.ReplaceItemValue ListTag(JSONEntry), ""
+				End If
+			End If	
+		Else
+			If isDocumentEntry Then	'THE REAL DATA ELEMENT / ENTRY
+				doc.ReplaceItemValue ListTag(JSONEntry), JSONEntry
+			End If
+		End If
+	End ForAll
+	
+	If isDocumentEntry Then
+		Set docList(CStr(listCount)) = doc
+		listCount = listCount + 1
+		'dc.AddDocument doc
+		If SaveDocumentToDB Then
+			doc.Save True, False
+		End If
+	End If
+End Function
+
+
+'++LotusScript Development Environment:2:2:getAppID:6:8
+%REM
+	Function getApplicationID
+	Description: Comments for Function
+%END REM
+
+sub getAppID(inputDoc As NotesDocument)
+
+	Dim appIDDoc As NotesDocument
+	Dim trialType As String
+	Dim appid As String
+
+	appid = GetID(CT_APPLICATION_SEQUENCE_KEY, CT_SEQUENCE_SYSTEMTYPE, CTN_APPTYPE)
+	trialtype="CTN"		
+	
+	%REM
+	If InStr(s.CommonUserName, "_")>0 Then
+		ctDoc.ReplaceItemValue "UserID", StrRight(s.CommonUserName, "_")
+	Else
+		ctDoc.ReplaceItemValue "UserID", s.CommonUserName
+	End If
+	%END REM
+	
+	Set appIDDoc = db.createdocument
+	appIDDoc.replaceitemvalue "form", "AppIDplaceholder"
+	appIDDoc.replaceitemvalue "type", "AppIDplaceholder"
+	appIDDoc.replaceitemvalue "id", appid
+	appIDDoc.replaceitemvalue "version", "1"
+	appIDDoc.replaceItemValue "ClinicalTrialType", trialtype
+	Call appIDDoc.save(True, False)
+	inputDoc.applicationID = appid
+	Call inputDoc.save(True, False)
+	
+	'Call setApplicationIDInChildren(inputDoc)
+	
+End sub
+
+'++LotusScript Development Environment:2:2:initEscapedArray:1:8
+Sub initEscapedArray
+	EscapedArray(0,0) = |\|
+	EscapedArray(1,0) = |"|
+	EscapedArray(2,0) = |/|
+	EscapedArray(3,0) = Chr(8)
+	EscapedArray(4,0) = Chr(9)
+	EscapedArray(5,0) = Chr(10)
+	EscapedArray(6,0) = Chr(12)
+	EscapedArray(7,0) = Chr(13)
+	
+	EscapedArray(0,1) = |\\|
+	EscapedArray(1,1) = |\"|
+	EscapedArray(2,1) = |\/|
+	EscapedArray(3,1) = |\b|
+	EscapedArray(4,1) = |\t|
+	EscapedArray(5,1) = |\n|
+	EscapedArray(6,1) = |\f|
+	EscapedArray(7,1) = |\r|
+End Sub
+
+'++LotusScript Development Environment:2:2:removeAttachment:5:8
+%REM
+	Sub removeAttachment
+	Description: Comments for Sub
+%END REM
+Sub removeAttachment(inputDoc As NotesDocument, callingButton As String)
+	
+	Dim lookupView As NotesView
+	Dim dbFileRepository As NotesDatabase
+	Dim dc As NotesDocumentCollection
+	Dim doc As NotesDocument
+	Dim nextDoc As NotesDocument
+	
+	Set dbFileRepository = fdbGetDatabase("CTF_Path")
+	Set lookupView = dbFileRepository.Getview("LookupAllByApplicationID")
+	Call lookupView.Refresh()
+	
+	Set dc = lookupView.Getalldocumentsbykey(InputDoc.applicationID(0) & "~" & InputDoc.version(0) & "~FileAttachment", True)
+	Set doc = dc.Getfirstdocument()
+
+	
+	Do Until doc Is Nothing
+		Set nextDoc = dc.Getnextdocument(doc)
+		If doc.inputDocID(0) = inputDoc.Universalid then
+			Select Case InputDoc.form(0)
+			Case "Clinical Trials Input"
+				If doc.attachmentLocation(0) = "Part1_SponsorDeclaration" Then
+					Call doc.Remove(True)
+				End If
+			Case "Clinical Trials Input Site"
+				If doc.attachmentLocation(0) = "dialog_Site_SponsorDeclaration" And callingButton = "Sponsor" Then
+					Call doc.Remove(True)
+					GoTo nextDoc
+				End If
+				If doc.attachmentLocation(0) = "dialog_Site_PrincipalInvestigatorDeclaration" And callingButton = "Principal" Then
+					Call doc.Remove(True)
+					GoTo nextDoc
+				End If
+				If doc.attachmentLocation(0) = "dialog_Site_HRECDeclaration" And callingButton = "HREC" Then
+					Call doc.Remove(True)
+					GoTo nextDoc
+				End If
+				If doc.attachmentLocation(0) = "dialog_Site_ApprovingAuthorityDeclaration" And callingButton = "ApprovingAuthority" Then
+					Call doc.Remove(True)
+					GoTo nextDoc
+				End If
+		End Select
+		End if
+nextDoc:
+		Set Doc = nextDoc
+	Loop
+	
+End Sub
+
+'++LotusScript Development Environment:2:1:InsertJSONSites:16:8
+
+
+%REM
+	Sub InsertJSONSites
+	Description: 
+	
+	We are looking for the text !@#$InsertSitesHere!@#$
+	We are replacing it with something like 
+	
+	eg) 2 sites --> {"id":["CT-2013-CTN-01994-1~1~Part1~Sites~16b34a2c-555a-4ca7-899d-828a5d769505"],"identifier":["id"],"label":["TrialSite"],"Type":["Site"],"Form":["Site"],"ApplicationId":["CT-2013-CTN-01994-1"],"ApplicationVersion":["1"],"DataSection":["1"],"RecordUNID":["CT-2013-CTN-01994-1~1~Part1~Sites~16b34a2c-555a-4ca7-899d-828a5d769505"],"SponsorAttachment":[""],"SponsorAttachment_Label":[""],"ExpectedSiteStartDate":["2013-03-03"],"ApprovingAuthorityName":["STinky Authority"],"ApprovingAuthorityState":["TAS"],"ApprovingAuthorityAttachment":[""],"ApprovingAuthorityAttachment_Label":[""],"HRECCode":["123456"],"HRECName":["Stinky HREC"],"HRECState":["NT"],"HRECAttachment":[""],"HRECAttachment_Label":[""],"PrincipalInvestigatorName":["Matt Stinky Thomson"],"PrincipalInvestigatorState":["0"],"PrincipalInvestigatorAttachment":[""],"PrincipalInvestigatorAttachment_Label":[""],"TrialSiteAddress":["56 Blah St"],"TrialSiteState":["NSW"],"TrialSite":["Stinky Site"],"copyHasBeenEdited":[false],"TrialSiteState_Label":["New South Wales"],"SponsorDeclaration":["SecondOracleMISExport.txt"],"PrincipalInvestigatorDeclaration":["SecondOracleMISExport.txt"],"HRECState_Label":["Northern Territory"],"HRECDeclaration":["JSON.txt"],"ApprovingAuthorityState_Label":["Tasmania"],"ApprovingAuthorityDeclaration":["December2012.xlsx"]},{"id":["CT-2013-CTN-01994-1~1~Part1~Sites~b6b1d3de-bbd9-47d7-8556-a67edc975b3b"],"identifier":["id"],"label":["TrialSite"],"Type":["Site"],"Form":["Site"],"ApplicationId":["CT-2013-CTN-01994-1"],"ApplicationVersion":["1"],"DataSection":["1"],"RecordUNID":["CT-2013-CTN-01994-1~1~Part1~Sites~b6b1d3de-bbd9-47d7-8556-a67edc975b3b"],"SponsorAttachment":[""],"SponsorAttachment_Label":[""],"ExpectedSiteStartDate":["2013-02-28"],"ApprovingAuthorityName":["fdasdf"],"ApprovingAuthorityState":["NSW"],"ApprovingAuthorityAttachment":[""],"ApprovingAuthorityAttachment_Label":[""],"HRECCode":["sdfasf"],"HRECName":["sdfasf"],"HRECState":["NT"],"HRECAttachment":[""],"HRECAttachment_Label":[""],"PrincipalInvestigatorName":["dsfadfa"],"PrincipalInvestigatorState":["0"],"PrincipalInvestigatorAttachment":[""],"PrincipalInvestigatorAttachment_Label":[""],"TrialSiteAddress":["blah st"],"TrialSiteState":["ACT"],"TrialSite":["2nd Site"],"copyHasBeenEdited":[false],"TrialSiteState_Label":["Australian Capital Territory"],"SponsorDeclaration":["September2012.xlsx"],"PrincipalInvestigatorDeclaration":["premierJanuary2013.xlsx"],"HRECState_Label":["Northern Territory"],"HRECDeclaration":["November2012.xlsx"],"ApprovingAuthorityState_Label":["New South Wales"],"ApprovingAuthorityDeclaration":["PremierAugust2012.xlsx"]}]
+	eg) 1 site --> {"id":["CT-2013-CTN-01914-1~1~Part1~Sites~47df6ae3-914c-4dac-8fb4-67d79acea020"],"identifier":["id"],"label":["TrialSite"],"Type":["Site"],"Form":["Site"],"ApplicationId":["CT-2013-CTN-01914-1"],"ApplicationVersion":["1"],"DataSection":["1"],"RecordUNID":["CT-2013-CTN-01914-1~1~Part1~Sites~47df6ae3-914c-4dac-8fb4-67d79acea020"],"SponsorAttachment":[""],"SponsorAttachment_Label":[""],"ExpectedSiteStartDate":["2013-03-01"],"ApprovingAuthorityName":["StinkyAuthorityName"],"ApprovingAuthorityState":["VIC"],"ApprovingAuthorityAttachment":[""],"ApprovingAuthorityAttachment_Label":[""],"HRECCode":["StinkyHRECCode"],"HRECName":["StinkyHRECName"],"HRECState":["NSW"],"HRECAttachment":[""],"HRECAttachment_Label":[""],"PrincipalInvestigatorName":["StinkyInvestigatorName"],"PrincipalInvestigatorState":["2"],"PrincipalInvestigatorAttachment":[""],"PrincipalInvestigatorAttachment_Label":[""],"TrialSiteAddress":["StinkySiteAddress"],"TrialSiteState":["ACT"],"TrialSite":["StinkySiteName"],"copyHasBeenEdited":[false],"TrialSiteState_Label":["Australian Capital Territory"],"SponsorDeclaration":["December2012.xlsx"],"PrincipalInvestigatorDeclaration":["July2012.xlsx"],"HRECState_Label":["New South Wales"],"HRECDeclaration":["premierJanuary2013.xlsx"],"ApprovingAuthorityState_Label":["Victoria"],"ApprovingAuthorityDeclaration":["September2012.xlsx"]}
+	When there is two Sites
+	each value is delimeted with {},{},{} for 3 Sites
+	
+%END REM
+function InsertJSONSites(siteDoc As NotesDocument) As String
+	
+	Dim JSONStr As String
+	JSONStr = |{"id":["!@#$ApplicationID!@#$~1~Part1~Sites~!@#$SiteDocUnid!@#$"],"identifier":["id"],"label":["TrialSite"],"Type":["Site"],"Form":["Site"],"ApplicationId":["!@#$ApplicationID!@#$"],"ApplicationVersion":["1"],"DataSection":["1"],"RecordUNID":["!@#$ApplicationID!@#$~1~Part1~Sites~!@#$SiteDocUnid!@#$"],"SponsorAttachment":[""],"SponsorAttachment_Label":[""],"ExpectedSiteStartDate":["!@#$ExpectedSiteStartDate!@#$"],"ApprovingAuthorityName":["!@#$ApprovingAuthorityName!@#$"],"ApprovingAuthorityState":["!@#$ApprovingAutorityState!@#$"],"ApprovingAuthorityAttachment":[""],"ApprovingAuthorityAttachment_Label":[""],"HRECCode":["!@#$HRECCode!@#$"],"HRECName":["!@#$HRECName!@#$"],"HRECState":["!@#$HRECState!@#$"],"HRECAttachment":[""],"HRECAttachment_Label":[""],"PrincipalInvestigatorName":["!@#$PrincipalInvestigatorName!@#$"],"PrincipalInvestigatorState":["2"],"PrincipalInvestigatorAttachment":[""],"PrincipalInvestigatorAttachment_Label":[""],"TrialSiteAddress":["!@#$TrialSiteAddress!@#$"],"TrialSiteState":["!@#$TrialSiteState!@#$"],"TrialSite":["!@#$TrialSiteName!@#$"],"copyHasBeenEdited":[false],"TrialSiteState_Label":["!@#$TrialSiteStateLabel!@#$"],"SponsorDeclaration":["!@#$SponsorDeclarationFileName!@#$"],"PrincipalInvestigatorDeclaration":["!@#$PrincipalInvestigatorDeclarationFileName!@#$"],"HRECState_Label":["!@#$HRECStateLabel!@#$"],"HRECDeclaration":["!@#$HRECDeclarationFileName!@#$"],"ApprovingAuthorityState_Label":["!@#$ApprovingAuthorityState_Label!@#$"],"ApprovingAuthorityDeclaration":["!@#$ApprovingAuthorityDeclaration!@#$"]}|
+	
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ApplicationID!@#$", escapeString(siteDoc.ApplicationID(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$SiteDocUnid!@#$", escapeString(siteDoc.universalID))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ExpectedSiteStartDate!@#$",  Format(siteDoc.SiteExpectedStartDate(0), "yyyy-mm-dd"))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ApprovingAuthorityName!@#$", escapeString(siteDoc.SiteAuthorityName(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ApprovingAuthorityState!@#$", escapeString(siteDoc.SiteAuthorityLocation(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$HRECCode!@#$", escapeString(siteDoc.SiteHRECCode(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$HRECName!@#$", escapeString(siteDoc.SiteHRECName(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$HRECState!@#$", escapeString(siteDoc.SiteHRECLocation(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$PrincipalInvestigatorName!@#$", escapeString(siteDoc.SiteInvestigatorName(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$PrincipalInvestigatorState!@#$", escapeString(siteDoc.SiteInvestigatorLocation(0))) ' this one may be WRONG
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$TrialSiteAddress!@#$", escapeString(siteDoc.SiteAddress(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$TrialSiteState!@#$", escapeString(siteDoc.SiteLocation(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$TrialSiteName!@#$", escapeString(siteDoc.SiteName(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$TrialSiteStateLabel!@#$", escapeString(siteDoc.SiteLocation(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$SponsorDeclarationFileName!@#$", escapeString(siteDoc.SiteSponsorDeclaration(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$PrincipalInvestigatorDeclarationFileName!@#$", escapeString(siteDoc.SiteInvestigatorDeclaration(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$HRECDeclarationFileName!@#$", escapeString(siteDoc.SiteHRECDeclaration(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ApprovingAuthorityDeclaration!@#$", escapeString(siteDoc.SiteAuthorityDeclaration(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$HRECStateLabel!@#$", escapeString(siteDoc.SiteHRECLocation(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ApprovingAuthorityState_Label!@#$", escapeString(siteDoc.SiteAuthorityLocation(0)))
+	
+	InsertJSONSites = JSONStr
+	
+End Function
+
+'++LotusScript Development Environment:2:1:GetArrValues:38:8
+%REM
+	Function GetArrValues
+	Description: Dim AOriginCode As Variant
+	
+Dim APartsCode  As variant
+Dim AppAreaCode  As variant
+Dim APrepCode As variant
+Dim CompDetCode  As variant
+Dim CountryCode  As variant
+Dim CTCode as  variant
+Dim DosageCode  As variant
+Dim FuncCode  As variant
+Dim ROACode  As variant
+Dim StatesCode  As variant
+Dim StatesApprovedCode as  variant
+Dim StatesHRecCode as variant
+Dim TheAreaCode as variant
+Dim TotalPatientsCode as variant
+Dim UnitsPropCode as variant
+
+Dim AOriginDesc  As variant
+Dim APartsDesc  As variant
+Dim AppAreaDesc As variant
+Dim APrepDesc As variant
+Dim CompDetDesc As variant
+Dim CountryDesc As variant
+Dim CTDesc As variant
+Dim DosageDesc As variant
+Dim FuncDesc  As variant
+Dim ROADesc as variant
+Dim StatesDesc as variant
+Dim StatesApprovedDesc as variant
+Dim StatesHRecDesc As variant
+Dim TheAreaDesc As variant
+Dim TotalPatientsDesc as variant
+Dim UnitsPropDesc as variant
+%END REM
+Function GetArrValues(arrayName As String) As Variant
+	Select Case arrayName
+		Case "TotalPatientsDesc"
+			GetArrValues = TotalPatientsDesc
+		Case "TotalPatientsCode"
+			GetArrValues = TotalPatientsCode
+		Case "TherapeuticArea"
+			getArrValues = TheAreaDesc
+		Case "TherapeuticCode"
+			getArrValues = TheAreaCode
+		Case "Locations"
+			getArrValues = StatesHRecDesc
+		Case "LocationIDs"
+			getArrValues = StatesHRecCode
+		Case "DosageDesc"
+			getArrValues = DosageDesc
+		Case "DosageCode"
+			getArrValues = DosageCode
+		Case "SpeciesDesc"
+			getArrValues = AOriginDesc
+		Case "SpeciesCode"
+			getArrValues = AOriginCode
+		Case "ROADesc"
+			getArrValues = ROADesc
+		Case "ROACode"
+			GetArrValues = ROACode
+		Case "CountryDesc"
+			getArrValues = CountryDesc
+		Case "CountryCode"
+			getArrValues = CountryCode
+		Case "UnitsPropDesc"
+			getArrValues = UnitsPropDesc
+		Case "UnitsPropCode"
+			getArrValues = UnitsPropCode
+		Case "APartsCode"
+			getArrValues = APartsCode
+		Case "APartsDesc"
+			getArrValues = APartsDesc
+		Case "APrepDesc"
+			getArrValues = APrepDesc
+		Case "APrepCode"
+			getArrValues = APrepCode
+	End Select
+End Function
+
+'++LotusScript Development Environment:2:2:setApplicationIDInChildren:5:8
+%REM
+	Sub setApplicationIDInChildren
+	Description: Comments for Sub
+%END REM
+Sub setApplicationIDInChildren(parentDoc As NotesDocument)
+	
+	
+	Dim embeddedView As NotesView
+	Dim dc As NotesDocumentCollection
+	Dim Doc As NotesDocument
+	
+	Set embeddedView = db.getView("Clinical Trials Input Embedded")
+	If embeddedView Is Nothing Then
+		MsgBox("Can not open Clinical Trials Input Embedded View.")
+		Exit sub
+	End If
+	
+	
+	Set dc = embeddedView.Getalldocumentsbykey(CStr(parentDoc.Universalid), False)
+	Set Doc = dc.Getfirstdocument()
+	
+	Do Until Doc Is Nothing 
+		If Doc.applicationID(0) <> "" Then
+		Else
+			Doc.applicationID = parentDoc.applicationID(0)
+			Call Doc.Save(True, False)
+		End If
+		Set doc = dc.getNextDocument(Doc)
+	Loop
+	
+End Sub
+
+'++LotusScript Development Environment:2:1:InsertJSONDevices:1:8
+Function InsertJSONDevices(deviceDoc As NotesDocument) As String
+	
+	Dim JSONStr As String
+	
+	JSONStr = |{"id":["!@#$ApplicationID!@#$~1~Part1~Devices~!@#$DeviceDocUnid!@#$"],"identifier":["RecordUNID"],"label":["ProductName"],"Type":["Device"],"Form":["Device"],"ApplicationId":["!@#$ApplicationID!@#$"],"ApplicationVersion":["1"],"DataSection":["1"],"RecordUNID":["!@#$ApplicationID!@#$~1~Part1~Devices~!@#$DeviceDocUnid!@#$"],"ProductName":["!@#$DeviceProductName!@#$"],"Manufacturer":["!@#$DeviceManufacturerName!@#$"],"Manufacturer_Label":[""],"Description":["!@#$DeviceDescription!@#$"]}|
+	
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ApplicationID!@#$", escapeString(deviceDoc.ApplicationID(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$DeviceDocUnid!@#$", escapeString(deviceDoc.universalID))
+	'JSONStr = StringStuffReplaceString(JSONStr, "!@#$ExpectedSiteStartDate!@#$",  Format(siteDoc.SiteExpectedStartDate(0), "yyyy-mm-dd"))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$DeviceProductName!@#$", escapeString(deviceDoc.DeviceProductName(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$DeviceManufacturerName!@#$", escapeString(deviceDoc.DeviceManufacturer(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$DeviceDescription!@#$", escapeString(deviceDoc.DeviceDescription(0)))
+	
+	InsertJSONDevices = JSONStr
+	
+End Function
+
+'++LotusScript Development Environment:2:1:InsertJSONComparators:1:8
+Function InsertJSONComparators(compDoc As NotesDocument) As String
+	
+	Dim JSONStr As String
+	
+	JSONStr = |{"id":["!@#$ApplicationID!@#$~1~Part1~Comparators~!@#$CompDocUnid!@#$"],"identifier":["RecordUNID"],"label":["ActiveName"],"Type":["Comparator"],"Form":["Comparator"],"ApplicationId":["!@#$ApplicationID!@#$"],"ApplicationVersion":["1"],"DataSection":["1"],"RecordUNID":["!@#$ApplicationID!@#$~1~Part1~Comparators~!@#$CompDocUnid!@#$"],"ActiveName":["!@#$ComparatorActiveName!@#$"],"DosageForm":["!@#$ComparatorDosageFormCode!@#$"],"DosageForm_Label":["!@#$ComparatorDosageFormDesc!@#$"],"DoseFrequency":["!@#$ComparatorDosageFrequency!@#$"],"TradeCodeName":["!@#$ComparatorCodeName!@#$"],"RouteOfAdmin":["!@#$ComparatorROACode!@#$"],"RouteOfAdmin_Label":["!@#$ComparatorROADesc!@#$"],"ProductStrength":[!@#$ComparatorQuantityStrength!@#$],"ProductStrengthUnit":["!@#$ComparatorProductStrengthCode!@#$"],"Presentation":["!@#$ComparatorPresentation!@#$"],"ProductStrengthUnit_Label":["!@#$ComparatorProductStrengthDesc!@#$"]}|
+	
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ApplicationID!@#$", escapeString(compDoc.ApplicationID(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$CompDocUnid!@#$", escapeString(compDoc.universalID))
+	'JSONStr = StringStuffReplaceString(JSONStr, "!@#$ExpectedSiteStartDate!@#$",  Format(siteDoc.SiteExpectedStartDate(0), "yyyy-mm-dd"))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ComparatorActiveName!@#$", escapeString(compDoc.comparatorActiveName(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ComparatorCodeName!@#$", escapeString(compDoc.ComparatorCodeName(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ComparatorDosageFormDesc!@#$", escapeString(compDoc.ComparatorDosageForm(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ComparatorDosageFormCode!@#$", escapeString(compDoc.ComparatorDosageFormID(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ComparatorQuantityStrength!@#$", escapeString(compDoc.ComparatorQuantityStrength(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ComparatorProductStrengthDesc!@#$", escapeString(compDoc.ComparatorProductStrength(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ComparatorProductStrengthCode!@#$", escapeString(compDoc.ComparatorProductStrengthID(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ComparatorPresentation!@#$", escapeString(compDoc.ComparatorPresentation(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ComparatorROADesc!@#$", escapeString(compDoc.ComparatorROA(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ComparatorROACode!@#$", escapeString(compDoc.ComparatorROAID(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ComparatorDosageFrequency!@#$", escapeString(compDoc.ComparatorDosageFrequency(0)))
+	
+	InsertJSONComparators = JSONStr
+	
+End Function
+
+'++LotusScript Development Environment:2:1:PickFile:5:8
+%REM
+	Sub PickFile
+	Description: Comments for Sub
+%END REM
+Function PickFile() As String
+	
+	Dim strFileName As String*256
+	Dim strTitle As String
+	Dim strFilter As String
+	Dim retVal As Variant
+	Dim ErrorStatus As Boolean
+
+	strFileName = ""
+	strTitle = "Please select the file to be imported"
+	'strFilter = "MS Excel Files*.xls" 'Filter is set to show only .xls files
+
+	' Show file dialog box till a Excel file is selected
+	Do
+		ErrorStatus=False
+		If NEMGetFile( 0, strFileName, strFilter, strTitle) = 0 Then
+			retval=MsgBox( "You have not selected a file to Upload. Do you want to exit ?",4+256,"Abort")
+			If retval=7 Then
+				ErrorStatus=True
+			Else
+				Exit Function
+			End If
+		End If
+	Loop Until ErrorStatus=False
+
+	PickFile = strFileName
+End Function
+
+'++LotusScript Development Environment:2:2:clearFieldsAccordingToThisTrial:5:8
+%REM
+	Sub clearFieldsAccordingToThisTrial
+	Description: the embedded Documents aren't written, this is for other fields on the doc
+%END REM
+Sub clearFieldsAccordingToThisTrial(InputDoc As NotesDocument)
+	
+	Dim pos As Variant
+	Dim thisTrial As Variant
+	
+	'Biologicals
+	thisTrial = inputdoc.ThisTrial
+	
+	pos = ArrayGetIndex(thisTrial, "0")
+	If IsNull(pos) Then
+		InputDoc.BioProductDescription = ""
+	End If
+	
+	pos = ArrayGetIndex(thisTrial, "8")
+	If IsNull(pos) Then
+		InputDoc.GeneticallyModifiedOrganism = ""
+	End If
+	
+	pos = ArrayGetIndex(thisTrial, "5")
+	If IsNull(pos) Then
+		Inputdoc.PreceedingTrials = ""
+		inputDoc.PreceedingTrialIDs = ""
+	End If
+	
+	pos = ArrayGetIndex(thisTrial, "9")
+	If IsNull(pos) Then
+		InputDoc.DetailsOfNanoParticles = ""
+	End If
+End Sub
+
+'++LotusScript Development Environment:2:1:ProcessJSONSupportData:1:8
+Function ProcessJSONSupportData(JSONString As String, otherDb As NotesDatabase) As NotesDocument 
+	On Error GoTo ErrorHandler
+	
+	%REM
+	We are only expecting 2 levels of data example below
+	{
+	"dbpath":"", 					<----------------- The Database name where the script should save the Parsed Document Context, if NULL or Non Existing, defaults to currentDatabase
+	"identifierlookupview":"",       <----------------- Lookup view, in the Database, on which it would seek, or perform getdocumentbykey using the Identifier Field
+	"identifier":"ApplicationId",  <----------------- The Identifier Field represents the Value used as the Key Unique value for the document
+	"items":{
+			"ApplicationId":"BI-2010-BI-00002-1",
+			"SponsorName":"Johnson & Johnson",
+			"ClientReference":"BleetBleet & Blah Blah",
+			"Form":"Application",
+			"Type":"BiologicalApplication",
+			.......
+			...............
+			..................
+		}
+	}
+	%END REM
+	Dim Ses As New NotesSession
+	Dim vResults As Variant
+	Dim jsonReader As JSONReader
+	Dim JSONEntries As Variant, subJSONEntries As Variant
+	Dim ObjType As String , subObjType As String 
+	
+	Dim dbPath As String, LookupViewName As String, KeyValueIdentifier As String 
+	'Dim db As NotesDatabase 
+	Dim lkupView As NotesView
+	Dim keyValue As String
+	Dim doc As NotesDocument, newDoc As NotesDocument
+	Dim mime As NotesMIMEEntity
+	
+	Set jsonReader = New JSONReader
+	Set vResults = jsonReader.Parse(JSONString)	'This is a JSONObject created using the ls.snapps.JSONReader library
+	
+	JSONEntries = vResults.Items		'This would return the top level entries, containing DBPath, identifierLookupView and identifier
+	subJSONEntries = JSONEntries("items").Items 'This would represent the Items Structure, which maintain the Field Value pairs to be created within the NotesDocument
+
+	If IsElement(JSONEntries("dbpath")) Then
+		'For Local Debugging
+		If JSONEntries("dbpath") <> "" Then
+			'Set db = New NotesDatabase(Ses.CurrentDatabase.Server,JSONEntries("DBPath"))
+			Set db = New NotesDatabase("",JSONEntries("dbpath"))
+		Else
+			Set db = Ses.CurrentDatabase	
+		End If
+	Else
+		Set db = Ses.CurrentDatabase
+	End If
+
+	If IsElement(JSONEntries("identifierlookupview")) Then
+		Set lkupView = db.GetView(JSONEntries("identifierlookupview"))
+		If lkupView Is Nothing Then
+			Error ERR_LOOKUPVIEW_ISNULL, "Supporting JSON Data strucure identifierLookupView:" + JSONEntries("identifierlookupview") + " does not exist in DB: " + db.FilePath
+		End If
+	Else
+		Error ERR_LOOKUPVIEW_ARGMISSING, "Supporting JSON Data structure does not defines a lookup view attribute"
+	End If
+	
+	If IsElement(JSONEntries("identifier")) Then
+		If IsElement(subJSONEntries(JSONEntries("identifier"))) Then
+			keyValue = subJSONEntries(JSONEntries("identifier"))
+		Else
+			Error ERR_IDENTIFIER_ARGNOTDEFINED, "Supporting JSON Data structure does not defines the identifier attribute:" + JSONEntries("identifier") + " value."
+		End If
+	Else
+		Error ERR_IDENTIFIER_ARGMISSING, "Supporting JSON Data structure does not defines a identifier attribute"
+	End If
+	
+	'Now we have the Base values for Identifying or creating a NotesDocument
+	Set doc = lkupView.GetDocumentByKey(keyValue, True)
+	Print(keyValue & " in " & lkupView.Name)
+	If doc Is Nothing Then
+		Print ("It is a new Entry for the database - Create a New document")
+		If otherDb Is Nothing Then
+			Set doc = New NotesDocument(db)
+		Else
+			Set doc = New NotesDocument(otherDb)
+		End If
+	Else
+		'Set oldDocument = doc
+		'Set doc = New NotesDocument(db)
+	End If
+	
+	ForAll JSONEntry In subJSONEntries
+		ObjType = TypeName(JSONEntry)
+		If objType = "JSONARRAY" Then
+			If TypeName(JSONEntry.Items) <> "EMPTY" Then
+				subObjType = TypeName(JSONEntry.Items(0))
+				If subObjType <> "JSONOBJECT" Then
+					'THE REAL DATA ELEMENT / ENTRY Type MULTIVALUE
+					Call doc.ReplaceItemValue( ListTag(JSONEntry), JSONEntry.Items)
+				End If
+			Else
+				Call doc.ReplaceItemValue( ListTag(JSONEntry), "")
+			End If
+		Else
+			Call doc.ReplaceItemValue( ListTag(JSONEntry), JSONEntry)
+		End If
+	End ForAll
+	
+	Set ProcessJSONSupportData = doc
+	
+	Exit Function
+ErrorHandler:
+	Dim ErrorMessage As String 
+	ErrorMessage = "Sub: ProcessJSONSupportData Number:" + CStr(Err()) +" ErrorMsg: " + Error() + " on line #:" + CStr(Erl()) + "\n"
+	MsgBox ErrorMessage
+	Error Err, ErrorMessage
+End Function
+
+'++LotusScript Development Environment:2:1:StringStuffReplaceString:1:8
+Function StringStuffReplaceString(ByVal strArg As String,ByVal strSrc As String,ByVal strDst As String) As String
+	
+	'On Error Goto Exception
+	
+	Dim iPos As Variant
+	
+	iPos = InStr(strArg, strSrc)
+	
+	While iPos > 0
+		strArg = Left$(strArg, iPos - 1) + strDst + Mid$(strArg, iPos +Len(strSrc))
+		iPos = InStr(iPos + Len(strDst), strArg, strSrc)
+	Wend
+	
+	StringStuffReplaceString = strArg
+	
+finished:
+	Exit Function
+exception:
+	MessageBox "An error " + Error + " has occurred on line " + Str(Erl) + "StringStuffReplaceString"
+	Resume finished	
+End Function
+
+'++LotusScript Development Environment:2:1:getSponsor:5:8
+%REM
+	Function getSponsor
+	Description: Comments for Function
+%END REM
+Function getSponsor(sponsorName As String, sponsorID As string)
+	
+	Dim clientDb As NotesDatabase
+	
+	Set clientDb = fdbGetClientWeb
+	
+	Dim workspace As New NotesUIWorkspace
+	Dim picklist As Variant
+	picklist = workspace.PickListStrings(3, False, clientDb.Server, clientDb.Filepath, "LUSponsorsByName", "Sponsor", "Please select a Sponsor", 1)
+	sponsorName = picklist(0)
+	
+	Dim lookupView As NotesView
+	Dim lookupEntry As NotesViewEntry
+	Set lookupView = clientDb.Getview("LUSponsorsByName")
+	Set lookupEntry = lookupView.getEntryByKey(picklist, True)
+	sponsorID = FullTrim(CStr(lookupEntry.columnValues(1)))
+
+	
+End Function
+
+
+
+'++LotusScript Development Environment:2:1:urlEncode:2:8
+
+Public Function urlEncode(decodedData As String) As String
+
+	Dim findStrings(0 To 2) As String
+	Dim replaceStrings(0 To 2) As String
+
+	findStrings(0) = "~"
+	findStrings(1) = "+2b"
+	findStrings(2) = "%2b"
+	
+	replaceStrings(0) = "%7E"
+	replaceStrings(1) = "+"
+	replaceStrings(2) = "+"
+	
+	Dim v As Variant
+	Dim s As New NotesSession
+	Dim doc As NotesDocument 
+	Set	doc = s.CurrentDatabase.CreateDocument
+	doc.xml = decodedData 
+
+
+	Dim EvalString As String
+	EvalString = {@URLEncode( "Domino"; xml)}
+	v = Evaluate(EvalString, doc)
+	urlEncode = v(0)
+	
+
+	urlEncode = stringStuffReplaceString(urlEncode, findStrings(0), replaceStrings(0))
+	urlEncode = stringStuffReplaceString(urlEncode, findStrings(1), replaceStrings(1))
+	urlEncode = stringStuffReplaceString(urlEncode, findStrings(2), replaceStrings(2))
+	
+	
+End Function
+
+
+
+'++LotusScript Development Environment:2:1:createSubmission:5:8
+%REM
+	Sub createSubmission
+	Description: Mimics the Agent (CreateSubmission)
+%END REM
+function createSubmission(inputDoc As NotesDocument) As Boolean
+	
+	On Error Resume Next
+	
+	Dim sess As New NotesSession
+	Dim view As NotesView
+	Dim docContext As NotesDocument
+	Dim appdoc As NotesDocument
+	Dim submissionDoc As NotesDocument
+	Dim item As NotesItem
+	
+	'receive single values via url
+	Dim strQueryString As String
+	Dim i As Integer
+	Dim lookupkey(0 To 1) As Variant
+	Dim formcontent As Variant
+	Dim secNames(5) As String
+	Dim variableName As String, onCompleteFunction As String, returnValue As String
+	Dim subid As String
+	Dim tmpstring As String
+	Dim tmpvar As Variant
+	Dim tmpDouble As Double
+	Dim formfields List As Variant
+	Dim ensureFieldListIntegrity As Variant
+	Dim fieldname As String
+	Dim agtJSONtoNotes As NotesAgent
+	Dim cwDB As NotesDatabase
+	Dim locationidview As NotesView
+	Dim entityidview As NotesView
+	Dim client_name As String
+	Dim clientdoc As NotesDocument
+	Dim locationdoc As NotesDocument
+	Dim SeqNumber As Variant
+	Dim dc As NotesDocumentCollection
+	
+	Set docContext = sess.DocumentContext
+	Set db = sess.CurrentDatabase
+	Set cwDB = fdbGetDatabase("ClientWebPath")
+	Set agtJSONtoNotes = db.GetAgent("(CJTN)")
+	Set locationidview = cwDB.GetView("LULocations")
+	Set entityidview = cwDB.GetView("LUClientByID")
+	Set view = db.GetView("LookupByApplicationID")
+	If view Is Nothing Then Error(1001)
+	Set submissionDoc = New NotesDocument(db)
+	If submissionDoc Is Nothing Then Error(1002)
+	
+	createSubmission = True
+	'Yield	'===== read commands and parameters from the Query String
+	'strQueryString = docContext.Query_String_Decoded(0)
+	ensureFieldListIntegrity = Split("clientid;clientname;sponsorid;clientaddressid;applicationUNIDs;invoiceamount",";")
+	ForAll f In ensureFieldListIntegrity
+		formfields(f)=""
+	End ForAll
+	
+'WE SHOULD VALIDATE THAT WE HAVE ALL OF THE BELOW FIELDS IN THE APPLICATION DOCUMENT
+	formfields("clientid") = inputDoc.ClientUserID(0)
+	formfields("clientname") = inputDoc.ClientName(0)
+	formfields("sponsorid") = inputDoc.SponsorID(0)
+	formfields("clientaddressid") = inputDoc.sponsorAddressID(0) 'is this the right one ?
+	formfields("invoiceamount") = "0"
+	formfields("applicationUNIDs") = InputDoc.ApplicationID(0) & "~" & inputDoc.Version(0)
+	
+	If Not entityidview Is Nothing Then
+		Set clientdoc = entityidview.getdocumentbykey( formfields("clientid"), True)
+		If Not clientdoc Is Nothing Then
+			If clientdoc.hasitem("ClientName") Then
+				formfields("clientname") = clientdoc.ClientName(0)
+			End If
+		End If
+	End If
+	
+'	Yield	'===== Go get the Location Document by ClientAddressID and read out the Address
+	If Not locationidview Is Nothing Then
+		lookupkey(0) = CStr(formfields("clientid"))
+		lookupkey(1) = Val(CStr(formfields("clientaddressid")))
+		Set locationdoc = locationidview.getdocumentbykey(lookupkey, True)
+		Dim locationfields As Variant
+		locationfields = Split("Address_Line1;Address_Line2;Address_Line3;Address_Line4;Town;State;PostCode", ";")
+		If Not locationdoc Is Nothing Then
+			formfields("clientaddress") = ""
+			ForAll thisfield In locationfields
+				If locationdoc.HasItem(thisfield) Then
+					tmpstring = locationdoc.getfirstitem(thisfield).text
+					If Len(Trim(tmpstring)) > 0 Then
+						If Len(formfields("clientaddress")) > 0 Then
+							formfields("clientaddress") = formfields("clientaddress") + " "
+						End If
+						formfields("clientaddress") = formfields("clientaddress") + tmpstring
+					End If
+				End If
+			End ForAll
+		Else
+			formfields("clientaddress") = "**no location doc for #"+formfields("clientaddressid") + " (" + Join(lookupkey,"::")+")"
+		End If
+	Else
+		formfields("clientaddress") = "**no view"
+	End If
+	
+	'Yield	'===== set appenentries for xmlmill usage
+	Dim appentriesArray As Variant
+	appentriesArray =""
+	
+	'Yield	'===== get the BIO Applications via formfields('applicationUNIDs'
+	Set dc = db.GetProfileDocCollection("0")
+	dc.RemoveAll(True)
+	tmpvar = formfields("applicationUNIDs")
+	If Not IsArray(tmpvar) Then
+		ReDim tmpvar(0)
+		tmpvar(0) = formfields("applicationUNIDs")
+	End If
+	
+	Dim xz As Long
+	formfields("invoiceamount") = 0
+	For xz = 0 To UBound(tmpvar)
+		Set appdoc = view.GetDocumentByKey(tmpvar(xz), True)
+		If Not appdoc Is Nothing Then
+			dc.AddDocument appdoc
+			If Len(appentriesarray) > 0 Then appentriesArray = appentriesArray + ";;**"
+			appentriesArray = appentriesArray + tmpvar(xz)
+			tmpstring = ""
+			If appdoc.Hasitem("TitleOfStudy") Then tmpstring = appdoc.GetFirstItem("TitleOfStudy").text
+			appentriesArray = appentriesArray +"<$>"+tmpstring
+			tmpstring = ""
+			If appdoc.Hasitem("LabelName") Then tmpstring = appdoc.GetFirstItem("LabelName").text
+			appentriesArray = appentriesArray +"<$>"+tmpstring
+			tmpstring = ""
+			If appdoc.Hasitem("ApplicationFees") Then tmpstring = appdoc.GetFirstItem("ApplicationFees").text
+			appentriesArray = appentriesArray +"<$>"+tmpstring
+			formfields("invoiceamount") = CDbl(formfields("invoiceamount")) + CDbl(tmpstring)
+		End If
+	Next
+	appentriesArray = Split(appentriesArray, ";;**")
+	
+	'Yield	'===== assume all information has been obtained, Applications, Clients, etc
+	submissionDoc.ReplaceItemValue "Form", "submission"
+	submissionDoc.ReplaceItemValue "ClientID", formfields("clientid")
+	submissionDoc.ReplaceItemValue "ClientName", formfields("clientname")
+	submissionDoc.ReplaceItemValue "ClientBillingAddressID", formfields("clientaddressid")
+	submissionDoc.ReplaceItemValue "InvoiceAmount", CStr(formfields("invoiceamount"))
+	submissionDoc.ReplaceItemValue "ApplicationIDs", formfields("applicationUNIDs")
+	submissionDoc.ReplaceItemValue "SubmitterName", formfields("clientname")
+	submissionDoc.ReplaceItemValue "ApplicationEntries", appentriesArray
+	
+	'Yield	'===== set security
+	secNames(0) = "SIME" + formfields("clientid")
+	secNames(1) = "[Admin]"
+	secNames(2) = "[TGA]"
+	secNames(3) = "[SIMEReader]"
+	secNames(4) = "LocalDomainServers"
+	secNames(5) = "OtherDomainServers"
+	submissionDoc.ReplaceItemValue "WebAuthors", secNames
+	Set item = submissionDoc.GetFirstItem("WebAuthors")
+	item.IsAuthors = True
+	submissionDoc.ReplaceItemValue "WebReaders", secNames
+	Set item = submissionDoc.GetFirstItem("WebReaders")
+	item.IsReaders = True
+	
+	'Yield	'===== get the submission id from Sequencer
+	subid = GetID(CT_SUBMISSION_SEQUENCE_KEY, "", CT_GENERAL_LISTING_APPTYPE) 'BW01
+	'subid = GetID(BOP_SUBMISSION_SEQUENCE_KEY, "", BOP_GENERAL_LISTING_APPTYPE)
+	submissionDoc.ReplaceItemValue "SubmissionId", subid
+	submissionDoc.ReplaceItemValue "SubmissionDate", Now
+	
+	'Yield	'===== Generate Invoice Data
+	%REM
+	SeqNumber = GetSequenceNumber(csINVOICE_SEQUENCE_KEY)
+	submissionDoc.ReplaceItemValue "PaymentRefNumber", Mid(SeqNumber(0), 4)
+	submissionDoc.ReplaceItemValue "InvoiceNumber", Mid(SeqNumber(0), 1,  Len(SeqNumber(0)) - 1)
+	submissionDoc.ReplaceItemValue "InvoiceCreatedDTStamp", Format(Now, "dd/mm/yyyy hh:nn:ss")
+	submissionDoc.ReplaceItemValue "InvoiceDate", Format(Now, "dd/mm/yyyy")
+	%END REM
+	'Yield	'===== update application documents
+	submissionDoc.Save True, False
+	
+	If dc.count > 0 Then
+		Set appdoc = dc.getfirstdocument
+		Do While Not appdoc Is Nothing
+			appdoc.ReplaceItemValue "SubmissionId", subid
+			appdoc.ReplaceItemValue "SubmissionDate", Now
+			appdoc.ReplaceItemValue "IsSubmitted", 1
+			appdoc.ReplaceItemValue "ApplicationStatus", "Submitted"
+			appdoc.ReplaceItemValue "BillingLocationID", formfields("clientaddressid")
+			appdoc.ReplaceItemValue "SubmitterName", formfields("clientname")
+			appdoc.Save True,False
+			Set appdoc = dc.GetNextDocument(appdoc)
+		Loop
+	End If
+	
+	Print |{"identifier": "id", "label": "name", "items":[{"id": "| + subid + |", "success":true, "recordunid": "| + submissionDoc.UniversalID + |"}]}|
+	agtJSONtoNotes.Run(submissionDoc.NoteID)
+	
+ErrorResume:
+	If Len(variableName) > 0 Then
+		Print "; "
+		returnValue = |'| + variableName + |'|
+	End If
+	If Len(onCompleteFunction)>0 Then
+		Print |parent.| + onCompleteFunction + "("+returnValue+");"
+	End If
+	Print |</script></head><body></body></html>|
+	Exit function
+	
+ErrorHandler:
+	createSubmission = false
+	Print |{"identifier": "id", "label": "name", "items":[{"success":false}|
+	Select Case Err
+		Case 1001
+			MsgBox "Clinical Trials - (createSubmission) agent: " + CStr(Error) + " at line " + CStr(Erl) + |:: the view "LookupByApplicationID" could not be accessed/found|
+			Print |,"the view 'LookupByApplicationID' could not be accessed/found"|
+		Case 1002
+			MsgBox "Clinical Trials - (createSubmission) agent: " +  CStr(Error) + " at line " + CStr(Erl) + |:: you dont have permission to create documents in this database|
+			Print |,"you dont have permission to create documents in this database"|
+		Case Else
+			MsgBox "Clinical Trials - (createSubmission) agent: " +  CStr(Error) + " at line " + CStr(Erl)
+			Print |,"| + CStr(Err) + ":: " + CStr(Error) + | @| + CStr(Erl) + |"|
+	End Select
+	Print |]}|
+	Resume ErrorResume
+	
+End function
+
+'++LotusScript Development Environment:2:1:EncodeJSONData:1:8
+Function EncodeJSONData(JSONDataValue As String) As String 
+	Dim retVal As String 
+	Dim strlen As Integer, ctr As Integer , tmp As String 
+	Dim pos As Integer
+	
+	stop
+	
+	strlen = Len(JSONDataValue)
+	For ctr = 0 To 7
+		pos = 1
+		While pos > 0 And pos < strlen
+			pos = InStr(pos, JSONDataValue, EscapedArray(ctr , 0))	
+			If pos > 0 Then
+				strlen = Len(JSONDataValue)
+				JSONDataValue = Left(JSONDataValue, (pos - 1)) + EscapedArray(ctr , 1) + Right(JSONDataValue, (strlen - pos))
+				pos = pos + 2
+				
+				tmp = Left(JSONDataValue,pos)
+			End If
+		Wend
+	Next ctr
+	
+	retVal =  JSONDataValue
+	
+	EncodeJSONData = retVal
+End Function
+
+'++LotusScript Development Environment:2:2:loadAttachments:5:8
+%REM
+	Sub loadEmbeddedDocs
+	Description: Comments for Sub
+%END REM
+Sub loadAttachments(InputDoc As NotesDocument)
+	
+	Dim lookupView As NotesView
+	Dim dbFileRepository As NotesDatabase
+	Dim dc As NotesDocumentCollection
+	Dim doc As NotesDocument
+	
+	Set dbFileRepository = fdbGetDatabase("CTF_Path")
+	Set lookupView = dbFileRepository.Getview("LookupAllByApplicationID")
+	Call lookupView.Refresh()
+	
+	Set dc = lookupView.Getalldocumentsbykey(InputDoc.applicationID(0) & "~" & InputDoc.version(0) & "~FileAttachment", True)
+	Set doc = dc.Getfirstdocument()
+	
+	
+	InputDoc.SponsorDeclaration = ""
+	InputDoc.SiteSponsorDeclaration = ""
+	InputDoc.SiteInvestigatorDeclaration = ""
+	InputDoc.SiteHRECDeclaration = ""
+	InputDoc.SiteAuthorityDeclaration = ""
+
+	
+	Do Until doc Is Nothing
+		If doc.inputDocID(0) = inputDoc.Universalid then
+			Select Case InputDoc.form(0)
+			Case "Clinical Trials Input"
+				If doc.attachmentLocation(0) = "Part1_SponsorDeclaration" Then
+					InputDoc.SponsorDeclaration = doc.AttachmentFileName(0)
+				End If
+			Case "Clinical Trials Input Site"
+				If doc.attachmentLocation(0) = "dialog_Site_SponsorDeclaration" Then
+					InputDoc.SiteSponsorDeclaration = doc.AttachmentFileName(0)
+				End If
+				If doc.attachmentLocation(0) = "dialog_Site_PrincipalInvestigatorDeclaration" Then
+					InputDoc.SiteInvestigatorDeclaration = doc.AttachmentFileName(0)
+				End If
+				If doc.attachmentLocation(0) = "dialog_Site_HRECDeclaration" Then
+					InputDoc.SiteHRECDeclaration = doc.AttachmentFileName(0)
+				End If
+				If doc.attachmentLocation(0) = "dialog_Site_ApprovingAuthorityDeclaration" Then
+					InputDoc.SiteAuthorityDeclaration = doc.AttachmentFileName(0)
+				End If
+		End Select
+		End if
+		Set doc = dc.Getnextdocument(doc)
+	Loop
+	
+End Sub
+
+'++LotusScript Development Environment:2:2:UploadData:5:8
+%REM
+	Sub UploadData
+	Description: Comments for Sub
+%END REM
+Sub UploadData()
+	'THE WEB User REQUIRES DELETE Privilege to RUN this agent
+	On Error GoTo ErrorHandler
+	Dim Ses As New NotesSession 
+	Dim dbThis As NotesDatabase
+	Dim docContext As NotesDocument
+	Dim contenttype As String
+	
+	Call initEscapedArray()
+	
+	Dim ws As New NotesUIWorkspace
+	Dim uidoc As NotesUIDocument
+	Dim doc As NotesDocument
+	
+	Set dbThis = ses.CurrentDatabase
+	Set uidoc = ws.Currentdocument
+	'Set docContext = Ses.DocumentContext
+	Set docContext = uidoc.Document 
+	contenttype = "Content-Type:application/json"
+	outputJS = ( InStr(1, docContext.GetFirstItem("query_string").text, "&ONCOMPLETE=", 5) > 0 )
+	If outputJS Then
+		contenttype = "Content-Type:text/html"
+	End If
+	Print contenttype
+	
+	Call ProcessHTTPPOSTRequest(docContext)
+	
+ExitSub:
+	MessageBox "Finished wUploadJSONandSupportingData"
+	Exit Sub
+	
+ErrorHandler:
+	MessageBox |{"key":| + CStr(Err()) + |,"reason":"|+EncodeJSONData(Error())+|"}|
+	Print |{"key":0, "reason":"| + CStr(Err()) + |=|+EncodeJSONData(Error())+|"}|
+	Resume ExitSub
+End Sub
+
+'++LotusScript Development Environment:2:2:getPreceedingTrials:5:8
+%REM
+	Sub getPreceedingTrials
+	Description: Comments for Sub
+%END REM
+Sub getPreceedingTrials(inputDoc As NotesDocument)
+	
+	Dim dbSrc As NotesDatabase
+	Dim view As NotesView
+	Dim vec As NotesViewEntryCollection
+	Dim ventry As NotesViewEntry
+	Dim resultCount As Integer
+	Dim entryCount As Integer
+	Dim prevID As String
+	Dim thisId As String
+	Dim newVal(0) As String
+	Dim idsVar As Variant
+	Dim namesVar As Variant
+	Dim idStr As String
+	Dim nameStr As String
+	Dim clientID As String
+	Dim UserVar As Variant
+	Dim WebReaderVar As Variant
+	Dim found As Boolean
+	Dim pos As Variant
+	Dim trialsList List As String
+	
+	'Looking for Docs with "SIME" + clientID in the WEBReadersField ?
+
+	Set dbSrc = fdbGetDatabase("CTR_Path")
+	Set view = dbSrc.GetView("PrecedingTrialsLUByApplicationId")
+	view.AutoUpdate = False		
+	
+	Set vec = view.AllEntries
+	Set ventry = vec.GetFirstEntry()
+	resultcount=vec.count
+	'MsgBox CStr(vec.Count)
+	ReDim UserVar(0 To 1) As String
+	UserVar(0) = "[SIMEReader]"
+	
+	Do While (Not ventry Is Nothing)
+		found = False
+		clientID = ""
+		'prevID = thisID
+		'thisID = ""
+		'thisID = ventry.ColumnValues(0)
+		
+		'can only return those where we are a web reader ie. SIME18 or whomever .. got to be something with this ?
+		
+		'EntryCount = EntryCount + 1
+
+		
+		'We must have either "[SIMEReader]" or "SIME18" in Web Readers
+
+		If inputDoc.ClientUserID(0) <> "" Then
+			clientID = "SIME" + inputDoc.ClientUserID(0)
+			UserVar(1) = clientID
+		End If
+		
+		UserVar = FullTrim(UserVar)
+		WebReaderVar = vEntry.Document.WebReaders
+		'sb 26 aug 2014 fix for 32 k field error, just look repository trial belons to this client
+		'ForAll theUser In UserVar
+			'pos = ArrayGetIndex(WebReaderVar, theUser)
+		
+		pos = ArrayGetIndex(WebReaderVar, clientID)
+		
+			If Not IsNull(pos) Then
+				found = true
+			End If
+		'End ForAll
+		' sb 26 aug 2014 fix
+		If found Then
+	%REM
+				newVal(0) = thisID
+				idStr = thisID
+				If IsArray(idsVar) Then
+					idsVar = ArrayAppend(idsVar, newVal)
+				Else
+					idsVar = newVal
+				End If
+				newVal(0) = Trim(ventry.ColumnValues(0)) + " - " + Trim(ventry.ColumnValues(1))
+				nameStr = newVal(0)
+				If IsArray(namesVar) Then
+					namesVar = ArrayAppend(namesVar, newVal)
+				Else
+					namesVar = newVal
+				End If
+	%END REM
+			
+			trialsList(ventry.ColumnValues(0)) = Trim(ventry.ColumnValues(0)) + " - " + Trim(ventry.ColumnValues(1))
+		End if
+		'Print |{ "id": "| + thisID + |", "name": "| + Trim(ventry.ColumnValues(0)) + " - " + Trim(ventry.ColumnValues(1)) + |" }|
+		'If EntryCount < resultcount Then Print ","
+		Set ventry = vec.GetNextEntry(ventry)
+	Loop
+	ForAll theValue In trialsList
+		newVal(0) = ListTag(theValue)
+		If IsArray(idsVar) Then
+			idsVar = ArrayAppend(idsVar, newVal)
+		Else
+			idsVar = newVal
+		End If
+		
+		newVal(0) = theValue
+		If IsArray(namesVar) Then
+			namesVar = ArrayAppend(namesVar, newVal)
+		Else
+			namesVar = newVal
+		End If
+	End ForAll
+	
+	InputDoc.TrialNames = namesVar
+	inputDoc.TrialIDs = idsVar
+	
+End Sub
+
+'++LotusScript Development Environment:2:1:getCTDoc:5:8
+%REM
+	Function getCTDoc
+	Description: Comments for Function
+%END REM
+Function getCTDoc(AppID As string) As NotesDocument
+	
+	
+	Dim lookupView As NotesView
+	
+	Set lookupView = db.GetView("LookupByApplicationID")
+	If lookupView Is Nothing Then
+		MessageBox("Real Bad, lookupView is nothing")
+	End If
+	
+	Set getCTDoc = lookupView.getDocumentByKey(appID & "~1")
+	
+	
+End Function
+
+'++LotusScript Development Environment:2:1:escapeString:5:8
+%REM
+	Function escapeString
+	Description: Comments for Function
+%END REM
+Function escapeString(strArg As string) As String
+	
+	%REM
+	EscapedArray(0,0) = |\|
+	EscapedArray(1,0) = |"|
+	EscapedArray(2,0) = |/|
+	EscapedArray(3,0) = Chr(8)
+	EscapedArray(4,0) = Chr(9)
+	EscapedArray(5,0) = Chr(10)
+	EscapedArray(6,0) = Chr(12)
+	EscapedArray(7,0) = Chr(13)
+	
+	EscapedArray(0,1) = |\\|
+	EscapedArray(1,1) = |\"|
+	EscapedArray(2,1) = |\/|
+	EscapedArray(3,1) = |\b|
+	EscapedArray(4,1) = |\t|
+	EscapedArray(5,1) = |\n|
+	EscapedArray(6,1) = |\f|
+	EscapedArray(7,1) = |\r|
+	%END REM
+	
+	
+	Dim x As Integer
+	Dim y As Integer
+	Dim pos As Variant
+	
+	x = 0
+	
+	For x = 0 To 7		
+		pos = InStr(strArg, EscapedArray(x, 0))
+		If Not IsNull(pos) Then
+			If pos > 0 Then
+				strArg = stringStuffReplaceString(strArg, EscapedArray(x, 0), EscapedArray(x, 1))
+			End If
+		End If
+	Next
+	
+	escapeString = strArg
+	
+End Function
+
+'++LotusScript Development Environment:2:1:InsertJSONCountries:1:8
+Function InsertJSONCountries(countryDoc As NotesDocument) As String
+	
+	Dim JSONStr As String
+	
+	'JSONStr = |{"id":["!@#$ApplicationID!@#$~1~Part1~Biologicals~!@#$BIODocUnid!@#$"],"identifier":["RecordUNID"],"label":["ProductName"],"Type":["Biological"],"Form":["Biological"],"ApplicationId":["!@#$ApplicationID!@#$"],"ApplicationVersion":["1"],"DataSection":["1"],"RecordUNID":["!@#$ApplicationID!@#$~1~Part1~Biologicals~!@#$BIODocUnid!@#$"],"AnimalOrigin":["!@#$BIOSpeciesOfOriginCode!@#$"],"AnimalOrigin_Label":["!@#$BIOSpeciesOfOriginDesc!@#$"],"DosageForm_Label":["!@#$BIODosageFormDesc!@#$"],"DosageForm":["!@#$BIODosageFormCode!@#$"],"LabelName":["!@#$BIOLabelName!@#$"],"ProductName":["!@#$BIOProductName!@#$"],"RouteOfAdmin":["!@#$BIORouteOfAdminCode!@#$"],"RouteOfAdmin_Label":["!@#$BIORouteOfAdminDesc!@#$"],"CountryList":["!@#$BIOCountryOfOriginCode!@#$"],"CountryList_Label":["!@#$BIOCountryOfOriginDesc!@#$"]}|
+	JSONStr = |{"id":["!@#$ApplicationID!@#$~1~Part1~TrialConductedInCountries~!@#$CountryDocUnid!@#$"],"identifier":["RecordUNID"],"label":["TrialConductedInCountry_Label"],"Type":["TrialConductedInCountry"],"Form":["TrialConductedInCountry"],"ApplicationId":["!@#$ApplicationID!@#$"],"ApplicationVersion":["1"],"DataSection":["1"],"RecordUNID":["!@#$ApplicationID!@#$~1~Part1~TrialConductedInCountries~!@#$CountryDocUnid!@#$"],"TrialConductedInCountry":["!@#$CountryCode!@#$"],"TrialConductedInCountry_Label":["!@#$CountryDesc!@#$"]}|
+	
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ApplicationID!@#$", escapeString(CountryDoc.ApplicationID(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$CountryDocUnid!@#$", escapeString(CountryDoc.universalID))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$CountryDesc!@#$", escapeString(CountryDoc.Country(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$CountryCode!@#$", escapeString(CountryDoc.CountryID(0)))
+	
+	InsertJSONCountries = JSONStr
+	
+End Function
+
+'++LotusScript Development Environment:2:2:setCodeTablesData:5:8
+%REM
+	Sub getCodeTablesData
+	Description: Comments for Sub
+%END REM
+Sub setCodeTablesData()
+	
+	Dim CTDb As NotesDatabase
+	Dim CTView As NotesView
+	Dim vec As NotesViewEntryCollection
+	Dim entry As NotesViewEntry
+	Dim doc As NotesDocument
+	Dim count As Integer
+	
+	Set CTDb = fdbGetDatabase("DCT_Path")
+	
+	If  CTDb Is Nothing Then
+		MessageBox("Can not open Code Table Database!")
+	End If
+	
+	
+	Set CTView = CTDb.GetView("DCTDojoLookup")
+	
+	Set vec = CTView.GetAllEntriesByKey("N~AORIGIN", False)
+	count = 0
+	Set entry = vec.Getfirstentry()
+	Do Until entry Is Nothing 
+		Set doc = entry.Document
+		AOriginCode(count) = doc.Code(0)
+		AOriginDesc(count) = doc.ShortDescription(0)
+		count = count + 1
+		Set entry = vec.Getnextentry(entry)
+	Loop	
+	
+	Set vec = CTView.GetAllEntriesByKey("N~APARTS", False)
+	count = 0
+	Set entry = vec.Getfirstentry()
+	Do Until entry Is Nothing 
+		Set doc = entry.Document
+		APartsCode(count) = doc.Code(0)
+		APartsDesc(count) = doc.ShortDescription(0)
+		count = count + 1
+		Set entry = vec.Getnextentry(entry)
+	Loop
+	
+	Set vec = CTView.GetAllEntriesByKey("N~APPAREA", False)
+	count = 0
+	Set entry = vec.Getfirstentry()
+	Do Until entry Is Nothing 
+		Set doc = entry.Document
+		AppAreaCode(count) = doc.Code(0)
+		AppAreaDesc(count) = doc.ShortDescription(0)
+		count = count + 1
+		Set entry = vec.Getnextentry(entry)
+	Loop
+	
+	Set vec = CTView.GetAllEntriesByKey("N~APREP", False)
+	count = 0
+	Set entry = vec.Getfirstentry()
+	Do Until entry Is Nothing 
+		Set doc = entry.Document
+		APrepCode(count) = doc.Code(0)
+		APrepDesc(count) = doc.ShortDescription(0)
+		count = count + 1
+		Set entry = vec.Getnextentry(entry)
+	Loop
+	
+	Set vec = CTView.GetAllEntriesByKey("N~COMPDET", False)
+	count = 0
+	Set entry = vec.Getfirstentry()
+	Do Until entry Is Nothing 
+		Set doc = entry.Document
+		CompDetCode(count) = doc.Code(0)
+		CompDetDesc(count) = doc.ShortDescription(0)
+		count = count + 1
+		Set entry = vec.Getnextentry(entry)
+	Loop
+	
+	Set vec = CTView.GetAllEntriesByKey("N~COUNTRY", False)
+	count = 0
+	Set entry = vec.Getfirstentry()
+	Do Until entry Is Nothing 
+		Set doc = entry.Document
+		CountryCode(count) = doc.Code(0)
+		CountryDesc(count) = doc.ShortDescription(0)
+		count = count + 1
+		Set entry = vec.Getnextentry(entry)
+	Loop
+	
+	
+	Set vec = CTView.GetAllEntriesByKey("N~CT", False)
+	count = 0
+	Set entry = vec.Getfirstentry()
+	Do Until entry Is Nothing 
+		Set doc = entry.Document
+		CTCode(count) = doc.Code(0)
+		CTDesc(count) = doc.ShortDescription(0)
+		count = count + 1
+		Set entry = vec.Getnextentry(entry)
+	Loop
+	
+	
+	Set vec = CTView.GetAllEntriesByKey("N~DOSAGE", False)
+	count = 0
+	Set entry = vec.Getfirstentry()
+	Do Until entry Is Nothing 
+		Set doc = entry.Document
+		DosageCode(count) = doc.Code(0)
+		DosageDesc(count) = doc.ShortDescription(0)
+		count = count + 1
+		Set entry = vec.Getnextentry(entry)
+	Loop
+	
+	Set vec = CTView.GetAllEntriesByKey("N~FUNC", False)
+	count = 0
+	Set entry = vec.Getfirstentry()
+	Do Until entry Is Nothing 
+		Set doc = entry.Document
+		FuncCode(count) = doc.Code(0)
+		FuncDesc(count) = doc.ShortDescription(0)
+		count = count + 1
+		Set entry = vec.Getnextentry(entry)
+	Loop
+	
+	Set vec = CTView.GetAllEntriesByKey("N~ROA", False)
+	count = 0
+	Set entry = vec.Getfirstentry()
+	Do Until entry Is Nothing 
+		Set doc = entry.Document
+		ROACode(count) = doc.Code(0)
+		ROADesc(count) = doc.ShortDescription(0)
+		count = count + 1
+		Set entry = vec.Getnextentry(entry)
+	Loop
+	
+	Set vec = CTView.GetAllEntriesByKey("N~STATES", False)
+	count = 0
+	Set entry = vec.Getfirstentry()
+	Do Until entry Is Nothing 
+		Set doc = entry.Document
+		StatesCode(count) = doc.Code(0)
+		StatesDesc(count) = doc.ShortDescription(0)
+		count = count + 1
+		Set entry = vec.Getnextentry(entry)
+	Loop
+	
+	Set vec = CTView.GetAllEntriesByKey("N~STATESAPPROVED", False)
+	count = 0
+	Set entry = vec.Getfirstentry()
+	Do Until entry Is Nothing 
+		Set doc = entry.Document
+		StatesApprovedCode(count) = doc.Code(0)
+		StatesApprovedDesc(count) = doc.ShortDescription(0)
+		count = count + 1
+		Set entry = vec.Getnextentry(entry)
+	Loop
+	
+	Set vec = CTView.GetAllEntriesByKey("N~STATESHREC", False)
+	count = 0
+	Set entry = vec.Getfirstentry()
+	Do Until entry Is Nothing 
+		Set doc = entry.Document
+		StatesHRecCode(count) = doc.Code(0)
+		StatesHRecDesc(count) = doc.ShortDescription(0)
+		count = count + 1
+		Set entry = vec.Getnextentry(entry)
+	Loop
+	
+	Set vec = CTView.GetAllEntriesByKey("N~THERAAREA", False)
+	count = 0
+	Set entry = vec.Getfirstentry()
+	Do Until entry Is Nothing 
+		Set doc = entry.Document
+		TheAreaCode(count) = doc.Code(0)
+		TheAreaDesc(count) = doc.ShortDescription(0)
+		count = count + 1
+		Set entry = vec.Getnextentry(entry)
+	Loop
+	
+	Set vec = CTView.GetAllEntriesByKey("N~TOTALPATIENTS", False)
+	count = 0
+	Set entry = vec.Getfirstentry()
+	Do Until entry Is Nothing 
+		Set doc = entry.Document
+		TotalPatientsCode(count) = doc.Code(0)
+		TotalPatientsDesc(count) = doc.ShortDescription(0)
+		count = count + 1
+		Set entry = vec.Getnextentry(entry)
+	Loop
+	
+	Set vec = CTView.GetAllEntriesByKey("N~UNITSPROP", False)
+	count = 0
+	Set entry = vec.Getfirstentry()
+	Do Until entry Is Nothing 
+		Set doc = entry.Document
+		UnitsPropCode(count) = doc.Code(0)
+		UnitsPropDesc(count) = doc.ShortDescription(0)
+		count = count + 1
+		Set entry = vec.Getnextentry(entry)
+	Loop	
+	
+	
+End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'++LotusScript Development Environment:2:2:processEmbeddedDocs:5:8
+%REM
+	Sub processEmbeddedDocs
+	Description: Comments for Sub
+%END REM
+Sub processEmbeddedDocs(inputDoc As notesDocument)
+	
+	'puts our embedded Docs info into the JSON String
+	Dim embeddedView As NotesView
+	Dim dc As NotesDocumentCollection
+	Dim doc As NotesDocument
+	Dim siteStr As String
+	Dim bioStr As String
+	Dim medStr As String
+	Dim animalStr As String
+	Dim deviceStr As String
+	Dim countryStr As String
+	Dim placeboStr As String
+	Dim compStr As String
+	Dim pos As Variant
+	
+	Set embeddedView = db.getView("LUClinical Trials Input Embedded")
+	Set dc = embeddedView.getAllDocumentsByKey(InputDoc.universalID, False)
+	Set doc = dc.getFirstDocument()
+	
+	siteStr = ""
+	bioStr = ""
+	medStr = ""
+	animalStr = ""
+	deviceStr = ""
+	countryStr = ""
+	placeboStr = ""
+	compStr = ""
+	
+	Do Until doc Is Nothing
+		Select Case doc.Form(0)
+		Case "Clinical Trials Input Site" ' this one always
+			If siteStr = "" Then
+				siteStr = InsertJSONSites(doc)
+			Else
+				siteStr = siteStr & "," & InsertJSONSites(doc)
+			End If
+		Case "Clinical Trials Input Biological"
+			pos = ArrayGetIndex(inputDoc.ThisTrial, "0")
+			If Not IsNull(pos) Then
+				If bioStr = "" Then
+					bioStr = InsertJSONBiologicals(doc)
+				Else
+					bioStr = bioStr & "," & InsertJSONBiologicals(doc)
+				End If
+			End if
+		Case "Clinical Trials Input Medicine"
+			pos = ArrayGetIndex(inputDoc.ThisTrial, "1")
+			If Not IsNull(pos) Then
+				If medStr = "" Then
+					medStr = InsertJSONMedicines(doc)
+				Else
+					medStr = medStr & "," & InsertJSONMedicines(doc)
+				End If
+			End if
+		Case "Clinical Trials Input Animal Excipient"
+			pos = ArrayGetIndex(inputDoc.ThisTrial, "3")
+			If Not IsNull(pos) then
+				If animalStr = "" Then
+					animalStr = InsertJSONAnimals(doc)
+				Else
+					animalStr = animalStr & "," & InsertJSONAnimals(doc)
+				End If
+			End if
+		Case "Clinical Trials Input Device"
+			pos = ArrayGetIndex(inputDoc.ThisTrial, "2")
+			If Not IsNull(pos) Then
+				If deviceStr = "" Then
+					deviceStr = InsertJSONDevices(doc)
+				Else
+					deviceStr = deviceStr & "," & InsertJSONDevices(doc)
+				End If
+			End if
+		Case "Clinical Trials Input Country"
+			pos = ArrayGetIndex(inputDoc.ThisTrial, "4")
+			If Not IsNull(pos) Then
+				If countryStr = "" Then
+					countryStr = InsertJSONCountries(doc)
+				Else
+					countryStr = countryStr & "," & InsertJSONCountries(doc)
+				End If
+			End if
+		Case "Clinical Trials Input Placebo"
+			pos = ArrayGetIndex(inputDoc.ThisTrial, "6")
+			If Not IsNull(pos) Then
+				If placeboStr = "" Then
+					placeboStr = InsertJSONPlacebos(doc)
+				Else
+					placeboStr = placeboStr & "," & InsertJSONPlacebos(doc)
+				End If
+			End if
+		Case "Clinical Trials Input Comparator"
+			pos = ArrayGetIndex(inputDoc.ThisTrial, "7")
+			If Not IsNull(pos) Then
+				If compStr = "" Then
+					compStr = InsertJSONComparators(doc)
+				Else
+					compStr = compStr & "," & InsertJSONComparators(doc)
+				End If
+			End if
+	End Select
+		
+		Set doc  = dc.getNextDocument(doc)
+	Loop
+	
+	'Only Insert the Stuff if the Right Check Boxes are selected on the Form
+	
+	JSONString = StringStuffReplaceString(JSONString, "!@#$InsertSitesHere!@#$", siteStr)
+	JSONString = StringStuffReplaceString(JSONString, "!@#$InsertBiologicalsHere!@#$", bioStr)
+	JSONString = StringStuffReplaceString(JSONString, "!@#$InsertMedicinesHere!@#$" , medStr)
+	JSONString = StringStuffReplaceString(JSONString, "!@#$InsertAnimalExipientsHere!@#$", animalStr)
+	JSONString = StringStuffReplaceString(JSONString, "!@#$InsertDevicesHere!@#$", deviceStr)
+	JSONString = StringStuffReplaceString(JSONString, "!@#$InsertCountriesHere!@#$", countryStr)
+	JSONString = StringStuffReplaceString(JSONString, "!@#$InsertPlacebosHere!@#$", placeboStr)
+	JSONString = StringStuffReplaceString(JSONString, "!@#$InsertComparatorsHere!@#$", compStr)
+	
+End Sub
+
+'++LotusScript Development Environment:2:1:InsertJSONAnimals:1:8
+Function InsertJSONAnimals(animalDoc As NotesDocument) As String
+	
+	Dim JSONStr As String
+	JSONStr = |{"id":["!@#$ApplicationID!@#$~1~Part1~AnimalExcipients~!@#$AnimalDocUnid!@#$"],"identifier":["RecordUNID"],"label":["ProductName"],"Type":["AnimalExcipient"],"Form":["AnimalExcipient"],"ApplicationId":["!@#$ApplicationID!@#$"],"ApplicationVersion":["1"],"DataSection":["1"],"RecordUNID":["!@#$ApplicationID!@#$~1~Part1~AnimalExcipients~!@#$AnimalDocUnid!@#$"],"AnimalOrigin":["!@#$AnimalSpeciesOfOriginCode!@#$"],"AnimalOrigin_Label":["!@#$AnimalSpeciesOfOriginDesc!@#$"],"AnimalPart":["!@#$AnimalTissueCode!@#$"],"AnimalPart_Label":["!@#$AnimalTissueDesc!@#$"],"AnimalPreparation":["!@#$AnimalPreparationCode!@#$"],"AnimalPreparation_Label":["!@#$AnimalPreparationDesc!@#$"],"Country":["!@#$AnimalCountryCode!@#$"],"Country_Label":["!@#$AnimalCountryDesc!@#$"],"ProductName":["!@#$AnimalProductName!@#$ "]}|
+	
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$ApplicationID!@#$", escapeString(animalDoc.ApplicationID(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$AnimalDocUnid!@#$", escapeString(animalDoc.universalID))
+	'JSONStr = StringStuffReplaceString(JSONStr, "!@#$ExpectedSiteStartDate!@#$",  Format(siteDoc.SiteExpectedStartDate(0), "yyyy-mm-dd"))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$AnimalProductName!@#$", escapeString(animalDoc.AnimalProductName(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$AnimalSpeciesOfOriginDesc!@#$", escapeString(animalDoc.AnimalSpeciesOfOrigin(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$AnimalSpeciesOfOriginCode!@#$", escapeString(animalDoc.AnimalSpeciesOfOriginID(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$AnimalTissueDesc!@#$", escapeString(animalDoc.AnimalTissue(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$AnimalTissueCode!@#$", escapeString(animalDoc.AnimalTissueID(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$AnimalPreparationDesc!@#$", escapeString(animalDoc.AnimalPreparation(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$AnimalPreparationCode!@#$", escapeString(animalDoc.AnimalPreparationID(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$AnimalCountryDesc!@#$", escapeString(animalDoc.AnimalCountry(0)))
+	JSONStr = StringStuffReplaceString(JSONStr, "!@#$AnimalCountryCode!@#$", escapeString(animalDoc.AnimalCountryID(0)))
+	
+	InsertJSONAnimals = JSONStr
+	
+End Function
+
+'++LotusScript Development Environment:2:2:insertJSONThisTrial:5:8
+%REM
+	Sub insertJSONThisTrial
+	Description: Comments for Sub
+%END REM
+Sub insertJSONThisTrial(inputDoc As notesDocument)
+	
+	
+	Dim JSONStr As String
+	Dim var As Variant
+
+	JSONStr = ""
+	var = inputDoc.ThisTrial
+	If IsArray(var) Then
+		If var(0) <> "" Then
+			ForAll Trial In var
+				If JSONStr = "" Then
+					JSONStr = |"| & EscapeString(CStr(Trial)) & |"|
+				Else
+					JSONStr = JSONStr & |,"| & EscapeString(CStr(Trial)) & |"|
+				End If
+			End ForAll
+		End If
+	End If
+	
+	JSONString = StringStuffReplaceString(JSONString, "!@#$InsertThisTrialHere!@#$", JSONStr)
+	
+End Sub

@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form name='ARTG Notification Email' alias='ARTGNotificationEMail' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' nocompose='true'
+ noquery='true' publicaccess='false' designerversion='7' renderpassthrough='true'>
+<noteinfo noteid='1c6' unid='76614B73B3C04A42CA257FD8000B2A05' sequence='14'>
+<created><datetime>20160620T120156,53+10</datetime></created>
+<modified><datetime>20160628T151503,32+10</datetime></modified>
+<revised><datetime>20160628T151503,31+10</datetime></revised>
+<lastaccessed><datetime>20160628T151503,31+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152008,84+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='windowtitle'><formula>"EMail Notification"</formula></code><code event='querysave'><lotusscript
+>Sub Querysave(Source As Notesuidocument, Continue As Variant)
+	
+	Dim fieldvalue As String
+	Continue = True
+	fieldvalue = Source.FieldGetText("KeywordCode")
+	
+	If fieldvalue = "" Then
+		Continue = False
+		Msgbox "Please enter a Keyword Code", 16, "Validation Error"
+	End If
+	
+End Sub
+</lotusscript></code>
+<actionbar bgcolor='#ece9d8' bordercolor='black'>
+<actionbuttonstyle bgcolor='system'/><font size='9pt' color='system'/><border
+ style='solid' width='0px 0px 1px'/>
+<action title='Save' icon='21'><code event='click'><formula>@Command([FileSave])</formula></code></action>
+<action title='Close' icon='18'><code event='click'><formula>@Command([CloseWindow])</formula></code></action></actionbar>
+<body><richtext>
+<pardef id='1' align='center'/>
+<par def='1'><run><font size='14pt' name='Arial' pitch='variable' truetype='true'
+ familyid='20' color='navy'/>EMail Notification</run></par>
+<par def='1'><run><font size='14pt' name='Arial' pitch='variable' truetype='true'
+ familyid='20' color='navy'/></run></par>
+<table widthtype='fitmargins' leftmargin='0.9896in' refwidth='11.9063in'><tablecolumn
+ width='5.7604%'/><tablecolumn width='94.2396%'/>
+<tablerow>
+<tablecell columnspan='2' borderwidth='0px'>
+<pardef id='4' keepwithnext='true' keeptogether='true'/>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>This keyword document contains information to compose automatic email sent </run><run
+><font name='Arial' pitch='variable' truetype='true' familyid='20' color='navy'/>on successful entry onto the ARTG for applications submitted. The &lt;XXX&gt; are place holders and will be replaced by values from application. Names of these place holders should not be changed. However, their position and other text can be modified.</run></par>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/></run></par></tablecell></tablerow></table>
+<pardef id='5'/>
+<par def='5'/>
+<par def='5'>Keyword Code</par>
+<par def='5'/>
+<par def='5'><field type='text' kind='editable' name='KeywordCode'/></par>
+<par def='5'/>
+<par def='5'>Keyword Description / Value</par>
+<par def='5'/>
+<par def='5'><field type='text' kind='editable' name='KeywordDesc'/></par>
+<par def='5'/>
+<par def='5'>RichText Field</par>
+<par def='5'/>
+<par def='5'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='richtext' kind='editable' name='Body'/></run><run><font name='Arial'
+ pitch='variable' truetype='true' familyid='20'/></run></par></richtext></body>
+<item name='$$ScriptName' summary='false' sign='true'><text>ARTGNotificationEMail</text></item></form>
+

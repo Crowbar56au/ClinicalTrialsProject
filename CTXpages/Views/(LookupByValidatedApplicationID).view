@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<view name='(LookupByValidatedApplicationID)' alias='LookupByValidatedApplicationID'
+ xmlns='http://www.lotus.com/dxl' version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780'
+ showinmenu='false' publicaccess='false' designerversion='8.5.3' comment='WEB DOCS ONLY! Used to submit/retrieve JSON/MIME content'
+ unreadmarks='none' onopengoto='lastopened' onrefresh='displayindicator' headers='beveled'
+ opencollapsed='false' showresponsehierarchy='true' showmargin='true' shrinkrows='false'
+ extendlastcolumn='false' showhierarchies='false' unreadcolor='black' rowlinecount='1'
+ headerlinecount='1' rowspacing='1' bgcolor='white' totalscolor='black' headerbgcolor='white'
+ boldunreadrows='false' evaluateactions='false' allownewdocuments='false'
+ allowcustomizations='true' hidemarginborder='false' marginwidth='0px' marginbgcolor='white'
+ uniquekeys='false'>
+<noteinfo noteid='4fa' unid='080D4B8068605829CA257F770006FE61' sequence='14'>
+<created><datetime dst='true'>20160315T121623,37+11</datetime></created>
+<modified><datetime>20160628T151506,43+10</datetime></modified>
+<revised><datetime>20160628T151506,42+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,42+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,09+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='selection'><formula>SELECT Type="Application" &amp; !@IsAvailable(IsNotes) &amp; ApplicationStatus="Validated" &amp; ValidationStatus="1"</formula></code>
+<column sort='ascending' hidedetailrows='false' itemname='$1' width='21.2500'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='true' sortnocase='true'
+ showaslinks='false'><columnheader title='ApplicationID~Version'><font size='9pt'
+ style='bold'/></columnheader><code event='value'><formula>ApplicationID+"~"+@Text(ApplicationVersion)</formula></code></column></view>
+

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?><note class="filter" maintenanceversion="1.0" replicaid="CA257FDB001B5780" version="9.0" xmlns="http://www.lotus.com/dxl">
+<noteinfo noteid="28e" sequence="29" unid="28F17CB3FC881D8BCA257F7700070758">
+<created><datetime dst="true">20160315T121646,32+11</datetime></created>
+<modified><datetime>20190925T094351,85+10</datetime></modified>
+<revised><datetime>20190925T094351,83+10</datetime></revised>
+<lastaccessed><datetime>20190925T094351,83+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152009,59+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<item name="$POID"><datetime>20160620T120200,69+10</datetime></item>
+<item name="$TITLE" sign="true"><text>ct.js</text></item>
+<item name="$Flags"><text>h534Q</text></item>
+<item name="$PublicAccess" sign="true"><text>1</text></item>
+<item name="$DesignerVersion"><text>8.5.3</text></item>
+
+
+
+
+
+
+</note>

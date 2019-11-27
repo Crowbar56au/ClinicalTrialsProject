@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='utf-8'?>
+<view name='xBiologicals' xmlns='http://www.lotus.com/dxl' version='9.0' maintenanceversion='1.0'
+ replicaid='CA257FDB001B5780' showinmenu='false' noreplace='true' publicaccess='false'
+ designerversion='8.5.3' unreadmarks='none' onopengoto='lastopened' onrefresh='displayindicator'
+ headers='simple' opencollapsed='true' showresponsehierarchy='true' showmargin='true'
+ shrinkrows='false' extendlastcolumn='false' showhierarchies='false' unreadcolor='black'
+ rowlinecount='1' headerlinecount='1' rowspacing='1' bgcolor='white' altrowcolor='white'
+ totalscolor='black' headerbgcolor='#efefef' boldunreadrows='false' evaluateactions='false'
+ allownewdocuments='false' allowcustomizations='true' hidemarginborder='false'
+ marginwidth='0px' marginbgcolor='#b2b2b2' uniquekeys='false' formatnoteid='87BFC5EFB3349857CA257F770006FDA1'>
+<noteinfo noteid='9ac6' unid='4F1369BC9E205060CA25837C001822E6' sequence='5'>
+<created><datetime dst='true'>20190108T152337,98+11</datetime></created>
+<modified><datetime>20190926T092713,29+10</datetime></modified>
+<revised><datetime>20190926T092713,27+10</datetime></revised>
+<lastaccessed><datetime dst='true'>20191127T084502,85+11</datetime></lastaccessed>
+<addedtofile><datetime dst='true'>20190108T152337,99+11</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='selection'><formula>SELECT Type="Biological" &amp; Form="Biological"</formula></code>
+<actionbar bgcolor='navy' bordercolor='black'><actionbarstyle height='4.4290ex'><font
+ size='9pt' name='Verdana' pitch='variable' truetype='true' familyid='20'/></actionbarstyle>
+<actionbuttonstyle bgcolor='system'/><font color='system'/><border style='solid'
+ width='0px 0px 1px' color='navy'/></actionbar>
+<column sort='ascending' hidedetailrows='false' itemname='ApplicationId' width='40.2500'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='true' sortnocase='true'
+ showaslinks='false'><font size='9pt'/><columnheader title='Application Id'><font
+ size='9pt'/></columnheader></column>
+<column sort='ascending' hidedetailrows='false' itemname='ExplicitKey' width='40.2500'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='true' sortnocase='true'
+ showaslinks='false'><font size='9pt'/><columnheader title='ExplicitKey'><font
+ size='9pt'/></columnheader></column>
+<column sort='ascending' hidedetailrows='false' itemname='$0' width='28.8750'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='false' sortnocase='true'
+ showaslinks='false'><columnheader title='UNID'><font size='9pt'/></columnheader><code
+ event='value'><formula>@Text(@DocumentUniqueID)</formula></code></column></view>
+

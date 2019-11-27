@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='utf-8'?>
+<outline name='UINavigator' alias='nMain' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='web'
+ publicaccess='false' designerversion='8.5.3'>
+<noteinfo noteid='3ce' unid='C173E320B07A1417CA257F7700070105' sequence='13'>
+<created><datetime dst='true'>20160315T121630,13+11</datetime></created>
+<modified><datetime>20160628T151505,71+10</datetime></modified>
+<revised><datetime>20160628T151505,70+10</datetime></revised>
+<lastaccessed><datetime>20160628T151505,70+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,37+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<outlineentry label='Applications' type='none' hide='web' displayimage='false'/>
+<outlineentry label='By Sponsor Name' level='1' type='namedelementlink' hide='web'
+ displayimage='false'><namedelementlink type='view' name='AppsBySponsorName'/></outlineentry>
+<outlineentry label='By Application ID' level='1' type='namedelementlink'
+ hide='web' displayimage='false'><namedelementlink type='view' name='AppsByApplicationId'/></outlineentry>
+<outlineentry label='By Submission ID' level='1' type='namedelementlink' hide='web'
+ displayimage='false'><namedelementlink type='view' name='AppsBySubmissionId'/></outlineentry>
+<outlineentry label='By Submission Date' level='1' type='namedelementlink'
+ hide='web' displayimage='false'><namedelementlink type='view' name='AppsBySubmissionDate'/></outlineentry>
+<outlineentry label='By Status' level='1' type='namedelementlink' hide='web'
+ displayimage='false'><namedelementlink type='view' name='AppsByStatus'/></outlineentry>
+<outlineentry label='By Application Type' level='1' type='namedelementlink'
+ displayimage='false'><namedelementlink type='view' name='AppsByApplicationType'/></outlineentry>
+<outlineentry alias='blank1' type='none'/>
+<outlineentry label='Search' type='namedelementlink' hide='web' displayimage='false'><namedelementlink
+ type='view' name='SearchView'/></outlineentry>
+<outlineentry label='Clinical Trials Input' type='none' displayimage='false'/>
+<outlineentry label='Create / Update' level='1' type='namedelementlink' displayimage='false'><namedelementlink
+ type='view' name='Clinical Trials Input Create Update'/></outlineentry>
+<outlineentry label='Submit / Write' level='1' type='namedelementlink' displayimage='false'><namedelementlink
+ type='view' name='Clinical Trials Input Submit Write'/></outlineentry>
+<outlineentry label='Web Clinical Trials Input' type='none' displayimage='false'/>
+<outlineentry label='Create Web CT Notification' level='1' type='action' displayimage='false'><code
+ event='value'><formula>@SetEnvironment("CT_FORMNAME";"CTN");
+@PostedCommand([RunAgent];"(NewWebCT)")</formula></code></outlineentry>
+<outlineentry label='Create Web CT Exemption' level='1' type='action' displayimage='false'><code
+ event='value'><formula>@SetEnvironment("CT_FORMNAME";"CTX");
+@PostedCommand([RunAgent];"(NewWebCT)")</formula></code></outlineentry>
+<outlineentry label='Goto Web Portal' level='1' type='action'><code event='value'><formula
+>@PostedCommand([RunAgent];"(GotoServerPortal)")</formula></code></outlineentry>
+<outlineentry alias='blank1' type='none'/>
+<outlineentry label='Admin' type='none' displayimage='false'><code event='hidewhen'><formula
+>!@IsMember("[Admin]"; @UserRoles)</formula></code></outlineentry>
+<outlineentry label='JSON' level='1' type='none' hide='web' displayimage='false'/>
+<outlineentry label='Application' level='2' type='namedelementlink' hide='web'
+ displayimage='false'><namedelementlink type='view' name='JSONApplication'/></outlineentry>
+<outlineentry label='FileAttachment' level='2' type='namedelementlink' hide='web'
+ displayimage='false'><namedelementlink type='view' name='JSONFileAttachment'/></outlineentry>
+<outlineentry label='Part1' level='2' type='namedelementlink' hide='web' displayimage='false'><namedelementlink
+ type='view' name='JSONPart1'/></outlineentry>
+<outlineentry label='AnimalExcipient' level='2' type='namedelementlink' hide='web'
+ displayimage='false'><namedelementlink type='view' name='JSONAnimalExcipient'/></outlineentry>
+<outlineentry label='Biological' level='2' type='namedelementlink' hide='web'
+ displayimage='false'><namedelementlink type='view' name='JSONBiological'/></outlineentry>
+<outlineentry label='Medicine' level='2' type='namedelementlink' hide='web'
+ displayimage='false'><namedelementlink type='view' name='JSONMedicine'/></outlineentry>
+<outlineentry label='Part2' level='2' type='namedelementlink' hide='web' displayimage='false'><namedelementlink
+ type='view' name='JSONPart2'/></outlineentry>
+<outlineentry label='Comparator' level='2' type='namedelementlink' hide='web'
+ displayimage='false'><namedelementlink type='view' name='JSONComparator'/></outlineentry>
+<outlineentry label='Placebo' level='2' type='namedelementlink' hide='web'
+ displayimage='false'><namedelementlink type='view' name='JSONPlacebo'/></outlineentry>
+<outlineentry label='Completion' level='2' type='namedelementlink' hide='web'
+ displayimage='false'><namedelementlink type='view' name='JSONCompletion'/></outlineentry>
+<outlineentry label='Sites' level='2' type='namedelementlink' hide='web' displayimage='false'><namedelementlink
+ type='view' name='JSONSites'/></outlineentry>
+<outlineentry label='UpdateDetails' level='2' type='namedelementlink' hide='web'
+ displayimage='false'><namedelementlink type='view' name='JSONUpdateDetails'/></outlineentry>
+<outlineentry label=' ' level='1' type='none' displayimage='false'/>
+<outlineentry label='Valid Trial Monitor' level='1' type='namedelementlink'
+ hide='web' displayimage='false'><namedelementlink type='view' name='JSON\vApplicationProcessMonitor'/></outlineentry>
+<outlineentry label='Invalid Trial Monitor' level='1' type='namedelementlink'
+ hide='web' displayimage='false'><namedelementlink type='view' name='JSON\viApplicationProcessMonitor'/></outlineentry>
+<outlineentry label='Migration' level='1' type='none' displayimage='false'/>
+<outlineentry label='Submit / Write' level='2' type='namedelementlink' displayimage='false'><namedelementlink
+ type='view' name='isw'/></outlineentry>
+<outlineentry label='TYPE' level='1' type='namedelementlink' displayimage='false'><namedelementlink
+ type='view' name='TYPE'/></outlineentry>
+<outlineentry label='AppIDtracker' level='1' type='namedelementlink' hide='web'
+ displayimage='false'><namedelementlink type='view' name='AppIDtracker'/></outlineentry>
+<outlineentry label='ApplicationJSON' level='1' type='namedelementlink' displayimage='false'><namedelementlink
+ type='view' name='ApplicationApplicationJSON'/></outlineentry>
+<outlineentry label='Bio Draft Apps for Portal' level='1' type='namedelementlink'
+ hide='web' displayimage='false'><namedelementlink type='view' name='portalBIO'/></outlineentry>
+<outlineentry label='ActiveDraftsManufacturer' level='1' type='namedelementlink'
+ hide='web' displayimage='false'><namedelementlink type='view' name='FormViewActiveDraftsManufacturer'/></outlineentry>
+<outlineentry label='ActiveDraftsProducts' level='1' type='namedelementlink'
+ hide='web' displayimage='false'><namedelementlink type='view' name='FormViewActiveDraftsProducts'/></outlineentry>
+<outlineentry label='LookupByApplicationID' level='1' type='namedelementlink'
+ hide='web' displayimage='false'><namedelementlink type='view' name='LookupByApplicationID'/></outlineentry>
+<outlineentry label='Lookup\FileAttachment' level='1' type='namedelementlink'
+ displayimage='false'><namedelementlink type='view' name='LookupFileAttachment'/></outlineentry>
+<outlineentry label='All Documents' level='1' type='namedelementlink' displayimage='false'><namedelementlink
+ type='view' name='all'/></outlineentry>
+<outlineentry label='Submission' level='1' type='namedelementlink' hide='web'
+ displayimage='false'><namedelementlink type='view' name='Submission'/></outlineentry>
+<outlineentry label='Keywords' level='1' type='namedelementlink' hide='web'
+ displayimage='false'><namedelementlink type='view' name='Keywords'/></outlineentry></outline>
+

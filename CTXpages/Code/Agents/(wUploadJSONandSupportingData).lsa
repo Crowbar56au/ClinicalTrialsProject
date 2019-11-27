@@ -1,0 +1,558 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(wUploadJSONandSupportingData)' alias='wUploadJSONandSupportingData'
+ xmlns='http://www.lotus.com/dxl' version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780'
+ hide='v3' runaswebuser='true' publicaccess='false' designerversion='8.5.3'
+ comment='Agent to Createt JSON Data MimeAttchment Draft Document'>
+<noteinfo noteid='60e' unid='271A02FE26700922CA257F77000709F0' sequence='14'>
+<created><datetime dst='true'>20160315T121652,96+11</datetime></created>
+<modified><datetime>20160628T151507,15+10</datetime></modified>
+<revised><datetime>20160628T151507,14+10</datetime></revised>
+<lastaccessed><datetime>20160628T151507,14+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,57+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151507,21+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+Option Declare
+Use "ls.snapps.JSONReader"
+Use "JSONToNotesDocument"
+
+
+</lotusscript></code><code event='declarations'><lotusscript>'These all ProcessJSONSupportData Errors
+Const ERR_LOOKUPVIEW_ARGMISSING = 1001
+Const ERR_LOOKUPVIEW_ISNULL = 1002
+Const ERR_IDENTIFIER_ARGMISSING = 1003
+Const ERR_IDENTIFIER_ARGNOTDEFINED = 1004
+
+Const CMD_SUBMIT_APPLICATION = "SUBMITAPP"
+
+Dim EscapedArray(7,1)  As String 
+
+Public oldDocument As NotesDocument 
+Dim outputJS As Long
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	'THE WEB User REQUIRES DELETE Privilege to RUN this agent
+	On Error Goto ErrorHandler
+	Dim Ses As New NotesSession 
+	Dim dbThis As NotesDatabase
+	Dim docContext As NotesDocument
+	Dim contenttype As String
+	
+	Call initEscapedArray()
+	
+	Set dbThis = ses.CurrentDatabase
+	Set docContext = Ses.DocumentContext
+	
+	contenttype = "Content-Type:application/json"
+	outputJS = ( Instr(1, docContext.GetFirstItem("query_string").text, "&amp;ONCOMPLETE=", 5) &gt; 0 )
+	If outputJS Then
+		contenttype = "Content-Type:text/html"
+	End If
+	Print contenttype
+	
+	Call ProcessHTTPPOSTRequest(docContext)
+	
+ExitSub:
+	Messagebox "Finished wUploadJSONandSupportingData"
+	Exit Sub
+	
+ErrorHandler:
+	Messagebox |{"key":| + Cstr(Err()) + |,"reason":"|+EncodeJSONData(Error())+|"}|
+	Print |{"key":0, "reason":"| + Cstr(Err()) + |=|+EncodeJSONData(Error())+|"}|
+	Resume ExitSub
+End Sub
+
+</lotusscript></code><code event='SetDocumentAuditNSecurity'><lotusscript
+>Sub SetDocumentAuditNSecurity(doc As NotesDocument)
+	'Update UpdateAudit Log
+	Dim itmCreatedBy As NotesItem 
+	Dim itmCreatedOn As NotesItem
+	Dim itmUpdatedBy As NotesItem 
+	Dim itmUpdatedOn As NotesItem
+	
+	Dim temp As Variant 
+	Dim UserManagerDBName As String 
+	Dim itmReaders As NotesItem
+	Dim itmAuthors As NotesItem 
+	Dim clientID As Variant 
+	Dim SecurityEntries As Variant 
+	
+	With doc
+		If .hasItem("LastEditor") Then
+			Set itmUpdatedBy = .getFirstItem("LastEditor")
+		Else
+			Set itmUpdatedBy = New NotesItem(doc, "LastEditor", "", NAMES)
+		End If
+		
+		If .hasItem("LastEdited") Then
+			Set itmUpdatedOn = .getFirstItem("LastEdited")
+		Else
+			Set itmUpdatedOn = New NotesItem(doc, "LastEdited", "")
+		End If
+		
+		If  (.IsNewNote) Then
+			Set itmCreatedBy = New NotesItem(doc, "CreatedBy", Evaluate(|@UserName|, doc), NAMES)
+			Set itmCreatedOn = New NotesItem(doc, "CreatedOn", Now)
+		Else
+			itmUpdatedBy.Values = Evaluate(|@Trim(@UserName : LastEditor)|, doc)
+			itmUpdatedOn.Values = Evaluate(|@If(@IsNull(LastEdited);@Now;@Now : LastEdited)|, doc)
+		End If
+		
+		'Update Security
+		If .IsNewNote Then
+			temp = Evaluate(|@ReplaceSubstring(@Word(@GetProfileField("System Profile Document";"SUM_Path");"!!";2); "\\"; "/")|)
+			UserManagerDBName = temp(0)
+			If UserManagerDBName="" Then UserManagerDBName = "ebs/UserMgt.nsf"
+			
+			clientID = Evaluate(|@Text(@DbLookup( "" : "NoCache" ; "" : "| + UserManagerDBName + |" ; "LULM" ; @Name( [CN] ; @UserName ) ; "ClientID" ;[FAILSILENT]))|)
+			If clientID(0) &lt;&gt; "" Then
+				clientID(0) = "SIME" + clientID(0) 
+			End If
+			
+			'Add the 
+			SecurityEntries = Evaluate(|@Trim("|+clientID(0)+|":"[Admin]" : "LocalDomainServers" : "OtherDomainServers")|)
+			
+			Set itmReaders = New NotesItem(doc, "WebReaders", SecurityEntries, READERS)
+			Set itmAuthors = New NotesItem(doc, "WebAuthors", SecurityEntries, AUTHORS)
+		End If
+	End With
+End Sub
+
+</lotusscript></code><code event='CreateMIMETextAttachment'><lotusscript>Sub CreateMIMETextAttachment(doc As NotesDocument, stream As NotesStream, fileName As String)
+	Dim s As New NotesSession
+	Dim mime As NotesMIMEEntity, header As NotesMimeHeader 
+	Dim child As NotesMimeEntity
+	Dim blankStream As NotesStream
+	Dim expectedHeaderVal As String, headerVal As String 
+	
+	s.ConvertMIME = False ' Do not convert MIME to rich text
+	expectedHeaderVal = Lcase(|attachment; filename="| + fileName + |"|)
+	
+	Set mime = doc.GetMIMEEntity("JSONMIMEFILE")
+	If mime Is Nothing Then
+		Set mime = doc.CreateMIMEEntity("JSONMIMEFILE")
+	Else
+		'For Existing Documents
+		Set child = mime.GetFirstChildEntity
+		Do While Not (child Is Nothing)
+			Set header = child.GetNthHeader("Content-Disposition")
+			headerVal = Lcase(header.GetHeaderValAndParams())
+			If headerVal = expectedHeaderVal Then
+				Exit Do
+			End If
+			
+			Set child = child.GetNextEntity()
+		Loop
+	End If
+	
+	Set header = mime.GetNthHeader("Content-Type")    
+	If header Is Nothing Then
+		Set header = mime.CreateHeader("Content-Type")
+		Call header.SetHeaderVal("multipart/mixed")
+	End If
+	
+	If child Is Nothing Then
+		Set child = mime.CreateChildEntity
+		Set header = child.CreateHeader("Content-Type")
+		Call header.SetHeaderValAndParams("text/plain; charset=UTF-8")
+		
+		Set header = child.CreateHeader("Content-Description")
+		Call header.SetHeaderVal(|"| + fileName + |"|)
+		
+		Set header = child.CreateHeader("Content-Disposition")
+		Call header.SetHeaderValAndParams(|attachment; filename="| + fileName + |"|)	
+	End If
+	
+	Call child.SetContentFromText(stream, "text/plain; charset=UTF-8; name=" + fileName, ENC_IDENTITY_8BIT)
+	Call doc.CloseMIMEEntities(True, "JSONMIMEFILE")
+	
+	s.ConvertMIME = True ' Do not convert MIME to rich text
+    'The Calling Routine should take the resposibility to close/flush the stream
+End Sub
+
+
+</lotusscript></code><code event='ProcessJSONSupportData'><lotusscript>Function ProcessJSONSupportData(JSONString As String) As NotesDocument 
+	On Error Goto ErrorHandler
+	
+%REM
+	We are only expecting 2 levels of data example below
+	{
+	"dbpath":"", 					&lt;----------------- The Database name where the script should save the Parsed Document Context, if NULL or Non Existing, defaults to currentDatabase
+	"identifierlookupview":"",       &lt;----------------- Lookup view, in the Database, on which it would seek, or perform getdocumentbykey using the Identifier Field
+	"identifier":"ApplicationId",  &lt;----------------- The Identifier Field represents the Value used as the Key Unique value for the document
+	"items":{
+			"ApplicationId":"BI-2010-BI-00002-1",
+			"SponsorName":"Johnson &amp; Johnson",
+			"ClientReference":"BleetBleet &amp; Blah Blah",
+			"Form":"Application",
+			"Type":"BiologicalApplication",
+			.......
+			...............
+			..................
+		}
+	}
+%END REM
+	Dim Ses As New NotesSession
+	Dim vResults As Variant
+	Dim jsonReader As JSONReader
+	Dim JSONEntries As Variant, subJSONEntries As Variant
+	Dim ObjType As String , subObjType As String 
+	
+	Dim dbPath As String, LookupViewName As String, KeyValueIdentifier As String 
+	Dim db As NotesDatabase 
+	Dim lkupView As NotesView
+	Dim keyValue As String
+	Dim doc As NotesDocument, newDoc As NotesDocument
+	Dim mime As NotesMimeEntity
+	
+	Set jsonReader = New JSONReader
+	Set vResults = jsonReader.Parse(JSONString)	'This is a JSONObject created using the ls.snapps.JSONReader library
+	
+	JSONEntries = vResults.Items		'This would return the top level entries, containing DBPath, identifierLookupView and identifier
+	subJSONEntries = JSONEntries("items").Items 'This would represent the Items Structure, which maintain the Field Value pairs to be created within the NotesDocument
+	
+	If Iselement(JSONEntries("dbpath")) Then
+		'For Local Debugging
+		If JSONEntries("dbpath") &lt;&gt; "" Then
+			'Set db = New NotesDatabase(Ses.CurrentDatabase.Server,JSONEntries("DBPath"))
+			Set db = New NotesDatabase("",JSONEntries("dbpath"))
+		Else
+			Set db = Ses.CurrentDatabase	
+		End If
+	Else
+		Set db = Ses.CurrentDatabase
+	End If
+	
+	If Iselement(JSONEntries("identifierlookupview")) Then
+		Set lkupView = db.GetView(JSONEntries("identifierlookupview"))
+		If lkupView Is Nothing Then
+			Error ERR_LOOKUPVIEW_ISNULL, "Supporting JSON Data strucure identifierLookupView:" + JSONEntries("identifierlookupview") + " does not exist in DB: " + db.FilePath
+		End If
+	Else
+		Error ERR_LOOKUPVIEW_ARGMISSING, "Supporting JSON Data structure does not defines a lookup view attribute"
+	End If
+	
+	If Iselement(JSONEntries("identifier")) Then
+		If Iselement(subJSONEntries(JSONEntries("identifier"))) Then
+			keyValue = subJSONEntries(JSONEntries("identifier"))
+		Else
+			Error ERR_IDENTIFIER_ARGNOTDEFINED, "Supporting JSON Data structure does not defines the identifier attribute:" + JSONEntries("identifier") + " value."
+		End If
+	Else
+		Error ERR_IDENTIFIER_ARGMISSING, "Supporting JSON Data structure does not defines a identifier attribute"
+	End If
+	
+	'Now we have the Base values for Identifying or creating a NotesDocument
+	Set doc = lkupView.GetDocumentByKey(keyValue, True)
+	If doc Is Nothing Then
+		'It is a new Entry for the database - Create a New document
+		Set doc = New NotesDocument(db)
+	Else
+		'Set oldDocument = doc
+		'Set doc = New NotesDocument(db)
+	End If
+	
+	Forall JSONEntry In subJSONEntries
+		ObjType = Typename(JSONEntry)
+		If objType = "JSONARRAY" Then
+			If Typename(JSONEntry.Items) &lt;&gt; "EMPTY" Then
+				subObjType = Typename(JSONEntry.Items(0))
+				If subObjType &lt;&gt; "JSONOBJECT" Then
+					'THE REAL DATA ELEMENT / ENTRY Type MULTIVALUE
+					Call doc.ReplaceItemValue( Listtag(JSONEntry), JSONEntry.Items)
+				End If
+			Else
+				Call doc.ReplaceItemValue( Listtag(JSONEntry), "")
+			End If
+		Else
+			Call doc.ReplaceItemValue( Listtag(JSONEntry), JSONEntry)
+		End If
+	End Forall
+	
+	Set ProcessJSONSupportData = doc
+	
+	Exit Function
+ErrorHandler:
+	Dim ErrorMessage As String 
+	ErrorMessage = "Sub: ProcessJSONSupportData Number:" + Cstr(Err()) +" ErrorMsg: " + Error() + " on line #:" + Cstr(Erl()) + "\n"
+	Msgbox ErrorMessage
+	Error Err, ErrorMessage
+End Function
+
+</lotusscript></code><code event='initEscapedArray'><lotusscript>Sub initEscapedArray
+	EscapedArray(0,0) = |\|
+	EscapedArray(1,0) = |"|
+	EscapedArray(2,0) = |/|
+	EscapedArray(3,0) = Chr(8)
+	EscapedArray(4,0) = Chr(9)
+	EscapedArray(5,0) = Chr(10)
+	EscapedArray(6,0) = Chr(12)
+	EscapedArray(7,0) = Chr(13)
+	
+	EscapedArray(0,1) = |\\|
+	EscapedArray(1,1) = |\"|
+	EscapedArray(2,1) = |\/|
+	EscapedArray(3,1) = |\b|
+	EscapedArray(4,1) = |\t|
+	EscapedArray(5,1) = |\n|
+	EscapedArray(6,1) = |\f|
+	EscapedArray(7,1) = |\r|
+End Sub
+
+</lotusscript></code><code event='EncodeJSONData'><lotusscript>Function EncodeJSONData(JSONDataValue As String) As String 
+	Dim retVal As String 
+	Dim strlen As Integer, ctr As Integer , tmp As String 
+	Dim pos As Integer
+	
+	strlen = Len(JSONDataValue)
+	For ctr = 0 To 7
+		pos = 1
+		While pos &gt; 0 And pos &lt; strlen
+			pos = Instr(pos, JSONDataValue, EscapedArray(ctr , 0))	
+			If pos &gt; 0 Then
+				strlen = Len(JSONDataValue)
+				JSONDataValue = Left(JSONDataValue, (pos - 1)) + EscapedArray(ctr , 1) + Right(JSONDataValue, (strlen - pos))
+				pos = pos + 2
+				
+				tmp = Left(JSONDataValue,pos)
+			End If
+		Wend
+	Next ctr
+	
+	retVal =  JSONDataValue
+	
+	EncodeJSONData = retVal
+End Function
+
+</lotusscript></code><code event='ProcessHTTPPOSTRequest'><lotusscript>Function ProcessHTTPPOSTRequest(docContext As NotesDocument)
+	On Error Goto errorhandler
+	Dim Session As New NotesSession
+	Dim dbThis As NotesDatabase
+	Dim docJSON As NotesDocument 
+	Dim dc As notesdocumentcollection, doc As notesdocument, success As Boolean
+	Dim JSONDataFieldName As String , JSONSupportDataFieldName As String 
+	Dim dataBuffer As String, dataTemp As Variant 
+	Dim JSONSupportDataBuffer As String 
+	Dim stream As NotesStream
+	Dim ItemValuePairs As Variant 
+	Dim DataValuePair As Variant
+	Dim ctr As Integer 
+	Dim fieldStr As String , fieldName As String , fieldlistULimit As Integer
+	Dim temp As Variant, totalbytes As Long, nextampersand As Long, querystring As String
+	Dim JSONstring As String, qsCMD As String, strReason As String
+	
+	If Not (docContext.HasItem("REQUEST_CONTENT") Or docContext.HasItem("REQUEST_CONTENT_000")) Then
+		Error 1000, "Invalid Document Type - Its is not a Web Document"
+	End If
+	
+	Set stream = session.CreateStream
+	
+	'Build the Field List
+	ctr = 0
+	If docContext.HasItem("REQUEST_CONTENT") Then
+		dataTemp = docContext.GetItemValue( "REQUEST_CONTENT")
+		dataBuffer = dataTemp(0)
+	Else
+		Do While True
+			fieldStr = Format(ctr,"000")
+			fieldName = "REQUEST_CONTENT_" + fieldStr
+			If docContext.HasItem(fieldName) Then
+				dataTemp = docContext.GetItemValue(fieldName)
+				dataBuffer = dataBuffer + dataTemp(0)
+			Else
+				Exit Do
+			End If
+			ctr = ctr + 1
+			If ctr&gt;999 Then Exit Do
+		Loop
+	End If
+	
+	JSONDataFieldName = "MultiPart32KJSONData_"
+	JSONSupportDataFieldName  = "SupportingFieldDataSet"
+	
+	'Process All the fields
+	ItemValuePairs = Split(dataBuffer,"&amp;")
+	If Ubound(ItemValuePairs) &gt; 0 Then
+		Forall ItemValuePair In ItemValuePairs
+			DataValuePair =Split(ItemValuePair,"=")
+			If Ubound(DataValuePair) &gt; 0 Then
+				If Left(DataValuePair(0),Len(JSONDataFieldName)) = JSONDataFieldName Then
+					Call stream.WriteText(urlDecode(DataValuePair(1)),EOL_NONE)	
+				Elseif DataValuePair(0) = JSONSupportDataFieldName Then
+					JSONSupportDataBuffer = JSONSupportDataBuffer + urlDecode(DataValuePair(1))
+				End If
+			End If
+		End Forall
+	End If
+	
+	Set dbThis = session.CurrentDatabase
+	
+	'Dim l As Long , ctr1 As Long 
+	'l = Len(JSONSupportDataBuffer)
+	'For ctr1 = 1 To l Step 100
+	'	Msgbox Mid(JSONSupportDataBuffer, ctr1, 100)
+	'Next
+	
+	'Parse the JSON Data Structure, which would give us the document
+	Set docJSON = ProcessJSONSupportData(JSONSupportDataBuffer)
+	
+	Call SetDocumentAuditNSecurity(docJSON)
+	
+	'If Not docJSON.HasItem("form") Then
+	'	docJSON.ReplaceItemValue "form", "Application"
+	'End If
+	'If docJSON.HasItem("form") Then
+	'	If docJSON.getfirstitem("form").text = "" Then
+	'		docJSON.ReplaceItemValue "form", "Application"
+	'	End If
+	'End If
+	
+	Call CreateMIMETextAttachment(docJSON, stream, "JSON.txt")
+	
+	'is this for submission?
+	qsCMD = Strright(docContext.GetFirstItem("query_string").text,"&amp;CMD=")
+	If Instr(qsCMD,"&amp;")&gt;0 Then qsCMD = Strleft(qsCMD,"&amp;")
+	Select Case qsCMD
+	Case CMD_SUBMIT_APPLICATION
+		stream.Position = 1
+		Do Until stream.IsEOS
+			JSONstring = JSONstring + stream.ReadText
+		Loop
+		Call stream.Truncate
+		Call stream.Close
+		
+		Set dc = JSONToNotesDocuments(JSONstring, True)
+		If dc.count &gt; 0 Then
+			Set doc = dc.GetFirstDocument
+			Do While Not doc Is Nothing
+				success = doc.Save(True, False, False)
+				If success = False Then Exit Do
+				Set doc = dc.GetNextDocument(doc)
+			Loop
+			If success Then
+				strReason = "successful creation of collection"
+			Else
+				strReason = |failed to save one of the documents: | + doc.GetFirstItem("type").text
+			End If
+		Else	'nothing to save
+			Print |{"key":0, "reason":"failed to create notes documents"}|
+		End If
+	Case Else		'or just for saving, draft docs, etc
+		Call stream.Truncate
+		Call stream.Close
+		success = docJSON.Save(True, False)
+		If success Then
+			strReason = "success"
+		Else
+			strReason = "failed to save document"
+		End If
+	End Select
+	
+errorresume:
+	On Error Resume Next
+	temp=""
+	If outputJS Then temp = |var result='|
+	temp=temp + |{"key":|
+	If success Then
+		temp=temp + "1"
+	Else
+		temp=temp + "0"
+	End If
+	temp=temp + |, "reason":"| + strReason + |"}|
+	If outputJS Then
+		temp=temp+|';|
+		querystring = docContext.GetFirstItem("query_string").text
+		qsCMD = Strright(querystring, "&amp;ONCOMPLETE=")
+		If Len(qsCMD) &gt; 0 Then	'has a function name been provided?
+			If Instr(qsCMD, "&amp;") &gt; 0 Then qsCMD = Strleft(qsCMD, "&amp;")
+			querystring = Join(Split(querystring, "'"), "`")
+			strReason = Join(Split(strReason, "'"), "`")
+			Print |&lt;html&gt;&lt;head&gt;&lt;script type="text/javascript"&gt;|
+			Print |//try {|
+			'Print temp
+			Print |parent.| + qsCMD + |(| + Cstr(Val(success)) + |, '| + strReason + |', '| + querystring + |');|
+			Print |//} catch (e) {console.log('error processing `post submit` functions');}|
+			Print |&lt;/script&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;|
+		End If
+	Else
+		Print temp
+	End If
+	Exit Function
+errorhandler:
+	success = 0
+	strReason = Cstr(Err) + "=" + Cstr(Error) + | at line | + Cstr(Erl)
+	Msgbox strReason
+	Resume ErrorResume
+End Function
+
+</lotusscript></code><code event='urlDecode'><lotusscript>Function urlDecode(encodedData As String) As String 
+	Dim ses As New NotesSession 
+	Dim dbThis As NotesDatabase, docTemp As NotesDocument 
+	Dim blocksize As Long, dataBlock As String  
+	Dim startPos As Long, endPos As Long 
+	Dim nextstartPos As Long, nextendPos As Long 
+	Dim DataLen As Long 
+	Dim lastChar As String, secondLastChar As String 
+	Dim retVal As String , temp As Variant 
+	Dim decodedData As Variant 
+	
+	urlDecode = ""
+	'Create a Temprory NotesDocument for @URLDecode
+	Set dbThis = Ses.CurrentDatabase
+	Set docTemp = New NotesDocument(dbThis)
+	
+	'Divide the data in 32k byte blocks
+	'This boundary/Block size should match what is defined in the JSONMIMEFileForm, Javascript
+	BlockSize = 32000
+	DataLen = Len(encodedData)
+	
+	If DataLen = 0 Then Exit Function
+	
+	StartPos = 1
+	EndPos = BlockSize
+	Do While True
+		'avoid the %00 boundaries
+		lastChar = Mid(encodedData, EndPos, 1)
+		secondLastChar = Mid(encodedData, (EndPos-1), 1)
+		
+		If secondLastChar = "%" Then
+			EndPos = EndPos - 2
+		Elseif lastChar = "%" Then
+			EndPos = EndPos - 1
+		End If
+		
+		NextStartPos = (EndPos + 1)
+		NextEndPos = (EndPos + BlockSize)
+		
+		'Extract the Data block and Decode It
+		dataBlock =  Mid$(encodedData, StartPos, EndPos)
+		
+		Call docTemp.ReplaceItemValue("EncodedData", dataBlock)
+		
+		temp = Evaluate(|@SetField("EncodedData"; @ReplaceSubstring( EncodedData ; "+" ; " " ))|, docTemp)
+		temp = Evaluate(|@SetField("decodedData";@URLDecode("Domino" ; EncodedData))|, docTemp)
+		decodedData = docTemp.GetItemValue("decodedData")
+		Forall decodedstr In decodedData
+			retVal = retVal + decodedstr
+		End Forall
+		
+		'get the Boundaries for the next block
+		StartPos = NextStartPos
+		EndPos = NextEndPos
+		
+		docTemp.RemoveItem("EncodedData")
+		docTemp.RemoveItem("decodedData")
+		
+		If StartPos &gt; DataLen Then
+			Exit Do
+		End If
+	Loop
+	
+	Set docTemp = Nothing
+	
+	urlDecode = retVal
+End Function</lotusscript></code>
+<item name='$POID'><datetime>20160620T120206,07+10</datetime></item></agent>
+

@@ -1,0 +1,301 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form name='CT Repository Print Preview' alias='ctRPP' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' treatashtml='true'
+ publicaccess='false' designerversion='8.5.3' signdocuments='true' renderpassthrough='true'>
+<noteinfo noteid='286' unid='097513804AAF7D85CA257FD8000B29E8' sequence='14'>
+<created><datetime>20160620T120156,24+10</datetime></created>
+<modified><datetime>20160628T151504,20+10</datetime></modified>
+<revised><datetime>20160628T151504,19+10</datetime></revised>
+<lastaccessed><datetime>20160628T151504,19+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152009,57+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1'/>
+<par def='1'/>
+<pardef id='2' leftmargin='2.9521in' firstlineleftmargin='0.7500in' hide='web'
+ tabs='L1.1438in L1.5375in L1.9313in L2.3250in L2.7188in L3.1125in L3.5063in L3.9000in L4.2938in L4.6875in L5.0813in L5.4750in L5.8688in L6.2625in L6.6563in L7.0500in L7.4438in L7.8375in L8.2313in L8.6250in'/>
+<section onread='collapse' onpreview='collapse' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='2' borderstyle='shadow' color='black'><text>hidden from web browsers, NOTES FIELDS HEADER</text></sectiontitle>
+<pardef id='3' leftmargin='2.9521in' firstlineleftmargin='1in' hide='web'
+ tabs='L1.1438in L1.5375in L1.9313in L2.3250in L2.7188in L3.1125in L3.5063in L3.9000in L4.2938in L4.6875in L5.0813in L5.4750in L5.8688in L6.2625in L6.6563in L7.0500in L7.4438in L7.8375in L8.2313in L8.6250in'/>
+<par def='3'><field type='text' kind='computedfordisplay' name='query_string_decoded'><code
+ event='defaultvalue'><formula>@ThisValue</formula></code></field><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='6' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><field type='text'
+ kind='computedfordisplay' name='query_string' htmlid='query_string'><code
+ event='defaultvalue'><formula>@ThisValue</formula></code></field><compositedata
+ type='98' prevtype='65402' nexttype='222' afterparcount='12' containertype='65418'
+ aftercontainercount='2' afterbegincount='4'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><field type='text'
+ kind='computedfordisplay' name='Server_Protocol_Name'><code event='defaultvalue'><formula
+>@If(@Contains(HTTP_Referer;"/"); @Left(HTTP_Referer;"/"); HTTP_Referer)</formula></code></field><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='17' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><field type='text'
+ kind='computedfordisplay' name='SaveOptions'><code event='defaultvalue'><formula
+>"0"</formula></code></field><compositedata type='98' prevtype='65418' nexttype='222'
+ afterparcount='22' containertype='65418' aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><field
+ type='text' kind='computedfordisplay' name='HTTP_User_Agent'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='27' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><field type='text' kind='computedfordisplay'
+ name='Server_Name'><code event='defaultvalue'><formula>@ThisValue</formula></code></field><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='32' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><field type='text'
+ kind='computed' name='ApplicationId'><code event='defaultvalue'><formula
+>tmp:=@RightBack(Query_String;"&amp;ID=");
+@LeftBack(tmp;"&amp;V=")</formula></code></field><compositedata type='98'
+ prevtype='65418' nexttype='222' afterparcount='37' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><field type='text'
+ kind='computed' name='ApplicationVersion'><code event='defaultvalue'><formula
+>tmp:=@RightBack(Query_String;"&amp;V=");
+@LeftBack(tmp;"&amp;PP=")</formula></code></field><compositedata type='98'
+ prevtype='65418' nexttype='222' afterparcount='42' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><field type='text'
+ kind='computed' name='Username'><code event='defaultvalue'><formula>@RightBack(Query_String;"&amp;U=")</formula></code></field><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='47' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata></par></section>
+<par def='1'/>
+<pardef id='4' leftmargin='0.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'
+ expanded='true'><sectiontitle pardef='4' borderstyle='single' color='#ff0041'><text
+>&lt;doctype&gt;&lt;html&gt;&lt;head&gt;&lt;title&gt;&lt;meta&gt;&lt;link&gt;&lt;script&gt;</text></sectiontitle>
+<pardef id='5' leftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='5'>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"&gt;&lt;html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"&gt;</par>
+<par def='5'>&lt;head&gt;&lt;title&gt;Clinical Trials Application&lt;/title&gt;</par>
+<par def='5'>&lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8"&gt;&lt;/meta&gt;</par>
+<pardef id='6' leftmargin='1.1806in' firstlineleftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='6'>&lt;meta http-equiv="X-UA-Compatible" content="IE=8"&gt;&lt;/meta&gt;</par>
+<pardef id='7' leftmargin='2.9521in' firstlineleftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='7'>&lt;link rel="stylesheet" type="text/css" href="/domjs/dojo-1.5.0/ebs/resources/basestyle.css" &gt;&lt;/link&gt;</par>
+<par def='7'>&lt;link rel="stylesheet" type="text/css" href="/domjs/dojo-1.5.0/ebs/resources/animations.css" &gt;&lt;/link&gt;</par>
+<par def='5'>&lt;link rel="stylesheet" type="text/css" href="/xsp/.ibmxspres/dojoroot/dojox/grid/resources/Grid.css"&gt;&lt;/link&gt;</par>
+<par def='5'>&lt;link rel="stylesheet" type="text/css" href="/xsp/.ibmxspres/dojoroot/dojox/grid/resources/claroGrid.css" &gt;&lt;/link&gt;</par>
+<par def='6'>&lt;link rel="stylesheet" type="text/css" href="/xsp/.ibmxspres/dojoroot/dojox/grid/enhanced/resources/claro/EnhancedGrid.css" &gt;&lt;/link&gt;</par>
+<par def='5'>&lt;link rel="stylesheet" type="text/css" href= "/domjs/dojo-1.5.0/ebs/resources/CheckedMultiSelect.css"&gt;&lt;/link&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="classes_ct.js"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="ct.js"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="dialog_util.js"&gt;&lt;/script&gt;</par>
+<par def='7'>&lt;script type="text/javascript" src="val_util.js"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="standard.js"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="fixdata.js"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="jsonxml.js"&gt;&lt;/script&gt;</par>
+<par def='6'>&lt;script type="text/javascript" defer=true SRC="LookupData?openagent&amp;F=CONTEXT&amp;NAME=storeSponsorList&amp;c=<computedtext
+><code event='value'><formula>x:=@Name([CN];@UserName);
+@If(@Contains(x;"_");@Right(x;"_"); x)</formula></code></computedtext>&amp;d=<computedtext
+><code event='value'><formula>@Text(@Year(@Today))+@Text(@Month(@Today))+@Text(@Day(@Today))</formula></code></computedtext>" &gt;&lt;/script&gt;</par>
+<par def='6'>&lt;script type="text/javascript" src="/domjs/dojo-1.5.0/dojo/dojo.js" djConfig="isDebug:false, parseOnLoad: false, locale:'en'"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="/domjs/dojo-1.5.0/ebs/resources/dojorequires.js"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="/domjs/dojo-1.5.0/ebs/resources/audit_util.js"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="/domjs/dojo-1.5.0/ebs/resources/loads_data.js<computedtext
+><code event='value'><formula>@If(@Left(@Name([CN];@ServerName);4)="EWDZ"; "?r="+@Text(@Random(1));"")</formula></code></computedtext>"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="/domjs/dojo-1.5.0/ebs/resources/json_util.js<computedtext
+><code event='value'><formula>@If(@Left(@Name([CN];@ServerName);4)="EWDZ"; "?r="+@Text(@Random(1));"")</formula></code></computedtext>"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="/domjs/dojo-1.5.0/ebs/resources/misc_util.js"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="/domjs/dojo-1.5.0/ebs/resources/attach_util.js"&gt;&lt;/script&gt;</par>
+<par def='7'>&lt;script type="text/javascript" src="/domjs/dojo-1.5.0/ebs/resources/tooltip_util.js"&gt;&lt;/script&gt;</par>
+<par def='7'>&lt;script type="text/javascript" src="/domjs/dojo-1.5.0/ebs/resources/sarissa.js"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="/domjs/dojo-1.5.0/ebs/resources/XMLProcessor.js"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript"&gt;</par>
+<par def='5'/></section>
+<par def='1'/>
+<pardef id='8' leftmargin='2.9521in' firstlineleftmargin='0.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'
+ expanded='true'><sectiontitle pardef='8' borderstyle='single' hidewhenexpanded='true'
+ color='teal'><text>function printPreview</text></sectiontitle>
+<par def='5'>xslt = Sarissa.getDomDocument();</par>
+<par def='5'>xml = Sarissa.getDomDocument();</par>
+<par def='5'>xslt.async = false;</par>
+<par def='5'>xml.async = false;</par>
+<par def='1'>var storeApplicationData;</par>
+<par def='1'/>
+<par def='5'>var results1 = {};</par>
+<par def='5'>var results2 = {};</par>
+<par def='5'>function printPreview(obj) {</par>
+<par def='5'/>
+<pardef id='9' leftmargin='1.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='9'>var xslurl = constant.HOST + '/domjs/dojo-1.5.0/ebs/resources/ct_preview.xsl?R='+Math.random();</par>
+<par def='9'>var output = '';</par>
+<par def='9'>// if (!obj) { alert("Loading this Application from the server failed, please contact TGA Technical Support regarding this issue."); window.location = "/"; }</par>
+<par def='9'>if (constant.browser.chrome) {</par>
+<pardef id='10' leftmargin='1.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='10'>var xslt1 = loadXMLDoc(xslurl );</par>
+<par def='10'>if (typeof(xslt1) != "object"){</par>
+<pardef id='11' leftmargin='1.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='11'>xslt = (new DOMParser()).parseFromString(xslt1, "text/xml");</par>
+<par def='10'>}else{</par>
+<par def='11'>xslt=xslt1;</par>
+<par def='10'>}</par>
+<par def='9'>} else {</par>
+<par def='10'>xslt.load(xslurl);</par>
+<par def='9'>}</par>
+<par def='9'/>
+<par def='9'>var appstatus = getQueryVariable('status');</par>
+<par def='9'>var subdate = getQueryVariable('subdate');</par>
+<par def='9'>var paydate = getQueryVariable('paydate');</par>
+<par def='9'/>
+<par def='9'>xmlText = '&lt;xml&gt;&lt;items&gt;&lt;ApplicationId&gt;Error Loading Data&lt;/ApplicationId&gt;&lt;/items&gt;&lt;/xml&gt;';</par>
+<par def='9'/>
+<par def='9'>try {</par>
+<par def='10'>results1 = dojo.xhrGet( {</par>
+<par def='11'>url:  'LookupDataRepository?OpenAgent&amp;ID='+ <computedtext
+><code event='value'><formula>"'" + ApplicationID + "'"</formula></code></computedtext>  + '&amp;V='+ <computedtext
+><code event='value'><formula>"'" + ApplicationVersion + "'"</formula></code></computedtext> +  '&amp;U=' +  <computedtext
+><code event='value'><formula>"'" + Username + "'"</formula></code></computedtext>  + '&amp;login&amp;F=FILES&amp;R='+Math.random(), </par>
+<par def='11'>handleAs: "json",</par>
+<par def='11'>sync: true,</par>
+<par def='11'>preventCache: true,</par>
+<par def='11'>load: function(response, ioArgs, err) {</par>
+<pardef id='12' leftmargin='2in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='12'>if (response.length &lt; 1) {</par>
+<pardef id='13' leftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='13'>response = { count:"0", identifier:"AttachmentId", label:"AttachmentFileName", items: [ { AttachmentId:"-1",  AttachmentFileName:"Loading this Application from the server failed, please contact TGA Technical Support regarding this issue." } ] };</par>
+<par def='12'>}</par>
+<par def='12'>return response;</par>
+<par def='11'>},</par>
+<par def='11'>success: function(response, ioArgs, err) {  return response; },</par>
+<par def='11'>error: function(response, ioArgs, err) {</par>
+<par def='12'>console.error("HTTP Error status code: ", ioArgs.xhr.status);</par>
+<par def='12'>return response;</par>
+<par def='11'>}</par>
+<par def='10'>});</par>
+<par def='10'/>
+<par def='10'>storeApplicationData = results1.results[0];</par>
+<par def='10'>var pp_sad = storeApplicationData;</par>
+<par def='10'/>
+<par def='10'>if(appstatus != undefined){</par>
+<par def='11'>pp_sad.items.ApplicationStatus = 'Repository';</par>
+<par def='10'>}</par>
+<par def='10'/>
+<par def='10'><run><font color='green'/>//TSK72422 Bruce L</run></par>
+<par def='10'><run><font color='green'/>//the function json2xml treats fields that end in 'date' differently but doesn't do it well</run></par>
+<par def='10'><run><font color='green'/>//so have named the json field xxxxDt, and the function json2xml just treats it like a string</run></par>
+<par def='10'>if(subdate != undefined){</par>
+<par def='11'>pp_sad.items.SubmissionDt = subdate;</par>
+<par def='10'>}</par>
+<par def='10'/>
+<par def='10'>if(paydate != undefined){</par>
+<par def='11'>pp_sad.items.PaymentReceiptDt = paydate;</par>
+<par def='10'>}</par>
+<par def='10'/>
+<par def='10'>try{</par>
+<par def='11'>pp_sad.items.SponsorAddress_Label = xmlEscape(pp_sad.items.SponsorAddress_Label);</par>
+<par def='10'>} catch(e) {'escape sponsor address label error: ' + console.log(e)}</par>
+<par def='10'/>
+<par def='10'><run><font color='green'/>//INC68425 escape xml special characters for the print preview - but only in the GMDNS_Label</run></par>
+<par def='10'>if(storeApplicationData.items.Part1.Devices.items){</par>
+<par def='11'>if(storeApplicationData.items.Part1.Devices.items.length &gt; 0){</par>
+<par def='12'>var d_items = pp_sad.items.Part1.Devices.items;</par>
+<par def='12'>for(k=0; k &lt; d_items.length; k++){</par>
+<par def='13'>try{ <run><font color='green'/>//do the best we can but if there is a problem move on BL 05APR2016</run></par>
+<pardef id='14' leftmargin='2.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='14'>pp_sad.items.Part1.Devices.items[k].GMDNS_Label[0] = xmlEscape(pp_sad.items.Part1.Devices.items[k].GMDNS_Label[0]);</par>
+<par def='13'>} catch(e) {'escape GMDNS label error: ' + console.log(e)}</par>
+<par def='12'>}</par>
+<par def='11'>}</par>
+<par def='10'>}</par>
+<par def='10'/>
+<par def='10'>var xml1 = json2xml(pp_sad, false, '_');</par>
+<par def='10'>xmlText = '&lt;xml&gt;' + xml1 + '&lt;/xml&gt;';</par>
+<par def='10'/>
+<par def='9'>}catch(e) {consoleLog('storeApplicationData cannot be converted to XML: ' + e.message); }</par>
+<par def='9'/>
+<par def='9'>xml = (new DOMParser()).parseFromString(xmlText, "text/xml");</par>
+<par def='9'>try {</par>
+<par def='10'>if (window.ActiveXObject) {</par>
+<par def='11'>output = xml.transformNode(xslt);</par>
+<par def='10'>} else if (document.implementation &amp;&amp; document.implementation.createDocument) {</par>
+<par def='11'>var processor = new XSLTProcessor();</par>
+<par def='11'>processor.importStylesheet(xslt);</par>
+<par def='11'>if (constant.browser.chrome) {</par>
+<par def='12'>var XmlDom = processor.transformToFragment(xml,document);</par>
+<par def='11'>}else{</par>
+<par def='12'>var XmlDom = processor.transformToDocument(xml);</par>
+<par def='11'>}</par>
+<par def='11'>var serializer = new XMLSerializer();</par>
+<par def='11'>var output = serializer.serializeToString(XmlDom);</par>
+<par def='10'>}</par>
+<par def='10'>if (output == '') { output = 'Cannot transform XML via XSLT to XML'; }</par>
+<par def='10'/>
+<par def='10'>/* if(!obj){</par>
+<par def='9'>		alert("Loading this Application from the server failed, please contact TGA Technical Support regarding this issue."); </par>
+<par def='11'>	window.location = "/";</par>
+<par def='10'>} */</par>
+<par def='10'>ppwin = window.open('', '_blank', 'directories=0,fullscreen=0,location=0,menubar=0,resizable=1,scrollbars=1,status=1,titlebar=1,toolbar=0', true);</par>
+<par def='10'>ppwin.document.open();</par>
+<par def='10'>ppwin.document.write(output);</par>
+<par def='10'>ppwin.document.close();  </par>
+<par def='10'>// window.history.back();</par>
+<par def='10'>ppwin.focus();</par>
+<par def='9'>}catch(e) {consoleLog('problem: ' + e.message); }</par>
+<par def='7'>}</par>
+<par def='7'/></section>
+<par def='7'>var username = <computedtext><code event='value'><formula>"'" + Username + "'"</formula></code></computedtext>;</par>
+<par def='5'>function getCookie(c_name) {</par>
+<par def='5'>	var c_name_v = c_name.replace(/ /g,'');</par>
+<par def='5'>	</par>
+<par def='5'>	if (typeof(window.localStorage) == "undefined") {</par>
+<par def='5'>		if (document.cookie.length &gt; 0) {</par>
+<par def='5'>			var c_start = document.cookie.indexOf(c_name_v + "=");</par>
+<par def='5'>			if (c_start != -1) {</par>
+<par def='5'>				c_start = c_start + c_name_v.length + 1;</par>
+<par def='5'>				var c_end = document.cookie.indexOf(";",c_start);</par>
+<par def='5'>				if (c_end == -1) c_end = document.cookie.length;</par>
+<par def='5'>				return unescape(document.cookie.substring(c_start, c_end));</par>
+<par def='5'>			}</par>
+<par def='5'>		}</par>
+<par def='5'>	} else {</par>
+<par def='5'>		if (window.localStorage.length &gt; 0) {</par>
+<par def='5'>			return (window.localStorage.getItem(c_name_v));</par>
+<par def='5'>		}	</par>
+<par def='5'>	}</par>
+<par def='5'/>
+<par def='5'>    return "";</par>
+<par def='5'>}</par>
+<par def='5'/>
+<par def='5'>function getQueryVariable(variable) {</par>
+<par def='9'>var query = window.location.search.substring(1);</par>
+<par def='9'>var vars = query.split('&amp;');</par>
+<par def='9'>for (var i = 0; i &lt; vars.length; i++) {</par>
+<par def='10'>var pair = vars[i].split('=');</par>
+<par def='10'>if (decodeURIComponent(pair[0]) == variable) {</par>
+<par def='11'>return decodeURIComponent(pair[1]);</par>
+<par def='9'>}</par>
+<par def='5'>}</par>
+<par def='9'>console.log('Query variable %s not found', variable);</par>
+<par def='5'>}</par>
+<par def='5'/>
+<par def='5'>&lt;/script&gt;</par>
+<pardef id='15' leftmargin='1.3778in' firstlineleftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='15'>&lt;/head&gt;</par>
+<par def='15'>&lt;body class="claro"&gt;</par>
+<par def='5'>&lt;script type="text/javascript"&gt;</par>
+<par def='5'>	<run><font color='red'/>// Get the cookie from eBS PortalState for the current user - if exist then PrintPreview if not it means the one who access this page is not the same.</run></par>
+<par def='5'>	var cookieUsername = getCookie(username + "_PortalState");</par>
+<par def='5'>	if (cookieUsername) {</par>
+<par def='5'>		printPreview();</par>
+<par def='5'>	} </par>
+<par def='5'>	window.history.back(); <run><font color='red'/> // go back to previous page, no matter what </run></par>
+<par def='5'>&lt;/script&gt;</par>
+<par def='7'>&lt;/body&gt;</par>
+<par def='7'>&lt;/html&gt;</par>
+<par def='7'/></richtext></body>
+<item name='$$ScriptName' summary='false' sign='true'><text>PrintPreview</text></item></form>
+

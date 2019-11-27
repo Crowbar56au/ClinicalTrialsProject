@@ -1,0 +1,467 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(WriteToRepo)' alias='(wTr)' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3'
+ publicaccess='false' designerversion='8.5.3' comment='Write trial to repository'>
+<noteinfo noteid='606' unid='24E6854E860EB93CCA257F7700070B19' sequence='14'>
+<created><datetime dst='true'>20160315T121655,93+11</datetime></created>
+<modified><datetime>20160628T151507,13+10</datetime></modified>
+<revised><datetime>20160628T151507,12+10</datetime></revised>
+<lastaccessed><datetime>20160628T151507,12+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,56+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151507,19+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='selected'/><code event='options'><lotusscript>%REM
+	Agent WriteToRepo
+	Created Apr 10, 2014 by Jeremie Alexis/DEVELOPER/TGADEV
+	Description: Used for writing migrated clinical trials to repository and to archive (modified from Write To CT Repository agent).
+	13AUG2015 Bruce Langner - Modifications to fix issue: Migrated docs: Trial Details data changed in the web portal, 
+	is not written to the Repository.
+%END REM
+
+Option Public
+Option Declare
+
+Use "MIMEJSONDataInterface"
+Use "GetDatabases"
+
+</lotusscript></code><code event='declarations'><lotusscript>' Changing in the Write To CT Repository
+' 1. We don't archive directly into the CT Archive, it will double up, since we will archive the same data from CT Repo into CT Archive
+' 2. That we left ct form from removing from this database into CT Repo
+Const ERR_PRIMARYARGUMENTSMISSING = 1001
+Const ERR_INVALIDDOCUMENTID = 1002
+Const ERR_EMPTYJSONSTORE = 1003
+Const CS_APP_STATUS = "Validated" '"Pending Write to Repository"
+
+Dim strNewStatus As String
+Dim unid As String, appID As String, strID As String, strLU As String, newRecordUNID As String , oldRecordUNID As String
+Dim appVer As String, appStage As String, strContact As String, strContactEmail As String, strContactFax As String, strContactPhone As String, strPart As String
+Dim totalPatients As String, therapeuticArea As String
+
+
+Dim AppJSONEntryStore As MIMEJSONEntryStore
+Dim JSONEntry As JSONObject
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	On Error Goto ErrorHandler
+	Dim Ses As New NotesSession
+	Dim dbThis As NotesDatabase, dbCTReg As NotesDatabase, dbArchive As NotesDatabase
+	Dim sourceDocument As NotesDocument, registerDocument As NotesDocument, regJSONDocument As NotesDocument, JSONDocument As NotesDocument, nextDocument As NotesDocument
+	Dim submission As NotesDocument
+	Dim appDocument As NotesDocument
+	Dim newDocWebArgs As Variant
+	Dim EmptyJSONArray As New JSONArray 
+	Dim agent As NotesAgent, tmpSrcDoc As NotesDocument
+	Dim count As Integer
+	Dim vwThis As NotesView, vwThisJSON As NotesView, vwThisApp As NotesView, vwCTRepoApp As NotesView, vwCTRepoJSON As NotesView
+	Dim dc As NotesDocumentCollection, uiview As NotesUIView, ws As New NotesUIWorkspace
+	Dim intDir As NotesDirectory, intServer As String
+	Dim profDoc As NotesDocument
+	
+	'/ INC 66801 - replaced all documents in this view to be a selected documents only
+	Dim dcCTNs As NotesDocumentCollection
+	
+	Set dbThis = Ses.CurrentDatabase
+	Set profDoc = dbThis.Getprofiledocument("System Profile Document", "")
+	intServer = profDoc.GetItemValue("CTA_Server")(0)
+	
+	Set dbCTReg = fdbGetDatabase("CTR_Path")
+	Set dbArchive = fdbGetDatabase("CTA_Path")
+	Set vwThisJSON = dbThis.GetView("JSONApplication")
+	Set vwThis = dbThis.GetView("isw")
+	Set vwThisApp = dbThis.GetView("AppsByApplicationId")	
+	Set vwCTRepoApp = dbCTReg.GetView("AppsByApplicationId")	
+	Set vwCTRepoJSON = dbCTReg.GetView("JSONApplication")
+	
+	vwThis.AutoUpdate = False
+	
+	'/ INC 66801 - hide this all replace with new one
+	'Set sourceDocument = vwThis.Getfirstdocument()
+	Set dcCTNs = dbThis.Unprocesseddocuments
+	Set sourceDocument = dcCTNS.Getfirstdocument()
+	
+	While Not sourceDocument Is Nothing
+		
+		'/ INC 66801 - hide this all replace with new one
+		'Set tmpSrcDoc = vwThis.GetNextDocument(sourceDocument)
+		Set tmpSrcDoc = dcCTNS.GetNextDocument(sourceDocument)
+		
+		If (sourceDocument.ApplicationStatus(0) = CS_APP_STATUS Or sourceDocument.ApplicationStatus(0) = "Completed") And Not sourceDocument.WriteStatus(0) = "1" Then
+			Print "Processing ID = " &amp; sourceDocument.ApplicationId(0)
+			Call setStatus(sourceDocument)
+			appID = sourceDocument.ApplicationId(0)
+			Set JSONDocument = vwThisJSON.getdocumentbykey(appID)
+			
+			If Not JSONDocument Is Nothing Then
+				
+				JSONDocument.ApplicationStatus = strNewStatus
+				
+				'get handle to current mime json 
+				Set AppJSONEntryStore = New MIMEJSONEntryStore(JSONDocument, "JSONMIMEFILE" ,"JSON.txt")
+				
+				If(Not AppJSONEntryStore Is Nothing)Then
+					removeMigratedNotesDocs appID+"~"+Cstr(appVer),dbCTReg
+					
+					Set agent = dbThis.GetAgent("(CJTN)")
+					'need to create dummy submission document for the agent to act on
+					Set submission = dbThis.Createdocument()
+					submission.replaceItemValue "Form","submission"
+					submission.replaceItemValue "ApplicationIds", sourceDocument.ApplicationId(0) + "~" + sourceDocument.ApplicationVersion(0)
+					submission.replaceItemValue "ClientID", sourceDocument.ClientId(0)
+					submission.replaceItemValue "ClientName", sourceDocument.ClientName(0)
+					submission.replaceItemValue "InvoiceAmount", "0"
+					submission.replaceItemValue "SubmitterName", sourceDocument.ClientName(0)
+					submission.replaceItemValue "SubmissionId", sourceDocument.SubmissionId(0)
+					
+					submission.Save True,False
+					If agent.RunOnServer(submission.NoteId) &lt;&gt; 0 Then
+						Messagebox "Agent did not run",, "Failure"
+					End If
+				Else
+					Msgbox "Could not get the JSON entries."
+					Exit Sub
+				End If
+				submission.remove(True) 'get rid of the dummy submission document
+				vwThisApp.Refresh
+				Set appDocument = vwThisApp.getdocumentbykey(sourceDocument.ApplicationId(0))
+				appDocument.ApplicationStatus = strNewStatus
+				appDocument.ValidationStatus = 1
+				Call setStatus(appDocument)
+				
+				If Cstr(appDocument.ApplicationStage(0)) = "4" Or Cstr(appDocument.ApplicationStage(0)) = "5" Then
+					Call varyJSON()
+				Else
+					Call updateJSON()
+				End If
+				
+				Call setSecurity(JSONDocument)
+				Call setSecurity(appDocument)  '/ INC 64761
+				Call JSONDocument.save(True, False)
+				Call appDocument.save(True, False)
+				
+				'/ For Completed Application, just registering into CTRepository
+				'/ INC 63195 
+				If Cstr(sourceDocument.ApplicationStage(0)) = "3" Then
+					'/ Remove the previous stage in CT Rep to CT Archive
+					Call archiveApp(appID+"~"+Cstr(appVer), dbArchive, dbCTReg)
+					
+					'/ then  register the current version into CT Repository
+					Call registerApp(appID+"~"+appVer, dbCTReg)
+					
+					'/ If more than version 1, archive as well the previous version from CT Repository
+					If Val(appVer) &gt; 1 Then
+						Call archiveApp(appID+"~"+Cstr(Cint(appVer)-1), dbArchive, dbCTReg)
+					End If
+					
+				Else
+
+					'/ For other Stages - old codes here
+					If Not (Cstr(sourceDocument.ApplicationStage(0)) = "4") Then
+						Call archiveApp(appID+"~"+Cstr(appVer), dbArchive, dbCTReg)
+					Else
+						If Val(appVer) &gt; 1 Then  '/ INC 63195 - added If
+							Call archiveApp(appID+"~"+Cstr(Cint(appVer)-1), dbArchive, dbCTReg)	
+						End If
+					End If
+
+					'/ register the current version into CT Repository					
+					Call registerApp(appID+"~"+appVer, dbCTReg)
+					
+					'/ INC 63195 - hide this line
+					'/ I think we just need to register current app into CT Rep if Not Completed, 
+					'/ then it will be archived for the next one by previous version  - archiveApp(appID+"~"+Cstr(CInt(appVer)-1), dbArchive, dbCTReg)	
+					' Call archiveApp(appID+"~"+appVer, dbArchive, dbThis)
+
+				End If
+				
+			End If
+		End If
+
+NextItem:		
+				Set sourceDocument = tmpSrcDoc		
+		Wend
+		
+		Print "Finished Copying to Repository and Archive..."
+		
+ExitSub:
+		Exit Sub
+ErrorHandler:
+		Print "CT - write to repository agent error: Error - "; Err(); " at line "; Erl(); ", "; Error()
+		Resume ExitSub
+End Sub
+
+</lotusscript></code><code event='updateJSON'><lotusscript>Function updateJSON( )
+	
+	Set JSONEntry = AppJSONEntryStore.GetFirstJSONEntry
+	
+	While Not (JSONEntry Is Nothing)
+		Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "IsActiveVersion", "1")
+		
+		If AppJSONEntryStore.GetItemFirstValue(JSONEntry, "Type") = "Application" Then			
+			Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ApplicationStatus", strNewStatus)
+			Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ApplicationStage", appStage)
+			Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "IsPushBackTriggered", "")
+			Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "IsPushBackSubmittedBack", "")
+			
+		End If
+		Set JSONEntry = AppJSONEntryStore.GetNextJSONEntry
+	Wend
+	
+	'save the updated json
+	Call AppJSONEntryStore.SaveJSONToMime()
+	
+End Function
+
+</lotusscript></code><code event='setSecurity'><lotusscript>Function setSecurity(JSONDocument As NotesDocument)
+	
+	'/ Modified INC 64761 - 
+	Dim secNames() As String
+	Dim item As NotesItem
+	
+	'/ Added INC 64761 - 
+	Redim secNames(3)
+	
+	Yield	'===== set security
+	'secNames(0) = "SIME" + formfields("clientid")
+	secNames(0) = "[Admin]"
+	secNames(1) = "[TGA]"
+	'secNames(3) = "[SIMEReader]"
+	secNames(2) = "LocalDomainServers"
+	secNames(3) = "OtherDomainServers"
+
+	'/ INC 64761 - Move the WebAuthors here - to prevent given the Author access to Sponsor
+	JSONDocument.ReplaceItemValue "WebAuthors", secNames
+	Set item = JSONDocument.GetFirstItem("WebAuthors")
+	item.IsAuthors = True
+	
+	'/ Added INC 64761 - to give the Access for Sponsor
+	'/ Only application to make it the same with the other Agent
+	If Lcase(JSONDocument.Form(0)) = "application" Then
+		Redim Preserve secNames(4)
+		secNames(4) = "SIME" + JSONDOcument.sponsorid(0)
+		'secNames(5) = "SIME40185"
+	End If
+	
+	JSONDocument.ReplaceItemValue "WebReaders", secNames
+	Set item = JSONDocument.GetFirstItem("WebReaders")
+	item.IsReaders = True
+	
+End Function
+
+</lotusscript></code><code event='setStatus'><lotusscript>Function setStatus(sourceDocument As NotesDocument)
+	appStage = Cstr(sourceDocument.ApplicationStage(0))
+	
+	If sourceDocument.ClinicalTrialType(0) = "CTN" Then
+		strPart = "Part1"
+	Else
+		strPart = "Part2"
+	End If
+	
+	If appStage = "3" Then
+		strNewStatus = "Completed"
+	Else
+		strNewStatus = "Active"	
+		If appStage = "4" Then
+			If sourceDocument.ClinicalTrialType(0) = "CTN" Then
+				appStage = "1"
+			Else
+				appStage = "2"
+			End If		
+		End If
+	End If
+	
+	appVer = Cstr(sourceDocument.ApplicationVersion(0)) 'DFS May 2013 - allow for numeric value
+	appID = sourceDocument.ApplicationId(0)
+	
+End Function
+
+</lotusscript></code><code event='removeItem'><lotusscript>Sub removeItem(doc As NotesDocument, itemName As String)
+	Dim nitem As NotesItem  '/ WP - TSK 61861 Feb - bug to remove Archived
+	If doc.Hasitem(itemName) Then
+		Set nitem = doc.Getfirstitem(itemName)
+		If Not nitem Is Nothing Then
+			Call nitem.Remove()
+		End If
+	End If
+End Sub
+
+</lotusscript></code><code event='varyJSON'><lotusscript>Function varyJSON()
+	On Error Goto ErrorHandler
+	
+	Dim JSONEntries As Variant, AllSites As Variant
+	Dim JSONEntryTrialTo As JSONObject
+	
+	JSONEntries = AppJSONEntryStore.GetEntriesByType("UpdateDetails")
+	
+	If Not Isnull(JSONEntries) Then
+		Forall entry In JSONEntries
+			Set JSONEntry = entry
+			
+			Select Case appStage
+			Case "1"
+				Set JSONEntryTrialTo = AppJSONEntryStore.GetEntryByIdentity(appID+"~"+appVer+"~Part1")
+			Case "2"
+				Set JSONEntryTrialTo = AppJSONEntryStore.GetEntryByIdentity(appID+"~"+appVer+"~Part2")
+			End Select
+			
+			Call AppJSONEntryStore.MoveItemToAnotherEntry(JSONEntry, "Sites", JSONEntryTrialTo, True, False)				
+			
+			'clean up items here
+			If  AppJSONEntryStore.HasItem(JSONEntry , "Sites") Then
+				Call AppJSONEntryStore.RemoveItem(JSONEntry, "Sites")
+				'Print "Removing JSON entry from app: " + appID
+			End If
+			
+		End Forall
+	End If
+	
+	Set JSONEntry = AppJSONEntryStore.GetFirstJSONEntry	
+	Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ApplicationStatus", strNewStatus)		
+	Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "IsPushBackTriggered", "")
+	Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "IsPushBackSubmittedBack", "")
+	
+
+	'save the updated json
+	Call AppJSONEntryStore.SaveJSONToMime()
+	
+	Exit Function
+ErrorHandler:
+	Print "CT - write to repository agent error (Function varyJSON): Error - "; Err(); " at line "; Erl(); ", "; Error()
+	Exit Function
+End Function
+
+</lotusscript></code><code event='registerApp'><lotusscript>Function registerApp(luKey As String, dbRegister As NotesDatabase)
+	Dim s As New NotesSession
+	Dim db As NotesDatabase
+	Dim dc As NotesDocumentCollection
+	Dim doc As NotesDocument,  tmpdoc As NotesDocument
+	Dim vwLookup As NotesView
+	
+	Set db = s.CurrentDatabase
+	Set vwLookup = db.GetView("LookupAllByApplicationID")
+	Set dc = vwLookup.GetAllDocumentsByKey(luKey)
+	Set doc = dc.GetFirstDocument
+	
+	While Not doc Is Nothing
+		'/ INC 63195
+		If Lcase(doc.Form(0)) = "ct" Then
+			Set tmpdoc = doc
+		End If
+		
+		Call doc.ReplaceItemValue("ApplicationStatus", "Active")
+		Call doc.ReplaceItemValue("WriteStatus", "1")
+		
+		'/ WP - TSK 61861 Feb 
+		'/ Checked for Archive field and Pushback to be removed
+		Call removeItem(doc, "archive")
+		Call removeItem(doc, "IsClean")
+		Call removeItem(doc, "IsPushBackTriggered")
+		
+		Call doc.Save( True ,False)
+		
+		Call doc.CopyToDatabase(dbRegister)
+		
+		Set doc = dc.GetNextDocument(doc)
+	Wend
+	
+	'/ So now we have to remove CT form from the collection, because we need it to Vary, NextStage or Complete action from CTRepository
+	'/ INC 63195
+	If Not (tmpdoc Is Nothing) Then
+		Call dc.Deletedocument(tmpdoc)	
+	End If
+	
+	'/ After we copy to CT Repo then we need to remove all Notes documents but CT web form
+	If dc.Count &gt; 0 Then
+		Call dc.RemoveAll(True)
+	End If
+	'/ End of New Code - INC 63195	
+	
+End Function
+
+</lotusscript></code><code event='archiveApp'><lotusscript>Function archiveApp(luKey As String, dbArchive As NotesDatabase, dbThis As NotesDatabase)
+	On Error Goto hang
+	
+	Dim dc As NotesDocumentCollection
+	Dim doc As NotesDocument, tmpdoc As NotesDocument
+	Dim vwLookup As NotesView
+	
+	'/ -&gt; This view contains every documents in this database, has been like this before we modified.
+	Set vwLookup = dbThis.GetView("LookupAllByApplicationID")
+	Set dc = vwLookup.GetAllDocumentsByKey(luKey)
+	Set doc = dc.GetFirstDocument
+	
+	While Not doc Is Nothing
+		doc.isArchived = "1"		
+		doc.ArchiveDate = Now
+		Call doc.ReplaceItemValue("ApplicationStatus", "Archived")
+		Call doc.ReplaceItemValue("archive", "1")		
+		Call doc.Save( True ,False)
+		
+		'/ INC 63195
+		If Lcase(doc.Form(0)) = "ct" Then
+			Set tmpdoc = doc
+		End If
+		
+		Call doc.CopyToDatabase(dbArchive)
+		Set doc = dc.GetNextDocument(doc)
+	Wend
+	
+	'/ So now we have to remove CT form from the collection, because we need it to Vary, NextStage or Complete action from CTRepository
+	'/ INC 63195
+	If Not (tmpdoc Is Nothing) Then
+		Call dc.Deletedocument(tmpdoc)	
+	End If
+	
+	'/ Old code put it back again to remove those documents
+	If dc.Count &gt; 0 Then
+		Call dc.RemoveAll(True)
+	End If
+	
+	Exit Function
+hang:
+	Print "CT - write to repository agent - function archiveApp error: Error - "; Err(); " at line "; Erl(); ", "; Error()
+	Exit Function
+End Function
+
+</lotusscript></code><code event='removeMigratedNotesDocs'><lotusscript>%REM
+	13AUG2015 Bruce Langner TSK 68435
+	Function removeMigratedNotesDocs
+	Description: The original migrated Notes documents need to be removed, except for the 'ct' form
+	New Notes documents are created based on the json.txt file when the application is committed to
+	the CT Repository
+	28OCT2015 Bruce Langner TSK70527
+	implement a fix to retain ADR and IBP documents prior to transfer of documents to the Repository
+%END REM
+Function removeMigratedNotesDocs(luKey As String, dbRegister As NotesDatabase)
+	Dim s As New NotesSession
+	Dim db As NotesDatabase
+	Dim dc As NotesDocumentCollection
+	Dim doc As NotesDocument, tmpdoc As NotesDocument, nextDoc As NotesDocument
+	Dim vwLookup As NotesView
+	
+	
+	Set db = s.CurrentDatabase
+	Set vwLookup = db.GetView("LookupAllByApplicationID")
+	Set dc = vwLookup.GetAllDocumentsByKey(luKey)
+	Set doc = dc.GetFirstDocument
+	
+	While Not doc Is Nothing
+		Set nextDoc = dc.GetNextDocument(doc)
+		Select Case doc.Form(0)
+		Case "ct": 'keep
+		Case "ADR": 'keep
+		Case "IBP": 'keep
+		Case Else 'discard the rest
+			Call doc.Remove(True)
+	End Select
+		
+		Set doc = nextDoc 
+		Set nextDoc = Nothing
+	Wend
+	
+	vwLookup.Refresh
+	
+End Function</lotusscript></code>
+<item name='$POID'><datetime>20160620T120207,24+10</datetime></item></agent>
+

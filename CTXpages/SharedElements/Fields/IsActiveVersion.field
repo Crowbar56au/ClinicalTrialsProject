@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<sharedfield name='IsActiveVersion' xmlns='http://www.lotus.com/dxl' version='9.0'
+ maintenanceversion='1.0' replicaid='CA257FDB001B5780' designerversion='7'>
+<noteinfo noteid='2f2' unid='9060AE17ACEDDA4ACA257F7700070150' sequence='13'>
+<created><datetime dst='true'>20160315T121630,88+11</datetime></created>
+<modified><datetime>20160628T151504,70+10</datetime></modified>
+<revised><datetime>20160628T151504,69+10</datetime></revised>
+<lastaccessed><datetime>20160628T151504,69+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152009,84+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><field
+ type='text' kind='computedwhencomposed' name='IsActiveVersion' htmlid='IsActiveVersion'><code
+ event='defaultvalue'><formula>@If(@ThisValue="1";"Yes";@ThisValue="0";"No";"")</formula></code></field>
+<item name='$HTMLCode' sign='true'>
+<rawitemdata type='1'>
+</rawitemdata></item></sharedfield>
+

@@ -1,0 +1,1670 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xp:view xmlns:xp="http://www.ibm.com/xsp/core" styleClass="claro" dojoParseOnLoad="true" dojoTheme="true" disableTheme="true"
+	pageTitle="Clinical Trials Notification" xmlns:xe="http://www.ibm.com/xsp/coreex" xmlns:xc="http://www.ibm.com/xsp/custom"
+	dojoForm="true">
+	<xp:this.resources>
+		<xp:styleSheet href="/applicationIcons.css"></xp:styleSheet>
+		<xp:styleSheet href="/applicationLayout.css"></xp:styleSheet>
+		<xp:styleSheet href="/applicationForm.css"></xp:styleSheet>
+		<xp:styleSheet href="/developer.css"></xp:styleSheet>
+		<xp:styleSheet href="/.ibmxspres/dojoroot/dojox/grid/resources/Grid.css"></xp:styleSheet>
+		<xp:styleSheet href="/.ibmxspres/dojoroot/dojox/grid/resources/claroGrid.css"></xp:styleSheet>
+		<xp:styleSheet href="/.ibmxspres/dojoroot/dojox/grid/enhanced/resources/claro/EnhancedGrid.css"></xp:styleSheet>
+		<xp:dojoModule name="dojo.dom-class"></xp:dojoModule>
+		<xp:dojoModule name="dijit.layout.TabContainer"></xp:dojoModule>
+		<xp:dojoModule name="dijit.layout.ContentPane"></xp:dojoModule>
+		<xp:dojoModule name="dijit.layout.LayoutContainer"></xp:dojoModule>
+		<xp:dojoModule name="dijit.Tooltip"></xp:dojoModule>
+		<xp:dojoModule name="dijit.TooltipDialog"></xp:dojoModule>
+		<xp:dojoModule name="dijit.Dialog"></xp:dojoModule>
+		<xp:dojoModule name="dijit.layout.BorderContainer"></xp:dojoModule>
+		<xp:dojoModule name="dijit.form.Button"></xp:dojoModule>
+		<xp:dojoModule name="dijit.form.TextBox"></xp:dojoModule>
+		<xp:dojoModule name="dijit.form.NumberTextBox"></xp:dojoModule>
+		<xp:dojoModule name="dijit.form.Textarea"></xp:dojoModule>
+		<xp:dojoModule name="dijit.form.SimpleTextarea"></xp:dojoModule>
+		<xp:dojoModule name="dijit.form.FilteringSelect"></xp:dojoModule>
+		<xp:dojoModule name="dijit.form.RadioButton"></xp:dojoModule>
+		<xp:dojoModule name="dijit.layout.AccordionContainer"></xp:dojoModule>
+		<xp:dojoModule name="dijit.Toolbar"></xp:dojoModule>
+		<xp:dojoModule name="dijit.MenuBar"></xp:dojoModule>
+		<xp:dojoModule name="dijit.PopupMenuBarItem"></xp:dojoModule>
+		<xp:dojoModule name="dijit.Menu"></xp:dojoModule>
+		<xp:dojoModule name="dijit.MenuItem"></xp:dojoModule>
+		<xp:dojoModule name="dijit.PopupMenuItem"></xp:dojoModule>
+		<xp:dojoModule name="dijit.MenuBarItem"></xp:dojoModule>
+		<xp:dojoModule name="dojo.data.ItemFileReadStore"></xp:dojoModule>
+		<xp:dojoModule name="dojo.data.ItemFileWriteStore"></xp:dojoModule>
+		<xp:dojoModule name="dijit.form.SimpleTextarea"></xp:dojoModule>
+		<xp:dojoModule name="dojox.grid.EnhancedGrid"></xp:dojoModule>
+		<xp:dojoModule name="dojox.grid.DataGrid"></xp:dojoModule>
+		<xp:dojoModule name="dojox.grid.enhanced.plugins.DnD"></xp:dojoModule>
+		<xp:dojoModule name="dojox.grid.enhanced.plugins.IndirectSelection"></xp:dojoModule>
+		<xp:dojoModule name="dojox.grid.enhanced.plugins.Pagination"></xp:dojoModule>
+		<xp:dojoModule name="dojox.grid.enhanced.plugins.Selector"></xp:dojoModule>
+		<xp:dojoModule name="dojox.grid.enhanced.plugins.Filter"></xp:dojoModule>
+		<xp:script src="/commonDatabases.jss" clientSide="false"></xp:script>
+		<xp:script src="/applicationActions.jss" clientSide="false"></xp:script>
+		<xp:script src="/ct.js" clientSide="true"></xp:script>
+		<xp:script src="/xCT.js" clientSide="true"></xp:script>
+		<xp:script src="/xTooltip.js" clientSide="true"></xp:script>
+	</xp:this.resources>
+	<xp:this.beforePageLoad><![CDATA[#{javascript:setCommonDatabases();
+getApplicationClientID();}]]></xp:this.beforePageLoad>
+	<xp:this.afterPageLoad><![CDATA[#{javascript:viewScope.applicationid = getComponent("applicationId1").getValue();
+viewScope.sponsorid = getComponent("SponsorID").getValue();
+viewScope.runValidation = "N";
+if (sessionScope.containsKey("postRedirectAction")) {
+	var postRedirectAction = sessionScope.postRedirectAction;
+	sessionScope.remove("postRedirectAction");
+	if (postRedirectAction != null) {
+		// Run post redirect action
+		if (postRedirectAction == "xxxxxxx") {
+			
+		} else {
+			try {
+				var fn = eval(postRedirectAction + "()");
+			} catch (e) {}
+		}
+	}
+}}]]></xp:this.afterPageLoad>
+	<xp:this.beforeRenderResponse><![CDATA[#{javascript:setBrowserMode();}]]></xp:this.beforeRenderResponse>
+	
+	<xp:div id="uiSplashScreen1"
+		style="background-color:#f0f0f0; padding:0; margin:0; position:absolute; top:0; left:0; width:100%; height:100%; z-index:-999; filter: alpha(opacity=100); opacity: 1.00; vertical-align:middle;">
+	</xp:div>
+	<xp:div id="uiSplashScreen2"
+		style="position:absolute; top:50%; left:40%; height:32px; text-align:center; z-index:-999; vertical-align:center;">
+		<xp:table>
+			<xp:tr>
+				<xp:td>
+					<img src='/domjs/dojo-1.5.0/ebs/resources/loader_lg.gif' />
+				</xp:td>
+				<xp:td id="uiSplashScreen1_label" style="padding:8px 15px 8px 15px;">Please wait, loading ...</xp:td>
+			</xp:tr>
+		</xp:table>
+	</xp:div>
+	<xp:div dojoType="dijit.layout.BorderContainer" styleClass="application" id="pageContainer">
+		<xp:this.dojoAttributes>
+			<xp:dojoAttribute name="gutters" value="false"></xp:dojoAttribute>
+		</xp:this.dojoAttributes>
+		<xp:div dojoType="dijit.MenuBar" id="menuBar" styleClass="menuBar">
+			<xp:this.dojoAttributes>
+				<xp:dojoAttribute name="region" value="top"></xp:dojoAttribute>
+			</xp:this.dojoAttributes>
+			<xp:div dojoType="dijit.PopupMenuBarItem" id="menubarApplication">
+				<xp:this.dojoAttributes>
+					<xp:dojoAttribute name="label" value="Application"></xp:dojoAttribute>
+				</xp:this.dojoAttributes>
+				<xp:div id="applicationMenu" dojoType="dijit.Menu">
+					<xp:div dojoType="dijit.MenuItem" id="menuItemClose">
+						<xp:this.dojoAttributes>
+							<xp:dojoAttribute name="label" value="Close"></xp:dojoAttribute>
+							<xp:dojoAttribute name="iconClass" value="appIcon appIconClose"></xp:dojoAttribute>
+						</xp:this.dojoAttributes>
+						<xp:eventHandler event="onclick" submit="true" refreshMode="norefresh" disableValidators="true">
+							<xp:this.action><![CDATA[#{javascript:closeApplication();
+}]]></xp:this.action>
+						</xp:eventHandler>
+					</xp:div>
+					<xp:div dojoType="dijit.MenuItem" id="menuItemSave">
+						<xp:this.dojoAttributes>
+							<xp:dojoAttribute name="label" value="Save"></xp:dojoAttribute>
+							<xp:dojoAttribute name="iconClass" value="appIcon appIconSave"></xp:dojoAttribute>
+						</xp:this.dojoAttributes>
+						<xp:eventHandler event="onclick" refreshMode="complete" submit="true" disableValidators="true"
+							onComplete="hideWaitDialog();">
+							<xp:this.script><![CDATA[var btnSubmit = dijit.byId("#{id:btnActionSubmit}");
+btnSubmit.set('disabled', true);]]>
+							</xp:this.script>
+							<xp:this.action><![CDATA[#{javascript:try{
+	if(ctapp.saveData()){
+		viewScope.runValidation = "N";
+		var action = context.getUrlParameter("action");
+		if (action == "newDocument") {
+			var url1 = @Left(context.getUrl(), "?");
+			sUNID = ctapp.getUnid();
+			var params = "?documentId=" + sUNID + "&action=editDocument";
+			var fullurl = url1 + params;
+			context.redirectToPage(fullurl);
+		}
+	}
+}catch(e){
+	print("application.xsp save button error: " + e);
+}}]]></xp:this.action>
+						</xp:eventHandler>
+					</xp:div>
+					<xp:div dojoType="dijit.MenuItem" id="menuItemValidate" rendered="true">
+						<xp:this.dojoAttributes>
+							<xp:dojoAttribute name="label" value="Validate"></xp:dojoAttribute>
+							<xp:dojoAttribute name="iconClass" value="appIcon appIconValidate"></xp:dojoAttribute>
+						</xp:this.dojoAttributes>
+						<xp:eventHandler event="onclick" submit="true" refreshMode="partial" disableValidators="true"
+							refreshId="gridJSONValidationErrors" onStart="showWaitDialog('Please wait, validating ...', 'Validation');"
+							onError="hideWaitDialog();">
+							<xp:this.script><![CDATA[try {
+	
+} catch(e) {
+	console.log("application.xsp validate dropdown error: " + e);
+}]]></xp:this.script>
+							<xp:this.action><![CDATA[#{javascript:try {
+	viewScope.runValidation = "Y";
+	if(ctapp.saveData()){
+		var action = context.getUrlParameter("action");
+		if (action == "newDocument") {
+			var url1 = @Left(context.getUrl(), "?");
+			sUNID = ctapp.getUnid();
+			var params = "?documentId=" + sUNID + "&action=editDocument";
+			var fullurl = url1 + params;
+			context.redirectToPage(fullurl);
+		}
+		part1.saveData(null);
+	}
+} catch (e) {
+	print("application.xsp menu validate item error: " + e);
+}}]]></xp:this.action>
+						</xp:eventHandler>
+					</xp:div>
+					<xp:div dojoType="dijit.MenuItem" id="menuItemPrintPreview">
+						<xp:this.dojoAttributes>
+							<xp:dojoAttribute name="label" value="Print Preview"></xp:dojoAttribute>
+							<xp:dojoAttribute name="iconClass" value="appIcon appIconPrint"></xp:dojoAttribute>
+						</xp:this.dojoAttributes>
+						<xp:eventHandler event="onclick" submit="false">
+							<xp:this.script><![CDATA[applicationPrintPreview();]]></xp:this.script>
+						</xp:eventHandler>
+					</xp:div>
+				</xp:div>
+			</xp:div>
+			<xp:div dojoType="dijit.MenuBarItem" id="menubarHelp">
+				<xp:this.dojoAttributes>
+					<xp:dojoAttribute name="label" value="How to use the online CTN form"></xp:dojoAttribute>
+					<xp:dojoAttribute name="iconClass" value="appIcon appIconHelp"></xp:dojoAttribute>
+				</xp:this.dojoAttributes>
+				<xp:eventHandler event="onclick" submit="false">
+					<xp:this.script><![CDATA[applicationHelp();]]></xp:this.script>
+				</xp:eventHandler>
+			</xp:div>
+			<xp:div id="userInfo" styleClass="userInfo">
+				<xp:text escape="true" id="userName">
+					<xp:this.value><![CDATA[#{javascript:var myName:NotesName = session.createName(session.getEffectiveUserName());
+var commonName = myName.getCommon();
+myName.recycle();
+return commonName;}]]></xp:this.value>
+				</xp:text>
+			</xp:div>
+		</xp:div>
+		<xp:div dojoType="dijit.layout.ContentPane" id="headerPane" styleClass="header">
+			<xp:this.dojoAttributes>
+				<xp:dojoAttribute name="region" value="top"></xp:dojoAttribute>
+			</xp:this.dojoAttributes>
+			<!-- Left Header Region -->
+			<xp:div styleClass="left">
+				<xp:div styleClass="tagline">Therapeutic Goods Administration | eBusiness Services</xp:div>
+				<h2>
+					<xp:text escape="true" id="cfdTitle">
+						<xp:this.value><![CDATA[#{javascript:"Clinical Trials Notification"}]]></xp:this.value>
+					</xp:text>
+				</h2>
+			</xp:div>
+			<!-- Right Header Region -->
+			<xp:div styleClass="right">
+				<xp:table>
+					<xp:tr>
+						<xp:td>
+							<xp:span styleClass="label"></xp:span>
+							<xp:label styleClass="label" value="Status:" id="lblAceStatus" for="cfdApplicationStatus"></xp:label>
+							&#160;
+							<xp:text escape="true" styleClass="label" id="cfdApplicationStatus">
+								<xp:this.value><![CDATA[#{javascript:try{
+	ctapp.getApplicationStatus();
+}catch(e){
+	print(database.getTitle() + " " + @Right(view.getPageName(), "/") + " cfdApplicationStatus error: " + e);
+}}]]></xp:this.value>
+							</xp:text>
+						</xp:td>
+						<xp:td>
+							<xp:span styleClass="label"></xp:span>
+							<xp:label value="Application Id:" id="lblAceApplicationID" for="cfdAceApplicationID" styleClass="label">
+							</xp:label>
+							&#160;
+							<xp:text styleClass="label" escape="true" id="cfdAceApplicationID" value="#{ctapp.applicationId}"></xp:text>
+						</xp:td>
+					</xp:tr>
+					<xp:tr>
+						<xp:td>
+							<xp:label styleClass="label" value="Client Reference:" id="lblgenAppClientReference"
+								for="djClientApplicationID">
+							</xp:label>
+						</xp:td>
+						<xp:td>
+							<xp:inputText id="djClientReference" dojoType="dijit.form.TextBox" value="#{ctapp.clientReference}">
+								<xp:this.dojoAttributes>
+									<xp:dojoAttribute name="placeHolder" value="Client reference, not seen by TGA"></xp:dojoAttribute>
+								</xp:this.dojoAttributes>
+							</xp:inputText>
+						</xp:td>
+					</xp:tr>
+				</xp:table>
+			</xp:div>
+			<xp:div styleClass="clearFix"></xp:div>
+		</xp:div>
+		<xp:div dojoType="dijit.layout.ContentPane" id="contentPane" styleClass="content">
+			<xp:this.dojoAttributes>
+				<xp:dojoAttribute name="region" value="center"></xp:dojoAttribute>
+			</xp:this.dojoAttributes>
+			<xp:div id="hiddenData" styleClass="hiddenData">
+				<xp:table>
+					<xp:tr>
+						<xp:td>
+							<xp:inputText value="#{ctapp.explicitKey}" id="explicitKey1" styleClass="hiddenField"></xp:inputText>
+						</xp:td>
+						<xp:td>
+							<xp:inputTextarea id="webReaders" value="#{ctapp.webReaders}" styleClass="hiddenField"
+								multipleSeparator="#{javascript:@NewLine();}">
+								<xp:this.defaultValue><![CDATA[${javascript:var username = @Name("[CN]", @UserName());
+	CID = sessionScope.clientid;
+	//This assumes that the groups are prefixed with SIME, these groups are created by the process new user Agent in the User Management DB};
+	username = "SIME" + CID;
+	var readers = new Array(username, "[Admin]","[TGA]","[SIMEReader]","[System Profile]","LocalDomainServers", "OtherDomainServers");
+	return readers;}]]></xp:this.defaultValue>
+							</xp:inputTextarea>
+						</xp:td>
+						<xp:td>
+							<xp:inputTextarea id="webAuthors" value="#{ctapp.webAuthors}" styleClass="hiddenField"
+								multipleSeparator="#{javascript:@NewLine();}">
+								<xp:this.defaultValue><![CDATA[${javascript:var username = @Name("[CN]", @UserName());
+	CID = sessionScope.clientid;
+	//This assumes that the groups are prefixed with SIME, these groups are created by the process new user Agent in the User Management DB};
+	username = "SIME" + CID;
+	var authors = new Array(username, "[Admin]","[TGA]","[SIMEReader]","[System Profile]","LocalDomainServers", "OtherDomainServers");
+	return authors;}]]></xp:this.defaultValue>
+							</xp:inputTextarea>
+						</xp:td>
+						<xp:td>
+							<xp:inputText value="#{ctapp.sponsorName}" id="sponsorName" styleClass="hiddenField"
+								dojoType="dijit.form.TextBox">
+								<xp:this.defaultValue><![CDATA[#{javascript:getComponent("cfdClientName").getValue();
+	}]]></xp:this.defaultValue>
+							</xp:inputText>
+						</xp:td>
+						<xp:td>
+							<xp:inputText value="#{ctapp.applicantName}" id="applicantName1" dojoType="dijit.form.TextBox"
+								styleClass="hiddenField">
+							</xp:inputText>
+						</xp:td>
+					</xp:tr>
+					<xp:tr>
+						<xp:td>
+							<xp:text escape="true" id="cfdClientID" styleClass="hiddenField" value="#{javascript:sessionScope.clientid;}">
+							</xp:text>
+						</xp:td>
+						<xp:td>
+							<xp:text escape="true" id="cfdLUClientType" styleClass="hiddenField">
+								<xp:this.value><![CDATA[#{javascript://REM {Get the Client ID using the Username};
+var dbName = createDBArray(sessionScope.clientwdb)
+cID = @If(@Contains( getComponent('cfdClientID').getValue(), "ERROR" ), "Error", "");
+//REM {Check if ID is an agent};
+agentResult = @DbLookup(dbName, "LUClientType", getComponent('cfdClientID').getValue(), 2 );
+//REM {If username was not found produce error message, if agent was not found in lookup user is sponsor, if was found user is agent};
+@If( cID == "Error", "ERROR: Could not find User Name \"" + @Name( ["CN"], @UserName() ) + "\" in User Manager database",
+        @IsError( agentResult ), "Sponsor", agentResult )
+//ctapp.getClientTypes();}]]></xp:this.value>
+							</xp:text>
+						</xp:td>
+						<xp:td>
+							<xp:inputText value="#{ctapp.sponsorID}" id="SponsorID" dojoType="dijit.form.TextBox"
+								styleClass="hiddenField">
+								<xp:this.dojoAttributes>
+									<xp:dojoAttribute value="sponsorID" name="jsId"></xp:dojoAttribute>
+								</xp:this.dojoAttributes>
+							</xp:inputText>
+						</xp:td>
+						<xp:td>
+							<xp:inputText id="clientId1" value="#{ctapp.clientId}" styleClass="hiddenField" dojoType="dijit.form.TextBox">
+								<xp:this.defaultValue><![CDATA[#{javascript:sessionScope.clientid;}]]></xp:this.defaultValue>
+							</xp:inputText>
+						</xp:td>
+						<xp:td>
+							<xp:inputText id="applicationId1" value="#{ctapp.applicationId}" styleClass="hiddenField"
+								dojoType="dijit.form.TextBox">
+								<xp:this.dojoAttributes>
+									<xp:dojoAttribute name="jsId" value="applicationid"></xp:dojoAttribute>
+								</xp:this.dojoAttributes>
+							</xp:inputText>
+						</xp:td>
+					</xp:tr>
+					<xp:tr>
+						<xp:td>
+							<xp:inputText value="#{ctapp.sponsorAddress}" id="SponsorAddress" dojoType="dijit.form.TextBox"
+								styleClass="hiddenField">
+								<xp:this.dojoAttributes>
+									<xp:dojoAttribute name="jsId" value="sponsorAddress"></xp:dojoAttribute>
+								</xp:this.dojoAttributes>
+								</xp:inputText>
+						</xp:td>
+						<xp:td>
+							
+						</xp:td>
+						<xp:td>
+							<xp:inputText id="applicationFees" value="#{ctapp.applicationFees}" styleClass="hiddenField"
+								dojoType="dijit.form.CurrencyTextBox">
+								<xp:this.dojoAttributes>
+									<xp:dojoAttribute name="currency" value="AUD"></xp:dojoAttribute>
+								</xp:this.dojoAttributes>
+							</xp:inputText>
+						</xp:td>
+						<xp:td>
+							<xp:inputText id="applicationStage" value="#{ctapp.applicationStage}" styleClass="hiddenField" defaultValue="1"
+								dojoType="dijit.form.TextBox">
+							</xp:inputText>
+						</xp:td>
+						<xp:td>
+							<xp:inputText value="#{ctapp.applicationVersion}" id="applicationVersion" defaultValue="1" styleClass="hiddenField"></xp:inputText></xp:td>
+					</xp:tr>
+					<xp:tr>
+						<xp:td>
+							<xp:inputText value="#{ctapp.clinicalTrialType}" id="ClinicalTrialType" dojoType="dijit.form.TextBox"
+								styleClass="hiddenField">
+							</xp:inputText>
+						</xp:td>
+						<xp:td>
+							<xp:inputText id="isActiveVersion" value="#{ctapp.isActiveVersion}" styleClass="hiddenField" defaultValue="1"></xp:inputText></xp:td>
+						<xp:td>
+							<xp:inputText value="#{ctapp.dataSection}" id="dataSection" styleClass="hiddenField" defaultValue="1"></xp:inputText></xp:td>
+						<xp:td>
+							
+						</xp:td>
+						<xp:td></xp:td>
+					</xp:tr>
+					<xp:tr>
+						<xp:td>
+							<xp:inputText id="lastSelectedTab" value="#{ctapp.lastSelectedTab}" styleClass="hiddenField"
+								dojoType="dijit.form.TextBox">
+							</xp:inputText>
+						</xp:td>
+						<xp:td>
+							<xp:inputText id="validationStatus" value="#{ctapp.validationStatus}" styleClass="hiddenField" defaultValue=""
+								dojoType="dijit.form.TextBox">
+							</xp:inputText>
+						</xp:td>
+						<xp:td></xp:td>
+						<xp:td></xp:td>
+						<xp:td></xp:td>
+					</xp:tr>
+					<xp:tr>
+						<xp:td>
+							<xp:text escape="true" id="cfdHelpKey" styleClass="hiddenField">
+								<xp:this.value><![CDATA[#{javascript:return "LVT_USERGUIDE";}]]></xp:this.value>
+							</xp:text>
+						</xp:td>
+						<xp:td>
+							<xp:text escape="true" id="isTGAUser" styleClass="hiddenField">
+								<xp:this.value><![CDATA[#{javascript:try{
+	if(context.getUser().getRoles().contains('[TGA]')){
+		return "1";
+	}else {
+		return "0";
+	}
+} catch (e) {
+	print(e);
+}}]]></xp:this.value>
+							</xp:text>
+						</xp:td>
+						<xp:td></xp:td>
+						<xp:td></xp:td>
+						<xp:td></xp:td>
+					</xp:tr>
+				</xp:table>
+			</xp:div>
+			<xp:div id="contentContainer" dojoType="dijit.layout.BorderContainer" styleClass="contentContainer">
+				<xp:this.dojoAttributes>
+					<xp:dojoAttribute name="gutters" value="false"></xp:dojoAttribute>
+				</xp:this.dojoAttributes>
+				<xp:div dojoType="dijit.layout.ContentPane" id="contentRegion" styleClass="contentRegion">
+					<xp:this.dojoAttributes>
+						<xp:dojoAttribute name="region" value="center"></xp:dojoAttribute>
+					</xp:this.dojoAttributes>
+					<xp:div dojoType="dijit.layout.TabContainer" id="contentTabContainer" styleClass="contentTabContainer">
+						<xp:this.dojoAttributes>
+							<xp:dojoAttribute name="jsId" value="tabContainer"></xp:dojoAttribute>
+						</xp:this.dojoAttributes>
+						<xp:this.onclick><![CDATA[try {
+	// Save the last tab
+	var lastusedtabid = "#{id:lastSelectedTab}";
+	var tabcontainer = tabContainer;
+	dojo.byId(lastusedtabid).value = tabcontainer.selectedChildWidget.id;
+	
+	// Refresh the Previous / Next buttons
+	//changeTab(0);
+} catch (e) {
+	console.log("Error in tab container click event: " + e);
+}]]></xp:this.onclick>
+						<xp:div dojoType="dijit.layout.ContentPane" title="Application" id="djTabApplication" styleClass="applicationTab">
+							<xp:this.dojoAttributes>
+								<xp:dojoAttribute name="selected" value="true"></xp:dojoAttribute>
+							</xp:this.dojoAttributes>
+							<xp:table border="0" styleClass="formTable">
+								<xp:tr>
+									<xp:td styleClass="labelCell" colspan="3">
+										<xp:span styleClass="mandatory">
+											<xp:span styleClass="mandatory">*</xp:span>
+										</xp:span>
+										<xp:text escape="true" id="computedField1" styleClass="instructions">
+											<xp:this.value><![CDATA[#{javascript:"Always Required"}]]></xp:this.value>
+										</xp:text>
+										&#160;&#160;
+										<xp:span styleClass="conditionalMandatory">
+											<xp:span styleClass="conditionalMandatory">*</xp:span>
+										</xp:span>
+										<xp:text escape="true" id="computedField4" styleClass="instructions">
+											<xp:this.value><![CDATA[#{javascript:" Required under certain conditions"}]]></xp:this.value>
+										</xp:text>
+									</xp:td>
+									<xp:td styleClass="helperCell"></xp:td>
+								</xp:tr>
+							</xp:table>
+							<xp:table border="0" styleClass="formTable">
+								<xp:tr>
+									<xp:td styleClass="labelCellLarge">
+										<xp:label value="Applicant name:" id="lblApplicantName" for="applicantName1"></xp:label>
+									</xp:td>
+									<xp:td styleClass="validationCell"></xp:td>
+									<xp:td>
+										<xp:text escape="true" id="cfdClientName">
+											<xp:this.value><![CDATA[#{javascript://This code Looksup the ClientName in the CLient Web Database.
+var cID = getComponent('cfdClientID').getValue();
+var cName = @DbLookup(createDBArray(sessionScope.clientwdb), "LUClientByID", cID, "ClientName" );
+//This code Displays an error if  the ClientName cannot be found  in the Client Web Database.
+var finalVal = @If(@IsError(cName), "ERROR: Could not find Client ID \"" + cID + "\" in client web database", cName);
+getComponent("applicantName1").setValue(finalVal);
+getComponent("clientId1").setValue(cID);
+return finalVal;
+}]]></xp:this.value>
+										</xp:text>
+										</xp:td>
+									<xp:td styleClass="helperCell">
+										<xp:inputText
+											value="#{ctapp.clientName}" id="clientName"
+											styleClass="hiddenField" dojoType="dijit.form.TextBox">
+											<xp:this.defaultValue><![CDATA[#{javascript:getComponent("cfdClientName").getValue();
+	}]]></xp:this.defaultValue>
+											</xp:inputText></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td>
+										<xp:label value="Sponsor name:" id="lblSponsorName" for="sponsorAddress1"></xp:label>
+									</xp:td>
+									<xp:td styleClass="validationCell">
+										<xp:span styleClass="mandatory">
+											<xp:span styleClass="mandatory">*</xp:span>
+										</xp:span>
+									</xp:td>
+									<xp:td>
+										<xp:panel id="sponsorid">
+											<xp:eventHandler
+												event="onClientLoad" submit="false" id="eventHandler4">
+												<xp:this.script><![CDATA[try {
+	var db = getNSFBase().toLowerCase();
+	var tgauserid = getItemId('','isTGAUser');
+	var tgauser = document.getElementById(tgauserid).innerHTML;
+	var clientid = getItemId('','clientId1');
+	var cid = dijit.byId(clientid).value;
+	var commonUserName = 'brucel_40185';
+	
+	if(tgauser == "1"){
+		var xagent = 'xAgentLookupAllSponsorData.xsp';
+		var params = '&c=' + cid + '&user=' + commonUserName;
+	}else{
+		var xagent = 'xAgentSponsorList.xsp';
+		var params = 'sponsorid=' + sponsorID.value + '&type=json';
+	}
+	
+	var fullurl = db + '/' + xagent + '?' + params + '&R=' + Math.random();
+	var jsonSponsorStore = new dojo.data.ItemFileReadStore({url:fullurl});
+	var fieldid = getItemId('','sponsorid');
+	
+	field = new dijit.form.FilteringSelect({
+			store: jsonSponsorStore,
+			placeHolder: 'Select a sponsor',
+			required: false,
+			value: sponsorID.value,
+			pageSize: 25,
+			class: 'dijitComboBoxWidthLarge',
+			onChange: function(x){
+				onChangeEvents(this);
+			},
+			selectOnClick: true
+		}, fieldid);
+	field.startup();
+	
+}catch(e){
+	console.log(e);
+}
+
+function onChangeEvents(itm){
+	try {
+		var statusid = getItemId('','cfdApplicationStatus');
+		var status = document.getElementById(statusid).innerHTML;
+		if(status == 'Passed Validation'){
+			dijit.byId(getItemId('','SponsorID').reset());
+			dijit.byId(getItemId('','sponsorregaddress').reset());
+			XSP.alert('The document status is Passed Validation. Please Save to reset the document to Draft and try again');
+			return false;
+		}else{
+			//console.log("sponsor value onChange: " + itm.value + " " + itm.displayedValue);
+			var sponsornameid = getItemId('','sponsorName');
+			var sponsorname = dojo.byId(sponsornameid);
+			sponsorname.value = itm.displayedValue;
+			var sponsorId_id = getItemId('','SponsorID');
+			var sponsor_id = dojo.byId(sponsorId_id);
+			sponsor_id.value = itm.value;
+			sponsorID.value = itm.value;
+		}
+		XSP.partialRefreshGet(getItemId('','sponsorregaddress'),{
+			onComplete: function() {
+				//console.log('partial refresh of sponsoraddress call');
+            }
+		});
+	} catch (e) {
+		console.log("panel sponsorid gridFetchComplete() - error: " + e); 
+	} 		
+}]]></xp:this.script>
+											</xp:eventHandler>
+										</xp:panel>
+									</xp:td>
+									<xp:td></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td>
+										<xp:label value="Sponsor address:" id="lblSponsorAddress" for="sponsorAddress1"></xp:label>
+									</xp:td>
+									<xp:td styleClass="validationCell">
+										<xp:span styleClass="mandatory">
+											<xp:span styleClass="mandatory">*</xp:span>
+										</xp:span>
+									</xp:td>
+									<xp:td id="sponsorregaddressTD">
+										<xp:panel id="sponsorregaddress">
+											<xp:eventHandler
+												event="onClientLoad" submit="false">
+												<xp:this.script><![CDATA[try {
+	var db = getNSFBase().toLowerCase();
+	var xagent = 'xAgentRegulatoryAddress.xsp';
+	var params = 'sponsorid=' + sponsorID.value + '&type=json';
+	var fullurl = db + '/' + xagent + '?' + params + '&R=' + Math.random();
+	var jsonRegulatoryAddressStore = new dojo.data.ItemFileReadStore({url:fullurl});
+	var fieldid = getItemId('','sponsorregaddress');
+	
+	field = new dijit.form.FilteringSelect({
+			store: jsonRegulatoryAddressStore,
+			placeHolder: 'Select an address',
+			required: false,
+			class: 'dijitComboBoxWidthLarge',
+			value: sponsorAddress.value,
+			onComplete: onCompleteEvents(),
+			onChange: function(x){
+				onChangeEvents(this);
+			},
+			selectOnClick: true
+		}, fieldid);
+	field.startup();
+	
+}catch(e){
+	console.log(e);
+}
+
+function onCompleteEvents(){
+	//console.log('sponsorreaddress onCompleteEvents');
+}
+
+function onChangeEvents(itmra){
+	try {
+		var regaddressid = getItemId('','SponsorAddress');
+		var regaddress_labelid = getItemId('','sponsorAddress_Label');
+		var regaddress = dojo.byId(regaddressid);
+		regaddress.value = itmra.value;
+		var regaddresslabel = dojo.byId(regaddress_labelid);
+		regaddresslabel = itmra.displayedValue
+	} catch (e) {
+		console.log("sponsorregaddress onChange event() - error: " + e); 
+	} 		
+}]]></xp:this.script>
+											</xp:eventHandler>
+										</xp:panel>
+									</xp:td>
+									<xp:td styleClass="helperCell" id="sponsorAddress_LabelTD">
+										<xp:inputText
+											value="#{ctapp.sponsorAddress_Label}"
+											id="sponsorAddress_Label" dojoType="dijit.form.TextBox" styleClass="hiddenField">
+											<xp:this.dojoAttributes>
+												<xp:dojoAttribute
+													name="jsId" value="sponsorRegAddress">
+												</xp:dojoAttribute>
+											</xp:this.dojoAttributes>
+										</xp:inputText></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td>
+										<xp:label value="Notification fee" id="lblNotificationFee" for="cfdApplicationFees"></xp:label>
+									</xp:td>
+									<xp:td></xp:td>
+									<xp:td>
+										<xp:text escape="true" id="cfdApplicationFees">
+											<xp:this.value><![CDATA[#{javascript:getComponent("applicationFees").getValue();}]]></xp:this.value>
+										</xp:text>
+									</xp:td>
+									<xp:td></xp:td>
+								</xp:tr>
+							</xp:table>
+						</xp:div>
+						<!-- end djTabApplication -->
+						<xp:div dojoType="dijit.layout.ContentPane" title="Trial Details" id="djTabTrialDetails">
+							<xp:table border="0" styleClass="formTable">
+								<xp:tr>
+									<xp:td styleClass="labelCell" colspan="3">
+										<xp:span styleClass="mandatory">
+											<xp:span styleClass="mandatory">*</xp:span>
+										</xp:span>
+										<xp:text escape="true" id="computedField2" styleClass="instructions">
+											<xp:this.value><![CDATA[#{javascript:"Always Required"}]]></xp:this.value>
+										</xp:text>
+										&#160;&#160;
+										<xp:span styleClass="conditionalMandatory">
+											<xp:span styleClass="conditionalMandatory">*</xp:span>
+										</xp:span>
+										<xp:text escape="true" id="computedField3" styleClass="instructions">
+											<xp:this.value><![CDATA[#{javascript:" Required under certain conditions"}]]></xp:this.value>
+										</xp:text>
+									</xp:td>
+									<xp:td styleClass="helperCell"></xp:td>
+								</xp:tr>
+							</xp:table>
+							<xp:table border="0"
+								styleClass="formTable">
+								<xp:tr>
+									<xp:td
+										styleClass="labelCellLarge">
+										<xp:label value="Contact Name:"
+											id="lblPart1ContactName" for="contactName">
+										</xp:label>
+									</xp:td>
+									<xp:td
+										styleClass="validationCell">
+										<xp:span
+											styleClass="mandatory">
+											<xp:span
+												styleClass="mandatory">
+												*
+											</xp:span>
+										</xp:span>
+									</xp:td>
+									<xp:td>
+										<xp:inputText id="contactName"
+											value="#{part1.contactName}" dojoType="dijit.form.TextBox"
+											styleClass="dijitTextBox">
+											<xp:this.dojoAttributes>
+												<xp:dojoAttribute
+													name="placeHolder" value="eg: Joan Johnson">
+												</xp:dojoAttribute>
+											</xp:this.dojoAttributes>
+											</xp:inputText>
+									</xp:td>
+									<xp:td styleClass="helperCell"></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td
+										styleClass="labelCellLarge">
+										<xp:label value="Contact Phone:"
+											id="lblContactPhone" for="contactPhone">
+										</xp:label>
+									</xp:td>
+									<xp:td
+										styleClass="validationCell">
+										<xp:span
+											styleClass="mandatory">
+											<xp:span
+												styleClass="mandatory">
+												*
+											</xp:span>
+										</xp:span>
+									</xp:td>
+									<xp:td>
+										<xp:inputText id="contactPhone"
+											value="#{part1.contactPhone}" dojoType="dijit.form.TextBox"
+											styleClass="dijitTextBox">
+											<xp:this.dojoAttributes>
+												<xp:dojoAttribute
+													name="placeHolder" value="eg: 0987654321">
+												</xp:dojoAttribute>
+											</xp:this.dojoAttributes>
+										</xp:inputText>
+									</xp:td>
+									<xp:td styleClass="helperCell"></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td>
+										<xp:label value="Contact Email:"
+											id="lblContactEmail" for="contactEmail" styleClass="label">
+										</xp:label>
+									</xp:td>
+									<xp:td
+										styleClass="validationCell">
+										<xp:span
+											styleClass="mandatory">
+											<xp:span
+												styleClass="mandatory">
+												*
+											</xp:span>
+										</xp:span>
+									</xp:td>
+									<xp:td>
+										<xp:inputText id="contactEmail"
+											value="#{part1.contactEmail}" dojoType="dijit.form.TextBox"
+											styleClass="dijitTextBox">
+											<xp:this.dojoAttributes>
+												<xp:dojoAttribute
+													name="placeHolder" value="email.address@domain.com.au">
+												</xp:dojoAttribute>
+											</xp:this.dojoAttributes>
+										</xp:inputText>
+									</xp:td>
+									<xp:td styleClass="helperCell"></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td>
+										<xp:label value="Confirm Email:"
+											id="lblConfirmEmail" styleClass="label" for="confirmEmail">
+										</xp:label>
+									</xp:td>
+									<xp:td></xp:td>
+									<xp:td>
+										<xp:inputText id="confirmEmail"
+											styleClass="dijitTextBox">
+										</xp:inputText>
+									</xp:td>
+									<xp:td></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td>
+										<xp:label value="Trial Details"
+											id="lblTrialDetails" styleClass="instructionsInlineBold">
+										</xp:label>
+									</xp:td>
+									<xp:td
+										styleClass="validationCell">
+										<xp:span
+											styleClass="mandatory">
+										</xp:span>
+									</xp:td>
+									<xp:td></xp:td>
+									<xp:td styleClass="helperCell"></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td>
+										<xp:label
+											value="Protocol Number:" id="lblProtocolNumber"
+											for="protocolNumber" styleClass="label">
+										</xp:label>
+									</xp:td>
+									<xp:td
+										styleClass="validationCell">
+										<xp:span
+											styleClass="mandatory">
+											<xp:span
+												styleClass="mandatory">
+												*
+											</xp:span>
+										</xp:span>
+									</xp:td>
+									<xp:td>
+										<xp:inputText
+											value="#{part1.protocolNumber}" id="protocolNumber"
+											dojoType="dijit.form.TextBox" styleClass="dijitTextBox">
+										</xp:inputText>
+									</xp:td>
+									<xp:td styleClass="helperCell"></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td>
+										<xp:label
+											value="Expected Trial Start Date:"
+											id="lblPt1ExpectedStartDate" for="startDate">
+										</xp:label>
+									</xp:td>
+									<xp:td
+										styleClass="validationCell">
+										<xp:span
+											styleClass="mandatory">
+											<xp:span
+												styleClass="mandatory">
+												*
+											</xp:span>
+										</xp:span>
+									</xp:td>
+									<xp:td>
+										<xp:inputText
+											value="#{part1.startDate}" id="startDate"
+											dojoType="dijit.form.DateTextBox">
+											<xp:this.dojoAttributes>
+												<xp:dojoAttribute
+													name="placeHolder" value="22/04/1931">
+												</xp:dojoAttribute>
+												<xp:dojoAttribute
+													value="Use the dd/MM/yyyy format if entering the date manually"
+													name="promptMessage">
+												</xp:dojoAttribute>
+												<xp:dojoAttribute
+													name="jsId" value="startDate">
+												</xp:dojoAttribute>
+												<xp:dojoAttribute
+													name="constraints">
+													<xp:this.value><![CDATA[#{javascript:try{
+	var day = @Text(@Day(@Today()));
+	day = @If(@Length(day) == 1, "0"+day, day);
+	var month = @Text(@Month(@Today()));
+	month = @If(@Length(month) == 1, "0"+month, month);
+	var thisday = @Text(@Year(@Today())) + "/" + month + "/" + day;
+	var thisday = @Text(@Year(@Today())) + "-" + month + "-" + day;
+	return "{min:" + thisday + ",datePattern:'dd/MM/yyyy'}";
+} catch(e) {
+	print(e);
+}}]]></xp:this.value>
+												</xp:dojoAttribute>
+											</xp:this.dojoAttributes>
+											<xp:dateTimeHelper
+												id="dateTimeHelper1">
+											</xp:dateTimeHelper>
+											<xp:this.converter>
+												<xp:convertDateTime
+													type="date">
+												</xp:convertDateTime>
+											</xp:this.converter>
+										</xp:inputText>
+									</xp:td>
+									<xp:td styleClass="helperCell"></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td>
+										<xp:label
+											value="Expected Completion Date:"
+											id="lblPt1ExpectedCompletionDate" for="startDate">
+										</xp:label>
+									</xp:td>
+									<xp:td
+										styleClass="validationCell">
+										<xp:span
+											styleClass="mandatory">
+											<xp:span
+												styleClass="mandatory">
+												*
+											</xp:span>
+										</xp:span>
+									</xp:td>
+									<xp:td>
+										<xp:inputText
+											value="#{part1.expectedCompletionDate}"
+											id="ExpectedCompletionDate"
+											dojoType="dijit.form.DateTextBox">
+											<xp:this.dojoAttributes>
+												<xp:dojoAttribute
+													name="placeHolder" value="19/12/1990">
+												</xp:dojoAttribute>
+												<xp:dojoAttribute
+													value="Use the dd/MM/yyyy format if entering the date manually"
+													name="promptMessage">
+												</xp:dojoAttribute>
+												<xp:dojoAttribute
+													name="jsId" value="startDate">
+												</xp:dojoAttribute>
+												<xp:dojoAttribute
+													name="constraints">
+													<xp:this.value><![CDATA[#{javascript:try{
+	var day = @Text(@Day(@Today()));
+	day = @If(@Length(day) == 1, "0"+day, day);
+	var month = @Text(@Month(@Today()));
+	month = @If(@Length(month) == 1, "0"+month, month);
+	var thisday = @Text(@Year(@Today())) + "/" + month + "/" + day;
+	var thisday = @Text(@Year(@Today())) + "-" + month + "-" + day;
+	return "{min:" + thisday + ",datePattern:'dd/MM/yyyy'}";
+} catch(e) {
+	print(e);
+}}]]></xp:this.value>
+												</xp:dojoAttribute>
+											</xp:this.dojoAttributes>
+											<xp:dateTimeHelper
+												id="dateTimeHelper2">
+											</xp:dateTimeHelper>
+											<xp:this.converter>
+												<xp:convertDateTime
+													type="date">
+												</xp:convertDateTime>
+											</xp:this.converter>
+										</xp:inputText>
+									</xp:td>
+									<xp:td styleClass="helperCell"></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td>
+										<xp:label
+											value="Potential use of restricted goods:"
+											id="lblIsPotentialRestrictedGoodUsed"
+											for="IsPotentialRestrictedGoodUsed">
+										</xp:label>
+									</xp:td>
+									<xp:td
+										styleClass="validationCell">
+										<xp:span
+											styleClass="mandatory">
+											<xp:span
+												styleClass="mandatory">
+												*
+											</xp:span>
+										</xp:span>
+									</xp:td>
+									<xp:td>
+										<xp:radioGroup
+											id="IsPotentialRestrictedGoodUsed"
+											value="#{part1.isPotentialRestrictedGoodUsed}">
+											<xp:selectItem
+												itemLabel="Yes" itemValue="Yes" id="selectItem1">
+											</xp:selectItem>
+											<xp:selectItem
+												itemLabel="No" itemValue="No" id="selectItem2">
+											</xp:selectItem>
+										</xp:radioGroup>
+									</xp:td>
+									<xp:td styleClass="helperCell"></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td>
+										<xp:label
+											value="Title of Study:" id="lblTitleOfStudy"
+											for="titleOfStudy">
+										</xp:label>
+									</xp:td>
+									<xp:td
+										styleClass="validationCell">
+										<xp:span
+											styleClass="mandatory">
+											<xp:span
+												styleClass="mandatory">
+												*
+											</xp:span>
+										</xp:span>
+									</xp:td>
+									<xp:td>
+										<xp:inputText id="titleOfStudy"
+											value="#{part1.titleOfStudy}" dojoType="dijit.form.TextBox"
+											styleClass="dijitComboBoxWidthLarge">
+										</xp:inputText>
+									</xp:td>
+									<xp:td styleClass="helperCell"></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td>
+										<xp:label value="Trial Type:"
+											id="lblTrialType" for="trialType">
+										</xp:label></xp:td>
+									<xp:td
+										styleClass="validationCell">
+										<xp:span
+											styleClass="mandatory">
+											<xp:span
+												styleClass="mandatory">
+												*
+											</xp:span>
+										</xp:span>
+									</xp:td>
+									<xp:td>
+										<xp:checkBoxGroup
+											id="trialType" value="#{part1.trialType}" >
+											<xp:selectItem
+												itemLabel="Phase 1" itemValue="1">
+											</xp:selectItem>
+											<xp:selectItem
+												itemLabel="Phase 2" itemValue="2">
+											</xp:selectItem>
+											<xp:selectItem
+												itemLabel="Phase 3" itemValue="3">
+											</xp:selectItem>
+											<xp:selectItem
+												itemLabel="Phase 4" itemValue="4">
+											</xp:selectItem>
+											<xp:selectItem
+												itemLabel="Bioavailability/Bioequivalence" itemValue="B">
+											</xp:selectItem>
+											<xp:selectItem
+												itemLabel="Device" itemValue="D">
+											</xp:selectItem>
+										</xp:checkBoxGroup></xp:td>
+									<xp:td styleClass="helperCell"></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td>
+										<xp:label id="lblTrialTypeDescription" value="Brief Description of Trial:" for="trialTypeDescription">
+										</xp:label></xp:td>
+									<xp:td
+										styleClass="validationCell">
+										<xp:span
+											styleClass="mandatory">
+											<xp:span
+												styleClass="mandatory">
+												*
+											</xp:span>
+										</xp:span>
+									</xp:td>
+									<xp:td>
+										<xp:inputText id="trialTypeDescription" value="#{part1.trialTypeDescription}" dojoType="dijit.form.TextBox" styleClass="dijitComboBoxWidthLarge"></xp:inputText></xp:td>
+									<xp:td></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td>
+										<xp:label value="This Trial:"
+											id="lblThisTrial" for="trialClassification">
+										</xp:label></xp:td>
+									<xp:td
+										styleClass="validationCell">
+										<xp:span
+											styleClass="mandatory">
+											<xp:span
+												styleClass="mandatory">
+												*
+											</xp:span>
+										</xp:span>
+									</xp:td>
+									<xp:td>
+										<xp:checkBoxGroup
+											id="trialClassification" value="#{part1.trialClassification}"
+											layout="pageDirection">
+											<xp:selectItem
+												itemLabel="Involves Animal excipients" itemValue="3">
+												<xp:this.attrs>
+													<xp:attr
+														name="dojoType" value="dijit.form.CheckBox">
+													</xp:attr>
+												</xp:this.attrs>
+											</xp:selectItem>
+											<xp:selectItem
+												itemLabel="Is being conducted in other countries"
+												itemValue="4">
+												<xp:this.attrs>
+													<xp:attr
+														name="dojoType" value="dijit.form.CheckBox">
+													</xp:attr>
+												</xp:this.attrs>
+											</xp:selectItem>
+											<xp:selectItem
+												itemLabel="Involves a product containing nanoparticles"
+												itemValue="9">
+												<xp:this.attrs>
+													<xp:attr
+														name="dojoType" value="dijit.form.CheckBox">
+													</xp:attr>
+												</xp:this.attrs>
+											</xp:selectItem>
+											<xp:selectItem
+												itemLabel="Involves the use of a Medicine" itemValue="1">
+											</xp:selectItem>
+											<xp:selectItem
+												itemLabel="Involves the use of a Biological"
+												itemValue="0">
+											</xp:selectItem>
+											<xp:selectItem
+												itemLabel="Involves the use of a Therapeutic Device" itemValue="2">
+											</xp:selectItem>
+										</xp:checkBoxGroup></xp:td>
+									<xp:td></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td>
+										<xp:label value="Total number of participants to be enrolled in the trial:"
+											id="lblTotalPatients" for="totalPatientsLU">
+										</xp:label></xp:td>
+									<xp:td
+										styleClass="validationCell">
+										<xp:span
+											styleClass="mandatory">
+											<xp:span
+												styleClass="mandatory">
+												*
+											</xp:span>
+										</xp:span>
+									</xp:td>
+									<xp:td>
+										<xp:panel
+											id="totalPatientsLU">
+											<xp:eventHandler
+												event="onClientLoad" submit="false">
+												<xp:this.script><![CDATA[try {
+	var db = getNSFBase().toLowerCase();
+	var xagent = 'xAgentLookupCT.xsp';
+	var params = 'S=N&T=TOTALPATIENTS&type=json';
+	var fullurl = db + '/' + xagent + '?' + params + '&R=' + Math.random();
+	var jsonTotalPatientsStore = new dojo.data.ItemFileReadStore({url:fullurl});
+	var fieldid = getItemId('','totalPatientsLU');
+	
+	field = new dijit.form.FilteringSelect({
+			store: jsonTotalPatientsStore,
+			placeHolder: 'Select a value',
+			required: false,
+			class: 'dijitComboBoxWidthLarge',
+			value: totalPatients.value,
+			onChange: function(x){
+				onChangeEvents(this);
+			},
+			selectOnClick: true
+		}, fieldid);
+	field.startup();
+	
+}catch(e){
+	console.log(e);
+}
+
+function onChangeEvents(itmtp){
+	try {
+		var totalpatientsid = getItemId('','totalPatients');
+		var totalpatients = dojo.byId(totalpatientsid);
+		totalpatients.value = itmtp.value;
+	} catch (e) {
+		console.log("totalPatientsLU onChange event() - error: " + e); 
+	} 		
+}]]></xp:this.script>
+											</xp:eventHandler></xp:panel></xp:td>
+									<xp:td id="totalPatientsTD">
+										<xp:inputText id="totalPatients"
+											value="#{part1.totalPatients}" styleClass="hiddenField"
+											dojoType="dijit.form.TextBox">
+										<xp:this.dojoAttributes>
+											<xp:dojoAttribute
+												name="jsId" value="totalPatients">
+											</xp:dojoAttribute>
+										</xp:this.dojoAttributes></xp:inputText></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td>
+										<xp:label value="Therapeutic Area:"
+											id="lblTherapeuticArea" for="trialTherapeuticAreaLU">
+										</xp:label></xp:td>
+									<xp:td
+										styleClass="validationCell">
+										<xp:span
+											styleClass="mandatory">
+											<xp:span
+												styleClass="mandatory">
+												*
+											</xp:span>
+										</xp:span>
+									</xp:td>
+									<xp:td>
+										<xp:panel
+											id="trialTherapeuticAreaLU">
+											<xp:eventHandler
+												event="onClientLoad" submit="false">
+												<xp:this.script><![CDATA[try {
+	var db = getNSFBase().toLowerCase();
+	var xagent = 'xAgentLookupCT.xsp';
+	var params = 'S=N&T=THERAAREA&type=json';
+	var fullurl = db + '/' + xagent + '?' + params + '&R=' + Math.random();
+	var jsonTheraAreaStore = new dojo.data.ItemFileReadStore({url:fullurl});
+	var fieldid = getItemId('','trialTherapeuticAreaLU');
+	
+	field = new dijit.form.FilteringSelect({
+			store: jsonTheraAreaStore,
+			placeHolder: 'Select a value',
+			required: false,
+			class: 'dijitComboBoxWidthLarge',
+			value: therapeuticArea.value,
+			onChange: function(x){
+				onChangeEvents(this);
+			},
+			selectOnClick: true
+		}, fieldid);
+	field.startup();
+	
+}catch(e){
+	console.log(e);
+}
+
+function onChangeEvents(itmtap){
+	try {
+		var trialtherapeuticareaid = getItemId('','trialTherapeuticArea');
+		var trialtherapeuticarea = dojo.byId(trialtherapeuticareaid);
+		trialtherapeuticarea.value = itmtap.value;
+	} catch (e) {
+		console.log("trialTherapeuticAreaLU onChange event() - error: " + e); 
+	} 		
+}]]></xp:this.script>
+											</xp:eventHandler>
+										</xp:panel></xp:td>
+									<xp:td id="trialTherapeuticAreaTD">
+										<xp:inputText
+											id="trialTherapeuticArea" styleClass="hiddenField"
+											value="#{part1.trialTherapeuticArea}"
+											dojoType="dijit.form.TextBox">
+										<xp:this.dojoAttributes>
+											<xp:dojoAttribute
+												name="jsId" value="therapeuticArea">
+											</xp:dojoAttribute>
+										</xp:this.dojoAttributes></xp:inputText></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td styleClass="labelCellLarge">
+										<xp:label id="lblGMP" value="Details of Genetically Modified Organism:" for="GMO">
+										</xp:label></xp:td>
+									<xp:td styleClass="validationCell">
+										<xp:span styleClass="mandatory">
+											<xp:span styleClass="mandatory">*</xp:span>
+										</xp:span>
+									</xp:td>
+									<xp:td>
+										<xp:inputTextarea
+											id="gmo" value="#{part1.GMO}" dojoType="dijit.form.Textarea">
+										</xp:inputTextarea></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td styleClass="labelCellLarge">
+										<xp:label value="Details of Nanoparticles:"
+											id="lblNanoparticles" for="Nanoparticles">
+										</xp:label></xp:td>
+									<xp:td styleClass="validationCell">
+										<xp:span styleClass="mandatory">
+											<xp:span styleClass="mandatory">*</xp:span>
+										</xp:span>
+									</xp:td>
+									<xp:td>
+										<xp:inputTextarea
+											id="Nanoparticles" value="#{part1.nanoparticles}" dojoType="dijit.form.Textarea">
+										</xp:inputTextarea></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td styleClass="labelCellLarge">
+										<xp:label id="lblGeneTherapy" value="Details of Gene Therapy:" for="GeneTherapyDetails">
+										</xp:label></xp:td>
+									<xp:td styleClass="validationCell">
+										<xp:span styleClass="mandatory">
+											<xp:span styleClass="mandatory">*</xp:span>
+										</xp:span>
+									</xp:td>
+									<xp:td>
+										<xp:inputTextarea
+											id="GeneTherapyDetails" value="#{part1.geneTherapyDetails}" dojoType="dijit.form.Textarea">
+										</xp:inputTextarea></xp:td>
+								</xp:tr>
+							</xp:table>
+							<xc:Biologicals></xc:Biologicals>
+							<xc:Sites></xc:Sites>
+						</xp:div>
+						<!-- end djTabTrialDetails -->
+						<xp:div dojoType="dijit.layout.ContentPane" title="Change to Trial Details" id="djTabUpdateDetails">
+							<xp:table border="0" styleClass="formTable">
+								<xp:tr>
+									<xp:td styleClass="labelCell" colspan="3">
+										<xp:span styleClass="mandatory">
+											<xp:span styleClass="mandatory">*</xp:span>
+										</xp:span>
+										<xp:text escape="true" id="computedField5" styleClass="instructions">
+											<xp:this.value><![CDATA[#{javascript:"Always Required"}]]></xp:this.value>
+										</xp:text>
+										&#160;&#160;
+										<xp:span styleClass="conditionalMandatory">
+											<xp:span styleClass="conditionalMandatory">*</xp:span>
+										</xp:span>
+										<xp:text escape="true" id="computedField6" styleClass="instructions">
+											<xp:this.value><![CDATA[#{javascript:" Required under certain conditions"}]]></xp:this.value>
+										</xp:text>
+									</xp:td>
+									<xp:td styleClass="helperCell"></xp:td>
+								</xp:tr>
+							</xp:table>
+							<xp:table border="0" styleClass="formTable">
+								<xp:tr rendered="false">
+									<xp:td styleClass="labelCellLarge"></xp:td>
+									<xp:td styleClass="validationCell">
+										<xp:span styleClass="mandatory">
+											<xp:span styleClass="mandatory">*</xp:span>
+										</xp:span>
+									</xp:td>
+									<xp:td></xp:td>
+									<xp:td styleClass="helperCell"></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td styleClass="labelCellLarge"></xp:td>
+									<xp:td styleClass="validationCell"></xp:td>
+									<xp:td></xp:td>
+									<xp:td styleClass="helperCell"></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td></xp:td>
+									<xp:td styleClass="validationCell">
+										<xp:span styleClass="mandatory">
+											<xp:span styleClass="mandatory">*</xp:span>
+										</xp:span>
+									</xp:td>
+									<xp:td></xp:td>
+									<xp:td styleClass="helperCell"></xp:td>
+								</xp:tr>
+							</xp:table>
+						</xp:div>
+						<!-- end djTabUpdateDetails -->
+						<xp:div dojoType="dijit.layout.ContentPane" title="Completion" id="djTabCompletion">
+							<xp:table border="0" styleClass="formTable">
+								<xp:tr>
+									<xp:td styleClass="labelCell" colspan="3">
+										<xp:span styleClass="mandatory">
+											<xp:span styleClass="mandatory">*</xp:span>
+										</xp:span>
+										<xp:text escape="true" id="computedField7" styleClass="instructions">
+											<xp:this.value><![CDATA[#{javascript:"Always Required"}]]></xp:this.value>
+										</xp:text>
+										&#160;&#160;
+										<xp:span styleClass="conditionalMandatory">
+											<xp:span styleClass="conditionalMandatory">*</xp:span>
+										</xp:span>
+										<xp:text escape="true" id="computedField8" styleClass="instructions">
+											<xp:this.value><![CDATA[#{javascript:" Required under certain conditions"}]]></xp:this.value>
+										</xp:text>
+									</xp:td>
+									<xp:td styleClass="helperCell"></xp:td>
+								</xp:tr>
+							</xp:table>
+							<xp:table border="0" styleClass="formTable">
+								<xp:tr rendered="false">
+									<xp:td styleClass="labelCellLarge"></xp:td>
+									<xp:td styleClass="validationCell">
+										<xp:span styleClass="mandatory">
+											<xp:span styleClass="mandatory">*</xp:span>
+										</xp:span>
+									</xp:td>
+									<xp:td></xp:td>
+									<xp:td styleClass="helperCell"></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td styleClass="labelCellLarge"></xp:td>
+									<xp:td styleClass="validationCell"></xp:td>
+									<xp:td></xp:td>
+									<xp:td styleClass="helperCell"></xp:td>
+								</xp:tr>
+								<xp:tr>
+									<xp:td></xp:td>
+									<xp:td styleClass="validationCell">
+										<xp:span styleClass="mandatory">
+											<xp:span styleClass="mandatory">*</xp:span>
+										</xp:span>
+									</xp:td>
+									<xp:td></xp:td>
+									<xp:td styleClass="helperCell"></xp:td>
+								</xp:tr>
+							</xp:table>
+						</xp:div>
+						<!-- end djTabCompletion -->
+					</xp:div>
+					<!-- end contentTabContainer -->
+				</xp:div>
+				<!-- end contentRegion -->
+				<xp:div dojoType="dijit.Toolbar" id="actionBar" styleClass="actionBar">
+					<xp:this.dojoAttributes>
+						<xp:dojoAttribute name="region" value="bottom"></xp:dojoAttribute>
+					</xp:this.dojoAttributes>
+					<xp:span id="tabNavButtons" styleClass="tabNavButtons">
+						<xp:span id="spanBtnTabPrev">
+							<xp:button id="btnTabPrev" dojoType="dijit.form.Button" value="Previous tab">
+								<xp:this.dojoAttributes>
+									<xp:dojoAttribute name="iconClass" value="appIcon appIconLeft"></xp:dojoAttribute>
+									<xp:dojoAttribute name="title" value="Ctr + Left arrow"></xp:dojoAttribute>
+								</xp:this.dojoAttributes>
+								<xp:eventHandler event="onclick" submit="false">
+									<xp:this.script><![CDATA[changeTab(-1);]]></xp:this.script>
+								</xp:eventHandler>
+							</xp:button>
+						</xp:span>
+						<xp:span id="spanPrevNextDivider">|</xp:span>
+						<xp:span id="spanBtnTabNext">
+							<xp:button id="btnTabNext" dojoType="dijit.form.Button" value="Next tab">
+								<xp:this.dojoAttributes>
+									<xp:dojoAttribute name="iconClass" value="appIcon appIconRight"></xp:dojoAttribute>
+									<xp:dojoAttribute value="Ctrl + Right arrow" name="title"></xp:dojoAttribute>
+								</xp:this.dojoAttributes>
+								<xp:eventHandler event="onclick" submit="false">
+									<xp:this.script><![CDATA[changeTab(1);]]></xp:this.script>
+								</xp:eventHandler>
+							</xp:button>
+						</xp:span>
+					</xp:span>
+					<!-- end tabNavButtons -->
+					<xp:button dojoType="dijit.form.Button" value="Save" id="save">
+						<xp:this.dojoAttributes>
+							<xp:dojoAttribute name="iconClass" value="appIcon appIconSave"></xp:dojoAttribute>
+							<xp:dojoAttribute name="title" value="Ctrl + S to Save"></xp:dojoAttribute>
+						</xp:this.dojoAttributes>
+						<xp:eventHandler event="onclick" submit="true"
+							refreshMode="complete" onStart="showWaitDialog('Saving ...','');"
+							onComplete="hideWaitDialog();" onError="hideWaitDialog();"
+							disableValidators="true">
+							<xp:this.action><![CDATA[#{javascript:try{
+	if(ctapp.saveData()){
+		viewScope.runValidation = "N";
+		viewScope.appunid = ctapp.getUnid();
+		//print("viewScope.appunid: " + viewScope.appunid);
+		var action = context.getUrlParameter("action");
+		if (action == "newDocument") {
+			var url1 = @Left(context.getUrl(), "?");
+			var params = "?documentId=" + viewScope.appunid + "&action=editDocument";
+			var fullurl = url1 + params;
+			context.redirectToPage(fullurl);
+		}
+		if (part1.saveData(viewScope.appunid)){
+			return true;
+		}else{
+			print("part1.saveData false");
+			return false;
+		}
+	}
+}catch(e){
+	print("application.xsp save button error: " + e);
+}}]]></xp:this.action>
+							<xp:this.script><![CDATA[try{
+	var btnSubmit = dijit.byId("#{id:btnActionSubmit}");
+	btnSubmit.set('disabled', true);
+	var typeid = "#{javascript:getClientId('ClinicalTrialType')}";
+	var type = dojo.byId(typeid);
+	type.value = "CTN";
+	
+}catch(e){
+	console.log('application.xsp save btn error: ' + e);
+}]]></xp:this.script>
+						</xp:eventHandler>
+					</xp:button>
+					<xp:button dojoType="dijit.form.Button" value="Validate" id="validate">
+						<xp:this.dojoAttributes>
+							<xp:dojoAttribute name="iconClass" value="appIcon appIconValidate"></xp:dojoAttribute>
+							<xp:dojoAttribute value="Crtl + A to Validate" name="title"></xp:dojoAttribute>
+						</xp:this.dojoAttributes>
+						<xp:eventHandler event="onclick" submit="true" refreshMode="partial" onError="hideWaitDialog();"
+							onStart="showWaitDialog('Please wait, validating ...', 'Validation');" disableValidators="true"
+							refreshId="gridJSONValidationErrors">
+							<xp:this.action><![CDATA[#{javascript:try {
+	viewScope.runValidation = "Y";
+	if(ctapp.saveData()){
+		var action = context.getUrlParameter("action");
+		if (action == "newDocument") {
+			var url1 = @Left(context.getUrl(), "?");
+			sUNID = ctapp.getUnid();
+			var params = "?documentId=" + sUNID + "&action=editDocument";
+			var fullurl = url1 + params;
+			context.redirectToPage(fullurl);
+		}
+	}
+} catch (e) {
+	print("application.xsp validate button error: " + e);
+}}]]></xp:this.action>
+						</xp:eventHandler>
+					</xp:button>
+					<xp:button dojoType="dijit.form.Button" id="btnActionSubmit" type="button" value="Next">
+						<xp:this.dojoAttributes>
+							<xp:dojoAttribute name="iconClass" value="appIcon appIconSubmission"></xp:dojoAttribute>
+							<xp:dojoAttribute name="title">
+								<xp:this.value><![CDATA[#{javascript:try{
+	var btn = getComponent("btnActionSubmit");
+	if (btn.disabled) {
+		"The notification needs to have passed validation";
+	} else {
+		"Ctrl + U Proceed to declaration"
+	}
+} catch(e) {
+	print(database.getTitle() + " application.xsp, Submit btn, title attr error: " + e);
+}}]]></xp:this.value>
+							</xp:dojoAttribute>
+						</xp:this.dojoAttributes>
+						<xp:eventHandler event="onclick" submit="true" refreshMode="partial" disableValidators="true"
+							refreshId="gridJSONValidationErrors" onError="hideWaitDialog();" onStart="showWaitDialog('Validating, please wait ..');">
+							<xp:this.action><![CDATA[#{javascript:try {
+	viewScope.runValidation = "Y";
+//	ctapp.loadDeclaration();
+} catch (e) {
+	print("ctapp.xsp Next btn error: " + e);
+}}]]></xp:this.action>
+							<xp:this.onComplete><![CDATA[try{
+	var grid = dijit.byId("#{id:gridJSONValidationErrors}");
+	setTimeout( function() {
+		if(grid.rowCount < 1){
+			showWaitDialog('Loading Declaration, please wait ..');
+			var url = getNSFBase().toLowerCase() + '/declaration.xsp?documentId=' + getParameterByName('documentId');
+			window.location = url;
+		}
+	}, 500);
+	
+}catch(e){
+	console.log("Next btn onComplete error: " + e);
+	hideWaitDialog();
+}finally{hideWaitDialog();}]]></xp:this.onComplete>
+						</xp:eventHandler>
+					</xp:button>
+					<xp:button dojoType="dijit.form.Button" value="Print Preview" id="btnActionPrint">
+						<xp:this.dojoAttributes>
+							<xp:dojoAttribute name="iconClass" value="appIcon appIconPrint"></xp:dojoAttribute>
+							<xp:dojoAttribute name="title" value="Ctrl + Q to Print Preview"></xp:dojoAttribute>
+						</xp:this.dojoAttributes>
+						<xp:eventHandler event="onclick" submit="false">
+							<xp:this.script><![CDATA[applicationPrintPreview();]]></xp:this.script>
+						</xp:eventHandler>
+					</xp:button>
+					<xp:button dojoType="dijit.form.Button" value="Close" id="close">
+						<xp:this.dojoAttributes>
+							<xp:dojoAttribute name="iconClass" value="appIcon appIconClose"></xp:dojoAttribute>
+							<xp:dojoAttribute name="title" value="Ctrl + O to Close"></xp:dojoAttribute>
+						</xp:this.dojoAttributes>
+						<xp:eventHandler event="onclick" submit="true" refreshMode="norefresh" disableValidators="true">
+							<xp:this.action><![CDATA[#{javascript:closeApplication();}]]></xp:this.action>
+						</xp:eventHandler>
+					</xp:button>
+				</xp:div>
+			</xp:div>
+			<!-- end contentContainer -->
+		</xp:div>
+		<!-- end contentPane -->
+		<xc:defaultValidationSidebarJSON id="ccValidation"></xc:defaultValidationSidebarJSON>
+		<xc:defaultFooter></xc:defaultFooter>
+	</xp:div><!-- end pageContainer" -->
+	<!-- Dialog boxes -->
+	<xe:dialog id="biologicalDetailDialog" title="Biological Detail" dojoType="dijit.Dialog">
+		<xc:Biological></xc:Biological>
+	</xe:dialog>
+	<xe:dialog id="siteDetailDialog" title="Site Detail" dojoType="dijit.Dialog">
+		<xc:Site></xc:Site>
+	</xe:dialog>
+	<!-- workflow items -->
+	<xc:executeOnServerCC></xc:executeOnServerCC>
+	<xp:panel id="refreshmePanel">
+		<!-- dummy refresh option -->
+	</xp:panel>
+	<xp:eventHandler event="onClientLoad" submit="false">
+		<xp:this.script><![CDATA[try {
+	var lastselectedtabid = "#{id:lastSelectedTab}";
+	var lasttabused = dojo.byId(lastselectedtabid).value || "";
+	if (typeof(lasttabused) != "undefined" && lasttabused != ""){
+		dijit.byId("#{id:contentTabContainer}").selectChild(lasttabused);
+	}
+	
+	setTimeout( function() {
+		var loaderid = "#{id:uiSplashScreen1}";
+		var loader = dojo.byId(loaderid);
+		dojo.fadeOut( {
+			node : loader,
+			duration : 250,
+			onEnd : function() {
+				loader.style.display = "none";
+			}
+		}).play();
+		var loader2id = "#{id:uiSplashScreen2}";
+		var loader2 = dojo.byId(loader2id);
+		dojo.fadeOut( {
+			node : loader2,
+			duration : 500,
+			onEnd : function() {
+				loader2.style.display = "none";
+			}
+		}).play();
+		//getContactList();
+		// Show welcome page
+			//showWelcomePage();
+	}, 500);
+	
+	//loadTooltipHelp("#{id:pageContainer}");
+	
+} catch (e) {
+	console.log('onClientLoad error: ' + e);
+}]]></xp:this.script>
+	</xp:eventHandler>
+	<xp:scriptBlock id="genAppScriptBlock" type="text/javascript">
+		<xp:this.value>
+			<![CDATA[dojo.addOnLoad(function() {
+	try {
+		// Add hotkeys event listener. 'activateHotKey' function is located in ACEDraft script library
+		if (window.addEventListener) {
+			window.addEventListener("keydown", activateHotKey, true);
+		} else if (document.attachEvent) { // IE 
+			document.attachEvent("onkeydown", activateHotKey);
+		} else {
+			document.addEventListener("keydown", activateHotKey, true);
+		}
+		
+		// Set initial state of previous / next tab buttons
+		changeTab(99);
+	} catch (e) {
+		console.log("addOnLoad error: " + e);
+	}
+})
+
+function applicationPrintPreview() {
+	// Application Print Preview
+	try {
+		var printPreviewURL = getNSFBase().toLowerCase();
+//		var docUNID = "#{javascript:}";
+		var agentName = "(PrintApplicationWeb)";
+		printPreviewURL += "/" + agentName + "?OpenAgent&unid=" + docUNID;
+		var windowOptions = "height=400,width=700,scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=no,addressbar=no";
+		window.open(printPreviewURL, "_blank", windowOptions);
+		return true;
+	} catch (e) {
+		XSP.error("Error generating print preview: " + e);
+	}	
+}
+
+function applicationHelp() {
+	try {
+		var helpkeyid = "#{javascript:getClientId('cfdHelpKey')}";
+		var helpkey = dojo.byId(helpkeyid).innerHTML;
+		var helpdb = "#{javascript: sessionScope.jshelpdb}";
+		printPreviewURL = "/" + helpdb + "/Help/" + helpkey + "?OpenDocument";
+		var windowOptions = "height=600,width=500,scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=no,addressbar=no";
+		window.open(printPreviewURL, "_blank", windowOptions);
+		return true;
+	} catch (e) {
+		XSP.error("Error generating help: " + e);
+	}
+}
+]]>
+		</xp:this.value>
+	</xp:scriptBlock>
+</xp:view>

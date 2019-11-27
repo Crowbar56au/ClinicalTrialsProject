@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xp:view xmlns:xp="http://www.ibm.com/xsp/core" dojoTheme="true"
+	dojoParseOnLoad="true">
+	<xp:this.resources>
+		<xp:styleSheet href="/applicationLayout.css"></xp:styleSheet>
+		<xp:styleSheet href="/applicationForm.css"></xp:styleSheet>
+		<xp:styleSheet href="/applicationIcons.css"></xp:styleSheet>
+		<xp:styleSheet href="/developer.css"></xp:styleSheet>
+	</xp:this.resources>
+	<xp:this.data>
+		<xp:dominoDocument var="site" action="editDocument"
+			formName="Site"
+			documentId="#{javascript:viewScope.siteUNID}">
+		</xp:dominoDocument>
+	</xp:this.data>
+	
+	<xp:panel>
+	<xp:div id="hiddenData">
+		<xp:table>
+			<xp:tr>
+				<xp:td><xp:inputText id="type" value="#{site.type}" styleClass="hiddenField" dojoType="dijit.form.TextBox" defaultValue="Site"></xp:inputText></xp:td>
+				<xp:td><xp:inputText value="#{site.clinicalTrialType}" id="ClinicalTrialType" dojoType="dijit.form.TextBox" styleClass="hiddenField" defaultValue="CTN">
+							</xp:inputText></xp:td>
+				<xp:td><xp:inputText id="applicationId" value="#{site.applicationId}" styleClass="hiddenField" dojoType="dijit.form.TextBox">
+							</xp:inputText></xp:td>
+				<xp:td><xp:inputText value="#{site.applicationVersion}" id="applicationVersion" defaultValue="1" styleClass="hiddenField"></xp:inputText></xp:td>
+				<xp:td></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td></xp:td>
+				<xp:td></xp:td>
+				<xp:td></xp:td>
+				<xp:td></xp:td>
+				<xp:td></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td>
+					<xp:inputText value="#{site.explicitKey}"
+						id="explicitKey1" styleClass="hiddenField">
+					</xp:inputText>
+				</xp:td>
+				<xp:td>
+					<xp:inputTextarea id="webReaders"
+						value="#{site.webReaders}" styleClass="hiddenField"
+						multipleSeparator="#{javascript:@NewLine();}">
+						<xp:this.defaultValue><![CDATA[${javascript:var username = @Name("[CN]", @UserName());
+	CID = sessionScope.clientid;
+	//This assumes that the groups are prefixed with SIME, these groups are created by the process new user Agent in the User Management DB};
+	username = "SIME" + CID;
+	var readers = new Array(username, "[Admin]","[TGA]","[SIMEReader]","[System Profile]","LocalDomainServers", "OtherDomainServers");
+	return readers;}]]></xp:this.defaultValue>
+					</xp:inputTextarea>
+				</xp:td>
+				<xp:td>
+					<xp:inputTextarea id="webAuthors"
+						value="#{site.webAuthors}" styleClass="hiddenField"
+						multipleSeparator="#{javascript:@NewLine();}">
+						<xp:this.defaultValue><![CDATA[${javascript:var username = @Name("[CN]", @UserName());
+	CID = sessionScope.clientid;
+	//This assumes that the groups are prefixed with SIME, these groups are created by the process new user Agent in the User Management DB};
+	username = "SIME" + CID;
+	var authors = new Array(username, "[Admin]","[TGA]","[SIMEReader]","[System Profile]","LocalDomainServers", "OtherDomainServers");
+	return authors;}]]></xp:this.defaultValue>
+					</xp:inputTextarea>
+				</xp:td>
+				<xp:td>
+
+				</xp:td>
+				<xp:td>
+
+				</xp:td>
+			</xp:tr>
+		</xp:table>
+	</xp:div>
+	<xp:div id="siteDetails">
+		<xp:table border="0" styleClass="formTable">
+			<xp:tr>
+				<xp:td styleClass="labelCell" colspan="3">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+					<xp:text escape="true" id="computedField1"
+						styleClass="instructions">
+						<xp:this.value><![CDATA[#{javascript:"Always Required"}]]></xp:this.value>
+					</xp:text>
+					&#160;&#160;
+					<xp:span styleClass="conditionalMandatory">
+						<xp:span styleClass="conditionalMandatory">
+							*
+						</xp:span>
+					</xp:span>
+					<xp:text escape="true" id="computedField4"
+						styleClass="instructions">
+						<xp:this.value><![CDATA[#{javascript:" Required under certain conditions"}]]></xp:this.value>
+					</xp:text>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+		</xp:table>
+		<xp:table border="0" styleClass="formTable">
+			<xp:tr>
+				<xp:td></xp:td>
+				<xp:td></xp:td>
+				<xp:td>
+					<xp:label value="Site Details" id="lblSiteHeader"
+						for="trialSite">
+					</xp:label>
+				</xp:td>
+				<xp:td></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td styleClass="labelCell">
+					<xp:label value="Site Name:" id="lblSiteName"
+						for="trialSite">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td styleClass="fieldCell">
+					<xp:inputText id="trialSite"
+						value="#{site.trialSite}" styleClass="dijitComboBoxWidthLarge">
+					</xp:inputText>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td styleClass="labelCell">
+					<xp:label value="Site Physical Location:"
+						id="lblSitePhysicalLocation" for="trialSiteAddress">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td styleClass="fieldCell">
+					<xp:inputText id="trialSiteAddress"
+						value="#{site.trialSiteAddress}"
+						styleClass="dijitComboBoxWidthLarge">
+					</xp:inputText>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td styleClass="labelCell">
+					<xp:label value="State/Territory:" id="lblState"
+						for="trialSiteStateLU">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td styleClass="fieldCell">
+					<xp:panel id="trialSiteStateLU">
+						<xp:eventHandler event="onClientLoad"
+							submit="false" id="eventHandler1">
+							<xp:this.script><![CDATA[try {
+	var db = getNSFBase().toLowerCase();
+	var xagent = 'xAgentLookupCT.xsp';
+	var params = 'S=N&T=STATES&type=json';
+	var fullurl = db + '/' + xagent + '?' + params + '&R=' + Math.random();
+	var jsonTrialSiteStateStore = new dojo.data.ItemFileReadStore({url:fullurl});
+	var fieldid = getItemId('','trialSiteStateLU');
+	
+	field = new dijit.form.FilteringSelect({
+			store: jsonTrialSiteStateStore,
+			placeHolder: 'Select a value',
+			required: false,
+			class: 'dijitComboBoxWidthLarge',
+			value: trialSiteState.value,
+			onChange: function(x){
+				onChangeEvents(this);
+			},
+			selectOnClick: true
+		}, fieldid);
+	field.startup();
+	
+}catch(e){
+	console.log(e);
+}
+
+function onChangeEvents(itmtst){
+	try {
+		var trialsitestateid = getItemId('','trialSiteState');
+		var trialsitestatelabelid = getItemId('','trialSiteState_Label');
+		var trialsitestate = dojo.byId(trialsitestateid);
+		var trialsitestatelabel = dojo.byId(trialsitestatelabelid);
+		trialsitestate.value = itmtst.value;
+		trialsitestatelabel.value = itmtst.displayedValue;
+		console.log(itmtst.displayedValue);
+	} catch (e) {
+		console.log("trialSiteStateLU onChange event() - error: " + e); 
+	} 		
+}]]></xp:this.script>
+						</xp:eventHandler>
+					</xp:panel>
+				</xp:td>
+				<xp:td id="trialsitestateTD" styleClass="helperCell">
+					<xp:inputText id="trialSiteState"
+						value="#{site.trialSiteState}" styleClass="hiddenField"
+						dojoType="dijit.form.TextBox">
+						<xp:this.dojoAttributes>
+							<xp:dojoAttribute name="jsId"
+								value="trialSiteState">
+							</xp:dojoAttribute>
+						</xp:this.dojoAttributes>
+					</xp:inputText>
+					<xp:inputText id="trialSiteState_Label"
+						value="#{site.trialSiteState_Label}" styleClass="hiddenField"
+						dojoType="dijit.form.TextBox">
+						<xp:this.dojoAttributes>
+							<xp:dojoAttribute name="jsId"
+								value="trialSiteStateLabel">
+							</xp:dojoAttribute>
+						</xp:this.dojoAttributes>
+					</xp:inputText>
+				</xp:td>
+			</xp:tr>
+
+			<xp:tr>
+				<xp:td styleClass="labelCell">
+					<xp:label value="Expected Site Start Date:"
+						id="lblExpectedSiteStartDate" for="expectedSiteStartDate">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td styleClass="fieldCell">
+					<xp:inputText id="expectedSiteStartDate"
+						value="#{site.expectedSiteStartDate}">
+						<xp:dateTimeHelper id="dateTimeHelper1"></xp:dateTimeHelper>
+						<xp:this.converter>
+							<xp:convertDateTime type="date">
+							</xp:convertDateTime>
+						</xp:this.converter>
+					</xp:inputText>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td></xp:td>
+				<xp:td></xp:td>
+				<xp:td>
+					<xp:label value="Principal Investigator Details"
+						id="lblPIHeader" for="principalInvestigatorName">
+					</xp:label>
+				</xp:td>
+				<xp:td></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td styleClass="labelCell">
+					<xp:label value="Name:" id="lblPInvestigatorName"
+						for="principalInvestigatorName">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td styleClass="fieldCell">
+					<xp:inputText id="principalInvestigatorName"
+						value="#{site.principalInvestigatorName}"
+						styleClass="dijitComboBoxWidthLarge">
+					</xp:inputText>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td styleClass="labelCell">
+					<xp:label value="Contact Phone Number:"
+						id="lblPIContactPhone" for="principalInvestigatorContactPhone">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td styleClass="fieldCell">
+					<xp:inputText id="principalInvestigatorContactPhone"
+						value="#{site.principalInvestigatorContactPhone}"
+						styleClass="dijitComboBoxWidthLarge">
+					</xp:inputText>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td styleClass="labelCell">
+					<xp:label value="Contact Email:"
+						id="lblPIContactEmail" for="principalInvestigatorContactEmail">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td styleClass="fieldCell">
+					<xp:inputText id="principalInvestigatorContactEmail"
+						value="#{site.principalInvestigatorContactEmail}"
+						styleClass="dijitComboBoxWidthLarge">
+					</xp:inputText>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td></xp:td>
+				<xp:td></xp:td>
+				<xp:td>
+					<xp:label
+						value="Human Research Ethics Committee (HREC) Details"
+						id="lblHRECHeader" for="HRECName">
+					</xp:label>
+				</xp:td>
+				<xp:td></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td styleClass="labelCell">
+					<xp:label value="HREC Name:" id="lblHRECName"
+						for="HRECName">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td styleClass="fieldCell">
+					<xp:inputText id="HRECName" value="#{site.HRECName}"
+						styleClass="dijitComboBoxWidthLarge">
+					</xp:inputText>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td styleClass="labelCell">
+					<xp:label value="HREC Code:" id="lblHRECCode"
+						for="HRECCode">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td styleClass="fieldCell">
+					<xp:inputText id="HRECCode" value="#{site.HRECCode}"
+						styleClass="dijitComboBoxWidthLarge">
+					</xp:inputText>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td styleClass="labelCell">
+					<xp:label value="Contact Officer:"
+						id="lblHRECContactOfficer" for="HRECContactOfficer">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td styleClass="fieldCell">
+					<xp:inputText id="HRECContactOfficer"
+						value="#{site.HRECContactOfficer}"
+						styleClass="dijitComboBoxWidthLarge">
+					</xp:inputText>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td styleClass="labelCell">
+					<xp:label value="Position:" id="lblHRECPosition"
+						for="HRECPosition">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td styleClass="fieldCell">
+					<xp:inputText id="HRECPosition"
+						value="#{site.HRECPosition}"
+						styleClass="dijitComboBoxWidthLarge">
+					</xp:inputText>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td styleClass="labelCell">
+					<xp:label value="Contact Phone:"
+						id="lblHRECContactPhone" for="HRECContactPhone">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td styleClass="fieldCell">
+					<xp:inputText id="HRECContactPhone"
+						value="#{site.HRECContactPhone}"
+						styleClass="dijitComboBoxWidthLarge">
+					</xp:inputText>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td styleClass="labelCell">
+					<xp:label id="lblHRECContactEmail"
+						value="Contact Email:" for="HRECContactEmail">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td styleClass="fieldCell">
+					<xp:inputText id="HRECContactEmail"
+						value="#{site.HRECContactEmail}"
+						styleClass="dijitComboBoxWidthLarge">
+					</xp:inputText>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td></xp:td>
+				<xp:td></xp:td>
+				<xp:td>
+					<xp:label id="lblAAHeader" value="Approving Authority Details" for="approvingAuthorityName"></xp:label></xp:td>
+				<xp:td></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td styleClass="labelCell">
+					<xp:label value="Name of Approving Authority:" id="lblAAName" for="approvingAuthorityName"></xp:label></xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td styleClass="fieldCell">
+					<xp:inputText id="approvingAuthorityName" value="#{site.approvingAuthorityName}" styleClass="dijitComboBoxWidthLarge"></xp:inputText></xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td styleClass="labelCell">
+					<xp:label id="lblAAContactOfficer" value="Contact Officer:" for="approvingAuthorityOfficer"></xp:label></xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td styleClass="fieldCell">
+					<xp:inputText id="approvingAuthorityOfficer" value="#{site.approvingAuthorityOfficer}" styleClass="dijitComboBoxWidthLarge"></xp:inputText></xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td styleClass="labelCell">
+					<xp:label value="Position:" id="lblAAPosition" for="approvingAuthorityPosition"></xp:label></xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td styleClass="fieldCell">
+					<xp:inputText id="approvingAuthorityPosition" value="#{site.approvingAuthorityPosition}" styleClass="dijitComboBoxWidthLarge"></xp:inputText></xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td styleClass="labelCell">
+					<xp:label value="Contact Phone:" id="lblAAContactPhone" for="approvingAuthorityContactPhone"></xp:label></xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td styleClass="fieldCell">
+					<xp:inputText id="approvingAuthorityContactPhone" value="#{site.approvingAuthorityContactPhone}" styleClass="dijitComboBoxWidthLarge"></xp:inputText></xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td styleClass="labelCell">
+					<xp:label value="Contact Email:" id="lblAAContactEmail" for="approvingAuthorityContactEmail"></xp:label></xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td styleClass="fieldCell">
+					<xp:inputText id="approvingAuthorityContactEmail" value="#{site.approvingAuthorityContactEmail}" styleClass="dijitComboBoxWidthLarge"></xp:inputText></xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			
+			
+		</xp:table>
+	</xp:div>
+	<xp:div id="actionBar" styleClass="dijitDialogPaneActionBar">
+			<xp:this.dojoAttributes>
+				<xp:dojoAttribute name="region" value="bottom">
+				</xp:dojoAttribute>
+			</xp:this.dojoAttributes>
+			
+			<xp:button value="Save" id="btnDialogSave" dojoType="dijit.form.Button" rendered="#{javascript:!siteB.isNewNote();}">
+				<xp:this.dojoAttributes>
+					<xp:dojoAttribute name="iconClass" value="appIcon appIconSave">
+					</xp:dojoAttribute>
+				</xp:this.dojoAttributes>
+				<xp:eventHandler event="onclick" submit="true"
+					refreshMode="partial" refreshId="gridSites"
+					disableValidators="true">
+					<xp:this.action><![CDATA[#{javascript:saveSite(site);}]]></xp:this.action>
+				</xp:eventHandler>
+			</xp:button>
+			<xp:button value="Save &amp; Close" id="btnDialogSaveClose" dojoType="dijit.form.Button" >
+				<xp:this.dojoAttributes>
+					<xp:dojoAttribute name="iconClass" value="appIcon appIconSave">
+					</xp:dojoAttribute>
+				</xp:this.dojoAttributes>
+				<xp:eventHandler event="onclick" submit="true"
+					refreshMode="partial" refreshId="gridSites"
+					onComplete="XSP.closeDialog(getItemId('','siteDetailDialog'));"
+					disableValidators="true">
+					<xp:this.action><![CDATA[#{javascript:saveSite(site);}]]></xp:this.action>
+				</xp:eventHandler>
+			</xp:button>			
+			<xp:button value="Close" id="btnDialogClose" dojoType="dijit.form.Button" styleClass="cannotbedisabled">
+				<xp:this.dojoAttributes>
+					<xp:dojoAttribute name="iconClass" value="appIcon appIconClose">
+					</xp:dojoAttribute>
+				</xp:this.dojoAttributes>
+				<xp:eventHandler event="onclick" submit="false"
+					immediate="true" save="false">
+					<xp:this.script><![CDATA[XSP.closeDialog(getItemId('','siteDetailDialog'))]]></xp:this.script>
+				</xp:eventHandler>
+			</xp:button>
+		</xp:div>
+	</xp:panel>
+	
+	<xp:scriptBlock id="siteDetailDlgScriptBlock"
+		type="text/javascript">
+		<xp:this.value>
+			<![CDATA[dojo.addOnLoad(function() {
+	// Make sure focus is set to first field in dialog.
+	try {
+		setTimeout(function () {
+			xSetFocus(getItemId('','trialSite'));
+		}, 500);
+	} catch (e) {
+		console.log("Site Detail Dialog addOnLoad error: " + e);
+	}
+});]]>
+		</xp:this.value>
+	</xp:scriptBlock>
+</xp:view>

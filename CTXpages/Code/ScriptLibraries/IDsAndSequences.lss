@@ -1,0 +1,315 @@
+'++LotusScript Development Environment:2:5:(Options):0:74
+Option Public
+Option Explicit
+
+Use "GetDatabases"
+
+'++LotusScript Development Environment:2:5:(Forward):0:1
+Declare Function GetSequenceNumber(strSequenceKey As String) As Variant
+Declare Function GetID(strSequenceKey As String, strID1 As String, strID2 As String) As String
+
+'++LotusScript Development Environment:2:5:(Declarations):0:10
+'=== History ===
+'BW01 27Feb13 INC-38841: Correct Clinical Trials contants.
+'PWB 26Aug11 INC-21394, correct Clinical Trials constants.
+'Dennis Fry 25Mar11 - INC-21394, ScriptLibrary "IDsAndSequences" across EBS databases were becoming out of sync. Extracted and compared all Declarions and versions of Function 'GetSequenceNumber'. Updated ScriptLibrary accordingly.
+'VN 04June09 - Changed the value of Device_IVD_APPTYPE from VD to IVA
+'PWB 22Jan09 - Added DEVICE_IVD_APPTYPE constant
+'PWB 18Apr08 - Synch'd this master design with constants from various lodgement sub-systems
+'PWB 13Jul07 AOS - Constants updated for Post Market sequences.
+'PWB 10May07 AOS - theSequencer
+'D.R 29 October 2009 - Added constants for Premier Pre-Submission
+
+'Invoices
+Public Const csINVOICE_SEQUENCE_KEY = "InvoiceNumber"
+Public Const csFIELD_INVOICE_NUMBER = "InvoiceNumber"
+Public Const csPAYMENT_REF_NUMBER = "PaymentReferenceNumber"
+
+'ADRS
+Public Const ADR_SEQUENCE_SYSTEMTYPE = "AD"
+Public Const ADR_NOTIFICATION_SEQUENCE_KEY = "ADRNotification"
+Public Const ADR_NOTIFICATION_INTTYPE = "IN"
+Public Const ADR_NOTIFICATION_WEBTYPE = "EN"
+
+'Devices
+Public Const DEVICE_SEQUENCE_SYSTEMTYPE = "DV"
+Public Const DEVICE_SUBMISSION_SEQUENCE_KEY = "DeviceSubmission"
+Public Const DEVICE_APPLICATION_SEQUENCE_KEY = "DeviceApplication"
+Public Const DEVICE_POSTMARKET_SEQUENCE_KEY = "DevicePostMarket"
+
+Public Const DEVICE_APPLICATION_SUBTYPE = "DA"
+Public Const DEVICE_MANUF_EVIDENCE_SUBTYPE = "DM"
+Public Const DEVICE_CONFORMITY_ASSESS_SUBTYPE = "DC"
+Public Const DEVICE_CHANGE_REQUEST_SUBTYPE = "DR"
+Public Const DEVICE_POST_MARKET_SUBTYPE = "DVP"
+
+Public Const DEVICE_APPLICATION_APPTYPE = "DA"
+Public Const DEVICE_MANUF_EVIDENCE_APPTYPE = "MC"
+Public Const DEVICE_CONFORMITY_ASSESS_APPTYPE = "CA"
+Public Const DEVICE_CHANGE_REQUEST_APPTYPE = "CR"
+
+Public Const DEVICE_INHOUSE_IVD_APPTYPE = "IVI"
+Public Const DEVICE_IVD_APPTYPE = "IVA"
+
+'Listed Medicines
+Public Const LM_SEQUENCE_SYSTEMTYPE = "LM"
+Public Const LM_SUBMISSION_SEQUENCE_KEY = "ListedSubmission"
+Public Const LM_APPLICATION_SEQUENCE_KEY = "ListedApplication"
+Public Const LM_POSTMARKET_SEQUENCE_KEY = "ListedPostMarket"
+
+Public Const LM_SUBTYPE = "LM"
+Public Const LM_POST_MARKET_SUBTYPE = "LMP"
+
+Public Const LM_GENERAL_LISTING_APPTYPE = "GL"
+Public Const LM_CODE_STOCK_APPTYPE = "CS"
+Public Const LM_COMPOSITE_PACK_APPTYPE = "CP"
+Public Const LM_MEDICINE_KIT_APPTYPE = "MK"
+Public Const LM_MULTICHANGE_APPTYPE = "MC"
+
+'OTC Medicines
+Public Const OTC_SEQUENCE_SYSTEMTYPE = "OM"
+Public Const OTC_SUBMISSION_SEQUENCE_KEY = "OTCSubmission"
+Public Const OTC_APPLICATION_SEQUENCE_KEY = "OTCApplication"
+Public Const OTC_POSTMARKET_SEQUENCE_KEY = "OTCPostMarket"
+
+Public Const OTC_SUBTYPE = "OM"
+Public Const OTC_POST_MARKET_SUBTYPE = "OMP"
+
+Public Const OTC_GENERAL_LISTING_APPTYPE = "GL"
+Public Const OTC_CLONE_APPTYPE = "CL"
+Public Const OTC_COMPOSITE_PACK_APPTYPE = "CP"
+Public Const OTC_MULTICHANGE_APPTYPE = "MC"
+Public Const OTC_MEDICINE_KIT_APPTYPE = "MK"
+Public Const OTC_CODE_STOCK_APPTYPE = "CS"
+
+
+'Export Medicines
+Public Const EXPORT_SEQUENCE_SYSTEMTYPE = "EX"
+Public Const EXPORT_SUBMISSION_SEQUENCE_KEY = "ExportSubmission"
+Public Const EXPORT_APPLICATION_SEQUENCE_KEY = "ExportApplication"
+Public Const EXPORT_POSTMARKET_SEQUENCE_KEY = "ExportPostMarket"
+
+Public Const EXPORT_SUBTYPE = "EX"
+Public Const EXPORT_POST_MARKET_SUBTYPE = "EXP"
+
+Public Const EXPORT_GENERAL_LISTING_APPTYPE = "EX"
+Public Const EXPORT_CODE_STOCK_APPTYPE = "CS"
+Public Const EXPORT_COMPOSITE_PACK_APPTYPE = "CP"
+Public Const EXPORT_MULTICHANGE_APPTYPE = "MC"
+Public Const EXPORT_MEDICINE_KIT_APPTYPE = "MK"
+Public Const EXPORT_CERT_PHARM_APPTYPE = "CPP"
+Public Const EXPORT_CERT_LISTABLE_APPTYPE = "CLP"
+Public Const EXPORT_CERT_EXEMPT_APPTYPE = "CEP"
+
+'MIS
+Public Const MIS_SEQUENCE_SYSTEMTYPE = "MI"
+Public Const MIS_SUBMISSION_SEQUENCE_KEY = "MISSubmission"
+Public Const MIS_APPLICATION_SEQUENCE_KEY = "MISApplication"
+Public Const MIS_POSTMARKET_SEQUENCE_KEY = "MISPostMarket"
+
+Public Const MIS_LICENCE_SUBTYPE = "ML"
+Public Const MIS_CERTIFICATE_SUBTYPE = "ME"
+Public Const MIS_CLEARANCE_SUBTYPE = "MC"
+Public Const MIS_POST_MARKET_SUBTYPE = "MIP"
+
+'Recalls
+Public Const RECALLS_SEQUENCE_SYSTEMTYPE = "RC"
+Public Const RECALLS_NOTIFICATIONAPP_SEQUENCE_KEY = "RecallsNotification"
+Public Const RECALLS_PROBLEMSUB_SEQUENCE_KEY = "RecallsProblem"
+Public Const RECALLS_INCIDENTSUB_SEQUENCE_KEY = "RecallsIncident"
+Public Const RECALLS_POSTMARKET_SEQUENCE_KEY = "RecallsPostMarket"
+Public Const RECALLS_SUBMISSION_SEQUENCE_KEY = "RecallsSubmission"
+Public Const RECALLS_APPLICATION_SEQUENCE_KEY = "RecallsApplication"
+
+Public Const RECALLS_NOTIFICATION_APPTYPE = "RN"
+Public Const RECALLS_PROBLEM_SUBTYPE = "RP"
+Public Const RECALLS_INCIDENT_SUBTYPE = "RI"
+Public Const RECALLS_POST_MARKET_SUBTYPE = "RMP"
+Public Const RECALLS_RI_SUBTYPE = "RI"
+Public Const RECALLS_RN_APPTYPE = "RN"
+
+'Premier
+Public Const PREMIER_SEQUENCE_SYSTEMTYPE = "PM"
+Public Const PREMIER_SUBMISSION_SEQUENCE_KEY = "PremierSubmission"
+Public Const PREMIER_APPLICATION_SEQUENCE_KEY = "PremierApplication"
+Public Const PREMIER_POSTMARKET_SEQUENCE_KEY = "PremierPostMarket"
+Public Const PREMIER_PRESUBMISSION_SEQUENCE_KEY = "PremierPreSubmission"
+
+Public Const PREMIER_SUBTYPE = "PM"
+Public Const PREMIER_POST_MARKET_SUBTYPE = "PMP"
+
+Public Const PREMIER_SINGLE_MEDICINE_APPTYPE = "SMA"
+Public Const PREMIER_COMPOSITE_PACK_APPTYPE = "CPA"
+'Premier Submission types are actually calculated from the submission form 'submission type' field
+Public Const PREMIER_C1_APPTYPE = "C1"
+Public Const PREMIER_C2_APPTYPE = "C2"
+Public Const PREMIER_C3_APPTYPE = "C3"
+Public Const PREMIER_SRN_APPTYPE = "SRN"
+Public Const PREMIER_SAN_APPTYPE = "SAN"
+Public Const PREMIER_PRESUBMISSION_APPTYPE = "PRE"
+
+'Consumer Medicine & Product Information
+Public Const CMPI_SEQUENCE_SYSTEMTYPE = "CP"
+Public Const CMPI_SUBMISSION_SEQUENCE_KEY = "PICMISubmission"
+Public Const CMPI_APPLICATION_SEQUENCE_KEY = "PICMIApplication"
+
+Public Const CMPI_CMI_APPTYPE = "CMI"
+Public Const CMPI_PI_APPTYPE = "PI"
+Public Const CMPI_MPI_APPTYPE = "MPI"
+Public Const CMPI_RPI_APPTYPE = "RPI"
+
+'LSX Interim Write
+Public Const LSX_INTERIM_KEY = "LSXInterimKey"
+Public Const LSX_SEQUENCE_SYSTEMTYPE = "LSX"
+
+'LVT
+Public Const LVT_SEQUENCE_SYSTEMTYPE = "LI"
+Public Const LVT_APPLICATION_SEQUENCE_KEY = "LVTApplication"
+Public Const LVT_APPLICATION_SUBTYPE = "LV"
+Public Const LVT_APPLICATION_APPTYPE = "LV"
+
+'Biologicals
+Public Const BOP_SEQUENCE_SYSTEMTYPE = "BIO"
+Public Const BOP_SUBMISSION_SEQUENCE_KEY = "BOPSubmission"
+Public Const BOP_APPLICATION_SEQUENCE_KEY = "BOPApplication"
+Public Const BIOLOGICALS_POSTMARKET_SEQUENCE_KEY = "BIOPostMarket"
+Public Const BOP_GENERAL_LISTING_APPTYPE = "BA"
+Public Const BIOLOGICALS_POST_MARKET_SUBTYPE = "BAP"
+
+'CTN
+Public Const CT_SEQUENCE_SYSTEMTYPE = "CT"
+Public Const CT_SUBMISSION_SEQUENCE_KEY = "CTSubmission"
+Public Const CT_APPLICATION_SEQUENCE_KEY = "CTApplication"
+Public Const CT_GENERAL_LISTING_APPTYPE = "CT" 'BW01
+Public Const CTN_APPTYPE = "CTN"
+Public Const CTX_APPTYPE = "CTX"
+
+'++LotusScript Development Environment:2:1:GetSequenceNumber:1:8
+Function GetSequenceNumber(strSequenceKey As String) As Variant
+	
+%REM
+Input: The key to the sequence number which will be retrieved
+Output: A two elment array, the first element either empty string on error, or a sequence number as text. The second element, the server identifier (eg. 1 or 2)
+Note:
+ No Print message should be given on error, calling applications must check return value for success.
+ The sequence number may be padded with leading zeros, this is configured in theSequencer database,
+	sequence configuration document
+
+DF 25MAR11. Removed the following two variables which are no longer required:
+	1.	Dim dbSeqMaster As New NotesDatabase("", "")
+	2.	Dim agtSetRef As NotesAgent
+%END REM
+	
+	On Error Goto errHandler
+	
+	'Set default failure return value
+	GetSequenceNumber = ""
+	
+	Dim ns As New NotesSession
+	Dim dbSeq As NotesDatabase
+	Dim nvSeq As NotesView
+	Dim strSeqMaster As String
+	Dim agent As NotesAgent
+	Dim nnEffectiveUserName As New NotesName(ns.EffectiveUserName)
+	
+	Dim docSeq As NotesDocument
+	Dim docRef As NotesDocument
+	Dim strNoteID As String
+	
+	Dim arrResult(1) As String
+	
+	Set dbSeq = fdbGetSequencer
+	Set nvSeq = dbSeq.GetView("Sequences")
+	Set docSeq = nvSeq.GetDocumentByKey(strSequenceKey, True)
+	strSeqMaster = docSeq.Server(0)
+	
+	Set docRef = dbSeq.CreateDocument()
+	docRef.Form = "SeqReq"
+	docRef.SequenceKey = Cstr(strSequenceKey)
+	docRef.MasterServer = strSeqMaster
+	docRef.AllocatedTo = nnEffectiveUserName.Abbreviated
+	
+	Dim readerNames(0 To 1) As String
+	readerNames(0) = "[Maintainers]"
+	readerNames(1) = nnEffectiveUserName.Canonical
+	docRef.readerNames = readerNames
+ ' If field did not previously exist, tell Notes it's a Readers field.
+	docRef.GetFirstItem("readerNames").IsReaders = True
+	
+	Dim authorNames(0 To 1) As String
+	authorNames(0) = "[Maintainers]"
+	authorNames(1) = nnEffectiveUserName.Canonical
+	docRef.authorNames = authorNames
+ ' If field did not previously exist, tell Notes it's an Authors field.
+	docRef.GetFirstItem("authorNames").IsAuthors = True
+	
+	Call docRef.Save(True, False)
+	strNoteID = docRef.NoteID
+	Delete docRef
+	
+	Set agent = dbSeq.GetAgent("GetSequenceNumber")
+	Call agent.RunOnServer(strNoteID)
+	
+	Set docRef = dbSeq.GetDocumentByID(strNoteID)
+	If (Ucase(docRef.ProcessStatus(0)) = "OK") Then
+		arrResult(0) = docRef.SeqValue(0)
+		arrResult(1) = docRef.ServerString(0)
+		GetSequenceNumber = arrResult
+	End If
+	Exit Function
+	
+errHandler:
+'	Print "Function GetSequenceNumber: Error " & Cstr(Err) & " at line " & Cstr(Erl) & " - " & Error$ & ". Unable to get next sequence number for '" & strSequencekey & "'"
+	GetSequenceNumber = ""
+	Exit Function
+	
+End Function
+
+'++LotusScript Development Environment:2:1:GetID:1:8
+Function GetID(strSequenceKey As String, strID1 As String, strID2 As String) As String
+	' returns an identifier string of the structure:
+	' strID1-YYYY-strID2-XXXXXX-S (generally known as an Application ID)
+	' or if strID1 is empty, strID2-YYYY-XXXXX-S (generally known as a Submission ID)
+	'
+	' Where 
+	' strID1 represents a system type for an application
+	' strID2 represents an application type or submission type
+	' YYYY is the current year, 
+	' XXXXX is the sequence generated using the key strSequenceKey
+	' S represents the last character of the server ID.
+	
+	On Error Goto errHandler
+	
+	Dim ns As New notesSession
+	Dim db As NotesDatabase
+	Dim strServerString As String
+	Dim strSequence As String
+	Dim arrResult As Variant
+	
+	GetID = ""
+	
+	Set db = ns.currentDatabase
+	
+	'Assumption: The last digit of the server name is sufficient to uniquely differentiate between servers in a cluster.
+	'				Any given ID/Sequence number is to be generated on only one cluster. 
+	'				A 'server string' of 1 is not unique across clusters, but is within a cluster.
+	' While current server names allow two digits, we assume a cluster will not make use of more than 9 servers.
+	'The Server string is returned in the result from GetSequenceNumber
+	
+	arrResult = GetSequenceNumber(strSequenceKey)
+	strSequence = arrResult(0)
+	If strSequence <> "" Then
+		strServerString = arrResult(1)
+		If strID1 <> "" Then ' Application ID
+			GetID = strID1 + "-" + Cstr(Year(Now)) + "-" + strID2 + "-" + strSequence + "-" + strServerString
+		Else ' Submisison ID
+			GetID = strID2 + "-" + Cstr(Year(Now)) + "-" + strSequence + "-" + strServerString
+		End If
+	End If
+	Exit Function
+	
+errHandler:
+	GetID = ""
+	Exit Function
+	
+End Function

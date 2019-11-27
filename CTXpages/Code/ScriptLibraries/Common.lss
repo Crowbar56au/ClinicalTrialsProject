@@ -1,0 +1,377 @@
+'++LotusScript Development Environment:2:5:(Options):0:66
+Option Public
+
+'++LotusScript Development Environment:2:5:(Forward):0:1
+Declare Type typeFormField
+Declare Sub Initialize
+Declare Function fintDisplayStatus(strMessage) As Integer
+Declare Function fintCheckMandatoryFields(nd As notesdocument, strFieldList As Variant) As Integer
+Declare Function fintWriteReportMessage(ndReport As notesdocument, strMessage As String) As Integer
+Declare Function fstrDefault(strValue As String, strDefault As String) As String
+Declare Function flngHasItem(nd As notesdocument, lngItem As Variant) As Long
+Declare Function fstrCreateBucketDoc(ndbTransfer As NotesDatabase, ndbBucket As NotesDatabase, nd As NotesDocument, strPrimaryKey As String, strBucketPrimaryKey As String, strFormName As String) As String
+Declare Function fstrConcatenateFields(strFieldList As Variant, strSeperator As String)
+Declare Function fstrHasItem(nd As NotesDocument, strItem As Variant) As String
+Declare Function fdatDefault(strValue As String, varDate As Variant) As Variant
+
+'++LotusScript Development Environment:2:5:(Declarations):0:10
+
+'Process type
+'If these values are changed the selection formulas in the relevant lookup views in the Transfer database will need to be changed.
+Const PT_INSERT = 1
+Const PT_UPDATE = 2
+Const PT_OVERWRITE = 3
+Const PT_DELETE = 4
+Const PT_DONOTHING= 99
+
+'Application document views
+Const AV_APPLICATIONHEADERS = "$ApplicationHeaders"
+Const AV_APPLICATIONSUBS = "$ApplicationSubs"
+Const AV_CLIENTLOCATIONFUNCTION = "(LUClientLocationFunction)"
+Const AV_MANUFACTURERLOCATIONFUNCTION = "(LUManufacturerLocationFunction)"
+Const AV_APPLICATIONTYPES = "LUFeeHierarchyLMSE"
+
+'Design form constants
+Const DF_GENERALLISTINGAPPLICATION = "GenApp"
+Const DF_COMPOSITEPACKAPPLICATION = "CompApp"
+Const DF_CODESTOCKAPPLICATION = "CodeStockApp"
+Const DF_MEDICINEKITAPPLICATION = "MediKitApp"
+Const DF_CARRIER = "Carrier"
+Const DF_COMPONENT = "Component"
+Const DF_EXPORTNAME = "ExportNames"
+Const DF_EXTRACTIONSTEP = "ExtractionStep"
+Const DF_FORMULATION = "Formulation"
+Const DF_INDICATION = "Indication"
+Const DF_INGREDIENT = "Ingredient"
+Const DF_MANUFACTURER = "Man"
+Const DF_MANUFACTURERSTEP = "ManSteps"
+Const DF_ROUTEOFADMINISTRATION = "RouteOfAdmin"
+Const DF_SOLVENT = "Solvent"
+Const DF_WARNING = "Warning"
+Const DF_MEDICINE = "Medicine"
+Const DF_DILUENT = "Diluent"
+Const DF_RESTRICTEDSOLVENT = "RestrictedSolvent"
+
+'Extraction Step Types
+Const ES_NATIVE_EXTRACTION_RATIO = 1
+Const ES_EXTRACTION_STEP = 2
+
+'Component Types
+Const CO_COMPONENT = 1
+Const CO_EQUIVALENT_PREPARATION = 2
+
+'Formulation Types
+Const FO_FORMULATION = 1
+Const FO_MEDICINE = 2
+
+'Field collection constants
+Const CTRF_FIELDCOLLECTION_NO = 0
+Const CTRF_FIELDCOLLECTION_YES = 1
+
+'Field collection check constants
+Const FIELDVALUE_CHANGED = 1
+Const FIELDVALUE_ADDITION = 2
+Const FIELDVALUE_DELETION = 3
+Const FIELD_ADDITION = 4
+Const FIELD_DELETION = 5
+Const FIELD_ADDITIONUPDATE = 6
+Const FIELD_DELETIONUPDATE = 7
+
+'New AUSTL and PRODUCT
+Const OR_NEWAUSTL = 1
+Const OR_EXISTINGAUSTL = 2
+Const OR_NEWPRODUCT = 3
+Const OR_EXISTINGPRODUCT = 4
+
+
+'Types
+'=======
+
+'Form and field value check
+Type typeFormField
+	lngDocId As Long
+	varFieldValue As Variant
+	intDocIdResult As Integer
+	intFieldValueResult As Integer
+End Type
+
+
+'Global Variables
+'=============
+'Notes objects
+Dim ns As notessession
+
+Dim ndbSubApps As notesdatabase
+Dim ndbTransfer As notesdatabase
+Dim ndbClient As notesdatabase
+Dim ndbLSXCFG As notesdatabase
+Dim ndbBucket As notesdatabase
+Dim ndbStoredProcedures As notesdatabase
+Dim ndbopARTG1 As notesdatabase
+Dim ndbopARTG2 As notesdatabase
+Dim ndbopBucket As notesdatabase
+Dim ndbopValidation As notesdatabase
+Dim ndProcessingReport As notesdocument
+
+Dim nvApplicationHeaders As notesview
+Dim nvApplicationSubs As notesview
+Dim nvClientLocationFunction As notesview
+Dim nvManufacturerLocationFunction As notesview
+Dim nvApplicationTypes As notesview
+
+Dim ndSubApplication As notesdocument
+Dim ndARTGApplication As notesdocument
+Dim ndApplicationType As notesdocument
+
+Dim ncSubApplications As notesdocumentcollection
+Dim ncSubFormulations As notesdocumentcollection
+Dim ncSubIndications As notesdocumentcollection
+Dim ncSubWarnings As notesdocumentcollection
+Dim ncSubExportNames As notesdocumentcollection
+Dim ncSubManufacturers As notesdocumentcollection
+Dim ncSubManufacturingSteps As notesdocumentcollection
+Dim ncSubIngredients As notesdocumentcollection
+Dim ncSubComponents As notesdocumentcollection
+Dim ncSubExtractionSteps As notesdocumentcollection
+Dim ncSubRoutesOfAdministration As notesdocumentcollection
+Dim ncSubSolvents As notesdocumentcollection
+Dim ncSubCarriers As notesdocumentcollection
+Dim ncSubMedicines As notesdocumentcollection
+Dim ncSubDiluents As notesdocumentcollection
+Dim ncSubRestrictedSolvents As notesdocumentcollection
+
+Dim ncARTGApplications As notesdocumentcollection
+Dim ncARTGFormulations As notesdocumentcollection
+Dim ncARTGIndications As notesdocumentcollection
+Dim ncARTGWarnings As notesdocumentcollection
+Dim ncARTGExportNames As notesdocumentcollection
+Dim ncARTGManufacturers As notesdocumentcollection
+Dim ncARTGManufacturingSteps As notesdocumentcollection
+Dim ncARTGIngredients As notesdocumentcollection
+Dim ncARTGComponents As notesdocumentcollection
+Dim ncARTGExtractionSteps As notesdocumentcollection
+Dim ncARTGRoutesOfAdministration As notesdocumentcollection
+Dim ncARTGSolvents As notesdocumentcollection
+Dim ncARTGCarriers As notesdocumentcollection
+Dim ncARTGMedicines As notesdocumentcollection
+Dim ncARTGDiluents As notesdocumentcollection
+Dim ncARTGRestrictedSolvents As notesdocumentcollection
+
+'Variables
+
+Dim intAUSTL As Integer
+Dim intProduct As Integer
+
+'Oracle ID numbers
+'Dim lngARTGID As Long
+Dim lngARTGEXPORTALIASID As Long
+Dim lngNONSTANDARDCONDINDICID As Long
+Dim lngPRODUCTCONDINDICATIONID As Long
+'Dim lngPRODUCTID As Long
+Dim lngPRODUCTWARNINGID As Long
+Dim lngMANUFACTURERSITEID As Long
+Dim lngARTGMANUFACTURINGSTEPID As Long
+Dim lngFORMULATIONID As Long
+Dim lngCOMPONENTADMINROUTEID As Long
+Dim lngINGREDIENTID As Long
+Dim lngCOMPONENTID As Long
+Dim lngEXTRACTIONSTEPID As Long
+Dim lngSOLVENTID As Long
+Dim lngCARRIERID As Long
+Dim lngMEDICINEID As Long
+Dim lngTRANSACTIONLOGID As Long
+Dim lngPRODUCTREFERENCEID As Long
+Dim lngPRODUCTTGAINID As Long
+Dim nd As notesdocument
+Dim ndLSXSystemProfile As NotesDocument
+Dim naStoredProcedure As notesagent
+Dim strDocumentUNID As String
+Dim pn As String
+Dim v As String
+Dim dt As String
+
+Dim rtitemReport As NotesRichTextItem
+
+'++LotusScript Development Environment:2:2:Initialize:1:10
+Sub Initialize
+End Sub
+'++LotusScript Development Environment:2:1:fintDisplayStatus:1:8
+Function fintDisplayStatus(strMessage) As Integer
+	
+     'Purpose:
+     'Display a message in the Notes client status bar.
+	
+	Print strMessage
+End Function
+'++LotusScript Development Environment:2:1:fintCheckMandatoryFields:1:8
+Function fintCheckMandatoryFields(nd As notesdocument, strFieldList As Variant) As Integer
+	
+     'Purpose:
+     'Check mandatory fields required to write to Oracle.
+	
+     'Decalre objects and variables
+	Dim i As Integer
+	Dim varValue As Variant
+	Dim intFlag As Integer
+	Dim iLowerBound As Integer 
+	Dim iUpperBound As Integer 
+	
+	intFlag = True
+	iLowerBound = Lbound(strFieldList)
+	iUpperBound = Ubound(strFieldList)
+	
+	For i = iLowerBound To iUpperBound
+		varValue = nd.GetItemValue(strFieldList(i))
+		If (Trim$(Cstr(varValue(0))) = "") Then
+			intFlag = False
+		Else
+			strFieldList(i) = ""
+		End If
+	Next
+	
+	If (intFlag) Then
+		fintCheckMandatoryFields = True
+	Else
+		fintCheckMandatoryFields = False
+	End If
+	Exit Function
+	
+errorhandler:
+	
+	fintCheckMandatoryFields = False
+	
+End Function
+'++LotusScript Development Environment:2:1:fintWriteReportMessage:1:8
+Function fintWriteReportMessage(ndReport As notesdocument, strMessage As String) As Integer
+	
+     'Purpose:
+     'Write a message to the report document for the current run.
+	Set rtitemReport = ndReport.GetFirstItem( "ReportDetails" )
+	If Not(rtitemReport Is Nothing) Then
+		Call rtitemReport.AppendText(Cstr(Now) + ":" + Chr$(9) + strMessage)
+		Call rtitemReport.AddNewLine(1)
+	End If
+	
+End Function
+'++LotusScript Development Environment:2:1:fstrDefault:1:8
+Function fstrDefault(strValue As String, strDefault As String) As String
+	     'Purpose:
+     'Return the default string if the length of a value string is 0.
+	
+	If Len(strValue) = 0 Then
+		If Len(strDefault) > 0 Then
+			fstrDefault = strDefault
+			Exit Function
+		End If     
+	End If
+	
+	fstrDefault = strValue
+	
+End Function
+'++LotusScript Development Environment:2:1:flngHasItem:1:8
+Function flngHasItem(nd As notesdocument, lngItem As Variant) As Long
+	
+     'Purpose:
+     'This function determines if the item exists on the document. It it exists it gets the value from the document.
+     'If it doesn't exist then the function passes back a zero
+	
+	If Not (nd Is Nothing) Then
+		If nd.hasitem(lngItem) Then
+			flngHasItem = nd.GetItemValue(lngItem)(0)
+		Else
+			flngHasItem = 0
+		End If
+	End If
+	
+End Function
+'++LotusScript Development Environment:2:1:fstrCreateBucketDoc:1:8
+Function fstrCreateBucketDoc(ndbTransfer As NotesDatabase, ndbBucket As NotesDatabase, nd As NotesDocument, strPrimaryKey As String, strBucketPrimaryKey As String, strFormName As String) As String
+	
+     'Purpose:
+     'Creates a bucket record used to move data into Oracle.
+	
+	Dim ndBucket As NotesDocument
+	Dim strBucketId As String
+	Dim niPrimaryKey As NotesItem
+	Dim strKey As String
+	
+	
+	On Error Goto errorhandle
+	
+	Set niPrimaryKey = nd.GetFirstItem(strPrimaryKey)     
+	Set ndBucket = ndbTransfer.CreateDocument
+	ndBucket.Form = strFormName
+	Call ndBucket.ReplaceItemValue(strBucketPrimaryKey, Cdbl(niPrimaryKey.Values(0)))
+	strKey = strFormName & niPrimaryKey.Values(0) & Cstr(Today)
+	ndBucket.BucketKey = strKey     
+	Call ndBucket.save(True, True)     
+	strBucketId = ndBucket.UniversalID
+	Set ndBucket = Nothing
+	Set ndBucket = ndbTransfer.GetDocumentByUNID(strBucketId)
+	Call ndBucket.ComputeWithForm(True, False)
+	Call ndBucket.save(True, True)
+	Call ndBucket.CopyToDatabase(ndbBucket)
+	Call ndBucket.Remove(True)
+	fstrCreateBucketDoc = strKey
+	
+endbucket:
+	Exit Function
+	
+errorhandle:
+	
+	fstrCreateBucketDoc = ""
+	Error Err, Error$ & Chr$(10) & " in procedure " & Getthreadinfo(1) & ", line " & Cstr(Erl)		  
+	Resume endbucket
+	
+End Function
+'++LotusScript Development Environment:2:1:fstrConcatenateFields:1:8
+Function fstrConcatenateFields(strFieldList As Variant, strSeperator As String)
+	
+     'Purpose:
+     'Concatenate a list of strings into a single string.
+	
+     'Declare objects and variables
+	Dim strFields As String
+	Dim i As Integer
+	
+	
+	For i = Lbound(strFieldList) To Ubound(strFieldList)
+		If (strFieldList(i) <> "") Then
+			strFields = strFields + strFieldList(i) + strSeperator
+		End If
+	Next
+	
+	fstrConcatenateFields = strFields
+	
+End Function
+
+'++LotusScript Development Environment:2:1:fstrHasItem:1:8
+Function fstrHasItem(nd As NotesDocument, strItem As Variant) As String
+	
+     'Purpose:
+     'This function determines if the item exists on the document. It it exists it gets the value from the document.
+     'If it doesn't exist then the function passes back an empty string.
+	
+	If Not (nd Is Nothing) Then
+		If nd.hasitem(strItem) Then
+			fstrHasItem = nd.GetItemValue(strItem)(0)
+		Else
+			fstrHasItem = ""
+		End If
+	End If
+End Function
+'++LotusScript Development Environment:2:1:fdatDefault:1:8
+Function fdatDefault(strValue As String, varDate As Variant) As Variant
+	
+     'If no value has been passed in then then return the default value.
+	
+	If Len(strValue) = 0 Then
+		If Len(Cstr(Cdat(varDate))) > 0 Then
+			fdatDefault = Cdat(varDate)
+			Exit Function
+		End If     
+	End If
+	
+	fdatDefault = Today()
+	
+End Function

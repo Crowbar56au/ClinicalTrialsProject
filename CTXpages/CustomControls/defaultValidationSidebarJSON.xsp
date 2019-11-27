@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xp:view xmlns:xp="http://www.ibm.com/xsp/core" xmlns:xe="http://www.ibm.com/xsp/coreex">
+
+	<xp:this.resources>
+		<xp:styleSheet href="/applicationLayout.css"></xp:styleSheet>
+		<xp:styleSheet href="/applicationForm.css"></xp:styleSheet>
+		<xp:styleSheet href="/developer.css"></xp:styleSheet>
+	</xp:this.resources>
+	<!--  SideBar Region -->
+	<xp:div dojoType="dijit.layout.ContentPane" id="sideBarPane"
+		styleClass="sideBar" rendered="true">
+		<xp:this.dojoAttributes>
+			<xp:dojoAttribute name="region" value="right"></xp:dojoAttribute>
+			<xp:dojoAttribute name="splitter" value="true"></xp:dojoAttribute>
+			<xp:dojoAttribute name="toggleSplitterState" value="closed"></xp:dojoAttribute>
+			<xp:dojoAttribute name="toggleSplitterCollapsedSize"
+				value="100px"></xp:dojoAttribute>
+		</xp:this.dojoAttributes>
+		<xp:div dojoType="dijit.layout.BorderContainer" styleClass="sideBarContainer"
+			id="sideBarContainer">
+			<xp:this.dojoAttributes>
+				<xp:dojoAttribute name="gutters" value="false"></xp:dojoAttribute>
+			</xp:this.dojoAttributes>
+
+			<!-- SideBar Top Region -->
+			<xp:div dojoType="dijit.layout.ContentPane" id="sideBarTop"
+				styleClass="top">
+				<xp:this.dojoAttributes>
+					<xp:dojoAttribute name="region" value="top">
+					</xp:dojoAttribute>
+				</xp:this.dojoAttributes>
+				<xp:text escape="true" id="sideBarHeader" style="display:block;">
+					<xp:this.value><![CDATA[#{javascript:"Double click on validation messages"}]]></xp:this.value>
+				</xp:text>
+			</xp:div>
+			<!-- SideBar Content Region -->
+			<xp:div dojoType="dijit.layout.ContentPane" id="sideBarMiddle"
+				styleClass="top" style="padding: 0px;">
+				<xp:this.dojoAttributes>
+					<xp:dojoAttribute name="region" value="center">
+					</xp:dojoAttribute>
+				</xp:this.dojoAttributes>
+
+				<xp:div dojoType="dijit.layout.ContentPane" id="validationGridContentPane"
+					style="display:none;">
+					
+					<xp:this.dojoAttributes>
+						<xp:dojoAttribute value="9" name="sizeShare">
+						</xp:dojoAttribute>
+						<xp:dojoAttribute name="minSize" value="400px">
+						</xp:dojoAttribute>
+						<xp:dojoAttribute name="layoutAlign" value="client">
+						</xp:dojoAttribute>
+					</xp:this.dojoAttributes>
+					<xp:panel id="gridJSONValidationErrors">
+						<xp:this.dojoAttributes>
+							<xp:dojoAttribute name="jsId" value="gridErrors">
+							</xp:dojoAttribute>
+						</xp:this.dojoAttributes>
+						<xp:eventHandler event="onClientLoad" submit="false">
+							<xp:this.script><![CDATA[try {
+	
+	var runVal = "#{javascript:viewScope.runValidation}";
+	var xagent = 'xAgentValidation.xsp';
+	var db = getNSFBase().toLowerCase();
+	
+	var params = 'applicationid=' + applicationid.value + '&runval=' + runVal + '&documentId='+getURLParameter('documentId');
+	var fullurl = db + '/' + xagent + '?' + params + '&R=' + Math.random();
+	var jsonValidationStore = new dojo.data.ItemFileReadStore({url:fullurl});
+	
+	var validationgridid = "#{id:gridJSONValidationErrors}";
+	var validationgrid = dijit.byId(validationgridid);
+	
+	if(validationgrid){
+		validationgrid.setStore(jsonValidationStore);
+		validationgrid.update();
+		validationgrid.render();
+		hideWaitDialog();
+	}else{
+		var grid1 = null;
+		dojo.addOnLoad(function(){
+			var layout1 = [{
+				defaultCell: {editable: false, type: dojox.grid.cells._Widget},
+				rows:[
+				{field: "error", name: "Validation Messages", width: 27}
+				]
+			}];
+			
+			grid1 = new dojox.grid.EnhancedGrid({
+				query: {error: '*'},
+				store: jsonValidationStore,
+				structure: layout1,
+				autoHeight: true,
+				autoWidth: true,
+				noDataMessage: 'No validation messages'
+			}, '#{id:gridJSONValidationErrors}');
+			grid1.focus._delayedCellFocus = function(){};
+			grid1.startup();
+			dojo.connect(grid1, '_onFetchComplete', function(){gridFetchComplete(runVal)});
+			dojo.connect(grid1, "onRowDblClick", function(evt){
+				var idx = evt.rowIndex;
+		  		var item  = this.getItem(idx);
+		  		var tab = this.store.getValue(item, "tab");
+		  		var field = this.store.getValue(item, "field");
+		  		validationSetFocusTab(tab.toString(),field.toString());
+		  	});
+		});//end addOnLoad
+	}//end if
+}catch(e){
+	hideWaitDialog();
+	XSP.error("Validation errors grid error: " + e);
+}
+
+function gridFetchComplete(runVal){
+	try {
+		var grid = dijit.byId("#{id:gridJSONValidationErrors}");
+		if(runVal != 'Y'){
+			//console.log('gridFetchComplete row count: ' + grid.rowCount);
+			if(grid.rowCount > 0){
+				validationShowSideBar();
+			}
+			return;
+		}
+		var validationPassed = false;
+		
+		var isnewdoc = "#{javascript: }";
+		if(isnewdoc != 'true'){
+			if(grid){
+				if(grid.rowCount == 0){
+					validationPassed = true;
+				}
+			}
+		}else{// do nothing for new unsaved documents
+			return;
+		}//end if isnewdoc
+		
+		// Perform refreshes after retrieving validation results. Add all items to be partially refreshed
+		// after validation here. Each id is checked to ensure the object exists before calling refresh on them
+		var refreshIDCheckList = new Array();
+		refreshIDCheckList.push("#{id:cfdApplicationStatus}");
+		refreshIDCheckList.push("#{id:btnActionSubmit}");
+		
+		var refreshIDList = new Array();
+		var refreshIDCounter = 0;
+		
+		for (var i=0; i < refreshIDCheckList.length;i++) {
+			var divRefreshCheck = dojo.byId(refreshIDCheckList[i]);
+			if (divRefreshCheck != null) {
+				refreshIDList[refreshIDCounter] = refreshIDCheckList[i];
+				refreshIDCounter++;
+			}
+		}
+		
+		if (refreshIDCounter > 0)
+			validationPartialRefreshMulti(refreshIDList, 0, validationPassed);
+		else
+			showPostValidationResult(validationPassed);
+	} catch (e) {
+		hideWaitDialog();
+		XSP.error("gridJSONValidationErrors gridFetchComplete() - error: " + e);
+	}
+}
+
+function showPostValidationResult(validationPassed) {
+	// Post validation processing - after all validation routines, refreshes, etc.
+	try {
+		var statusid = "#{id:cfdApplicationStatus}";		
+		if(validationPassed){
+			document.getElementById(statusid).innerHTML = 'Passed Validation';
+			validationHideSideBar();
+		}else{
+			validationShowSideBar();
+		}
+		var status = document.getElementById(statusid).innerHTML;
+		var btnSubmit = dijit.byId("#{id:btnActionSubmit}");
+		var menuSubmit = dijit.byId("#{id:menuItemSubmit}");
+		if(btnSubmit && status == 'Draft'){
+			btnSubmit.set('disabled', true);
+		}else if(btnSubmit && status == 'Passed Validation'){
+			btnSubmit.set('disabled', false);
+		}
+		if(menuSubmit && status == 'Draft'){
+			menuSubmit.set('disabled', true);
+		}else if(menuSubmit && status == 'Passed Validation'){
+			menuSubmit.set('disabled', false);
+		}	
+		hideWaitDialog();
+	} catch (e) {
+		hideWaitDialog();
+		XSP.error("gridJSONValidationErrors showPostValidationResult() - error: " + e);
+	}
+}
+
+function validationPartialRefreshMulti(refreshIDList, offset, validationPassed) {
+	try {
+		if (offset >= refreshIDList.length) {
+			showPostValidationResult(validationPassed);
+			return;		// maximum number of elements has been iterated
+		}
+		
+		var refreshObject = null;
+		var id = refreshIDList[offset];
+		if (id != "") {
+			refreshObject = dojo.byId(id);
+		}
+		offset++;
+				
+		if (refreshObject) {
+			// Make sure refresh is not blocked
+			XSP.allowSubmit();
+					
+			if (offset == refreshIDList.length) {
+				// Last element in the list has been reached
+				XSP.partialRefreshGet(id, {
+					onComplete: function() {
+						showPostValidationResult(validationPassed);
+					}
+				});
+			} else {
+				XSP.partialRefreshGet(id, {
+					onComplete: function() {
+						validationPartialRefreshMulti(refreshIDList, offset, validationPassed);
+					}
+				});
+			}
+		} else {
+			// Object not found. Skip to next element in the list 
+			validationPartialRefreshMulti(refreshIDList, offset, validationPassed);
+		}
+	} catch(e) {
+		hideWaitDialog();
+		XSP.error("gridJSONValidationErrors validationPartialRefreshMulti() - error: " + e);
+	}
+}]]></xp:this.script>
+						</xp:eventHandler></xp:panel>
+					
+				</xp:div>
+			</xp:div>
+				<!-- SideBar Bottom Region -->
+			<xp:div dojoType="dijit.layout.ContentPane" id="sideBarBottom"
+				styleClass="bottom" rendered="true">
+				<xp:this.dojoAttributes>
+					<xp:dojoAttribute name="splitter" value="true">
+					</xp:dojoAttribute>
+					<xp:dojoAttribute name="region" value="bottom">
+					</xp:dojoAttribute>
+				</xp:this.dojoAttributes>
+			</xp:div>
+		</xp:div>
+	</xp:div>
+	<xp:scriptBlock id="scriptBlock1" type="text/javascript">
+		<xp:this.value><![CDATA[function validationShowSideBar() {
+	try {
+		// Set the header
+		//validationSetHeader();
+		
+		// Make the grid contents visible
+		var vh = dojo.byId("#{id:sideBarHeader}");
+		vh.style.display = "";
+		
+		var vcp = dojo.byId("#{id:validationGridContentPane}");
+		vcp.style.display = "";
+			
+		// Open and set the width of the validation sidebar
+		var sideBarPane = dojo.byId("#{id:sideBarPane}");
+		sideBarPane.style.width = "350px";
+		
+		var sideBarPane = dijit.byId("#{id:sideBarPane}");
+		sideBarPane.resize();
+		
+		var pageContainer = dijit.byId("#{id:pageContainer}");
+		pageContainer.resize();
+	} catch (e) {
+		hideWaitDialog();
+		XSP.error("Error opening side bar: " + e);
+	}
+}
+
+function validationHideSideBar() {
+	try {
+		// Make the grid contents hidden
+		var vh = dojo.byId("#{id:sideBarHeader}");
+		vh.style.display = "none";
+		
+		var vcp = dojo.byId("#{id:validationGridContentPane}");
+		vcp.style.display = "none";
+			
+		// Open and set the width of the validation sidebar
+		var sideBarPane = dojo.byId("#{id:sideBarPane}");
+		sideBarPane.style.width = "0px";
+		
+		var sideBarPane = dijit.byId("#{id:sideBarPane}");
+		sideBarPane.resize();
+		
+		var pageContainer = dijit.byId("#{id:pageContainer}");
+		pageContainer.resize();
+		
+	} catch (e) {
+		hideWaitDialog();
+		XSP.error("Error hiding side bar: " + e);
+	}
+}
+
+function validationSetFocus() {
+	try {
+		if (djgrid_Validation.focus.rowIndex >= 0) {
+			// Get handle to the selected and get its values
+	        var ti = djgrid_Validation.getItem(djgrid_Validation.focus.rowIndex);
+	        var applicationId = ti.applicationID[0];
+	        var docUNID = ti.elementRef[0];
+	        var targetField = ti.entryName[0];
+	        var errorMessage = ti.errorMessage[0];
+	        var errorSeqNo = ti.errorSeqNo[0];
+	        var targetTab = ti.type[0];
+	        var sourceForm = ti.form[0];
+	        
+	        // Set focus to the required tab
+	        validationSetFocusTab(targetTab);
+		}
+	} catch (e) {
+		XSP.error("Validation focus error: " + e);
+	}
+}
+
+function validationSetFocusTab(targetTab, field) {
+	try {
+		if (targetTab == null || targetTab == "")
+			return false;
+		//XSP.alert(unid);
+        // Set the id's of the parent container and tabs
+		var tabContainerId = "#{id:contentTabContainer}";
+		var tabApplicationId = "#{id:djTabApplication}";
+		var tabARTGEntryId = "#{id:djTabARTGEntry}";
+		
+		var fieldid = '';
+		var dialogid = '';
+		var btn = -1;
+		var t = -1;
+        
+        if(typeof(field) == 'undefined')
+        	field = '';
+        
+        if(field != ''){
+        	btn = field.indexOf('btn');
+        	t = field.indexOf('~');
+        	if(t > -1){
+        		dialogid = getDialogId(field,t);
+        	}
+        }
+        // Set focus to the target tab
+        if (targetTab != null && targetTab != "") {
+        	var tabContainer = dijit.byId(tabContainerId);
+        	if (tabContainer == null)
+        		return false;
+        	
+        	var targetTabId = "";
+        
+        	if (targetTab == "Notification"){
+        		targetTabId = tabApplicationId;
+        		fieldid = getFieldId(field,t);
+        	}else if (targetTab == "ARTG Entry"){
+        		targetTabId = tabARTGEntryId;
+        		fieldid = getFieldId(field,t);
+        	}
+        	
+        	if (targetTabId != ""){
+        		tabContainer.selectChild(targetTabId);
+        		if(btn == 0){
+        			if(dojo.byId(fieldid)){
+	        			dojo.byId(fieldid).click();
+	        			return;
+        			}
+        		}
+        		if (dijit.byId(fieldid)) {
+                	var fieldObj = dijit.byId(fieldid);
+					setTimeout(function () { fieldObj.focus() }, 400);
+					dojo.style(fieldObj.domNode, "border", "1px solid red");
+					setTimeout(function () { dojo.style(fieldObj.domNode, "border", "1px solid #b3b3b3");}, 2000);
+				}
+        	}
+        }
+	} catch (e) {
+		XSP.error("validationSetFocusTab() - error: " + e);
+	}
+	
+	function getFieldId(field, t){
+		
+		var tmpfieldid = '';
+		var arr = [];
+		if(t > -1){
+			arr = field.split('~');
+			tmpfieldid = getItemId('', arr[1]);
+		}else{
+    		tmpfieldid = getItemId('', field);
+		}
+		return tmpfieldid;
+	}
+	
+	function getDialogId(field, t){
+		var tmpdialogid = '';
+		var arr = [];
+		if(t > -1){
+			arr = field.split('~');
+			tmpdialogid = getItemId('', arr[0]);
+		}
+		return tmpdialogid;
+	}
+}]]></xp:this.value>
+	</xp:scriptBlock>
+</xp:view>

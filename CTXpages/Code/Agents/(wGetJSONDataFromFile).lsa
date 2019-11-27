@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(wGetJSONDataFromFile)' alias='wGetJSONDataFromFile' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3'
+ runaswebuser='true' publicaccess='false' designerversion='7' comment='Agent to get JSON Data from the MimeAttchment Draft Document'>
+<noteinfo noteid='5ee' unid='364FFA4D24A1B274CA257F7700070A2D' sequence='14'>
+<created><datetime dst='true'>20160315T121653,57+11</datetime></created>
+<modified><datetime>20160628T151507,08+10</datetime></modified>
+<revised><datetime>20160628T151507,07+10</datetime></revised>
+<lastaccessed><datetime>20160628T151507,07+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,53+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151507,12+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+Option Declare
+
+</lotusscript></code><code event='declarations'><lotusscript>Const ERR_PRIMARYARGUMENTSMISSING = 1001
+Const ERR_LOOKUPVIEW_ISNULL = 1002
+Const ERR_IDENTIFIER_ARGMISSING = 1003
+Const ERR_IDENTIFIER_INVALIDKEY = 1004
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	On Error Goto ErrorHandler
+	
+	Dim Ses As New NotesSession
+	Dim docContext As NotesDocument 
+	Dim QueryString As String 
+	Dim newQS As Variant, qspairs List As String, x As Long
+	Dim db As NotesDatabase 
+	Dim doc As NotesDocument
+	Dim lkupView As NotesView
+	Dim stream As NotesStream , buffer As String 
+	
+	Set docContext = Ses.DocumentContext
+	
+	newQS = Split(docContext.Query_String_Decoded(0), "&amp;")
+	For x = 0 To Ubound(newQS)
+		If Instr(newqs(x), "=") &gt; 0 Then
+			qspairs(Strleft(newqs(x),"=")) = Strright(newqs(x), "=")
+		End If
+	Next
+	
+	Print "Content-type: application/json"
+	
+	If Not (Iselement(qspairs("_identifierlookupview")) Or Iselement(qspairs("_identifier"))) Then
+		Error ERR_PRIMARYARGUMENTSMISSING, "invalid arguments passed." + docContext.Query_String_Decoded(0)
+	End If
+	
+	If Iselement(qspairs("_dbpath")) Then
+		If qspairs("_dbpath") &lt;&gt; "" Then
+			Set db = New NotesDatabase("",qspairs("_dbpath"))
+		Else
+			Set db = Ses.CurrentDatabase	
+		End If
+	Else
+		Set db = Ses.CurrentDatabase
+	End If
+	
+	Set lkupView = db.GetView(qspairs("_identifierlookupview"))
+	If lkupView Is Nothing Then
+		Error ERR_LOOKUPVIEW_ISNULL, "identifierLookupView:" + qspairs("_identifierlookupview") + " does not exist in DB: " + db.FilePath
+	End If
+	
+	Set doc = lkupView.GetDocumentByKey(qspairs("_identifier"), True)
+	If doc Is Nothing Then
+		Error ERR_IDENTIFIER_INVALIDKEY, "identifier:" + qspairs("_identifier") + " entry document does not exist in DB: " + db.FilePath
+	End If
+	
+	Set stream = GetMIMETextAttachment(doc, "JSON.txt")
+	'Push the JSON content to the browser
+	Stream.Position = 0
+	While (Not stream.IsEOS)
+		buffer$ = stream.ReadText(STMREAD_LINE)
+		Print buffer$
+	Wend
+	
+	Call Stream.Close()
+ExitSub:
+	Exit Sub
+ErrorHandler:
+	Dim ErrorMessage As String 
+	ErrorMessage = "Sub: wGetJSONDataFromFile Number:" + Cstr(Err()) +" ErrorMsg: " + Error() + " on line #:" + Cstr(Erl()) + "\n"
+	Msgbox ErrorMessage
+	Print |{"identifier":"key","label":"reason","items":[{"key":|+Cstr(Err())+|,"reason":"|+ErrorMessage+|"}]}|
+	Resume ExitSub
+End Sub
+</lotusscript></code><code event='GetMIMETextAttachment'><lotusscript>Function GetMIMETextAttachment(doc As NotesDocument, fileName As String) As NotesStream 
+	Dim s As New NotesSession
+	Dim mime As NotesMIMEEntity, header As NotesMimeHeader 
+	Dim child As NotesMimeEntity
+	Dim headerVal As String, expectedHeaderVal As String 
+	Dim stream As NotesStream , buffer As String 
+	
+	expectedHeaderVal = Lcase(|attachment; filename="| + fileName + |"|)
+	
+	Set GetMIMETextAttachment = Nothing 
+	s.ConvertMIME = False ' Do not convert MIME to rich text
+	
+	Set mime = doc.GetMIMEEntity("JSONMIMEFILE")
+	If mime Is Nothing Then
+		s.ConvertMIME = True ' convert MIME to rich text
+		Exit Function
+	End If
+	
+	Set child = mime.GetFirstChildEntity
+	While Not (child Is Nothing)
+		Set header = child.GetNthHeader("Content-Disposition")
+		headerVal = Lcase(header.GetHeaderValAndParams())
+		If headerVal = expectedHeaderVal Then
+			Call child.DecodeContent()
+			Set stream = s.CreateStream 
+			Call child.GetContentAsText(stream, True)
+			
+			stream.Position = 0
+			Set GetMIMETextAttachment = stream
+			s.ConvertMIME = True 'convert MIME to rich text
+			Exit Function
+		End If
+		
+		Set child = child.GetNextEntity()
+	Wend
+	
+	s.ConvertMIME = True ' convert MIME to rich text
+End Function</lotusscript></code>
+<item name='$POID'><datetime>20160620T120206,24+10</datetime></item></agent>
+

@@ -1,0 +1,252 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form name='(JSONMIMEFile)' alias='JSONMIMEFile' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' nocompose='true'
+ noquery='true' publicaccess='false' designerversion='7' comment='file attachment uploader for Web Browser UI'
+ signdocuments='true' renderpassthrough='true' conflictaction='donotcreateconflicts'>
+<noteinfo noteid='4de' unid='E81D6C268755F057CA257FD8000B2A59' sequence='14'>
+<created><datetime>20160620T120157,37+10</datetime></created>
+<modified><datetime>20160628T151506,38+10</datetime></modified>
+<revised><datetime>20160628T151506,37+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,37+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,03+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='htmlhead'><formula>"&lt;style type=\"text/css\"&gt;
+html, body { font-family: Verdana, Arial, Helvetica, sans-serif; width:100%; height:100%; overflow:hidden; margin: 0; padding: 0; }
+textarea {overflow:auto; margin: 0; padding: 0;}
+&lt;/style&gt;"</formula></code><code event='jsheader' for='web'><javascript
+>var onLoadError = false;
+function submitJSONUploadform(){
+	if(! onLoadError){
+		if(uploadJSONData()) {
+			document.forms["_JSONMIMEFile"]._submit();
+		}
+	} else{
+		alert("Sorry page cannot be submitted. Error on loading the form");
+		return(false);
+	}
+}
+function overrideFormSubmit(objThisForm){
+	//try{
+		var DBURL = window.location.pathname.substring(0,(window.location.pathname.indexOf('.nsf')+5));
+		newFormSubmit = submitJSONUploadform;
+		attachEventListener(objThisForm, "submit", newFormSubmit, true);
+		objThisForm._submit =objThisForm.submit;
+		objThisForm.submit = newFormSubmit;
+		if(typeof objThisForm.prototype != "undefined"){	//FireFox and IE8 and above
+			objThisForm.prototype._submit =objThisForm.prototype.submit;
+			objThisForm.prototype.submit = newFormSubmit;
+		}
+	
+		var DBDATA = '';
+		if (window.location.href.indexOf('&amp;') &gt; 0) {
+			DBDATA = window.location.href.substring(window.location.href.indexOf('&amp;'));
+		}
+		objThisForm.action = (DBURL + "wUploadJSONandSupportingData?openagent" + DBDATA);
+		
+		var submitFunction = window.location.href.substring(window.location.href.indexOf('&amp;ONSUBMIT=')+10);
+		if (submitFunction.indexOf('&amp;') &gt; 0) {
+			submitFunction = submitFunction.substring(0, submitFunction.indexOf('&amp;'));
+		}
+
+		var frameName = window.name;
+		if (window.frameElement) {
+			frameName = window.frameElement.name;
+		}
+		eval("parent." + submitFunction + "('" + frameName + "');")
+		
+	//} catch(e){ onLoadError = true; }
+}
+function uploadJSONData(){
+	try{
+		var blockSize = 32000;
+		var MultiPartFieldPrefix = 'MultiPart32KJSONData_';
+		var MultiPartFieldCount = 100;
+		var TextStream = document.getElementById('JSONDataDump').value;
+		var TextStreamLength = TextStream.length;
+		var thisForm = window.document.forms["_JSONMIMEFile"];
+		var loopCtr;
+		
+		//IF YOU MAY NEED THIS VALIDATION UNCOMMENT THE CODE
+		//if(!hasValue(document.getElementById('JSONDataDump'))){
+		//	alert("JSON data structure is EMPTY");
+		//	return false;
+		//}
+		//if(!hasValue(document.getElementById('SupportingFieldDataSet'))){
+		//	alert("SupportingFieldDataSet data structure is EMPTY");
+		//	return false;
+		//}
+		
+		//Clean Up Exitsing Objects - Can happen , if user uses back button, or history.back
+		loopCtr= 1
+		while (true)	{
+			var objNameandID = MultiPartFieldPrefix + loopCtr.toString();
+			var oldObj = document.getElementById(objNameandID);
+			if(oldObj)
+				thisForm.removeChild(oldObj);
+			else
+				break;
+			loopCtr++;
+		} 
+		
+		//UPLOAD DATA IN 32K BLOCKS
+		for(loopCtr = 1;true;loopCtr++){
+			var startPos = (loopCtr - 1) * blockSize;
+			var endPos = (loopCtr * blockSize);
+			
+			var dataBlock = TextStream.slice(startPos, endPos)
+		
+			//Create the MultiPartField Object
+			var objNameandID = MultiPartFieldPrefix + loopCtr.toString();
+			currentElement = document.createElement("input");
+			currentElement.setAttribute("type", "hidden");
+			currentElement.setAttribute("name", objNameandID);
+			currentElement.setAttribute("id", objNameandID);
+			currentElement.setAttribute("value", dataBlock);
+			thisForm.appendChild(currentElement);
+	
+			if(endPos &gt; TextStreamLength)
+				break;
+		}
+		document.getElementById('JSONDataDump').value = "";
+		return true;
+	}
+	catch(er){
+		return false;
+	}
+}
+
+//Function attachEventListener : to add event listner compatible with both IE and W3C
+function attachEventListener(target, eventType, functionRef, capture){
+	if(typeof target.addEventListener != "undefined"){
+		target.addEventListener(eventType, functionRef, capture);
+	} else if(typeof target.attachEvent != "undefined"){
+		target.attachEvent("on" + eventType, functionRef);
+	} else{
+		// for old browser
+		eventType = "on" + eventType;
+		if(typeof target[eventType] == "function"){
+			var oldListner = target[eventType];
+			target[eventType] = function(){
+				return functionRef();
+			};
+		} else{
+			target[eventType] = functionRef;
+		}
+	}		
+}
+
+//DATA VALIDATION FUNCTIONS
+function hasValue(objThis, isFirstValueInvalid){
+	if(objThis == null)
+		return(false);	
+		
+	if(typeof objThis.tagName == 'undefined')
+		return(false);
+		
+	if(isFirstValueInvalid == null)
+		isFirstValueInvalid = false;
+
+	var tagName;
+	tagName = objThis.tagName.toLowerCase();
+	
+	if(tagName == "select"){
+		var objOptions = objThis.options;
+		if(objThis.type == "select-one"){
+			if(objOptions.selectedIndex &lt;= -1 || (isFirstValueInvalid &amp;&amp; objOptions.selectedIndex == 0)) {
+				return(false);
+			}else{
+				return (trim(objOptions[objOptions.selectedIndex].value) != "");
+			}
+		} else if(objThis.type == "select-multiple"){
+			var arrValues = new Array();
+			var idx = 0;
+			var l = objOptions.length;
+			var valueSelected = false;
+			for(var i = isFirstValueInvalid ? 1 : 0; i &lt; l; i++){
+				if((objOptions[i].selected == true || objOptions[i].checked == true) &amp;&amp; (trim(objOptions[i].value) != "")){
+					valueSelected = true;
+					break;	
+				}
+			}
+			return(valueSelected);
+		}
+	} else{
+		objType = objThis.getAttribute("type");
+		if(objType != null){
+			objType = objType.toString().toLowerCase();
+			if(objType == "radio" || objType == "checkbox"){
+				return(objThis.checked);	
+			}else if(objThis.value != null &amp;&amp; (typeof objThis.value == 'string')){
+				return (trim(objThis.value) != "");
+			}
+		}
+		else if(objThis.value != null &amp;&amp; (typeof objThis.value == 'string')){
+			return (trim(objThis.value) != "");
+		} else {
+			return(false);
+		}
+	}			
+}
+
+//START function TRIM
+function trim(inputString) {
+	// Removes leading and trailing spaces from the passed string. Also removes
+	// consecutive spaces and replaces it with one space. If something besides
+	// a string is passed in (null, custom object, etc.) then return the input.
+
+	if (typeof inputString != "string") { return inputString; }
+
+	var retValue = inputString;
+	var ch = retValue.substring(0, 1);
+
+	while (ch == " ") { // Check for spaces at the beginning of the string
+		retValue = retValue.substring(1, retValue.length);
+		ch = retValue.substring(0, 1);
+	}
+
+	ch = retValue.substring(retValue.length-1, retValue.length);
+	while (ch == " ") { // Check for spaces at the end of the string
+		retValue = retValue.substring(0, retValue.length-1);
+		ch = retValue.substring(retValue.length-1, retValue.length);
+	}
+
+	while (retValue.indexOf("  ") != -1) { // Note that there are two spaces in the string - look for multiple spaces within the string
+      		retValue = retValue.substring(0, retValue.indexOf("  ")) + retValue.substring(retValue.indexOf("  ")+1, retValue.length); 
+			// Again, there are two spaces in each of the strings
+	}
+	return retValue; // Return the trimmed string back to the user
+} 
+//END the "trim" function</javascript></code><code event='onLoad' for='web'><javascript
+>overrideFormSubmit(window.document.forms["_JSONMIMEFile"]);</javascript></code>
+<background allowoverride='false'/>
+<body><richtext>
+<pardef id='1' hide='notes web mobile'/>
+<par def='1'><field type='text' kind='editable' name='Query_String_Decoded'><code
+ event='htmlattributes'><formula>"Type=\"Hidden\""</formula></code><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field><run html='true'><field type='text' kind='editable'
+ name='IsTestMode'><code event='defaultvalue'><formula>_args := @Explode(Query_String_Decoded;"&amp;");
+@If(@IsMember("_test";@LowerCase(_args));"1";"0")</formula></code></field></run></par>
+<pardef id='2' hide='notes web mobile' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='2'><run html='true'><font style='bold' color='green'/>REM {Rendered/Displayed when QueryString has an argument called </run><run
+ html='true'><font style='bold'/>_test</run><run html='true'><font style='bold'
+ color='green'/>}</run></par>
+<pardef id='3' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'><code
+ event='hidewhen'><formula>IsTestMode!="1"</formula></code></pardef>
+<par def='3'><run html='true'>&lt;TEXTAREA NAME="JSONDataDump" id="JSONDataDump" rows=20 style="height:93%; width:60%;"&gt;&lt;/TEXTAREA&gt;</run></par>
+<par def='3'><run html='true'>&lt;TEXTAREA NAME="SupportingFieldDataSet" id="SupportingFieldDataSet" rows=20 style="height:93%; width:39%;"&gt;</run><run
+ html='true'>&lt;/TEXTAREA&gt;</run></par>
+<par def='3'><button width='2in' widthtype='maximum' maxlines='1' wraptext='true'
+ bgcolor='system' htmlid='btnSubmit' htmltitle='Submit' name='btnSubmit'><code
+ event='onClick' for='web'><javascript>document.forms["_JSONMIMEFile"].submit();
+</javascript></code>Submit</button></par>
+<par def='2'><run html='true'><font style='bold' color='green'/>REM {Rendered/Displayed when QueryString </run><run
+ html='true'><font style='bold' color='red'/>DOES NOT </run><run html='true'><font
+ style='bold' color='green'/>have an argument called </run><run html='true'><font
+ style='bold'/>_test</run><run html='true'><font style='bold' color='green'/>}</run></par>
+<pardef id='4'><code event='hidewhen'><formula>IsTestMode="1"</formula></code></pardef>
+<par def='4'><run html='true'>&lt;input value="" Type="hidden" name="JSONDataDump" id="JSONDataDump"&gt;<break
+/>&lt;input value="" Type="hidden" name="SupportingFieldDataSet" id="SupportingFieldDataSet"&gt;</run></par></richtext></body>
+<item name='$HFFlags' sign='true'><text>1</text></item>
+<item name='$$ScriptName' summary='false' sign='true'><text>JSONMIMEFile</text></item></form>
+

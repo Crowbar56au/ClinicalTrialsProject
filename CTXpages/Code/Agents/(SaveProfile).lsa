@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(SaveProfile)' alias='SaveProfile' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3'
+ runaswebuser='true' publicaccess='false' designerversion='8.5.3'>
+<noteinfo noteid='664a' unid='9167632EB7058650CA2582860016AB94' sequence='7'>
+<created><datetime>20180507T140737,16+10</datetime></created>
+<modified><datetime>20180507T141017,58+10</datetime></modified>
+<revised><datetime>20180507T141017,56+10</datetime></revised>
+<lastaccessed><datetime>20180507T141017,56+10</datetime></lastaccessed>
+<addedtofile><datetime>20180507T140737,15+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20180507T141017,38+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>%REM
+	Agent (SaveProfile)
+	Created May 7, 2018 by Bruce Langner/DEVELOPER/TGADEV
+	Description: Comments for Agent
+%END REM
+Option Public
+Option Declare
+
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	
+	Dim sess As New NotesSession
+	Dim db As NotesDatabase
+	Dim profDoc As NotesDocument
+	
+	Set db = sess.Currentdatabase
+	Set profDoc = db.Getprofiledocument("frmEBSProfile", "")
+	Call profDoc.Save(True, False, False)
+	
+End Sub</lotusscript></code>
+<rundata processeddocs='0' exitcode='0'>
+<agentmodified><datetime>20180507T141017,20+10</datetime></agentmodified></rundata></agent>
+

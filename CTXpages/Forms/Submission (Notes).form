@@ -1,0 +1,99 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form name='Submission (Notes)' alias='submission' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='web mobile'
+ nocompose='true' noquery='true' publicaccess='false' designerversion='7'
+ comment='the notes form' renderpassthrough='true'>
+<noteinfo noteid='3b2' unid='26BA5BB8E467CA27CA257FD8000B28DB' sequence='14'>
+<created><datetime>20160620T120153,55+10</datetime></created>
+<modified><datetime>20160628T151505,57+10</datetime></modified>
+<revised><datetime>20160628T151505,56+10</datetime></revised>
+<lastaccessed><datetime>20160628T151505,56+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,30+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='windowtitle'><formula>"Submission Document: " + SubmissionId</formula></code>
+<actionbar bgcolor='#f0f0f0' bordercolor='black'>
+<actionbuttonstyle bgcolor='#f0f0f0'/><font size='9pt' color='system'/><border
+ style='solid' width='0px 0px 1px'/>
+<action title='DocId'><code event='options'><lotusscript>Option Declare
+
+</lotusscript></code><code event='click'><lotusscript>Sub Click(Source As Button)
+	Dim UIWs As New NotesUIWorkspace
+	Dim Doc As NotesDocument
+	Dim x As Variant
+	Set Doc = UIWs.CurrentDocument.Document
+	x =   Inputbox("This Document", "DocumentUniqueId: ", doc.UniversalID)
+End Sub
+</lotusscript></code></action></actionbar>
+<body><richtext>
+<pardef id='1' leftmargin='1in' rightmargin='76%'/>
+<par def='1'/>
+<table rightmargin='76%' widthtype='fixedleft' refwidth='7.8444in'><tablecolumn
+ width='1.9688in'/><tablecolumn width='5.8757in'/>
+<tablerow>
+<tablecell borderwidth='0px'>
+<pardef id='3' keepwithnext='true' keeptogether='true'/>
+<par def='3'>SubmissionId</par></tablecell>
+<tablecell borderwidth='0px'>
+<pardef id='4' keepwithnext='true' keeptogether='true'/>
+<par def='4'><field type='text' kind='computed' name='SubmissionId'><code
+ event='defaultvalue'><formula>@ThisValue</formula></code></field></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='0px'>
+<par def='3'>SubmissionDate</par></tablecell>
+<tablecell borderwidth='0px'>
+<par def='4'><field type='datetime' kind='computed' name='SubmissionDate'><datetimeformat
+ show='date' date='yearmonthday' fourdigityearfor21stcentury='true' zone='never'
+ dateformat='weekdaydaymonthyear' dayformat='twodigitday' monthformat='twodigitmonth'
+ yearformat='fourdigityear' weekdayformat='shortname' dateseparator1=' ' dateseparator2='/'
+ dateseparator3='/' timeseparator=':' preference='usersetting'/><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='0px'>
+<par def='3'>Client ID</par></tablecell>
+<tablecell borderwidth='0px'>
+<par def='4'><field type='text' kind='computedwhencomposed' name='ClientID'
+ htmlid='ClientId'><code event='defaultvalue'><formula>@ThisValue</formula></code></field></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='0px'>
+<par def='3'>Client Name</par></tablecell>
+<tablecell borderwidth='0px'>
+<par def='4'><field type='text' kind='computedwhencomposed' name='ClientName'
+ htmlid='AgentName' htmlclass='L98P'><code event='defaultvalue'><formula>@ThisValue</formula></code></field></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='0px'>
+<par def='3'>Client Billing Address</par></tablecell>
+<tablecell borderwidth='0px'>
+<par def='4'><field type='text' kind='computed' name='ClientBillingAddressID'><code
+ event='defaultvalue'><formula>@ThisValue</formula></code></field></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='0px'>
+<par def='3'>Invoice Amount</par></tablecell>
+<tablecell borderwidth='0px'>
+<par def='4'><field type='number' kind='computed' name='InvoiceAmount'><numberformat
+ format='general' digits='2' punctuated='false' parens='false' percent='false'
+ bytes='false'/><code event='defaultvalue'><formula>@ThisValue</formula></code></field></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='0px'>
+<par def='3'>Application Entries</par></tablecell>
+<tablecell borderwidth='0px'>
+<par def='4'><field type='text' allowmultivalues='true' kind='computed' name='ApplicationEntries'
+ listinputseparators='comma semicolon' listdisplayseparator='semicolon'><code
+ event='defaultvalue'><formula>@ThisValue</formula></code></field></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='0px'>
+<par def='3'>Document UNID</par></tablecell>
+<tablecell borderwidth='0px'>
+<par def='4'><computedtext><code event='value'><formula>@Text(@DocumentUniqueID)</formula></code></computedtext></par></tablecell></tablerow></table>
+<par def='1'/>
+<pardef id='5' leftmargin='0.7500in' rightmargin='76%'/>
+<section><sectiontitle pardef='5' hidewhenexpanded='true' color='teal'><text
+>XML</text></sectiontitle>
+<par def='1'>XML</par>
+<par def='1'><field type='richtext' kind='editable' name='XML'/></par></section>
+<par def='1'/></richtext></body>
+<item name='Submission_InvoiceAmount' summary='false' sign='true'><number
+>0</number></item>
+<item name='InvoiceAmount' summary='false' sign='true'><number>0</number></item>
+<item name='$$ScriptName' summary='false' sign='true'><text>submission</text></item></form>
+

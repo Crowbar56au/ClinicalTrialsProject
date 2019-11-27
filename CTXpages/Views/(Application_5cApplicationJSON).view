@@ -1,0 +1,145 @@
+<?xml version='1.0' encoding='utf-8'?>
+<view name='(Application\ApplicationJSON)' alias='ApplicationApplicationJSON'
+ xmlns='http://www.lotus.com/dxl' version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780'
+ showinmenu='false' publicaccess='false' designerversion='8.5.3' unreadmarks='none'
+ onopengoto='lastopened' onrefresh='displayindicator' headers='flat' opencollapsed='false'
+ showresponsehierarchy='false' showmargin='true' shrinkrows='true' extendlastcolumn='false'
+ showhierarchies='false' unreadcolor='black' rowlinecount='8' headerlinecount='1'
+ rowspacing='1.25' treatashtml='true' bgcolor='white' altrowcolor='#f7f7f7'
+ totalscolor='black' headerbgcolor='#b2b2b2' boldunreadrows='false' evaluateactions='false'
+ allownewdocuments='false' allowcustomizations='true' hidemarginborder='false'
+ marginwidth='5px 0px 0px' belowheadermargin='5px' marginbgcolor='#b2b2b2'
+ gridstyle='solid' gridcolor='#e1e1e1' uniquekeys='false' formatnoteid='0CC131B1AD9AB6BACA2577C00081ED37'>
+<noteinfo noteid='42a' unid='7E52E28B4F2C0C3FCA257F770006FF5B' sequence='14'>
+<created><datetime dst='true'>20160315T121625,87+11</datetime></created>
+<modified><datetime>20160628T151505,93+10</datetime></modified>
+<revised><datetime>20160628T151505,92+10</datetime></revised>
+<lastaccessed><datetime>20160628T151505,92+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,68+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<globals><code event='options'><lotusscript>Option Public
+
+%REM
+DFS May 2013 
+TGA-INC-29052 - Label Column now uses text rep of field values ApplicationFees and ApplicationVersion to cater for numeric values;
+%END REM
+</lotusscript></code></globals><code event='selection'><formula>SELECT TYpe="Application"</formula></code>
+<actionbar bgcolor='navy' bordercolor='black'><actionbarstyle height='4.4290ex'><font
+ size='9pt' name='Verdana' pitch='variable' truetype='true' familyid='20'/></actionbarstyle>
+<actionbuttonstyle bgcolor='system'/><font size='9pt' color='system'/><border
+ style='solid' width='0px 0px 1px' color='navy'/></actionbar>
+<column sort='ascending' resort='both' hidedetailrows='false' itemname='ApplicationId'
+ width='27.2500' resizable='true' separatemultiplevalues='true' sortnoaccent='false'
+ sortnocase='true' showaslinks='false' categorized='true' twisties='true'><font
+ name='Verdana' pitch='variable' truetype='true' familyid='20'/><columnheader
+ align='center' title='UNID'><font size='9pt' style='bold' name='Verdana'
+ pitch='variable' truetype='true' familyid='20'/></columnheader></column>
+<column resort='both' hidedetailrows='false' itemname='$7' width='61.5000'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='false' sortnocase='true'
+ showaslinks='false'><font name='Verdana' pitch='variable' truetype='true'
+ familyid='20'/><columnheader align='center' title='Label'><font size='9pt'
+ style='bold' name='Verdana' pitch='variable' truetype='true' familyid='20'/></columnheader><code
+ event='value'><formula>_tmpCreateDate := @If(CreatedOn="";@Created;CreatedOn);
+_CreateDate := @Text(@Year(_tmpCreateDate);"G") + "-" + @Text(@Month(_tmpCreateDate);"G") + "-" + @Text(@Day(_tmpCreateDate);"G");
+
+_tmpLastEdited :=  @If(LastEdited="";@Modified;LastEdited);
+_LastEdited := @Text(@Year(_tmpCreateDate);"G") + "-" + @Text(@Month(_tmpCreateDate);"G") + "-" + @Text(@Day(_tmpCreateDate);"G");
+
+_appPurpose := @If(IsNewBiologicalApplication="1";"Create a new Biological ARTG entry";
+IsNewExportBiologicalApplication="1";"Create a new Export Only Biological entry";
+IsARTGVariation="1";"Vary a current Biological (or Export only) entry";
+"INVALID UNKNOWN VALUE");
+
+REM {DFS May 2013 - TGA-INC-29052 - Use text rep of field values};
+_ApplicationFees := @Text(ApplicationFees; "F2");
+_ApplicationVersion := @Text(ApplicationVersion);
+
+"{" +
+"\"identifier\": \"UNID\"," +
+"\"Application\": {" +
+"\"id\" : \"" + ApplicationId + "\", " +
+"\"UNID\" : \"" + ApplicationId + "\", " +
+"\"ApplicantName\" : \"" + ApplicantName +"\", " +
+"\"ApplicationFees\" : " + _ApplicationFees + ", " +
+"\"ApplicationId\" : \"" + ApplicationId + "\", " +
+"\"ApplicationVersion\" : \"" + _ApplicationVersion + "\", " +
+"\"ContactEmail\" : \"" + ContactEmail + "\", " +
+"\"ContactFax\" : \"" + ContactFax + "\", " +
+"\"ContactName\" : \"" + ContactName + "\", " +
+"\"ContactPhone\" : \"" + ContactPhone + "\", " +
+"\"CreatedBy\" : \"" + CreatedBy + "\", " +
+"\"CreatedOn\" : " + _CreateDate  + ", " +
+"\"ApplicationPurpose\" : \"" + _appPurpose + "\", " +
+"\"IsARTGVariation\" : \"" + IsARTGVariation + "\", " +
+"\"IsNewBiologicalApplication\" : \"" + IsNewBiologicalApplication + "\", " +
+"\"IsNewExportBiologicalApplication\" : \"" + IsNewExportBiologicalApplication + "\", " +
+"\"LastEdited\" : " + _LastEdited +  ", "      +
+"\"LastEditor\" : \"" + LastEditor + "\", " +
+"\"PaymentExemptionNo\" : \"" + PaymentExemptionNo + "\", " +
+"\"SponsorAddressBA\" : \"" + SponsorAddressBA + "\", " +
+"\"SponsorAddressBA_Id\" : \"" + SponsorAddressBA_Id + "\", " +
+"\"SponsorAddressPA\" : \"" + SponsorAddressPA + "\", " +
+"\"SponsorAddressPA_Id\" : \"" + SponsorAddressPA_Id + "\", " +
+"\"SponsorAddressRA\" : \"" + SponsorAddressRA + "\", " +
+"\"SponsorAddressRA_Id\" : \"" + SponsorAddressRA_Id + "\", " +
+"\"SponsorID\" : \"" + SponsorID + "\", " +
+"\"SponsorName\" : \"" + SponsorName + "\", " +
+"\"Type\" : \"" + Type + "\" " +
+
+"}" +
+"};"</formula></code></column>
+<item name='$SCRIPTOBJ_1' sign='true'>
+<rawitemdata type='14'>
+AQAAAkxTT0IDABQIZW4AAAQAFAA4AAQAAAAUBpQCAAAAAAQAZANQBQAAAAAoANgAHAA8AP//9AAA
+AAAAAAAAAAIAAAAYAGwBAAAAAGwBbAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAGAAYAAEAAAAsAiwCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALAIsAgAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAYAAADMAFAFMARQBQAAAABwA3ADAAAAAKACoALMAMwAAAAAAAAAAAAAAAAA
+AAAAAMAEwAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAEABQBMb3R1cyBQcm9kdWN0AAAAVjAuMAAAAAAAAAAAAAAAAAAA
+AAAEAAAAOAAAAAAAAAAUBgAAlAIAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAAAA
+AAUAAABXMzJJvQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAwCYAgAAAABYAAoAJABWADUAQQBDAFQASQBPAE4AUwAAAAAAcAADAE4ARQBXAAAAhAAGAEQA
+RQBMAEUAVABFAAAAAACoAAoASQBOAEkAVABJAEEATABJAFoARQAAAAAAEAEJAFQARQBSAE0ASQBO
+AEEAVABFAAAAJAIGAE8AQgBKAEUAQwBUAAAAAACMAAAAAAAAAMQACwBIAGUAbABwAFMAYwByAGkA
+cAB0AHMAAAA4AQsASABFAEwAUABTAEMAUgBJAFAAVABTAAAA//8GAFMATwBVAFIAQwBFAAAAAAAk
+AQoAQgBJAE4ARABFAFYARQBOAFQAUwAAAAAASAELAE8AQgBKAEUAQwBUAE4AQQBNAEUAXwAAAMgB
+BgBCAFUAVABUAE8ATgAAAAAAbAEGACUATABTAEkARABFAAAAAADoAQUAQwBMAEkAQwBLAAAA/AEO
+AEcARQBUAFYASQBFAFcASABFAEwAUABEAE8AQwAAAAAA//8rAEwATQBfAFYAXwBTAEEAUABfAEEA
+bABsAF8AQQBwAHAAbABpAGMAYQB0AGkAbwBuAHMAXwBiAHkAXwBBAHAAcABsAGkAYwBhAHQAaQBv
+AG4AXwBJAGQAAABcAg0ATgBPAFQARQBTAEQAQQBUAEEAQgBBAFMARQAAADgCBgAlAEwAUwBYAEIA
+RQAAAAAA//8QAE4ATwBUAEUAUwBVAEkAVwBPAFIASwBTAFAAQQBDAEUAAAAAAP//BgAlAEwAUwBY
+AFUASQAAAAAA//8PAE4ATwBUAEUAUwBVAEkARABPAEMAVQBNAEUATgBUAAAAdAIJAE4ATwBUAEUA
+UwBWAEkARQBXAAAA//8NAE4ATwBUAEUAUwBEAE8AQwBVAE0ARQBOAFQAAAAFABgGAAAAAGVczpIY
+AAAAAACsAPD8WwkAAAAAAAAAAAgAAABsAQAA3AAAAAAAAAACAAAAsABcAQAAAAAAAAAAAAAAAAAA
+AACwALAAAAAAAAAAAAAAAAAAAAAAAAAAAABcAVwBAAAAAAAAAAABAAAAAgAAAAwAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AwABAFwBAAD4AAYIAAAAABoAAAAoAf//AAAAABAAAACgAgAAFAEAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABFhMp7S5pEL9d
+AN0BEYa3AAAAAAAAAAAAAAAAAAAAAGQAAAAAAAAAAAAAAAAAAAACAMAAAAAUAgAAAABaBAEA//8A
+AAMAIAAAAAAAyAAJAgAAzAAIAAAAAAAAADwBAAAAAAAAAQAAAAQCBAIAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAIEAgAAAAAAAAAAAQAAAAgAAAAqAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMA
+AQAAAAAAyAAJAgAAzAATAAAAPAEAANUAAAAAAAAAIQAEAJAEAAAIAEAAAAAAAEwBAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AQALAAYACQKgAgkCcAMJAjAECQLABAkCUAUZABoAwADsAf//AAAAABAAAABwAwAAzAEAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAACFBMp7S5pEL9dAN0BEYa3AAAAAAAAAAAAAAAAAAAAAGQAAAAAAAAAAAAAAAAAAAACAJQCMAMA
+AMwAAAACAAEA//8AABIAFAAAAAAA//8JAgAAAAASBAAAAACgApQC//8AAAAABgADAAAACQKgAgkC
+oAIGCAYIGQAaAJQCKAL//wAAAAAQAAAAMAQAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhUTKe0uaRC/XQDdARGGtwAA
+AAAAAAAAAAAAAAAAAABkAAAAAAAAAAAAAAAAAAAAAgBkAwAEAACgAgAACgABAP//AAASABQAAAAA
+AP//CQIAAAAAAAYAAAAAcANkA///AAAAAAQAAQAAAAkCcAMJAnADGQAQAAAAwARQBTwCAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAABBUTKe0uaRC/XQDdARGGtwAAAAAAAAAAAAAAAAAAAABkAAAAAAAAAAAAAAAAAAAAAgBkAwAA
+AABwAwAACgABAP//AAAQAAAAUAUAAGACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAxQTKe0uaRC/XQDdARGGtwAAAAAAAAAA
+AAAAAAAAAABkAAAAAAAAAAAAAAAAAAAAAgCUAgAAAAAwBAAAAgABAP//AAAQAAQAAAAAAHgCAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAABBQTKe0uaRC/XQDdARGGty4UEyntLmkQv10A3QERhrdkAAAAAAAAAAAAAAAAAAAAAgCU
+AuAFAADABAAAAgABAP//AAASABQAAAAAAP//CQIAAAAAjQQAAAAAUAWUAv//AAAAAAYAAgAAAAkC
+UAUJAlAFCQKgAhkABAA8AAAAAAA6AAAaAwDSkAAdAAAaDABbXAFJsADKzACmGg0AR1wBy9UAAABs
+ARoOAB0aEgApLAJ9cAEjGhMAHQIAAAARABgAAAAAAP//AQADAAQAAAAHANwACQA8ARAACgAAAA==
+</rawitemdata></item></view>
+

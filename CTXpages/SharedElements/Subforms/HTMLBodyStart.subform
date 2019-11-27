@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='utf-8'?>
+<subform name='HTMLBodyStart' xmlns='http://www.lotus.com/dxl' version='9.0'
+ maintenanceversion='1.0' replicaid='CA257FDB001B5780' designerversion='7'
+ renderpassthrough='true'>
+<noteinfo noteid='2da' unid='7EA3F7B1C640BB00CA257FD8000B26FB' sequence='14'>
+<created><datetime>20160620T120148,75+10</datetime></created>
+<modified><datetime>20160628T151503,59+10</datetime></modified>
+<revised><datetime>20160628T151503,58+10</datetime></revised>
+<lastaccessed><datetime>20160628T151503,58+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152009,78+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1' leftmargin='1in' tabs='L1in'/>
+<par def='1'><run><font color='#00a000'/>&lt;/head&gt;&lt;body </run><run
+><font color='#00a000'/>class="soria</run><run><font color='#00a000'/>"&gt;</run></par>
+<pardef id='2' leftmargin='0.7500in' tabs='L1in'/>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='2' hidewhenexpanded='true' color='#c2ff91' borderstyle='tabdiag'><text
+>div - Splash Screen</text></sectiontitle>
+<par def='1'>&lt;div id="uiSplashScreen" style="z-index:998; position:absolute; top:0; left:0; width:100%; height:100%;"&gt;</par>
+<pardef id='3' leftmargin='1.2500in' tabs='L1in'/>
+<par def='3'>&lt;img src="/<computedtext><code event='value'><formula>@WebDbName</formula></code></computedtext>/shadow.png" width="100%" height="100%" /&gt;</par>
+<par def='1'>&lt;/div&gt;</par>
+<par def='1'>&lt;div id="uiSplashScreen2" style="z-index:999; position:absolute; top:0; left:0; width:100%; height:100%; text-align:center; vertical-align:center;"&gt;</par>
+<par def='3'>&lt;table width="100%" height="100%"&gt;</par>
+<pardef id='4' leftmargin='1.5000in' tabs='L1in'/>
+<par def='4'>&lt;tr height="49%"&gt;</par>
+<pardef id='5' leftmargin='1.7500in' tabs='L1in'/>
+<par def='5'>&lt;td colspan="3"&gt; &lt;/td&gt;</par>
+<par def='4'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='5'>&lt;td width="45%"&gt; &lt;/td&gt;</par>
+<par def='5'>&lt;td nowrap style="font-size: 125%; font-weight: bold; text-align:center; color:white; background:#333;"&gt;Please wait, loading...&lt;/td&gt;</par>
+<par def='5'>&lt;td width="45%"&gt; &lt;/td&gt;</par>
+<par def='4'>&lt;/tr&gt;&lt;tr height="49%"&gt;</par>
+<par def='5'>&lt;td colspan="3"&gt; &lt;/td&gt;</par>
+<par def='4'>&lt;/tr&gt;</par>
+<par def='3'>&lt;/table&gt;</par>
+<par def='1'>&lt;/div&gt;</par></section>
+<par def='1'/></richtext></body>
+<item name='$$ScriptName' summary='false' sign='true'><text>HTMLBodyStart</text></item></subform>
+

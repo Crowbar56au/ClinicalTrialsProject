@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='utf-8'?>
+<subform name='SponsorDetails' alias='sd' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' designerversion='8.5.3'
+ comment='Shows sponsor name, address, location id and location address details if available.'
+ renderpassthrough='true'>
+<noteinfo noteid='3aa' unid='E2881643B43C9A8FCA257FD8000B26C3' sequence='14'>
+<created><datetime>20160620T120148,19+10</datetime></created>
+<modified><datetime>20160628T151505,53+10</datetime></modified>
+<revised><datetime>20160628T151505,52+10</datetime></revised>
+<lastaccessed><datetime>20160628T151505,52+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,28+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1' leftmargin='2.9521in' rightmargin='100%' firstlineleftmargin='2in'/>
+<par def='1'><run><font color='blue'/>&lt;table&gt;</run></par>
+<par def='1'><run><font color='blue'/>&lt;</run><run><font color='maroon'/>tr</run><run
+><font color='blue'/> </run>id="sponsor_details_row0"<run><font color='blue'/>&gt;&lt;td&gt;</run>&lt;font color = "red"&gt;Sponsor Details for Processing&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='1'><run><font color='blue'/>&lt;tr </run>id="sponsor_details_row1"<run
+><font color='blue'/>&gt;</run></par>
+<pardef id='2' leftmargin='2.9521in' rightmargin='100%' firstlineleftmargin='2.2500in'/>
+<par def='2'><run><font color='blue'/>&lt;</run><run><font color='maroon'/>td</run> <run
+><font color='blue'/>class="n1"</run><run><font color='blue'/>&gt;Sponsor Address Label</run><run
+><font color='blue'/>&lt;/td&gt;</run><run><font color='blue'/>&lt;</run><run
+><font color='maroon'/>td</run><run><font color='blue'/>&gt;</run></par>
+<par def='2'>&lt;div style="background-color:#e1efbb; width:500px;" dojoType="dijit.form.TextBox" id="Application_sponsoraddress_label"&gt;</par>
+<pardef id='3' leftmargin='2.7500in' tabs='L1in'/>
+<par def='3'>&lt;script type="dojo/method"&gt;</par>
+<par def='3'>	var sal = dijit.byId('Application_sponsoraddress_label');</par>
+<par def='3'>	sal.set("value", storeApplicationData.items.SponsorAddress_Label);</par>
+<pardef id='4' leftmargin='3.2021in' rightmargin='100%' firstlineleftmargin='2.7500in'/>
+<par def='4'>&lt;/script&gt;</par>
+<par def='2'>&lt;/div&gt;<run><font color='blue'/>&lt;/</run><run><font color='maroon'/>td</run><run
+><font color='blue'/>&gt;</run></par>
+<par def='1'><run><font color='blue'/>&lt;/</run><run><font color='maroon'/>tr</run><run
+><font color='blue'/>&gt;</run></par>
+<par def='1'><run><font color='blue'/>&lt;</run><run><font color='maroon'/>tr</run><run
+><font color='blue'/> </run>id="sponsor_details_row2"<run><font color='blue'/>&gt;</run></par>
+<par def='2'><run><font color='blue'/>&lt;</run><run><font color='maroon'/>td</run> <run
+><font color='blue'/>class="n1"</run><run><font color='blue'/>&gt;Sponsor ID&lt;/td&gt;</run></par>
+<par def='2'><run><font color='blue'/>&lt;</run><run><font color='maroon'/>td</run>&gt;&lt;div style="background-color:#e1efbb; width:500px" dojoType="dijit.form.TextBox" id="Application_sponsorid"&gt;</par>
+<par def='3'>&lt;script type="dojo/method"&gt;</par>
+<par def='3'>	var si= dijit.byId('Application_sponsorid');</par>
+<par def='3'>	si.set("value", storeApplicationData.items.SponsorID);</par>
+<par def='4'>&lt;/script&gt;</par>
+<par def='2'>&lt;/div<run><font color='blue'/>&gt;&lt;/</run><run><font color='maroon'/>td</run><run
+><font color='blue'/>&gt;</run></par>
+<par def='1'><run><font color='blue'/>&lt;/</run><run><font color='maroon'/>tr</run><run
+><font color='blue'/>&gt;</run></par>
+<par def='1'><run><font color='blue'/>&lt;</run><run><font color='maroon'/>tr</run><run
+><font color='blue'/> </run>id="sponsor_details_row3"<run><font color='blue'/>&gt;</run></par>
+<par def='2'><run><font color='blue'/>&lt;</run><run><font color='maroon'/>td</run> <run
+><font color='blue'/>class="n1"</run><run><font color='blue'/>&gt;Sponsor Name&lt;/td&gt;</run></par>
+<par def='2'><run><font color='blue'/>&lt;</run><run><font color='maroon'/>td</run><run
+><font color='blue'/>&gt;</run>&lt;div style="background-color:#e1efbb; width:500px" dojoType="dijit.form.TextBox" id="Application_sponsorname"&gt;</par>
+<par def='3'>&lt;script type="dojo/method"&gt;</par>
+<par def='3'>	var sn = dijit.byId('Application_sponsorname');</par>
+<par def='3'>	sn.set("value", storeApplicationData.items.SponsorName);</par>
+<par def='4'>&lt;/script&gt;</par>
+<par def='2'>&lt;/div&gt;<run><font color='blue'/>&lt;/</run><run><font color='maroon'/>td</run><run
+><font color='blue'/>&gt;</run></par>
+<par def='1'><run><font color='blue'/>&lt;/</run><run><font color='maroon'/>tr</run><run
+><font color='blue'/>&gt;</run></par>
+<par def='1'><run><font color='blue'/>&lt;/table&gt;</run></par>
+<par def='1'/></richtext></body>
+<item name='$$ScriptName' summary='false' sign='true'><text>sd</text></item></subform>
+

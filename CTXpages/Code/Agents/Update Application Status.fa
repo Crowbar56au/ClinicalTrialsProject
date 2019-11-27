@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='Update Application Status' xmlns='http://www.lotus.com/dxl' version='9.0'
+ maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3' publicaccess='false'
+ designerversion='8.5.3' restrictions='unrestricted' activatable='false'>
+<noteinfo noteid='3d6' unid='2E8AB5A4AB9805C6CA257F7700070975' sequence='13'>
+<created><datetime dst='true'>20160315T121651,73+11</datetime></created>
+<modified><datetime>20160628T151505,73+10</datetime></modified>
+<revised><datetime>20160628T151505,72+10</datetime></revised>
+<lastaccessed><datetime>20160628T151505,72+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,38+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<designchange><datetime>20160628T151505,79+10</datetime></designchange>
+<trigger type='scheduled'>
+<schedule type='byminutes' hours='0' minutes='30' runlocation='specific' runserver='CN=EWCBRDOMI01/OU=SVR/O=TTRADEV'>
+<starttime><datetime>T070000,00</datetime></starttime>
+<endtime><datetime>T210000,00</datetime></endtime></schedule></trigger>
+<documentset type='modified'/><code event='action'>
+<simpleaction action='runformula'><formula>SELECT @If( Form = "Application" &amp;
+(
+(DECISION = "AP" &amp; ApplicationStatus = "Under Review") |
+(DECISION = "AC" &amp; ApplicationStatus = "Under Review") |
+(DECISION = "RE" &amp; (ApplicationStatus != "Rejected" &amp; ApplicationStatus != "Completed")) |
+(DECISION = "WD" &amp; ApplicationStatus != "Withdrawn") |
+(DECISION = "AP" &amp; ApplicationStatus = "Payment Processed") |
+(DECISION = "AC" &amp; ApplicationStatus = "Payment Processed")
+);
+@SetField("ApplicationStatus";
+  @If(DECISION="AP" | DECISION="AC";
+        "Pending Write to Repository";
+    DECISION="RE";
+      "Rejected";
+    "Withdrawn")
+)
+;@Success)</formula></simpleaction></code>
+<item name='$POID'><datetime>20160620T120204,72+10</datetime></item></agent>
+

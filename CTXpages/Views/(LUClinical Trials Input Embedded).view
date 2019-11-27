@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='utf-8'?>
+<view name='(LUClinical Trials Input Embedded)' alias='LUClinical Trials Input Embedded'
+ xmlns='http://www.lotus.com/dxl' version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780'
+ showinmenu='false' publicaccess='false' designerversion='8.5.3' unreadmarks='none'
+ onopengoto='lastopened' onrefresh='displayindicator' headers='flat' opencollapsed='false'
+ showresponsehierarchy='true' showmargin='true' shrinkrows='false' extendlastcolumn='false'
+ showhierarchies='false' unreadcolor='black' rowlinecount='1' headerlinecount='2'
+ rowspacing='1' bgcolor='white' totalscolor='black' headerbgcolor='#e0e0ff'
+ boldunreadrows='false' evaluateactions='false' allownewdocuments='false'
+ allowcustomizations='true' hidemarginborder='false' marginwidth='0px' marginbgcolor='white'
+ uniquekeys='false'>
+<noteinfo noteid='546' unid='912344E7C182DE8CCA257F770006FE8A' sequence='14'>
+<created><datetime dst='true'>20160315T121623,78+11</datetime></created>
+<modified><datetime>20160628T151506,65+10</datetime></modified>
+<revised><datetime>20160628T151506,64+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,64+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,23+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='selection'><formula>SELECT (Form = "Clinical Trials Input Site") | (Form  = "Clinical Trials Input Biological")| (Form  = "Clinical Trials Input Medicine") | (form = "Clinical Trials Input Animal Excipient") | (form = "Clinical Trials Input Device")  | (form = "Clinical Trials Input Placebo") | (form = "Clinical Trials Input Comparator") | (form = "Clinical Trials Input Country")</formula></code>
+<actionbar bgcolor='#f0f0f0' bordercolor='black'>
+<actionbuttonstyle bgcolor='#f0f0f0'/><font size='9pt' color='system'/><border
+ style='solid' width='0px 0px 1px'/>
+<action title='New CT Input' showinmenu='false'><code event='click'><formula
+>@Command([Compose]; "Clinical Trials Input")</formula></code></action></actionbar>
+<column sort='ascending' hidedetailrows='false' itemname='ParentUNID' width='15.1250'
+ resizable='true' separatemultiplevalues='true' sortnoaccent='true' sortnocase='true'
+ showaslinks='false' twisties='true'><columnheader title='ParentUNID'><font
+ size='9pt' style='bold'/></columnheader></column>
+<column hidedetailrows='false' itemname='$6' width='10' resizable='true' separatemultiplevalues='false'
+ sortnoaccent='false' sortnocase='true' showaslinks='false'><font color='navy'/><columnheader
+ title='Col1'><font size='9pt' style='bold'/></columnheader><code event='value'><formula
+>@If(form = "Clinical Trials Input Site" ; SiteName ; form = "Clinical Trials Input Biological"; BiologicalProductName ; form = "Clinical Trials Input Medicine"; MedicineActiveName ; form = "Clinical Trials Input Animal Excipient" ; AnimalProductName ; form = "Clinical Trials Input Device" ; DeviceProductName ; form = "Clinical Trials Input Placebo";  PlaceboProductName ; form = "Clinical Trials Input Comparator" ; ComparatorActiveName ; "")</formula></code></column>
+<column hidedetailrows='false' itemname='$2' width='10' resizable='true' separatemultiplevalues='false'
+ sortnoaccent='false' sortnocase='true' showaslinks='false'><font color='navy'/><columnheader
+ title='Col2'><font size='9pt' style='bold'/></columnheader><code event='value'><formula
+>@If(form = "Clinical Trials Input Site" ; SiteAddress ; form = "Clinical Trials Input Biological"; BiologicalLabelName ; form = "Clinical Trials Input Medicine"; MedicineCodeName ; form = "Clinical Trials Input Animal Excipient" ; AnimalSpeciesOfOrigin ; form = "Clinical Trials Input Device" ; DeviceManufacturer ; form = "Clinical Trials Input Placebo";  PlaceboActiveName ; form = "Clinical Trials Input Comparator" ; ComparatorCodeName ;"")</formula></code></column>
+<column hidedetailrows='false' listseparator='comma' itemname='$3' width='10'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='false' sortnocase='true'
+ showaslinks='false'><font color='navy'/><columnheader title='Col3'><font
+ size='9pt' style='bold'/></columnheader><code event='value'><formula>@If(form = "Clinical Trials Input Site" ; SiteLocation; form = "Clinical Trials Input Biological"; BiologicalDosageForm ; form = "Clinical Trials Input Medicine"; MedicineDosageForm ; form = "Clinical Trials Input Animal Excipient" ; AnimalTissue ; form = "Clinical Trials Input Device" ; DeviceDescription ; form = "Clinical Trials Input Placebo";  PlaceboDosageForm ; form = "Clinical Trials Input Comparator" ; ComparatorDosageForm ;"")</formula></code></column>
+<column hidedetailrows='false' itemname='$4' width='10' resizable='true' separatemultiplevalues='false'
+ sortnoaccent='false' sortnocase='true' showaslinks='false'><font color='navy'/><columnheader
+ title='Col4'><font size='9pt' style='bold'/></columnheader><code event='value'><formula
+>@If(form = "Clinical Trials Input Site" ; SiteInvestigatorName ; form = "Clinical Trials Input Biological"; BiologicalSpeciesOfOrigin ; form = "Clinical Trials Input Medicine"; MedicineQuanitityStrength + ": " + MedicineProductStrength ; form = "Clinical Trials Input Animal Excipient" ; AnimalPreparation ; form = "Clinical Trials Input Placebo";  PlaceboStrength ; form = "Clinical Trials Input Comparator" ; ComparatorSpeciesOfOrigin ;"")</formula></code></column>
+<column hidedetailrows='false' itemname='$5' width='10' resizable='true' separatemultiplevalues='false'
+ sortnoaccent='false' sortnocase='true' showaslinks='false'><font color='navy'/><columnheader
+ title='Col5'><font size='9pt' style='bold'/></columnheader><code event='value'><formula
+>@If(form = "Clinical Trials Input Site" ; SiteHRECName ; form = "Clinical Trials Input Biological"; BiologicalROA ; form = "Clinical Trials Input Medicine"; MedicinePresentation ; form = "Clinical Trials Input Animal Excipient" ; AnimalCountry ; form = "Clinical Trials Input Placebo";  PlaceboROA ;  form = "Clinical Trials Input Comparator" ; ComparatorROA ;"" )</formula></code></column>
+<column hidedetailrows='false' listseparator='comma' itemname='$1' width='10'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='false' sortnocase='true'
+ showaslinks='false'><font color='navy'/><columnheader title='Col6'><font
+ size='9pt' style='bold'/></columnheader><code event='value'><formula>@If(form = "Clinical Trials Input Site" ; SiteHRECCode ; form = "Clinical Trials Input Biological"; BiologicalCountry ; form = "Clinical Trials Input Medicine"; MedicineDosageFrequency ; form = "Clinical Trials Input Placebo";  PlaceboDosageAndFrequency ; form = "Clinical Trials Input Comparator" ; ComparatorDosageFrequency ;"")</formula></code></column></view>
+

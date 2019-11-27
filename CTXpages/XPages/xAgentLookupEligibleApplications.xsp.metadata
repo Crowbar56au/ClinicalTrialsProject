@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?><note class="form" maintenanceversion="1.0" replicaid="CA257FDB001B5780" version="9.0" xmlns="http://www.lotus.com/dxl">
+<noteinfo noteid="402" sequence="19" unid="F847C30DB84C891DCA257FD8000B228F">
+<created><datetime>20160620T120137,43+10</datetime></created>
+<modified><datetime>20160623T152529,20+10</datetime></modified>
+<revised><datetime>20160623T152529,18+10</datetime></revised>
+<lastaccessed><datetime>20160623T152529,18+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,58+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<item name="$TITLE"><text>xAgentLookupEligibleApplications.xsp</text></item>
+<item name="$Flags"><text>gC~4K</text></item>
+
+
+<item name="$FileNames" sign="true"><text>xAgentLookupEligibleApplications.xsp</text></item>
+
+<item name="$DesignerVersion"><text>9.0.1</text></item>
+
+
+
+</note>

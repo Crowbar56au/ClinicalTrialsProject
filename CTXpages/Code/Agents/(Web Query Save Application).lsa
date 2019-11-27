@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(Web Query Save Application)' alias='WebQuerySaveApplication'
+ xmlns='http://www.lotus.com/dxl' version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780'
+ hide='v3' runaswebuser='true' publicaccess='false' designerversion='8.5.3'
+ restrictions='unrestricted'>
+<noteinfo noteid='cbce' unid='94F82DA3AC0C3307CA258478001222D8' sequence='13'>
+<created><datetime>20190917T131805,68+10</datetime></created>
+<modified><datetime>20190917T132423,35+10</datetime></modified>
+<revised><datetime>20190917T132423,34+10</datetime></revised>
+<lastaccessed><datetime>20190917T132423,34+10</datetime></lastaccessed>
+<addedtofile><datetime>20190917T131805,70+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20190917T132424,04+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+Option Declare
+
+
+</lotusscript></code><code event='declarations'><lotusscript>
+Const csFILED_CREATED_BY = "CreatedBy"
+Dim Session As  NotesSession
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	
+	On Error Goto ErrHandle
+	
+	
+	Dim docCurrent As NotesDocument
+	Set Session= New NotesSession
+	Set docCurrent = Session.DocumentContext
+		
+	' if this agent is being run from query save of gen app then
+	Select Case  docCurrent.GetItemValue("Form")( 0 )  
+		
+	Case "Application" 
+		'Call UpdateApplicationID( Session.CurrentDatabase , docCurrent , "CT" )
+		
+	End Select
+	
+		Call RedirectUpdate( docCurrent )
+	
+	
+Out: 
+	Exit Sub
+	
+ErrHandle:
+	
+	Resume Out
+	
+	
+End Sub
+
+
+</lotusscript></code><code event='RedirectUpdate'><lotusscript>Function RedirectUpdate( docCurrent As NotesDocument )
+	
+	On Error Goto ErrHandle
+	
+	Dim dbSubApps As NotesDatabase
+	Dim docSubApp As NotesDocument
+	Dim sApplicationID As String
+	Dim sURL As String
+	
+	' get application id from current document
+	'sApplicationID = docCurrent.GetItemValue( csFIELD_APPLICATION_ID )( 0 )
+	
+	' ensure application id ok
+	If sApplicationID = "" Then
+		Print "Invalid ApplicationID retreived."
+		Exit Function
+	End If
+		
+	' create url for redirect
+	'sURL = csVAL_WEB_PRINT_URL_PREFIX_REDIRECT + GetDatabaseWebPath( dbSubApps ) + _
+	'csVAL_WEB_SLASH + csFORM_WEB_REDIRECT + csVAL_WEB_OPEN_PAGE+ _
+	'csVAL_WEB_QUERY_PREFIX_URL+ GetDatabaseWebPath( dbSubApps ) + csVAL_WEB_SLASH +  _
+	'csAGENT_TGA_UPDATE_SUBMITTED_APPLICATION + csVAL_WEB_OPEN_AGENT + _
+	'csVAL_WEB_QUERY_PREFIX_UNID + docSubApp.UniversalID + csVAL_WEB_PRINT_URL_SUFFIX_REDIRECT
+	
+	Print sURL
+	End
+	
+	RedirectUpdate = True
+	
+Out: 
+	Exit Function
+	
+ErrHandle:
+	'Call sPrintErrorReport( docCurrent.ParentDatabase )
+	RedirectUpdate = True
+	Resume Out
+	
+End Function</lotusscript></code>
+<rundata processeddocs='0' exitcode='0'>
+<agentmodified><datetime>20190917T132423,93+10</datetime></agentmodified></rundata>
+<item name='$POID'><datetime>20190822T150858,30+10</datetime></item></agent>
+

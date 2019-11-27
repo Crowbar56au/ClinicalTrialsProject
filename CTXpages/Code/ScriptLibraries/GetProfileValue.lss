@@ -1,0 +1,34 @@
+'++LotusScript Development Environment:2:5:(Options):0:74
+Option Public
+Option Explicit
+
+'++LotusScript Development Environment:2:5:(Forward):0:1
+Declare Sub Initialize
+Declare Function fstrGetProfileValue(strFieldName As String) As String
+
+'++LotusScript Development Environment:2:5:(Declarations):0:2
+
+'++LotusScript Development Environment:2:2:Initialize:1:10
+Sub Initialize
+     
+End Sub
+'++LotusScript Development Environment:2:1:fstrGetProfileValue:1:8
+Function fstrGetProfileValue(strFieldName As String) As String
+     'Generic routine to get a value from the system profile
+     'Requires field name of value to retrieve
+     
+     Dim session As New NotesSession
+     Dim db As NotesDatabase     
+     Dim docSysProfile As NotesDocument
+     Dim dbOther As NotesDatabase     
+     Dim varProfileValue As Variant     
+     
+     Set db = session.CurrentDatabase
+     Set docSysProfile = db.GetProfileDocument("System Profile Document")
+     
+     'Get value from profile document
+     varProfileValue = docSysProfile.GetItemValue(strFieldName)
+     
+     fstrGetProfileValue = varProfileValue(0)  
+     
+End Function

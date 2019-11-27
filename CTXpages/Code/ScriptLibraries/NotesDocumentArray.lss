@@ -1,0 +1,294 @@
+'++LotusScript Development Environment:2:5:(Options):0:74
+Option Public
+Option Declare  
+
+'++LotusScript Development Environment:2:5:(Forward):0:1
+Declare Class NotesDocumentArray
+
+'++LotusScript Development Environment:2:5:(Declarations):0:10
+%REM ....................................CLASS Information: NotesDocumentArray
+'Version: 0.8.6.0 (beta) 11/10/2001
+'Created: By Andrew Tetlaw
+'Creation Date: 03 Sep 2001
+'PURPOSE: A more flexible document collection container than a document collection.
+'The class gets around limitations in the R4 NotesDocumentCollection. With DocArray
+'you can add document collections or add one document at a time to the array. It also
+'has most of the methods and properties of theNotesDocumentCollection class with a
+'few extras like SortBy and GetDocumentIndex.
+
+'Re: Error handling: I just want it to ignore problems like a good little class and
+'instead do nothing. For example if a function requires a NotesDocument as an argument
+'and Nothing is passed (indicating a problem) the function just doesn't do anything
+'rather than throwing an exception and messing up what ever routine called the class.
+'This means that error checking must be done in the calling function.
+
+'Based on work done by:
+' Micheal Werry for the class idea and the AddCollection method
+' Slade Swan for the bubble sort routine in the SortBy method
+%END REM
+Class NotesDocumentArray
+     
+'## ===== PROPERTIES ==== ##
+     Public Array() As NotesDocument
+     Private Index As Integer
+     Private Srtd As Integer
+     Private SrtdBy As String
+     
+     Public Property Get Count As Integer
+          Count = Me.Index
+     End Property
+     
+     Public Property Get IsSorted As Integer
+          IsSorted = Me.Srtd
+     End Property
+     
+     Public Property Get SortedBy As String
+          SortedBy = Me.SrtdBy     
+     End Property
+     
+     '// Returns first document in array
+     Public Property Get GetFirstDocument As NotesDocument
+          If Me.Index > 0 Then
+               Set GetFirstDocument = Me.Array(Lbound(Me.Array))
+          Else
+               Set GetFirstDocument = Nothing
+          End If
+     End Property
+     
+     '// Returns last document in array
+     Public Property Get GetLastDocument As NotesDocument
+          If Me.Index > 0 Then
+               Set GetLastDocument = Me.Array(Ubound(Me.Array))
+          Else
+               Set GetLastDocument = Nothing
+          End If
+     End Property
+     
+     '// Returns document at index <x>
+     Public Property Get GetNthDocument(x As Integer) As NotesDocument
+          If (x > 0) And (Me.Index >= x) Then
+               Set GetNthDocument = Me.Array(x-1)
+          Else
+               Set GetNthDocument = Nothing
+          End If
+     End Property
+     
+     '// Returns document index number or 0 if not found
+     Public Property Get GetDocumentIndex(doc As NotesDocument) As Integer
+          Dim x As Integer
+          If Not (doc Is Nothing) Then '// Don't do anything for nothing!
+               For x = 1 To (Me.Index)
+                    If Me.Array(x-1).UniversalID =  doc.UniversalID Then
+                         GetDocumentIndex = x
+                    End If
+               Next
+          End If
+     End Property
+     
+     '// Returns next document sfter supplied docs index otherwise nothing if there's no next doc
+     Public Property Get GetNextDocument(doc As NotesDocument) As NotesDocument
+          Dim x As Integer
+          If Not (doc Is Nothing) Then '// Don't do anything for nothing!
+               For x = 0 To Ubound(Me.Array)
+                    If Me.Array(x).UniversalID = doc.UniversalID Then
+                         If Ubound(Me.Array) > x Then
+                              Set GetNextDocument = Me.Array(x+1)
+                         End If
+                    End If
+               Next
+          End If
+     End Property
+     
+     '// Returns previous document before supplied docs index otherwise nothing if there's no prev doc
+     Public Property Get GetPrevDocument(doc As NotesDocument) As NotesDocument
+          Dim x As Integer
+          If Not (doc Is Nothing) Then '// Don't do anything for nothing!
+               For x = 0 To (Me.Index-1)
+                    If Me.Array(x).UniversalID = doc.UniversalID Then
+                         If Lbound(Me.Array) >= x-1 Then
+                              Set GetPrevDocument = Me.Array(x-1)
+                         End If
+                    End If
+               Next
+          End If
+     End Property
+     
+     
+     
+'## ==== NEW ==== ##
+     '// Class New constructor
+     Public Sub new ()
+          Redim Me.Array(0)
+          Me.Index = 0
+          Me.Srtd = False
+          Me.SrtdBy = ""
+     End Sub
+     
+'## ==== Reset ==== ##
+     '// resets the doc array to empty
+     Public Sub Reset()
+          Redim Me.Array(0)
+          Me.Index = 0
+          Me.Srtd = False
+          Me.SrtdBy = ""
+     End Sub
+     
+'## ==== ADD DOCUMENT ARRAY ==== ##
+     '// Add another notes document array to the array
+     Public Sub AddArray(array2 As NotesDocumentArray)
+          If Not (array2 Is Nothing) Then '// Don't do anything for nothing!
+               If array2.Count > 0 Then '// Don't do anything if the array is empty!
+                    Redim Preserve Me.Array(Me.Index + array2.Count -1)
+                    Dim doc As NotesDocument
+                    Dim x As Integer
+                    For x = 1 To array2.Count
+                         Set Me.Array(Me.Index + (x-1)) = array2.GetNthDocument(x)
+                    Next 
+                    Me.Index = Me.Index + array2.Count
+               End If
+          End If
+     End Sub
+     
+'## ==== ADD DOCUMENT COLLECTION ==== ##
+     '// Add a notes document collection to the array
+     Public Sub AddCollection(dc As NotesDocumentCollection)
+          If Not (dc Is Nothing) Then '// Don't do anything for nothing!
+               If dc.Count > 0 Then '// don't add anything if the DC is empty!
+                    Redim Preserve Me.Array(Me.Index + dc.Count -1)
+                    Dim doc As NotesDocument
+                    Dim x As Integer
+                    For x = 1 To dc.Count
+                         Set Me.Array(Me.Index + (x-1)) = dc.GetNthDocument(x)
+                    Next 
+                    Me.Index = Me.Index + dc.Count
+               End If
+          End If
+     End Sub
+     
+'## ==== ADD DOCUMENT ==== ##
+     '// Add a document to the array
+     Public Sub AddDocument(doc As NotesDocument)
+          If Not (doc Is Nothing) Then '// Don't do anything for nothing!
+               Redim Preserve Me.Array(Me.Index) '// Me.Index will always be 1 above the ubound anyway so you don't need to +1
+               Set Me.Array(Me.Index) = doc
+               Me.Index = Me.Index + 1
+          End If
+     End Sub
+     
+'## ==== REMOVE DOCUMENT ==== ##
+     '// Remove a document from the array
+     Public Sub RemoveDocument(doc As NotesDocument)
+          Dim x As Integer
+          Dim y As Integer
+          Dim newArray() As NotesDocument
+          Dim sortfield As String
+          Dim dosort As Integer
+          
+          
+          If Not (doc Is Nothing) Then '// Don't do anything for nothing!
+               Redim newArray(0) '// Initialise
+               '// make a new array of documents excluding the one to remove
+               For x = 0 To (Me.Index-1)
+                    If Not (Me.Array(x).UniversalID = doc.UniversalID) Then
+                         Redim Preserve newArray(y)
+                         Set newArray(y) = Me.Array(x)
+                         y=y+1
+                    End If
+               Next
+              '// reset the NotesDocumentArray and rebuild it from the new array of documents created above
+               'Didn't want to use Reset() because I didn't want to interfere with the sorting properties
+               Redim Me.Array(0)
+               Me.Index = 0
+               For x = 0 To Ubound(newArray)
+                    Call Me.AddDocument(newArray(x))
+               Next
+          End If
+     End Sub
+     
+'## ==== REMOVE MATCHING DOCUMENTS ==== ##
+     '// Removes all document where item.text = text
+     Public Sub RemoveMatchingDocuments(itemname As String, text As String)
+          Dim x As Integer
+          Dim y As Integer
+          Dim newArray() As NotesDocument
+          Dim doc As NotesDocument
+          Dim item As NotesItem
+      '    Dim sortfield As String
+      '    Dim dosort As Integer
+          
+          
+          Redim newArray(0) '// Initialise
+               '// make a new array of documents excluding the one to remove
+          For x = 0 To (Me.Index-1)
+               Set doc = Me.Array(x)
+               If Not (doc Is Nothing) Then
+                    Set item = doc.GetFirstItem(itemname)
+                    If Not (item Is Nothing) Then
+                         If Not (item.Text = text) Then
+                              Redim Preserve newArray(y)
+                              Set newArray(y) = doc
+                              y=y+1
+                         End If
+                    End If
+               End If
+          Next
+              '// reset the NotesDocumentArray and rebuild it from the new array of documents created above
+               'Didn't want to use Reset() because I didn't want to interfere with the sorting properties
+          Redim Me.Array(0)
+          Me.Index = 0
+          For x = 0 To Ubound(newArray)
+               Call Me.AddDocument(newArray(x))
+          Next
+     End Sub
+     
+'## ==== SORT BY ==== ##
+     Public Sub SortBy(itemname As String)
+          
+          Dim doc As NotesDocument
+          Dim doc1 As NotesDocument
+          Dim j As Integer     
+          Dim i As Integer
+          Dim a As Variant
+          Dim b As Variant
+          Dim lngA As Long
+          Dim lngB As Long
+          Dim swap As Integer
+          '// Bubble sort
+          If Me.Index > 0 Then
+               For i=1 To (Me.Index-1) '// Outer loop for sort
+                    j=i
+                    Do While j>=1 '// Inner loop for sort
+                         
+                         b = Me.Array(j).GetItemValue(itemname) '// i.e. order val of 2nd doc in pair
+                         a = Me.Array(j-1).GetItemValue(itemname)'// i.e. i.e. order val of 1st doc in pair
+                         
+                         If b(0)<a(0) Then '// if 2nd is lower than first swap them!
+                              Set doc=Me.Array(j)
+                              Set doc1=Me.Array(j-1)
+                              Set Me.Array(j)=doc1
+                              Set Me.Array(j-1)=doc
+                              j=j-1 '// decrement so that previous 2nd doc be comes 1st: that is you compare 1 and 0, then 2 and 1, then 3 and 2...and so on
+                         Else
+                              Exit Do
+                         End If
+                    Loop    
+               Next
+               Me.Srtd = True
+               Me.SrtdBy = itemname
+          End If
+     End Sub
+     
+'## ==== SET FIELD VALUE ==== ##
+     '// sets a specified field to a specified value in all docs in array
+     Public Sub SetFieldValue(itemname As String,itemvalue As Variant)
+          Dim doc As NotesDocument
+          Dim x As Integer
+          For x = 0 To (Me.Index-1)
+               Set doc = Me.Array(x)
+               If Not (doc Is Nothing) Then '// don't want to generate any errors.
+                    Call doc.ReplaceItemValue(itemname,itemvalue)
+                    Call doc.save(True,True)
+               End If
+          Next 
+     End Sub
+End Class

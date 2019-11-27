@@ -1,0 +1,381 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(createSubmission)' alias='createSubmission' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3'
+ runaswebuser='true' publicaccess='false' designerversion='8.5.3'>
+<noteinfo noteid='46e' unid='A6F50DC9EDDB0240CA257F7700070ADF' sequence='14'>
+<created><datetime dst='true'>20160315T121655,35+11</datetime></created>
+<modified><datetime>20160628T151506,07+10</datetime></modified>
+<revised><datetime>20160628T151506,06+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,06+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,80+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151506,13+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+Option Declare
+Use "GetDatabases"
+Use "DraftToJSON"
+Use "JSONtoNotesDocument"
+Use "IDsAndSequences"
+
+%REM
+BW01 27Feb13 INC-38841: System unable to create review, work process and tasks in Work Management.	
+%END REM
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	
+	On Error Resume Next
+	
+	Dim sess As New NotesSession, db As NotesDatabase
+	Dim view As NotesView
+	Dim docContext As NotesDocument
+	Dim appdoc As NotesDocument
+	Dim submissionDoc As NotesDocument
+	Dim item As NotesItem
+	
+	'receive single values via url
+	Dim strQueryString As String
+	Dim i As Integer
+	Dim lookupkey(0 To 1) As Variant
+	Dim formcontent As Variant
+	Dim secNames(5) As String
+	Dim variableName As String, onCompleteFunction As String, returnValue As String
+	Dim subid As String
+	Dim tmpstring As String
+	Dim tmpvar As Variant
+	Dim tmpDouble As Double
+	Dim formfields List As Variant
+	Dim ensureFieldListIntegrity As Variant
+	Dim fieldname As String
+	Dim agtJSONtoNotes As notesagent
+	Dim cwDB As NotesDatabase
+	Dim locationidview As NotesView
+	Dim entityidview As NotesView
+	Dim client_name As String
+	Dim tmpDoc As NotesDocument
+	Dim vwSubmissions As NotesView
+	Dim clientdoc As NotesDocument
+	Dim locationdoc As NotesDocument
+	Dim SeqNumber As Variant
+	Dim dc As NotesDocumentCollection
+	Dim tmpError As String
+	
+	Set docContext = sess.DocumentContext
+	Set db = sess.CurrentDatabase
+	Set cwDB = fdbGetDatabase("ClientWebPath")
+	Set agtJSONtoNotes = db.GetAgent("(CJTN)")
+	Set locationidview = cwDB.GetView("LULocations")
+	Set entityidview = cwDB.GetView("LUClientByID")
+	Set view = db.GetView("LookupByApplicationID")
+	Set vwSubmissions = db.Getview("Submissions")
+	If view Is Nothing Then Error(1001)
+	
+	
+	Yield	'===== read commands and parameters from the Query String
+	strQueryString = docContext.Query_String_Decoded(0)
+	ensureFieldListIntegrity = Split("clientid;clientname;sponsorid;clientaddressid;applicationUNIDs;invoiceamount;invoicesponsor",";")
+	Forall f In ensureFieldListIntegrity
+		formfields(f)=""
+	End Forall
+	
+	Yield	'===== read the contents of the form that was submitted and split Arrays that are ';' delimited
+	formcontent = Split(doccontext.GetFirstItem("Request_Content").text,"&amp;")
+	Forall thing In formcontent	'doccontext
+		fieldname = Strleft(thing,"=")
+		If Instr(fieldname,"_")&gt;0 Then
+			fieldname = Strright(fieldname,"_")
+		End If
+		formfields(fieldname) = urldecode(Strright(thing,"="))
+		If Instr(formfields(fieldname),";") Then
+			formfields(fieldname) = Split(formfields(fieldname),";")
+		End If
+	End Forall
+	
+	Yield	'===== check for variable name / function callback
+	variableName = Trim(GetWebVariable(strQueryString, "varname"))
+	Print |Content-type: text/html; charset=utf-8|
+	Print |&lt;html&gt;&lt;head&gt;|
+	If Len(variableName)&gt;0 Then
+		Print |&lt;script type="text/javascript"&gt;|
+		Print "var " + variableName + "="
+	End If
+	onCompleteFunction = Trim(GetWebVariable(strQueryString, "oncomplete"))
+	On Error Goto ErrorHandler
+	
+	Yield	'===== Go get the Client Document by ClientID and read out the Client Name
+	If Not entityidview Is Nothing Then
+		Set clientdoc = entityidview.getdocumentbykey( formfields("clientid"), True)
+		If Not clientdoc Is Nothing Then
+			If clientdoc.hasitem("ClientName") Then
+				formfields("clientname") = clientdoc.ClientName(0)
+			End If
+		End If
+	End If
+	
+	Yield	'===== Go get the Location Document by ClientAddressID and read out the Address
+	If Not locationidview Is Nothing Then
+		lookupkey(0) = Cstr(formfields("clientid"))
+		lookupkey(1) = Val(Cstr(formfields("clientaddressid")))
+		Set locationdoc = locationidview.getdocumentbykey(lookupkey, True)
+		Dim locationfields As Variant
+		locationfields = Split("Address_Line1;Address_Line2;Address_Line3;Address_Line4;Town;State;PostCode", ";")
+		If Not locationdoc Is Nothing Then
+			formfields("clientaddress") = ""
+			Forall thisfield In locationfields
+				If locationdoc.HasItem(thisfield) Then
+					tmpstring = locationdoc.getfirstitem(thisfield).text
+					If Len(Trim(tmpstring)) &gt; 0 Then
+						If Len(formfields("clientaddress")) &gt; 0 Then
+							formfields("clientaddress") = formfields("clientaddress") + " "
+						End If
+						formfields("clientaddress") = formfields("clientaddress") + tmpstring
+					End If
+				End If
+			End Forall
+		Else
+			formfields("clientaddress") = "**no location doc for #"+formfields("clientaddressid") + " (" + Join(lookupkey,"::")+")"
+		End If
+	Else
+		formfields("clientaddress") = "**no view"
+	End If
+	
+	Yield	'===== set appenentries for xmlmill usage
+	Dim appentriesArray As Variant
+	appentriesArray =""
+	
+	Yield	'===== get the CT Applications via formfields('applicationUNIDs'
+	Set dc = db.GetProfileDocCollection("0")
+	dc.RemoveAll(True)
+	tmpvar = formfields("applicationUNIDs")
+	If Not Isarray(tmpvar) Then
+		Redim tmpvar(0)
+		tmpvar(0) = formfields("applicationUNIDs")
+	End If
+	
+	Dim xz As Long
+	formfields("invoiceamount") = 0
+	For xz = 0 To Ubound(tmpvar)
+		Set tmpDoc = vwSubmissions.Getdocumentbykey(tmpvar(xz), True) 'check to see if appid has already been submitted
+		Set appdoc = view.GetDocumentByKey(tmpvar(xz), True)
+		'***********
+		'INC71827: if the application is in the Completion stage then do not stop the submission processing because
+		'of an existing submission document
+		If Cstr(appdoc.ApplicationStage(0)) = "3" Then
+			Set tmpdoc = Nothing
+		End If
+		'***********
+		If Not appdoc Is Nothing And tmpDoc Is Nothing Then
+			dc.AddDocument appdoc
+			If Len(appentriesarray) &gt; 0 Then appentriesArray = appentriesArray + ";;**"
+			appentriesArray = appentriesArray + tmpvar(xz)
+			tmpstring = ""
+			If appdoc.Hasitem("TitleOfStudy") Then tmpstring = appdoc.GetFirstItem("TitleOfStudy").text
+			appentriesArray = appentriesArray +"&lt;$&gt;"+tmpstring
+			tmpstring = ""
+			If appdoc.Hasitem("LabelName") Then tmpstring = appdoc.GetFirstItem("LabelName").text
+			appentriesArray = appentriesArray +"&lt;$&gt;"+tmpstring
+			tmpstring = ""
+			If appdoc.Hasitem("ApplicationFees") Then tmpstring = appdoc.GetFirstItem("ApplicationFees").text
+			appentriesArray = appentriesArray +"&lt;$&gt;"+tmpstring
+			formfields("invoiceamount") = Cdbl(formfields("invoiceamount")) + Cdbl(tmpstring)
+		Else
+			If Not tmpDoc Is Nothing Then
+				If tmpError = "" Then
+					tmpError = tmpVar(xz)
+				Else
+					tmpError = tmpError + "\n" + tmpVar(xz)
+				End If
+				
+			End If
+		End If
+		If Not tmpDoc Is Nothing Then
+			Set tmpDoc = Nothing
+		End If
+	Next
+	
+	Yield	'===== update application documents
+	If dc.count &gt; 0 Then
+	
+		appentriesArray = Split(appentriesArray, ";;**")
+		Set submissionDoc = New NotesDocument(db)
+		If submissionDoc Is Nothing Then Error(1002)
+		
+		Yield	'===== assume all information has been obtained, Applications, Clients, etc
+		submissionDoc.ReplaceItemValue "Form", "submission"
+		submissionDoc.ReplaceItemValue "ClientID", formfields("clientid")
+		submissionDoc.ReplaceItemValue "ClientName", formfields("clientname")
+		submissionDoc.ReplaceItemValue "ClientBillingAddressID", formfields("clientaddressid")
+		submissionDoc.ReplaceItemValue "InvoiceAmount", Cstr(formfields("invoiceamount"))
+		submissionDoc.ReplaceItemValue "ApplicationIDs", formfields("applicationUNIDs")
+		submissionDoc.ReplaceItemValue "SubmitterName", formfields("clientname")
+		submissionDoc.ReplaceItemValue "ApplicationEntries", appentriesArray
+		submissionDoc.ReplaceItemValue "InvoiceSponsor", formfields("invoicesponsor")	' *** JV ***
+		
+		Yield	'===== set security
+		secNames(0) = "SIME" + formfields("clientid")
+		secNames(1) = "[Admin]"
+		secNames(2) = "[TGA]"
+		secNames(3) = "[SIMEReader]"
+		secNames(4) = "LocalDomainServers"
+		secNames(5) = "OtherDomainServers"
+		submissionDoc.ReplaceItemValue "WebAuthors", secNames
+		Set item = submissionDoc.GetFirstItem("WebAuthors")
+		item.IsAuthors = True
+		submissionDoc.ReplaceItemValue "WebReaders", secNames
+		Set item = submissionDoc.GetFirstItem("WebReaders")
+		item.IsReaders = True
+		
+		Yield	'===== get the submission id from Sequencer
+		subid = GetID(CT_SUBMISSION_SEQUENCE_KEY, "", CT_GENERAL_LISTING_APPTYPE) 'BW01	
+		'subid = GetID(BOP_SUBMISSION_SEQUENCE_KEY, "", BOP_GENERAL_LISTING_APPTYPE)
+		submissionDoc.ReplaceItemValue "SubmissionId", subid
+		submissionDoc.ReplaceItemValue "SubmissionDate", Now
+		
+		Yield	'===== Generate Invoice Data
+		SeqNumber = GetSequenceNumber(csINVOICE_SEQUENCE_KEY)
+		submissionDoc.ReplaceItemValue "PaymentRefNumber", Mid(SeqNumber(0), 4)
+		submissionDoc.ReplaceItemValue "InvoiceNumber", Mid(SeqNumber(0), 1,  Len(SeqNumber(0)) - 1)
+		submissionDoc.ReplaceItemValue "InvoiceCreatedDTStamp", Format(Now, "dd/mm/yyyy hh:nn:ss")
+		submissionDoc.ReplaceItemValue "InvoiceDate", Format(Now, "dd/mm/yyyy")
+		submissionDoc.Save True, False
+		
+		Set appdoc = dc.getfirstdocument
+		Do While Not appdoc Is Nothing
+			appdoc.ReplaceItemValue "SubmissionId", subid
+			appdoc.ReplaceItemValue "SubmissionDate", Now
+			appdoc.ReplaceItemValue "IsSubmitted", 1
+			appdoc.ReplaceItemValue "ApplicationStatus", "Submitted"
+			appdoc.ReplaceItemValue "BillingLocationID", formfields("clientaddressid")
+			appdoc.ReplaceItemValue "SubmitterName", formfields("clientname")
+			appdoc.Save True,False
+			Set appdoc = dc.GetNextDocument(appdoc)
+		Loop
+		
+		Print |{"identifier": "id", "label": "name", "items":[{"id": "| + subid + |", "success":true, "recordunid": "| + submissionDoc.UniversalID + |", "error":"| + tmpError + |"}]}|
+		agtJSONtoNotes.Run(submissionDoc.NoteID)
+		%REM 28APR2016 seems to be stuffing things up
+		'TSK69533 11APR2016 BL: correctly set the title of study and protocol number on the Application document
+		'after submission
+		Dim part1doc As NotesDocument
+		Dim updatedetailsdoc As NotesDocument
+		Dim tmpAppDoc As NotesDocument
+		Dim part1view As NotesView
+		Dim updatedetailsview As NotesView
+		Dim tmp As String
+		Dim appsview As NotesView
+		Dim tos As String
+		Dim pn As String
+		
+		Set appsview = db.GetView("AppsByApplicationId")
+		Set part1view = db.GetView("FormViewPart1")
+		Set updatedetailsview = db.GetView("FormViewUpdateDetails")
+		
+		part1view.Refresh
+		updatedetailsview.Refresh
+		
+		Set appdoc = dc.getfirstdocument
+		If dc.Count &gt; 0 then
+			Do While Not appdoc Is Nothing
+				Set tmpAppDoc = appsview.GetDocumentByKey(appdoc.ApplicationId(0), True)
+				tmp = tmpAppDoc.ApplicationId(0) + "~" + CStr(tmpAppDoc.ApplicationVersion(0))
+				'take into account variation versions where updatedetails holds the most recent data
+				If CInt(tmpAppDoc.ApplicationVersion(0)) &lt;= 1 Then
+					Set part1doc = part1view.getDocumentbyKey(tmp, True)
+					If Not part1doc Is Nothing Then
+						tmpAppDoc.ReplaceItemvalue "TitleOfStudy", part1doc.TitleOfStudy(0)
+						tmpAppDoc.ReplaceItemValue "ProtocolNumber", part1doc.ProtocolNumber(0)
+					Else
+						'do nothing
+					End If
+				ElseIf CInt(tmpAppDoc.ApplicationVersion(0)) &gt; 1 Then
+					Set updatedetailsdoc = updatedetailsview.getDocumentbyKey(tmp, True)
+					If Not updatedetailsdoc Is Nothing Then
+						tmpAppDoc.ReplaceItemvalue "TitleOfStudy", updatedetailsdoc.TitleOfStudy(0)
+						tmpAppDoc.ReplaceItemValue "ProtocolNumber", updatedetailsdoc.ProtocolNumber(0)
+					Else
+						'do nothing
+					End if
+				End If
+				
+				tmpAppDoc.Save True, False
+				Set appdoc = dc.GetNextDocument(appdoc)
+			Loop
+		End if
+		'End TSK69533 modifications
+		%END REM
+	Else 
+		Msgbox "No applications to process as they have already been submitted"
+		Print |{"identifier": "id", "label": "name", "items":[{"success":false, "error": "Application(s) not submitted, as submission data already exists: \n\n| + tmpError + |\n\nContact TGA to report the problem"}]}|
+	End If  'end if dc.count &gt; 0
+	
+ErrorResume:
+	If Len(variableName) &gt; 0 Then
+		Print "; "
+		returnValue = |'| + variableName + |'|
+	End If
+	If Len(onCompleteFunction)&gt;0 Then
+		Print |parent.| + onCompleteFunction + "("+returnValue+");"
+	End If
+	Print |&lt;/script&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;|
+	Exit Sub
+	
+ErrorHandler:
+	Print |{"identifier": "id", "label": "name", "items":[{"success":false}|
+	Select Case Err
+	Case 1001
+		Msgbox "Clinical Trials - (createSubmission) agent: " + Cstr(Error) + " at line " + Cstr(Erl) + |:: the view "LookupByApplicationID" could not be accessed/found|
+		Print |,"the view 'LookupByApplicationID' could not be accessed/found"|
+	Case 1002
+		Msgbox "Clinical Trials - (createSubmission) agent: " +  Cstr(Error) + " at line " + Cstr(Erl) + |:: you dont have permission to create documents in this database|
+		Print |,"you dont have permission to create documents in this database"|
+	Case Else
+		Msgbox "Clinical Trials - (createSubmission) agent: " +  Cstr(Error) + " at line " + Cstr(Erl)
+		Print |,"| + Cstr(Err) + ":: " + Cstr(Error) + | @| + Cstr(Erl) + |"|
+	End Select
+	Print |]}|
+	Resume ErrorResume
+End Sub
+
+</lotusscript></code><code event='urlEncode'><lotusscript>Public Function urlEncode(s As String) As String
+	If Len(s) = 0 Then Exit Function
+	
+	Dim tmp As String
+	Dim c As String
+	Dim i As Integer
+	
+	For i = 1 To Len(s)
+		c = Mid(s, i, 1)
+		If (Asc(c) &gt;= 65 And Asc(c) &lt;= 90) _
+		Or (Asc(c) &gt;= 97 And Asc(c) &lt;= 122) _
+		Or (Asc(c) &gt;= 48 And Asc(c) &lt;= 58) _
+		Or Asc(c) = 38 _
+		Or (Asc(c) &gt;= 45 And Asc(c) &lt;= 47) _
+		Or Asc(c) = 58 Or Asc(c) = 61 _
+		Or Asc(c) = 63 Or Asc(c) = 126 Then
+			tmp = tmp + c
+		Else
+			tmp = tmp + "%" + Hex(Asc(c))
+		End If
+	Next i
+	urlEncode = tmp
+End Function
+
+</lotusscript></code><code event='urlDecode'><lotusscript>Public Function urlDecode(s As String) As String
+	If Len(s) = 0 Then Exit Function
+	Dim i As Integer
+	Dim tmp As String
+	Dim c As String
+	For i = 1 To Len(s)
+		c = Mid$(s, i, 1)
+		If c = "+" Then c = " "
+		If c = "%" Then
+			c = Chr$("&amp;H" + Mid$(s, i + 1, 2))
+			i = i + 2
+		End If
+		tmp = tmp + c
+	Next i
+	urlDecode = tmp
+End Function</lotusscript></code>
+<item name='$POID'><datetime>20160620T120207,10+10</datetime></item></agent>
+

@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form name='Application Guide CTN' alias='ApplicationGuideCTN' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' nocompose='true'
+ noquery='true' treatashtml='true' publicaccess='false' designerversion='8.5.3'>
+<noteinfo noteid='186' unid='92537B5E7B269D94CA257FD8000B29FE' sequence='14'>
+<created><datetime>20160620T120156,46+10</datetime></created>
+<modified><datetime>20160628T151503,21+10</datetime></modified>
+<revised><datetime>20160628T151503,20+10</datetime></revised>
+<lastaccessed><datetime>20160628T151503,20+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152008,65+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1' leftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='1'><run><font size='8pt' name='Arial Narrow' pitch='variable' truetype='true'
+ familyid='20'/>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"&gt;&lt;html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"&gt;</run></par>
+<par def='1'>&lt;head&gt;&lt;title&gt;Clinical Trials Application&lt;/title&gt;</par>
+<par def='1'>&lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8"&gt;&lt;/meta&gt;</par>
+<par def='1'>&lt;meta http-equiv="X-UA-Compatible" content="chrome=1"&gt;&lt;/meta&gt;</par>
+<pardef id='2' leftmargin='2.9521in' firstlineleftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='2'>&lt;link rel="stylesheet" type="text/css" href="/domjs/dojo-1.5.0/ebs/resources/basestyle.css" &gt;&lt;/link&gt;</par>
+<par def='2'>&lt;style&gt;</par>
+<pardef id='3' leftmargin='1.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='3'>body { overflow-y : scroll; }</par>
+<par def='2'>&lt;/style&gt;</par>
+<par def='2'>&lt;/head&gt;</par>
+<pardef id='4' leftmargin='1.3778in' firstlineleftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='4'>&lt;body class="soria" scroll=auto&gt;</par>
+<pardef id='5' leftmargin='1in' tabs='L1in'/>
+<par def='5'>&lt;div dojoType="dijit.layout.BorderContainer" id="djborder_Main" style="width:100%; height:100%"&gt;</par>
+<pardef id='6' leftmargin='2.9521in' firstlineleftmargin='1.2500in'/>
+<par def='6'>&lt;div dojoType="dijit.layout.ContentPane" region="top" &gt;</par>
+<pardef id='7' leftmargin='2.7021in' firstlineleftmargin='1.5000in'/>
+<par def='7'>&lt;table border="0" cellspacing="0" cellpadding="0"&gt;</par>
+<pardef id='8' leftmargin='3.2021in' firstlineleftmargin='1.7500in'/>
+<par def='8'>&lt;tr&gt;</par>
+<pardef id='9' leftmargin='3.4521in' firstlineleftmargin='2in'/>
+<par def='9'>&lt;td nowrap width="20%"&gt;&lt;img src = "<run><font style='bold'
+ color='red'/><computedtext><code event='value'><formula>server_protocol_name+"/"+@ReplaceSubstring(@GetProfileField("System Profile Document"; "GRA_Db"); "\\"; "/")</formula></code></computedtext></run>/smLogo.gif?openimageresource" alt="logo" /&gt;&lt;/td&gt;</par>
+<pardef id='10' leftmargin='2in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='10'>&lt;td width="60%"&gt;</par>
+<pardef id='11' leftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='11'>&lt;span style="margin:0; text-align:middle; vertical-align:top; font-weight:bold; font-size:15pt;"&gt;Clinical Trial Notification Application Guide&lt;/span&gt;</par>
+<par def='10'>&lt;/td&gt;</par>
+<pardef id='12' leftmargin='2in'/>
+<par def='12'>&lt;td&gt;&amp;nbsp;&lt;/td&gt;</par>
+<pardef id='13' leftmargin='2in' firstlineleftmargin='1.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='13'>&lt;/tr&gt;</par>
+<pardef id='14' leftmargin='1.7500in'/>
+<par def='14'>&lt;tr&gt;</par>
+<par def='12'>&lt;td&gt;&amp;nbsp;&lt;/td&gt;</par>
+<par def='12'>&lt;td&gt;</par>
+<pardef id='15' leftmargin='2.2500in'/>
+<par def='15'>&lt;div&gt;<run><font color='fuchsia'/><computedtext><code event='value'><formula
+>@DbLookup("":"NoCache";"";"keywords";"APPLICATIONGUIDECTN";"KeywordDesc";[FailSilent])</formula></code></computedtext></run>&lt;/div&gt;</par>
+<par def='12'>&lt;/td&gt;</par>
+<par def='12'>&lt;td&gt;&amp;nbsp;&lt;/td&gt;</par>
+<par def='14'>&lt;/tr&gt;</par>
+<par def='14'>&lt;tr&gt;&lt;td colspan="3"&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;</par>
+<pardef id='16' leftmargin='1.5000in'/>
+<par def='16'>&lt;/table&gt;</par>
+<pardef id='17' leftmargin='1.2500in'/>
+<par def='17'>&lt;/div&gt;</par>
+<pardef id='18'/>
+<par def='18'>&lt;/div&gt;</par>
+<par def='18'>&lt;/body&gt;</par>
+<par def='18'>&lt;/html&gt;</par></richtext></body>
+<item name='$$ScriptName' summary='false' sign='true'><text>ApplicationGuideCTN</text></item></form>
+

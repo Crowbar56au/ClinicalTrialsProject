@@ -1,0 +1,381 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(Write To CT Repository)' alias='WriteToCTRepository' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3'
+ publicaccess='false' designerversion='8.5.3' activatable='false'>
+<noteinfo noteid='5fe' unid='04A76E9A67A60F33CA257F7700070B39' sequence='14'>
+<created><datetime dst='true'>20160315T121656,25+11</datetime></created>
+<modified><datetime>20160628T151507,10+10</datetime></modified>
+<revised><datetime>20160628T151507,09+10</datetime></revised>
+<lastaccessed><datetime>20160628T151507,09+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,55+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151507,16+10</datetime></designchange>
+<trigger type='scheduled'>
+<schedule type='byminutes' hours='1' minutes='0' runlocation='specific' runserver='CN=DWCBRDOMI01/OU=SVR/O=TGADEV'>
+<starttime><datetime>T070000,00</datetime></starttime>
+<endtime><datetime>T210000,00</datetime></endtime></schedule></trigger>
+<documentset type='modified'/><code event='options'><lotusscript>Option Public
+Option Declare
+
+Use "MIMEJSONDataInterface"
+Use "GetDatabases"
+
+</lotusscript></code><code event='declarations'><lotusscript>Const ERR_PRIMARYARGUMENTSMISSING = 1001
+Const ERR_INVALIDDOCUMENTID = 1002
+Const ERR_EMPTYJSONSTORE = 1003
+Const CS_APP_STATUS = "Pending Write to Repository"
+
+Dim strNewStatus As String
+Dim unid As String, appID As String, strID As String, strLU As String, newRecordUNID As String , oldRecordUNID As String
+Dim appVer As String, appStage As String, strContact As String, strContactEmail As String, strContactFax As String, strContactPhone As String, strPart As String
+
+
+Dim AppJSONEntryStore As MIMEJSONEntryStore
+Dim JSONEntry As JSONObject
+
+' Changing in the Write To CT Repository
+' 1. We don't archive directly into the CT Archive, it will double up, since we will archive the same data from CT Repo into CT Archive
+' 2. That we left ct form from removing from this database into CT Repo
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	On Error Goto ErrorHandler
+	Dim Ses As New NotesSession
+	Dim dbThis As NotesDatabase, dbCTReg As NotesDatabase, dbArchive As NotesDatabase
+	Dim sourceDocument As NotesDocument, registerDocument As NotesDocument, regJSONDocument As NotesDocument, JSONDocument As NotesDocument, nextDocument As NotesDocument
+	Dim newDocWebArgs As Variant
+	Dim EmptyJSONArray As New JSONArray 
+	Dim agent As NotesAgent, tmpSrcDoc As notesdocument
+	Dim count As Integer
+	Dim vwThis As notesview, vwThisJSON As notesview, vwThisApp As notesview, vwCTRepoApp As NotesView, vwCTRepoJSON As NotesView
+	
+	Set dbThis = Ses.CurrentDatabase
+	Set dbCTReg = fdbGetDatabase("CTR_Path")
+	Set dbArchive = fdbGetDatabase("CTA_Path")
+	Set vwThisJSON = dbThis.GetView("JSONApplication")
+	Set vwThis = dbThis.GetView("AppsAwaitingWriteToRepository")	
+	Set vwThisApp = dbThis.GetView("AppsByApplicationId")	
+	Set vwCTRepoApp = dbCTReg.GetView("AppsByApplicationId")	
+	Set vwCTRepoJSON = dbCTReg.GetView("JSONApplication")	
+	
+	vwThis.AutoUpdate = False
+	Set sourceDocument = vwThis.GetfirstDocument
+	
+	While Not sourceDocument Is Nothing
+		
+		Set tmpSrcDoc = vwThis.GetNextDocument(sourceDocument)
+		
+		If sourceDocument.ApplicationStatus(0) = CS_APP_STATUS Then
+			
+			Call setStatus(sourceDocument)
+			Set JSONDocument = vwThisJSON.getdocumentbykey(appID)
+			
+			If Not JSONDocument Is Nothing Then
+				
+				sourceDocument.ApplicationStatus =  strNewStatus
+				JSONDocument.ApplicationStatus =  strNewStatus
+				
+				'get handle to current mime json 
+				Set AppJSONEntryStore = New MIMEJSONEntryStore(JSONDocument, "JSONMIMEFILE" ,"JSON.txt")
+				
+				If Cstr(sourceDocument.ApplicationStage(0)) = "4" Or Cstr(sourceDocument.ApplicationStage(0)) = "5" Then
+					Call varyJSON()
+				Else
+					Call updateJSON()
+				End If
+				
+				Call setSecurity(JSONDocument)
+				Call JSONDocument.save(True, False)
+				Call sourceDocument.save(True, False)
+				
+				
+				'/ For Completed Application, just registering into CTRepository
+				'/ INC 63195 
+				If Cstr(sourceDocument.ApplicationStage(0)) = "3" Then
+					'/ Remove the previous stage in CT Rep to CT Archive
+					Call archiveApp(appID+"~"+Cstr(appVer), dbArchive, dbCTReg)
+					
+					'/ then  register the current version into CT Repository					
+					Call registerApp(appID+"~"+appVer, dbCTReg)
+					
+					'/ If more than version 1, archive as well the previous version from CT Repository
+					If Val(appVer) &gt; 1 Then
+						Call archiveApp(appID+"~"+Cstr(Cint(appVer)-1), dbArchive, dbCTReg)
+					End If
+					
+				Else
+
+					'/ For other Stages - old codes here
+					If Not (Cstr(sourceDocument.ApplicationStage(0)) = "4") Then
+						Call archiveApp(appID+"~"+Cstr(appVer), dbArchive, dbCTReg)
+					Else
+						If Val(appVer) &gt; 1 Then  '/ INC 63195 - added If
+							Call archiveApp(appID+"~"+Cstr(Cint(appVer)-1), dbArchive, dbCTReg)	
+						End If
+					End If
+
+					'/ register the current version into CT Repository					
+					Call registerApp(appID+"~"+appVer, dbCTReg)
+					
+					'/ INC 63195 - hide this line
+					'/ I think we just need to register current app into CT Rep if Not Completed, 
+					'/ then it will be archived for the next one by previous version  - archiveApp(appID+"~"+Cstr(CInt(appVer)-1), dbArchive, dbCTReg)	
+					' Call archiveApp(appID+"~"+appVer, dbArchive, dbThis)
+
+				End If
+				
+			End If
+		End If
+		
+		'Set sourceDocument = vwThis.GetNextDocument(sourceDocument)
+		Set sourceDocument = tmpSrcDoc
+		
+	Wend
+	
+ExitSub:
+	Exit Sub
+ErrorHandler:
+	Print "CT - write to repository agent error: Error - "; Err(); " at line "; Erl(); ", "; Error()
+	Resume ExitSub
+End Sub
+
+</lotusscript></code><code event='updateJSON'><lotusscript>Function updateJSON( )
+	
+	Set JSONEntry = AppJSONEntryStore.GetFirstJSONEntry
+	
+	While Not (JSONEntry Is Nothing)
+		Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "IsActiveVersion", "1")
+		
+		If AppJSONEntryStore.GetItemFirstValue(JSONEntry, "Type") = "Application" Then			
+			Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ApplicationStatus", strNewStatus)
+			Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ApplicationStage", appStage)
+			Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "IsPushBackTriggered", "")
+			Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "IsPushBackSubmittedBack", "")
+			If(AppJSONEntryStore.HasItem(JSONEntry, "IsCleanTrial")) Then
+				Call AppJSONEntryStore.RemoveItem(JSONEntry, "IsCleanTrial")
+			End If
+		End If
+%REM
+		If AppJSONEntryStore.GetItemFirstValue(JSONEntry, "Type") = strPart Then			
+			strContact = AppJSONEntryStore.GetItemValue(JSONEntry, "ContactName")
+			strContactEmail = AppJSONEntryStore.GetItemValue(JSONEntry, "ContactEmail")
+			strContactFax = AppJSONEntryStore.GetItemValue(JSONEntry, "ContactFax")
+			strContactPhone = AppJSONEntryStore.GetItemValue(JSONEntry, "ContactPhone")
+		End If
+		
+		If AppJSONEntryStore.GetItemFirstValue(JSONEntry, "Type") = "Part1" Then			
+			Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ContactName", strContact)
+			Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ContactEmail", strContactEmail)
+			Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ContactFax", strContactFax)
+			Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ContactPhone", strContactPhone)
+		End If	
+%END REM
+		
+		Set JSONEntry = AppJSONEntryStore.GetNextJSONEntry
+	Wend
+	
+	'save the updated json
+	Call AppJSONEntryStore.SaveJSONToMime()
+	
+End Function
+
+</lotusscript></code><code event='setSecurity'><lotusscript>Function setSecurity(JSONDocument As NotesDocument)
+	
+	Dim secNames(3) As String
+	Dim item As NotesItem
+	
+	Yield	'===== set security
+	'secNames(0) = "SIME" + formfields("clientid")
+	secNames(0) = "[Admin]"
+	secNames(1) = "[TGA]"
+	'secNames(3) = "[SIMEReader]"
+	secNames(2) = "LocalDomainServers"
+	secNames(3) = "OtherDomainServers"
+	JSONDocument.ReplaceItemValue "WebAuthors", secNames
+	Set item = JSONDocument.GetFirstItem("WebAuthors")
+	item.IsAuthors = True
+	JSONDocument.ReplaceItemValue "WebReaders", secNames
+	Set item = JSONDocument.GetFirstItem("WebReaders")
+	item.IsReaders = True
+	
+End Function
+
+</lotusscript></code><code event='setStatus'><lotusscript>Function setStatus(sourceDocument As NotesDocument)
+	appStage = Cstr(sourceDocument.ApplicationStage(0))
+	
+	If sourceDocument.ClinicalTrialType(0) = "CTN" Then
+		strPart = "Part1"
+	Else
+		strPart = "Part2"
+	End If
+	
+	If appStage = "3" Then
+		strNewStatus = "Completed"
+	Else
+		strNewStatus = "Active"	
+		If appStage = "4" Then
+			If sourceDocument.ClinicalTrialType(0) = "CTN" Then
+				appStage = "1"
+			Else
+				appStage = "2"
+			End If		
+		End If
+	End If
+	
+	appVer = Cstr(sourceDocument.ApplicationVersion(0)) 'DFS May 2013 - allow for numeric value
+	appID = sourceDocument.ApplicationId(0)
+	
+End Function
+
+</lotusscript></code><code event='removeItem'><lotusscript>
+Sub removeItem(doc As NotesDocument, itemName As String)
+	Dim nitem As NotesItem  '/ WP - TSK 61861 Feb - bug to remove Archived
+	If doc.Hasitem(itemName) Then
+		Set nitem = doc.Getfirstitem(itemName)
+		If Not nitem Is Nothing Then
+			Call nitem.Remove()
+		End If
+	End If
+End Sub
+
+</lotusscript></code><code event='varyJSON'><lotusscript>Function varyJSON()
+	On Error Goto ErrorHandler
+	
+	Dim JSONEntries As Variant, AllSites As Variant
+	Dim JSONEntryTrialTo As JSONObject
+	
+	JSONEntries = AppJSONEntryStore.GetEntriesByType("UpdateDetails")
+	
+	If Not Isnull(JSONEntries) Then
+		Forall entry In JSONEntries
+			Set JSONEntry = entry
+			
+			Select Case appStage
+			Case "1"
+				Set JSONEntryTrialTo = AppJSONEntryStore.GetEntryByIdentity(appID+"~"+appVer+"~Part1")
+			Case "2"
+				Set JSONEntryTrialTo = AppJSONEntryStore.GetEntryByIdentity(appID+"~"+appVer+"~Part2")
+			End Select
+			
+			'commented out 23FEB2016 in response to TSK72076 rework issue no. 2,
+			'which brings into question this whole loop code - BL
+			'Call AppJSONEntryStore.MoveItemToAnotherEntry(JSONEntry, "Sites", JSONEntryTrialTo, True, False)				
+			
+			'clean up items here
+			'If  AppJSONEntryStore.HasItem(JSONEntry , "Sites") Then
+			'	Call AppJSONEntryStore.RemoveItem(JSONEntry, "Sites")
+				'Print "Removing JSON entry from app: " + appID
+			'End If
+			
+		End Forall
+	End If
+	
+	Set JSONEntry = AppJSONEntryStore.GetFirstJSONEntry	
+	Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ApplicationStatus", strNewStatus)		
+	Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "IsPushBackTriggered", "")
+	Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "IsPushBackSubmittedBack", "")
+	If(AppJSONEntryStore.HasItem(JSONEntry, "IsCleanTrial")) Then
+		Call AppJSONEntryStore.RemoveItem(JSONEntry, "IsCleanTrial")
+	End If
+	'save the updated json
+	Call AppJSONEntryStore.SaveJSONToMime()
+	
+	Exit Function
+ErrorHandler:
+	Print "CT - write to repository agent error (Function varyJSON): Error - "; Err(); " at line "; Erl(); ", "; Error()
+	Exit Function
+End Function
+
+</lotusscript></code><code event='registerApp'><lotusscript>Function registerApp(luKey As String, dbRegister As NotesDatabase)
+	Dim s As New notessession
+	Dim db As NotesDatabase
+	Dim dc As NotesDocumentCollection
+	Dim doc As NotesDocument,  tmpdoc As NotesDocument
+	Dim vwLookup As NotesView
+	
+	Set db = s.CurrentDatabase
+	Set vwLookup = db.GetView("LookupAllByApplicationID")
+	Set dc = vwLookup.GetAllDocumentsByKey(luKey)
+	Set doc = dc.GetFirstDocument
+	
+	While Not doc Is Nothing
+		'/ INC 63195
+		If Lcase(doc.Form(0)) = "ct" Then
+			Set tmpdoc = doc
+		End If
+		
+		Call doc.ReplaceItemValue("ApplicationStatus", "Active")
+		Call doc.ReplaceItemValue("WriteStatus", "1")
+		
+		'/ WP - TSK 61861 Feb 
+		'/ Checked for Archive field and Pushback to be removed
+		Call removeItem(doc, "archive")
+		Call removeItem(doc, "IsPushBackTriggered")
+		Call removeItem(doc, "IsCleanTrial")
+		
+		Call doc.Save( True ,False)
+		
+		Call doc.CopyToDatabase(dbRegister)
+		
+		Set doc = dc.GetNextDocument(doc)
+	Wend
+	
+	'/ So now we have to remove CT form from the collection, because we need it to Vary, NextStage or Complete action from CTRepository
+	'/ INC 63195
+	If Not (tmpdoc Is Nothing) Then
+		Call dc.Deletedocument(tmpdoc)	
+	End If
+	
+	'/ After we copy to CT Repo then we need to remove all Notes documents but CT web form
+	If dc.Count &gt; 0 Then
+		Call dc.RemoveAll(True)
+	End If
+	'/ End of New Code - INC 63195	
+	
+End Function
+
+</lotusscript></code><code event='archiveApp'><lotusscript>Function archiveApp(luKey As String, dbArchive As NotesDatabase, dbThis As NotesDatabase)
+	Dim dc As NotesDocumentCollection
+	Dim doc As NotesDocument, tmpdoc As notesdocument
+	Dim vwLookup As NotesView
+	
+	'/ -&gt; This view contains every documents in this database, has been like this before we modified.
+	Set vwLookup = dbThis.GetView("LookupAllByApplicationID")
+	Set dc = vwLookup.GetAllDocumentsByKey(luKey)
+	Set doc = dc.GetFirstDocument
+	
+	While Not doc Is Nothing
+		doc.isArchived = "1"		
+		doc.ArchiveDate = Now
+		Call doc.ReplaceItemValue("ApplicationStatus", "Archived")
+		Call doc.ReplaceItemValue("archive", "1")
+		Call removeItem(doc, "IsCleanTrial")
+		Call doc.Save( True ,False)
+		
+		'/ INC 65021 - The JSON Document is left behind in the Repository and never archive to CT Archive from Repository - rehide this code again
+		'/ This cause a problem in PrintPreview for Repository
+		'/ INC 63195
+		'If Lcase(doc.Form(0)) = "ct" Then
+		'	Set tmpdoc = doc
+		'End If
+		
+		Call doc.CopyToDatabase(dbArchive)
+		Set doc = dc.GetNextDocument(doc)
+	Wend
+	
+	'/ INC 65021 - The JSON Document is left behind in the Repository and never archive to CT Archive from Repository - rehide this code again
+	'/ This cause a problem in PrintPreview for Repository
+	'/ So now we have to remove CT form from the collection, because we need it to Vary, NextStage or Complete action from CTRepository
+	'/ INC 63195
+	'If Not (tmpdoc Is Nothing) Then
+	'	Call dc.Deletedocument(tmpdoc)	
+	'End If
+	
+	'/ Old code put it back again to remove those documents
+	If dc.Count &gt; 0 Then
+		Call dc.RemoveAll(True)
+	End If
+	
+End Function</lotusscript></code>
+<item name='$POID'><datetime>20160620T120207,41+10</datetime></item></agent>
+

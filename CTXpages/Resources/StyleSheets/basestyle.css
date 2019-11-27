@@ -1,0 +1,134 @@
+/* VERSION 1.04 */
+/*  
+	24SEP2015 - Bruce Langner
+	modify td.m1 and td.c1 classes, and add a neutral class td.n1
+	29AUG2012 - Bruce Langner
+	add dojo theme claro
+	11JUL2012 - Bruce Langner
+	added custom css for dijitTooltipContainer
+	RBL 25OCT2011
+	changed vertical alignments on c1,c2,m1,m2 to 'top'
+	and m2 back-ground position to 'top right'
+	allows for correct alignment of text for easy reading
+	added work-around to allow word wrap in grid headers
+*/
+
+@import "/domjs/dojo-1.5.0/dojo/resources/dojo.css";
+@import "/domjs/dojo-1.5.0/dijit/themes/soria/soria.css";
+@import "/domjs/dojo-1.5.0/dijit/themes/claro/claro.css";
+
+html, body { font-family: Arial, Verdana, Helvetica, sans-serif; width:100%; height:100%; overflow:hidden; margin: 0; padding: 0; }
+.dijitTextBox { margin: 2px !IMPORTANT; padding: 2px; }
+.dojoxGrid { border:1px #ccc !important; margin:0; width:100%; height:100%; }
+.dialogbox1 { overflow:hidden;  }
+.textbox1 {width:99% !IMPORTANT; }
+.dijitReadOnly {color:black !IMPORTANT;}
+.dojoxGridCell { font-size:110% !IMPORTANT; padding: 1 !IMPORTANT; }
+th.dojoxGridCell { font-size:110% !IMPORTANT; font-weight: bold !IMPORTANT; }
+
+td.m1header:before {
+	color: #FF0000;
+    content: "*";
+    font-size: 14px;
+    padding: 0 2px;
+}
+
+td.m1header {
+	text-align:right; 
+	vertical-align:top; 
+	color:#000080;
+	overflow:hidden;
+	width:190px; 
+	font-size:100%; 
+	padding-right:13px;
+}
+
+td.c1header:before {
+	color: #808080;
+    content: "*";
+    font-size: 14px;
+    padding: 0 2px;
+}
+
+td.c1header {
+	text-align:left; 
+	vertical-align:top; 
+	color:#000080;
+	overflow:hidden;
+	width:190px; 
+	font-size:100%; 
+	padding-right:13px;	
+}
+
+td.m1:after {
+    color: #FF0000;
+    content: "*";
+    font-size: 14px;
+    padding: 0 2px;
+}
+td.m1 {
+	text-align:right; 
+	vertical-align:top; 
+	color:#000080;
+	overflow:hidden;
+	width:190px; 
+	font-size:100%; 
+	/* background-image:url(required.png); 
+	background-position:top right; 
+	background-repeat:no-repeat; */
+	padding-right:13px; 
+}
+
+td.n1 {
+	text-align:right;
+	vertical-align:top;
+	color:#000080;
+	overflow:hidden;
+	width:190px;
+	font-size:100%;
+	padding-right:26px;
+}
+text.m1 {text-align:right; vertical-align:top; color:#000080; overflow:hidden; font-size:100%; background-image:url(required.png); background-position:top right; background-repeat:no-repeat; padding-right:13px; }
+td.m2 {text-align:right; vertical-align:top; color:#000080; overflow:hidden; width:100px; font-size:100%; background-image:url(required.png); background-position:top right; background-repeat:no-repeat; padding-right:13px; }
+td.c1:after {
+    color: #808080;
+    content: "*";
+    font-size: 14px;
+    padding: 0 2px;
+}
+td.c1 {
+	text-align:right;
+	vertical-align:top;
+	color:#000080;
+	overflow:hidden;
+	width:190px;
+	font-size:100%;
+	padding-right:13px;
+}
+td.c2 {text-align:right; vertical-align:top; color:#000080; overflow:hidden; width:150px; font-size:100%; padding-right:13px; }
+#productDataTable tr,#Formulations_Table tr{height:25px;}
+legend {font-weight:bold;}
+.dijitDialogUnderlay { background: black; }
+.dijitDisabled { color: #000000 !important; }
+.dijitReset { color: #000000 !important; }
+.dijitDisabled { color: #000000 !important; }
+.dijitInputInner { color: #000000 !important; }
+.dijitTextBoxReadOnly { color: #000000; }
+.dijitTextBoxDisabled { color: #000000; }
+.dijitPlaceHolder {color: #666;}
+.dijitTextArea { font-family: Arial, Verdana, Helvetica, sans-serif; font-size: 100%;}
+.dojoxGridSortNode{white-space:normal;}
+.dojoxGridColCaption{overflow:auto;}
+#djgrid_Product_RouteOfAdminCode .dojoxGridHeader { display:block; }
+ul.ManufacturingSteps {
+	list-style-type: none;
+	list-style-position: outside;
+	width: 33em;
+	padding: 0.5em 0.5em 0.5em 0.5em;
+	margin: 0.75em 0 0 1.0em;
+}
+ul.ManufacturingSteps li {
+	padding: 0;
+	margin: 0;
+}
+.dijitTooltipContainer {background-color: #ffc !important}

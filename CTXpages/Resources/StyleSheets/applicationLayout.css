@@ -1,0 +1,240 @@
+body {
+	margin: 0px;
+	padding: 0px;
+	overflow: hidden;
+	width: 100%;
+	height: 100%;	
+}
+
+.dijitSplitter {
+	background-color: #f8f8f8 !important;	
+}
+
+.dijitSplitterThumb  {
+	border: 1px dotted #002746;	
+}
+	
+.application, sidebarContainer {
+	width: 100%;
+	height: 100%;
+	padding: 0px;
+}
+
+.header {
+	background: #00264C url('tgaBanner.gif') no-repeat right;
+	border-bottom: 1px solid #eeeeee;	
+	height: 52px;	
+	color: #ffffff;
+	overflow: none;
+	padding: 4px !important;
+}
+
+.header h2 .xspTextComputedField {
+	font-weight: bold;
+	font-size: 1.1em;	
+}
+
+.header .tagline {
+	font-size: 80%;	
+	margin-bottom: 5px;
+}
+
+.header .left {
+	text-align: left;	
+	width: 50%;
+	float: left;	
+}
+
+.header .right {
+	text-align: right;	
+	width: 47%;
+	float: right;	
+}
+
+.header .right table {
+	min-width: 300px;
+	float: right;
+	font-weight: bold;
+	background-color: #00264C;
+	margin-right: 22px;
+	border: 1px solid #98C475;
+}
+
+.header .right table td {
+	padding: 2px;
+}
+	
+.header .right .label {
+	display: inline-block;
+	color: #ffffff;	
+	padding-right: 6px;
+	font-size: 80%;
+	font-weight: normal;		
+}
+	
+.userInfo{
+	white-space: nowrap;
+	float: right;	
+	padding: 4px;
+}
+
+.navigator {
+	border-right: 1px solid #eeeeee;	
+	padding: 2px !important;
+	width: 150px;
+}
+
+.navigator .top{
+	border-bottom: 1px solid #eeeeee;	
+	padding: 2px !important;	
+}
+
+.navigator .bottom{
+	border-top: 1px solid #eeeeee;	
+	padding: 2px !important;	
+}
+
+.navigatorMenu {
+	width: 100%;
+	margin: 0px !important;	
+}
+
+.dijitMenuItemIconCell, .dijitMenuArrowCell {
+	width: 20px !important;	
+}
+	
+	
+.navigator ul {
+	padding: 0px;
+	margin: 0px;
+	list-style: none;
+}
+
+.navigator li {
+	padding: 0px;
+	margin: 0px;
+	list-style: none;	
+}
+
+.navigator li a {
+	display: block;
+	padding: 2px 3px 2px 4px;
+	margin: 1px 0px 2px 0px;
+	border: 1px solid #002746;
+	background-color: #002746;
+	color: #ffffff;
+}
+
+.navigator li a:hover {
+	text-decoration: none;
+	background-color: #eeeeee;
+	color: #000000;
+}
+
+.content {
+	border-right: 1px solid #eeeeee;	
+	padding: 0px !important;		
+}
+
+.contentRegion {
+	padding: 2px !important;	
+}
+
+.contentTabContainer {
+	width: 100%;
+	height: 100%;	
+}
+		
+.actionBar {
+	text-align: right;
+	border: 1px solid #dddddd !important;	
+	margin: 2px !important;
+	height: 1.8em;
+}	
+
+.sideBar {
+	border-left: 1px solid #eeeeee;	
+	padding: 0px !important;
+}
+
+.sideBar .top{
+	border-bottom: 1px solid #eeeeee;	
+}
+
+.sideBar .bottom{
+	border-top: 1px solid #eeeeee;	
+}
+
+.footer {
+	font-size: 85%;
+	color: #ffffff;
+	background-color: #00264C;	
+}
+
+.footer ul {
+		padding: 0px;
+		margin: 0px;
+		list-style-type: none;
+}
+
+.footer li {
+		display: block;
+		padding: 0px 6px 0px 6px;
+		margin: 0px;
+		list-style-type: none;
+		border-right: 1px solid #ffffff;
+}
+
+.footer li.last {
+	border: none;	
+}
+	
+.footer a {
+	color: #ffffff;
+}
+	
+.footer .left li {
+	float: left;
+}
+
+.footer .left {
+	text-align: left;	
+	width: 50%;
+	float: left;
+}
+
+.footer .right {
+	text-align: right;	
+	width: 50%;
+	float: right;
+}
+
+.clearFix {
+	clear: both;
+}
+
+.hidden, .hiddenText, .hiddenData {
+	display: none;	
+}
+
+.dijitTabChecked .tabLabel {
+	font-weight: bold;	
+}
+
+.dialogScrollContent {
+	overflow: auto;
+	padding: 5px;
+	margin: -10px -8px;	
+}
+
+.sidebarSelDocs {
+	width: 190px;
+	position: fixed;
+	top: 200px;
+	margin: 0 0 0 5px;
+	padding: 2px;
+	background: #eee;
+	border: 1px solid #ddd;
+	max-height:300px;
+	overflow:auto;
+}

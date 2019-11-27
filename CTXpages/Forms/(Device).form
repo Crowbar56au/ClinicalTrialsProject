@@ -1,0 +1,145 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form name='(Device)' alias='Device' xmlns='http://www.lotus.com/dxl' version='9.0'
+ maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='web mobile' nocompose='true'
+ noquery='true' publicaccess='false' designerversion='8.5.3' comment='Notes Device form'
+ renderpassthrough='true'>
+<noteinfo noteid='496' unid='DBD48748535F9C41CA257FD8000B2A6D' sequence='14'>
+<created><datetime>20160620T120157,57+10</datetime></created>
+<modified><datetime>20160628T151506,20+10</datetime></modified>
+<revised><datetime>20160628T151506,19+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,19+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,89+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='windowtitle'><formula>Type + " - " + ApplicationId</formula></code>
+<actionbar bgcolor='#f0f0f0' bordercolor='black'>
+<actionbuttonstyle bgcolor='#f0f0f0'/><font size='9pt' color='system'/><border
+ style='solid' width='0px 0px 1px' color='system'/></actionbar>
+<body><richtext>
+<pardef id='1' leftmargin='0.7868in' spacebefore='1.5' hide='notes web mobile'/><subformref
+ name='CommonActionButtons'/>
+<pardef id='2' leftmargin='0.7868in' hide='notes web mobile'/>
+<par def='2'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'/></run></par>
+<table widthtype='fitmargins' cellbordercolor='#e1e1e1' colorstyle='altrows'
+ bgcolor='white' altbgcolor='#efefef' rowspacing='0.0396in' refwidth='15.9167in'><tablecolumn
+ width='1.5750in'/><tablecolumn width='100%'/>
+<tablerow>
+<tablecell valign='center' borderwidth='1px 0px'>
+<pardef id='4' align='right' leftmargin='1%' rightmargin='99%' keepwithnext='true'
+ keeptogether='true'/>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Is Active Version:</run></par></tablecell>
+<tablecell valign='center' borderwidth='1px 0px'>
+<pardef id='5' leftmargin='1%' keepwithnext='true' keeptogether='true'/>
+<par def='5'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'/></run><run
+><font name='Arial' pitch='variable' truetype='true' familyid='20'/><sharedfieldref
+ name='IsActiveVersion'/></run><run><font name='Arial' pitch='variable' truetype='true'
+ familyid='20'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<pardef id='6' align='right' rightmargin='1.5590in' keepwithnext='true' keeptogether='true'/>
+<par def='6'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Is this a:</run></par></tablecell>
+<tablecell borderwidth='1px 0px'>
+<pardef id='7' leftmargin='0.0819in' keepwithnext='true' keeptogether='true'/>
+<par def='7'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'/></run><run
+><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedfordisplay' name='IsAKit'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='7' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font name='Arial' pitch='variable'
+ truetype='true' familyid='20'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell valign='center' borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Product Name:</run></par></tablecell>
+<tablecell valign='center' borderwidth='1px 0px'>
+<par def='5'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='red'/></run><run><font name='Arial' pitch='variable' truetype='true'
+ familyid='20'/><field type='text' kind='computedfordisplay' name='ProductName'><code
+ event='defaultvalue'><formula>@ThisValue</formula></code></field></run><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='9' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font name='Arial'
+ pitch='variable' truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell valign='center' borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Manufacturer:</run></par></tablecell>
+<tablecell valign='center' borderwidth='1px 0px'>
+<par def='5'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='red'/></run><run><font name='Arial' pitch='variable' truetype='true'
+ familyid='20'/><field type='text' kind='computedfordisplay' name='Manufacturer'><code
+ event='defaultvalue'><formula>@ThisValue</formula></code></field></run><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='9' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font name='Arial'
+ pitch='variable' truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell valign='center' borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Description:</run></par></tablecell>
+<tablecell valign='center' borderwidth='1px 0px'>
+<par def='5'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='red'/></run><run><font name='Arial' pitch='variable' truetype='true'
+ familyid='20'/><field type='text' kind='computedfordisplay' name='Description'><code
+ event='defaultvalue'><formula>@ThisValue</formula></code></field></run><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='9' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font name='Arial'
+ pitch='variable' truetype='true' familyid='20' color='navy'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<pardef id='8' align='right' keepwithnext='true' keeptogether='true'/>
+<par def='8'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>GMDN:</run></par></tablecell>
+<tablecell borderwidth='1px 0px'>
+<par def='7'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/></run><run><font name='Arial' pitch='variable' truetype='true'
+ familyid='20'/><field type='text' kind='computedfordisplay' name='GMDNS_Label'><code
+ event='defaultvalue'><formula>@ThisValue</formula></code></field></run><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='9' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font name='Arial'
+ pitch='variable' truetype='true' familyid='20' color='navy'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='6'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Intended Purpose:</run></par></tablecell>
+<tablecell borderwidth='1px 0px'>
+<par def='7'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'/></run><run
+><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedfordisplay' name='IntendedUse_Label'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='6' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font name='Arial' pitch='variable'
+ truetype='true' familyid='20'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='8'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>If 'Other' please provide a description:</run></par></tablecell>
+<tablecell borderwidth='1px 0px'>
+<par def='7'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'/></run><run
+><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedfordisplay' name='IntendedUseOtherDescription'><code
+ event='defaultvalue'><formula>@ThisValue</formula></code></field></run><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='6' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font name='Arial'
+ pitch='variable' truetype='true' familyid='20'/></run></par></tablecell></tablerow></table>
+<pardef id='9' leftmargin='1in' hide='notes web'/>
+<par def='9'/><subformref name='Sponsor Web Security'/>
+<par def='9'/></richtext></body>
+<item name='$SubForm_RepIDs' sign='true'><textlist><text>0000000000000000</text><text
+>0000000000000000</text></textlist></item>
+<item name='$$ScriptName' summary='false' sign='true'><text>Device</text></item></form>
+

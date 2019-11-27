@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
+<subform name='HTMLHeadSubmission' xmlns='http://www.lotus.com/dxl' version='9.0'
+ maintenanceversion='1.0' replicaid='CA257FDB001B5780' designerversion='8.5.3'
+ renderpassthrough='true'>
+<noteinfo noteid='2e6' unid='125E40354DD621F2CA257FD8000B26DC' sequence='14'>
+<created><datetime>20160620T120148,44+10</datetime></created>
+<modified><datetime>20160628T151504,64+10</datetime></modified>
+<revised><datetime>20160628T151504,63+10</datetime></revised>
+<lastaccessed><datetime>20160628T151504,63+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152009,81+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1' leftmargin='0.7500in' tabs='L1in'/>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'
+ expanded='true'><sectiontitle pardef='1' borderstyle='single' color='green'><font
+ color='green'/><text>Style Sheets / Claro</text></sectiontitle>
+<pardef id='2' leftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='2'>&lt;link rel="stylesheet" type="text/css" href="/domjs/dojo-1.5.0/dijit/themes/claro/claro.css" /&gt;</par>
+<par def='2'>&lt;style type="text/css"&gt;</par>
+<par def='2'>@import "/domjs/dojo-1.5.0/dojox/grid/resources/Grid.css";</par>
+<par def='2'>@import "/domjs/dojo-1.5.0/dojox/grid/resources/claroGrid.css";</par>
+<par def='2'>@import "/domjs/dojo-1.5.0/ebs/resources/basestyle.css";</par>
+<pardef id='3'/>
+<par def='3'>#loader {padding:0; margin:0; position:absolute; top:0; left:0; width:100%; height:100%;  background:#f0f0f0;  filter: alpha(opacity=100); opacity: 1.0 z-index:999; vertical-align:middle; }<break
+/>#loaderInner {position: absolute; top: 50%; left: 40%; width: 32px; height: 32px; background-repeat: no-repeat;}</par>
+<par def='2'/>
+<par def='2'>&lt;/style&gt;</par></section>
+<pardef id='4' leftmargin='1.2500in' firstlineleftmargin='1in' tabs='L1in'/>
+<par def='4'/></richtext></body>
+<item name='$$ScriptName' summary='false' sign='true'><text>HTMLHeadSubmission</text></item></subform>
+

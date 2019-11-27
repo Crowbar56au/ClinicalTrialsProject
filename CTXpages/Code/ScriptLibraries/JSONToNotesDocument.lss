@@ -1,0 +1,84 @@
+'++LotusScript Development Environment:2:5:(Options):0:74
+Option Public
+Option Declare
+Use "ls.snapps.JSONReader"
+
+
+'++LotusScript Development Environment:2:5:(Forward):0:1
+Declare Function JSONToNotesDocuments(JSONString As String, CommitDocuments As Boolean) As Variant 
+Declare Function ReadJSONObject(JSONObj As Variant, SaveDocumentToDB As Boolean, dc As NotesDocumentCollection) As Long
+
+'++LotusScript Development Environment:2:5:(Declarations):0:2
+
+'++LotusScript Development Environment:2:1:JSONToNotesDocuments:1:8
+Function JSONToNotesDocuments(JSONString As String, CommitDocuments As Boolean) As Variant 
+	Dim jsonReader As JSONReader
+	Dim vResults As Variant
+	Dim dbThis As NotesDatabase
+	Dim isDocumentsArrayInit As Boolean
+	Dim dc As NotesDocumentCollection
+	Dim DocCount As Long
+	
+	'SaveDocumentToDB = CommitDocuments
+	isDocumentsArrayInit = False
+	
+	Set jsonReader = New JSONReader
+	
+	Set vResults = jsonReader.Parse(JSONString)	'This is a JSONObject created using the ls.snapps.JSONReader library
+	DocCount = ReadJSONObject(vResults, CommitDocuments, dc) 'Recursivly called
+End Function
+
+'++LotusScript Development Environment:2:1:ReadJSONObject:1:8
+Function ReadJSONObject(JSONObj As Variant, SaveDocumentToDB As Boolean, dc As NotesDocumentCollection) As Long
+	Dim s As New NotesSession
+	Dim JSONEntries As Variant, subJSONEntries As Variant
+	Dim ObjType As String , subObjType As String 
+	Dim doc As NotesDocument, isDocumentEntry As Boolean
+	
+	JSONEntries = JSONObj.Items
+	
+	isDocumentEntry=False
+	If Iselement(JSONEntries("RecordUNID")) And Iselement(JSONEntries("id"))  Then
+		'Create a Notes Document only in the case where the entry has UNID and ID JSON Elements, as according to the JSON every document Entry has to have a UNID, Id aswell as a TYPE element
+		Set doc = New NotesDocument(s.currentdatabase)
+		ReadJSONObject=ReadJSONObject+ 1
+		isDocumentEntry=True
+	End If
+	
+	Forall JSONEntry In JSONEntries
+		ObjType = Typename(JSONEntry)
+		If  objType = "JSONOBJECT" Then
+			'If this is an Object, its a Document/Document Collection entry call ReadJSONObject to process the nested document
+			ReadJSONObject=ReadJSONObject + ReadJSONObject(JSONEntry, SaveDocumentToDB, dc)
+		Elseif objType = "JSONARRAY" Then
+			'JSONEntry.Items would be of type EMPTY in cases where the Object has no entries in the ITEMS array of JSON where the Dummy EMPTY JSON objects have been created
+			If Typename(JSONEntry.Items) <> "EMPTY" Then
+				subObjType = Typename(JSONEntry.Items(0))
+				If subObjType <> "JSONOBJECT" Then	'THE REAL DATA ELEMENT / ENTRY Type MULTIVALUE
+					If isDocumentEntry Then
+						doc.ReplaceItemValue Listtag(JSONEntry), JSONEntry.Items
+					End If
+				Else	'Else This is a Collection of other Documents
+					Forall JSONSubEntry In JSONEntry.Items
+						ReadJSONObject=ReadJSONObject + ReadJSONObject(JSONSubEntry, SaveDocumentToDB, dc)
+					End Forall
+				End If
+			Else
+				If isDocumentEntry Then
+					doc.ReplaceItemValue Listtag(JSONEntry), ""
+				End If
+			End If	
+		Else
+			If isDocumentEntry Then	'THE REAL DATA ELEMENT / ENTRY
+				doc.ReplaceItemValue Listtag(JSONEntry), JSONEntry
+			End If
+		End If
+	End Forall
+	
+	If isDocumentEntry Then
+		dc.AddDocument doc
+		If SaveDocumentToDB Then
+			doc.Save True, False
+		End If
+	End If
+End Function

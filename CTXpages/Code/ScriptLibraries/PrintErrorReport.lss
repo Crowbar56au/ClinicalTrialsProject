@@ -1,0 +1,85 @@
+'++LotusScript Development Environment:2:5:(Options):0:74
+Option Public
+Option Explicit
+Use "GetProfileValue"
+Use "DeterminePath"
+'++LotusScript Development Environment:2:5:(Forward):0:1
+Declare Sub Initialize
+Declare Function fstrGetGraphicsFilePath As String     
+Declare Sub sPrintErrorReport(db As NotesDatabase)
+
+'++LotusScript Development Environment:2:5:(Declarations):0:2
+
+'++LotusScript Development Environment:2:2:Initialize:1:10
+Sub Initialize
+	
+End Sub
+'++LotusScript Development Environment:2:1:fstrGetGraphicsFilePath:1:8
+Function fstrGetGraphicsFilePath As String     
+     'Return file path of graphics database
+	
+	Dim strGraphicsFilePath As String
+	Dim ExPos As Long
+	
+	strGraphicsFilePath = fstrGetProfileValue("GRA_Path")
+	
+     'change "\" To "/" and pre-pend a "/"
+	strGraphicsFilePath = "/" & fstrSwapPathSlashes(strGraphicsFilePath)
+	
+	ExPos& = Instr(1,strGraphicsFilePath ,"!") + 2
+	
+	fstrGetGraphicsFilePath = "/" & Mid(strGraphicsFilePath,ExPos&)
+	
+End Function
+
+'++LotusScript Development Environment:2:2:sPrintErrorReport:1:8
+Sub sPrintErrorReport(db As NotesDatabase)
+     'Display Error Report 
+	
+	Dim strErrorMsg As String
+	Dim strUserMsg As String
+	Dim strGraphicsFilePath As String
+	Dim strHomeFilePath As String
+	
+     'Get file paths
+	strGraphicsFilePath = fstrGetGraphicsFilePath     
+	strHomeFilePath = fstrSwapPathSlashes(db.FilePath)
+	
+     'Print header     
+	Print "[<TABLE WIDTH=""100%"" CELLSPACING=0 CELLPADDING=0> <TR BGCOLOR=DE5A22 ALIGN=CENTER><TD>]"
+	Print "[<TR BGCOLOR=02A6A6 ALIGN=CENTER><TD>]"
+	Print "[<img src =""" & strGraphicsFilePath & "/Lookup/TGABanner/$file/TGABanner.gif""></TD>]"
+	Print "[</TABLE>]"
+	
+     'Print form title
+	Print "[<B><FONT SIZE=5 FACE=""Arial"">Error Report</FONT></B>]"
+	Print "[<BR>]"     
+	
+     'Print navigator bar
+	Print "[<HR WIDTH=""100%"" SIZE=2 ALIGN=left COLOR=""20B2AA"" NOSHADE>]"     
+	Print "[<A HREF=/" & strHomeFilePath & "?opendatabase>]"     
+	Print "[<img src =""" & strGraphicsFilePath & "/Lookup/Home/$file/Home.gif""border=0></A>]"
+     'Print previous button     
+	Print "[<A HREF=javascript:history.back()>]"     
+	Print "[<img src =""" & strGraphicsFilePath & "/Lookup/previous/$file/previous.gif""border=0></A>]"
+	Print "[<HR WIDTH=""100%"" SIZE=2 ALIGN=left COLOR=""e26200"" NOSHADE>]"     
+	
+          'Print error message
+	Print "[<BR>]"     
+	Print "[<B><FONT COLOR=""008080"" FACE=""Arial"">Error</FONT></B>]"
+	Print "[<BR>]"     
+	strErrorMsg = Str(Err) & ": " & Error$     
+	Print "[<FONT SIZE=2 FACE=""Arial"">" & strErrorMsg & "</FONT>]"
+	Print "[<BR>]"     
+	
+     'Print standard error message
+	strUserMsg = "Please contact TGA for more information."
+	
+     'Print user message
+	Print "[<BR>]"     
+	Print "[<B><FONT COLOR=""008080"" FACE=""Arial"">" & strUserMsg & "</FONT></B>]"
+	
+     'Full stop at the end is required to work     
+	Print "[<BR>]" & "."
+	
+End Sub

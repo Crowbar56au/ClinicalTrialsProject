@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(ValidateApplication)' alias='ValidateApplication' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3'
+ publicaccess='false' designerversion='7'>
+<noteinfo noteid='5d2' unid='B00DF6C5B872AE69CA257F7700070BB8' sequence='14'>
+<created><datetime dst='true'>20160315T121657,52+11</datetime></created>
+<modified><datetime>20160628T151507,02+10</datetime></modified>
+<revised><datetime>20160628T151507,01+10</datetime></revised>
+<lastaccessed><datetime>20160628T151507,01+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,47+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151507,07+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+Option Declare
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	On Error Goto ErrorHandler
+	Dim s As New NotesSession, docContext As NotesDocument
+	Dim dbSource As NotesDatabase	'the database to read the document from, defaults to the current database if 'S' not supplied
+	Dim viewSource As NotesView	'used internally, the view used to reference the document by the passed 'id'
+	Dim docSource As NotesDocument	'the document object after we've found it in the view
+	Dim strQueryString As String		'from the browser...
+	Dim newQS As Variant		'the querystring split apart
+	Dim x As Long		'a counter used in a loop
+	Dim QSpairs List As String		'the pairs read from the querystring after it's split by ampersand
+	
+	Set docContext = s.DocumentContext
+	newQS = Split(docContext.Query_String_Decoded(0), "&amp;")
+	QSpairs("ID")=""	'id of the document to get (not notes unid)
+	QSpairs("S")=""	'system mask
+	QSpairs("V")=""	'version, defaults to '1' if not supplied
+	For x = 0 To Ubound(newQS)
+		If Instr(newqs(x), "=") &gt; 0 Then
+			QSpairs(Ucase(Strleft(newqs(x),"="))) = Strright(newqs(x), "=")
+		End If
+	Next
+	
+	Print "Content-Type:application/json"
+	Print |{ "identifier": "id", "label": "name", "items": [|
+	
+	
+ErrorResume:
+	Print |]}|
+	Exit Sub
+ErrorHandler:
+	Print Cstr(Error) + " at line " + Cstr(Erl)
+	Resume ErrorResume
+End Sub</lotusscript></code>
+<item name='$POID'><datetime>20160620T120207,84+10</datetime></item></agent>
+

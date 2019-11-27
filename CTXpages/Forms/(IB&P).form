@@ -1,0 +1,265 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form name='(IB&amp;P)' alias='IBP' xmlns='http://www.lotus.com/dxl' version='9.0'
+ maintenanceversion='1.0' replicaid='CA257FDB001B5780' nocompose='true' noquery='true'
+ publicaccess='false' designerversion='8.5.3' comment='Stores IBP data collected in migration'
+ renderpassthrough='true'>
+<noteinfo noteid='4da' unid='2685FBCFF4B51CB6CA257FD8000B2A5F' sequence='14'>
+<created><datetime>20160620T120157,43+10</datetime></created>
+<modified><datetime>20160628T151506,37+10</datetime></modified>
+<revised><datetime>20160628T151506,36+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,36+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,02+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1' leftmargin='0.7868in' spacebefore='1.5' hide='notes web mobile'/><subformref
+ name='CommonActionButtons'/>
+<pardef id='2' leftmargin='0.7500in' hide='notes web mobile'/>
+<par def='2'><run><font size='9pt' name='Arial' pitch='variable' truetype='true'
+ familyid='20' color='red'/></run></par>
+<table widthtype='fitmargins' cellbordercolor='silver' colorstyle='altrows'
+ bgcolor='#f7f7f7' altbgcolor='white' rowspacing='0.0396in' refwidth='14.4167in'><tablecolumn
+ width='11.3090%'/><tablecolumn width='41.0729%'/><tablecolumn width='11.7882%'/><tablecolumn
+ width='35.8299%'/>
+<tablerow>
+<tablecell borderwidth='0px 1px 0px 0px'>
+<pardef id='4' align='right' leftmargin='1%' rightmargin='99%' keepwithnext='true'
+ keeptogether='true'/>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Record No:</run></par></tablecell>
+<tablecell columnspan='3' borderwidth='0px'>
+<pardef id='7' leftmargin='1%' rightmargin='99%' keepwithnext='true' keeptogether='true'/>
+<par def='7'>   <field type='text' kind='editable' name='RecordNo'/><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='7' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='0px 0px 1px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>S31 No:</run></par></tablecell>
+<tablecell columnspan='3' borderwidth='0px 0px 1px'>
+<par def='7'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='S31no'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='6' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Amendment Only:</run></par></tablecell>
+<tablecell columnspan='3' borderwidth='1px 0px'>
+<par def='7'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='AmendmentOnly'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='6' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Date Requested:</run></par></tablecell>
+<tablecell columnspan='3' borderwidth='1px 0px'>
+<par def='7'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='IBP_DateRequested'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='6' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Reply Due:</run></par></tablecell>
+<tablecell columnspan='3' borderwidth='1px 0px'>
+<par def='7'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='IBP_ReplyDue'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='6' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Date Received</run></par></tablecell>
+<tablecell columnspan='3' borderwidth='1px 0px'>
+<par def='7'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='IBP_DateReceived'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='6' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Name of Medical Officer:</run></par></tablecell>
+<tablecell columnspan='3' borderwidth='1px 0px'>
+<par def='7'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='IBP_MedicalOfficer'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='6' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Date Forwarded to Medical Officer:</run></par></tablecell>
+<tablecell columnspan='3' borderwidth='1px 0px'>
+<par def='7'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='DateForwardedToMedicalOfficer'><code
+ event='defaultvalue'><formula>@ThisValue</formula></code></field></run><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='6' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt'
+ name='Arial' pitch='variable' truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>RMS Date:</run></par></tablecell>
+<tablecell columnspan='3' borderwidth='1px 0px'>
+<par def='7'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='IBP_RMSDate'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='6' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Investigator Brochure:</run></par></tablecell>
+<tablecell columnspan='3' borderwidth='1px 0px'>
+<par def='7'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='InvestigatorBrochure'><code
+ event='defaultvalue'><formula>@ThisValue</formula></code></field></run><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='6' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt'
+ name='Arial' pitch='variable' truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Protocol:</run></par></tablecell>
+<tablecell columnspan='3' borderwidth='1px 0px'>
+<par def='7'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='Protocol'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='6' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Other:</run></par></tablecell>
+<tablecell columnspan='3' borderwidth='1px 0px'>
+<par def='7'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='IBP_Other'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='6' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Other Information Details:</run></par></tablecell>
+<tablecell columnspan='3' borderwidth='1px 0px'>
+<par def='7'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='IBP_OtherInformation'><code
+ event='defaultvalue'><formula>@ThisValue</formula></code></field></run><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='6' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt'
+ name='Arial' pitch='variable' truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Date Amendment Received:</run></par></tablecell>
+<tablecell columnspan='3' borderwidth='1px 0px'>
+<par def='7'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='IBP_DateAmendmentReceived'><code
+ event='defaultvalue'><formula>@ThisValue</formula></code></field></run><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='6' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt'
+ name='Arial' pitch='variable' truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Amendment Information - RMS Date:</run></par></tablecell>
+<tablecell columnspan='3' borderwidth='1px 0px'>
+<par def='7'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='Amendment_RMSDate'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='6' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Amendment Information  Name of Medical Officer:</run></par></tablecell>
+<tablecell columnspan='3' borderwidth='1px 0px'>
+<par def='7'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='Amendment_MedicalOfficer'><code
+ event='defaultvalue'><formula>@ThisValue</formula></code></field></run><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='6' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt'
+ name='Arial' pitch='variable' truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Amendment Information - Date Forwarded to Medical Officer:</run></par></tablecell>
+<tablecell columnspan='3' borderwidth='1px 0px'>
+<par def='7'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='Amendment_DateForwardedToMO'><code
+ event='defaultvalue'><formula>@ThisValue</formula></code></field></run><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='6' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt'
+ name='Arial' pitch='variable' truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Amendment Information - Comment:</run></par></tablecell>
+<tablecell columnspan='3' borderwidth='1px 0px'>
+<par def='7'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='Amendment_Comment'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='6' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow></table>
+<pardef id='42'/>
+<par def='42'/>
+<pardef id='43' leftmargin='1in' hide='notes web'/><subformref name='Sponsor Web Security'/>
+<par def='43'/></richtext></body>
+<item name='$SubForm_RepIDs' sign='true'><textlist><text>0000000000000000</text><text
+>0000000000000000</text></textlist></item>
+<item name='$$ScriptName' summary='false' sign='true'><text>IBP</text></item></form>
+

@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<sharedactions xmlns='http://www.lotus.com/dxl' version='9.0' maintenanceversion='1.0'
+ replicaid='CA257FDB001B5780' hide='v3 v4strict' designerversion='8.5.3' maxid='4'>
+<noteinfo noteid='416' unid='AA2DA6BE6EEAFBBECA257FD8000B2AAF' sequence='14'>
+<created><datetime>20160620T120158,23+10</datetime></created>
+<modified><datetime>20160628T151505,87+10</datetime></modified>
+<revised><datetime>20160628T151505,86+10</datetime></revised>
+<lastaccessed><datetime>20160628T151505,86+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,63+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<action title='Close' showinmenu='false' hide='preview previewedit web' id='1'><imageref
+ name='action_close.gif'/><code event='click'><formula>@Command([FileCloseWindow])</formula></code></action>
+<action title='Edit' showinmenu='false' hide='edit previewedit web' id='2'><imageref
+ name='action_edit.gif'/><code event='click'><formula>@Command([EditDocument]; "1")</formula></code><code
+ event='hidewhen'><formula>IsDialog = "1" | (!@IsMember("[Admin]"; @UserRoles) &amp; !@IsMember("[TGA]"; @UserRoles)) | DocType = "Archive"</formula></code></action>
+<action title='Save' showinmenu='false' hide='preview read web' id='3'><imageref
+ name='action_save.GIF'/><code event='click'><formula>@Command([FileSave])</formula></code></action>
+<action title='Save &amp; Close' showinmenu='false' hide='preview read web'
+ id='4'><imageref name='action_save.GIF'/><code event='click'><formula>@If(
+	@Command([FileSave]);
+		@Command([FileCloseWindow]);
+	""
+)</formula></code></action>
+<item name='$$ScriptName' summary='false' sign='true'><text>$ACTIONS</text></item></sharedactions>
+

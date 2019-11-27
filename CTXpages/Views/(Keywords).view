@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<view name='(Keywords)' alias='Keywords' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='web mobile'
+ showinmenu='false' publicaccess='false' designerversion='8.5.3' unreadmarks='none'
+ onopengoto='top' onrefresh='refresh' headers='beveled' opencollapsed='true'
+ showresponsehierarchy='false' showmargin='true' shrinkrows='false' extendlastcolumn='true'
+ showhierarchies='false' unreadcolor='black' rowlinecount='1' headerlinecount='1'
+ rowspacing='1' bgcolor='white' altrowcolor='#efefef' totalscolor='gray' headerbgcolor='white'
+ boldunreadrows='false' evaluateactions='false' allownewdocuments='false'
+ allowcustomizations='false' hidemarginborder='false' marginwidth='0px' marginbgcolor='white'
+ uniquekeys='false' indexrefresh='automatic' indexdiscard='inactivebyinterval'
+ indexdiscardinterval='24' initialbuildrestricted='false' noemptycategories='false'
+ formatnoteid='913D51000E43FA73CA2577F1007BC361'>
+<noteinfo noteid='4e2' unid='2C23CBAE86083100CA257F770006FEB4' sequence='14'>
+<created><datetime dst='true'>20160315T121624,20+11</datetime></created>
+<modified><datetime>20160628T151506,27+10</datetime></modified>
+<revised><datetime>20160628T151506,26+10</datetime></revised>
+<lastaccessed><datetime dst='true'>20191127T020256,71+11</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,04+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='selection'><formula>SELECT Form = "Keyword" : "ARTGNotificationEMail" : "configSubmissionDoc"</formula></code>
+<actionbar bgcolor='navy' bordercolor='black'>
+<actionbuttonstyle showdropdown='true' bgcolor='system'/><font size='9pt'/><border
+ width='0px 0px 1px'/>
+<action title='Categori_ze' showinbar='false' systemcommand='categorize'/>
+<action title='Create Mail Notification'><code event='click'><formula>@Command([Compose]; "ARTGNotificationEMail")</formula></code></action>
+<action title='Create Submission Config'><code event='click'><formula>@Command([Compose]; "configSubmissionDoc")</formula></code></action>
+<action title='_Edit Document' showinbar='false' systemcommand='edit'/>
+<action title='Send Docu_ment' showinbar='false' systemcommand='send'/>
+<action title='_Forward' showinbar='false' systemcommand='forward'/>
+<action title='_Move To Folder...' showinbar='false' systemcommand='movetofolder'/>
+<action title='_Remove From Folder' showinbar='false' systemcommand='removefromfolder'/></actionbar>
+<column sort='ascending' hidedetailrows='false' itemname='KeywordCode' width='24.8750'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='true' sortnocase='true'
+ showaslinks='false'><columnheader title='Code'><font size='9pt' style='bold'/></columnheader></column></view>
+

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?><note class="form" maintenanceversion="1.0" replicaid="CA257FDB001B5780" version="9.0" xmlns="http://www.lotus.com/dxl">
+<noteinfo noteid="cf32" sequence="43" unid="B185C91B30301DBDCA258480007F8D3B">
+<created><datetime>20190926T091312,27+10</datetime></created>
+<modified><datetime>20190930T085801,26+10</datetime></modified>
+<revised><datetime>20190930T085801,24+10</datetime></revised>
+<lastaccessed><datetime>20190930T085801,24+10</datetime></lastaccessed>
+<addedtofile><datetime>20190926T091312,27+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<item name="$Flags"><text>gC~4;</text></item>
+<item name="$TITLE"><text>BiologicalIngredients.xsp</text></item>
+
+
+
+<item name="$DesignerVersion"><text>9.0.1</text></item>
+
+
+
+
+<item name="$FileNames" sign="true"><text>BiologicalIngredients.xsp</text></item>
+
+</note>
