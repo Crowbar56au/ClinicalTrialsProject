@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='utf-8'?>
+<view name='(FormView\(IBP)' alias='FormViewIBP' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='web'
+ showinmenu='false' publicaccess='false' designerversion='8.5.3' comment='Used in Clinical Trials application to import IBP data'
+ unreadmarks='none' onopengoto='top' onrefresh='refresh' headers='beveled'
+ opencollapsed='false' showresponsehierarchy='false' showmargin='true' shrinkrows='false'
+ extendlastcolumn='true' showhierarchies='false' unreadcolor='black' rowlinecount='1'
+ headerlinecount='1' rowspacing='1.5' bgcolor='white' altrowcolor='#f7f7f7'
+ totalscolor='black' headerbgcolor='white' boldunreadrows='false' evaluateactions='false'
+ allownewdocuments='false' allowcustomizations='false' hidemarginborder='false'
+ marginwidth='0px' marginbgcolor='white' gridstyle='solid' gridcolor='#d2d2d2'
+ uniquekeys='false' indexrefresh='automatic' indexdiscard='inactivebyinterval'
+ indexdiscardinterval='24' initialbuildrestricted='false' noemptycategories='true'
+ formatnoteid='79A35BC1B099813FCA2578FB007F26A9'>
+<noteinfo noteid='4be' unid='490B37DC348DF4E5CA257F770006FEFC' sequence='14'>
+<created><datetime dst='true'>20160315T121624,92+11</datetime></created>
+<modified><datetime>20160628T151506,33+10</datetime></modified>
+<revised><datetime>20160628T151506,32+10</datetime></revised>
+<lastaccessed><datetime dst='true'>20191127T020256,57+11</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,98+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='selection'><formula>SELECT IsActiveVersion="1" &amp; (DataSection="7" | Type="IBP")</formula></code><code
+ event='form'><formula>Type</formula></code><code event='querypaste'><lotusscript
+>Sub Querypaste(Source As Notesuiview, Continue As Variant)
+	Continue = False
+End Sub
+</lotusscript></code>
+<actionbar bgcolor='#f0f0f0' bordercolor='black'>
+<actionbuttonstyle bgcolor='#f0f0f0'/><font size='9pt' color='system'/><border
+ style='solid' width='0px 0px 1px'/>
+<action title='Categori_ze' showinbar='false' systemcommand='categorize'/>
+<action title='_Edit Document' showinbar='false' systemcommand='edit'/>
+<action title='_Send Document' showinbar='false' systemcommand='send'/>
+<action title='_Forward' showinbar='false' systemcommand='forward'/>
+<action title='_Move To Folder...' showinbar='false' systemcommand='movetofolder'/>
+<action title='_Remove From Folder' showinbar='false' systemcommand='removefromfolder'/></actionbar>
+<column sort='ascending' hidedetailrows='false' itemname='$find' width='1.3750'
+ resizable='true' separatemultiplevalues='true' sortnoaccent='true' sortnocase='true'
+ showaslinks='false' categorized='true' twisties='true'><font color='navy'
+ style='bold' name='Arial' pitch='variable' truetype='true' familyid='20'/><columnheader
+><font size='9pt' style='bold'/></columnheader><code event='value'><formula
+>@Text(ApplicationID)+"~"+@Text(ApplicationVersion)</formula></code></column>
+<column sort='ascending' hidedetailrows='false' itemname='$sort' width='29.5000'
+ resizable='true' separatemultiplevalues='true' sortnoaccent='true' sortnocase='true'
+ flatinr5='true' showaslinks='false' categorized='true' hidden='true' twisties='true'><font
+ color='olive' name='Arial' pitch='variable' truetype='true' familyid='20'/><columnheader
+><font size='9pt' style='bold'/></columnheader><code event='value'><formula
+>@ReplaceSubstring(@Right(@Right(RecordUNID;"~");"~");"~";"\\")</formula></code></column>
+<column hidedetailrows='false' itemname='$20' width='64.1250' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='true' sortnocase='true' showaslinks='false'><font
+ size='9pt' name='Arial' pitch='variable' truetype='true' familyid='20'/><columnheader
+><font size='9pt' style='bold'/></columnheader><code event='value'><formula
+>@If(Type="IBP"; "IBP - Record No: " + @Text(RecordNo) + ", Date Received: " + @Text(IBP_DateReceived);
+"")</formula></code></column></view>
+

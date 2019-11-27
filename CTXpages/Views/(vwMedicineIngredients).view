@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='utf-8'?>
+<view name='(vwMedicineIngredients)' alias='vwMedicineIngredients' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' showinmenu='false'
+ publicaccess='false' designerversion='8.5.3' unreadmarks='none' onopengoto='lastopened'
+ onrefresh='displayindicator' headers='beveled' opencollapsed='false' showresponsehierarchy='false'
+ showmargin='true' shrinkrows='true' extendlastcolumn='false' showhierarchies='false'
+ unreadcolor='black' rowlinecount='8' headerlinecount='1' rowspacing='1.25'
+ bgcolor='white' altrowcolor='#f7f7f7' totalscolor='black' headerbgcolor='#b2b2b2'
+ boldunreadrows='false' evaluateactions='false' allownewdocuments='false'
+ allowcustomizations='false' hidemarginborder='false' marginwidth='0px' marginbgcolor='#b2b2b2'
+ uniquekeys='false' formatnoteid='5FEF03D452E07095CA25784A00108829'>
+<noteinfo noteid='5e2' unid='9D8479E580134DD1CA257F770006FDD3' sequence='14'>
+<created><datetime dst='true'>20160315T121621,95+11</datetime></created>
+<modified><datetime>20160628T151507,06+10</datetime></modified>
+<revised><datetime>20160628T151507,05+10</datetime></revised>
+<lastaccessed><datetime>20160628T151507,05+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,51+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='selection'><formula>SELECT Form="MedicineIngredient"</formula></code>
+<actionbar bgcolor='navy' bordercolor='black'><actionbarstyle height='4.4290ex'><font
+ size='9pt' name='Verdana' pitch='variable' truetype='true' familyid='20'/></actionbarstyle>
+<actionbuttonstyle bgcolor='system'/><font size='9pt' color='system'/><border
+ style='solid' width='0px 0px 1px' color='navy'/>
+<action title='Print' icon='147' align='right'><code event='click'><formula
+>@Command([ToolsRunMacro]; "(PrintApplicationNotes)")</formula></code></action>
+<action title='Help' icon='45' showinmenu='false' align='right'><code event='options'><lotusscript
+>Option Declare
+Use "HelpScripts"
+</lotusscript></code><code event='click'><lotusscript>Sub Click(Source As Button)
+     Call GetViewHelpDoc("LM_V_SAP_All_Applications_by_Application_Id")
+End Sub
+</lotusscript></code></action></actionbar>
+<column sort='ascending' hidedetailrows='false' itemname='medicineId' width='28.2500'
+ resizable='true' separatemultiplevalues='true' sortnoaccent='true' sortnocase='true'
+ showaslinks='false' categorized='true'><columnheader title='medicineId'><font
+ size='9pt' style='bold'/></columnheader></column>
+<column sort='ascending' hidedetailrows='false' itemname='Name' width='32.2500'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='false' sortnocase='true'
+ showaslinks='false'><columnheader title='Ingredient Name'><font size='9pt'
+ style='bold'/></columnheader></column>
+<column align='right' hidedetailrows='false' itemname='Quantity' width='11.7500'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='false' sortnocase='true'
+ showaslinks='false'><columnheader align='center' title='Quantity'><font size='9pt'
+ style='bold'/></columnheader></column>
+<column hidedetailrows='false' itemname='Unit' width='36' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='false' sortnocase='true' showaslinks='false'><columnheader
+ align='center' title='Unit'><font size='9pt' style='bold'/></columnheader></column></view>
+

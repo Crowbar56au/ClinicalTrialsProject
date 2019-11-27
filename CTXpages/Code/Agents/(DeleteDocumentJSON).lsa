@@ -1,0 +1,267 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(DeleteDocumentJSON)' alias='(DeleteDocumentJSON)' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3'
+ runaswebuser='true' publicaccess='false' designerversion='8.5.3'>
+<noteinfo noteid='492' unid='7A050062B78BB723CA257F7700070CBF' sequence='18'>
+<created><datetime dst='true'>20160315T121700,15+11</datetime></created>
+<modified><datetime dst='true'>20190109T153312,97+11</datetime></modified>
+<revised><datetime dst='true'>20190109T153312,96+11</datetime></revised>
+<lastaccessed><datetime dst='true'>20190109T153312,96+11</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,88+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime dst='true'>20190109T153313,97+11</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+Option Declare
+Use "MIMEJSONDataInterface"
+Use "GetDatabases"
+
+</lotusscript></code><code event='declarations'><lotusscript>Const ERR_PRIMARYARGUMENTSMISSING = 1001
+Const ERR_INVALIDDOCUMENTID = 1002
+Dim appID As String, appVer As String, strStatus As String, strStage As String
+
+Dim vwDraft As NotesView, dbDraft As NotesDatabase
+Dim JSONEntry As JSONObject 
+Dim AppJSONEntryStore As MIMEJSONEntryStore
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	%REM
+		INC-77727:- Fix by SrinivasRefresh the application version in CT after the delete document initiated by user
+	%END REM	
+	On Error Goto ErrorHandler
+	Dim Ses As New NotesSession
+	Dim webQueryString As Variant, webQueryStringArgs List As String
+	Dim dbThis As NotesDatabase, dbRepo As NotesDatabase, webDBName As Variant
+	Dim docContext As NotesDocument
+	Dim sourceDocument As NotesDocument
+	Dim repoDoc As NotesDocument
+	Dim vwRepo As NotesView
+	Dim strLUKey As String
+	
+	Set dbThis = Ses.CurrentDatabase
+	Set dbRepo = fdbGetDatabase("CTR_Path")
+	Set vwRepo = dbRepo.GetView("AppsByApplicationId")
+	
+	Set docContext = Ses.DocumentContext
+	webQueryString = Split(docContext.Query_String_Decoded(0), "&amp;")
+	Forall QueryString In webQueryString
+		If Instr(QueryString, "=") &gt; 0 Then
+			webQueryStringArgs(Strleft(QueryString,"=")) = Strright(QueryString, "=")
+		End If
+	End Forall
+	
+	If Not (Iselement(webQueryStringArgs("deleteunid"))) Then
+		Error ERR_PRIMARYARGUMENTSMISSING, "invalid arguments passed." + docContext.Query_String_Decoded(0)
+	End If
+	
+	Set sourceDocument = dbThis.GetDocumentByUNID(webQueryStringArgs("deleteunid"))
+	Set repoDoc = vwRepo.GetDocumentByKey(sourceDocument.ApplicationId(0))
+	
+	Set AppJSONEntryStore = New MIMEJSONEntryStore(sourceDocument, "JSONMIMEFILE" ,"JSON.txt")
+	
+	If Not repoDoc Is Nothing Then
+		appID = sourceDocument.ApplicationId(0)
+		appVer = Cstr(repoDoc.ApplicationVersion(0))
+		strStatus = "Active"
+		strStage = Cstr(repoDoc.ApplicationStage(0))
+		
+		If sourceDocument.ApplicationStage(0) = "4" Or sourceDocument.ApplicationStage(0) = "5" Then
+			strLUKey = Cstr(appID)+"~"+Cstr(appVer+1)
+			Call updateAttachmentIDs(strLUKey)
+		End If
+		
+		Call revertStage(sourceDocument,strStage)
+	Else
+		Call sourceDocument.Remove(True)	
+	End If
+	
+	Call returnResponse(True, "Refresh", "")
+	
+ExitSub:
+	Exit Sub
+ErrorHandler:
+	Call returnResponse(False, "", "There was an unexpected error while attempting to delete the document requested: Error " &amp; Err &amp; "(line: " &amp; Erl &amp; "), " &amp; Error)
+	Resume ExitSub
+End Sub
+
+</lotusscript></code><code event='updateTopLevelIDs'><lotusscript>Function updateTopLevelIDs(AppJSONEntryStore As MIMEJSONEntryStore, JSONEntry As JSONObject)
+	Dim keyEntries As Variant, keyEntry As JSONObject , oldID As String, newID As String, strID As String
+	
+	Dim aSearchItems(7) As String
+	
+	aSearchItems(0) = "TrialConductedInCountries"
+	aSearchItems(1) ="AnimalExcipients"
+	aSearchItems(2) ="Biologicals"
+	aSearchItems(3) ="Medicines"
+	aSearchItems(4) ="Placebos"
+	aSearchItems(5) ="Comparators"
+	aSearchItems(6) ="Devices"
+	aSearchItems(7) ="Sites"
+	
+	Forall items In aSearchItems
+		
+	'need to cleanup all key values
+		If  AppJSONEntryStore.HasItem(JSONEntry , items) Then
+			Set keyEntry =  AppJSONEntryStore.GetItemValue(JSONEntry , items)
+			
+			If Not(keyEntry Is Nothing) Then
+				oldID =  AppJSONEntryStore.GetItemFirstValue(keyEntry, "id")
+				strID = Cstr(Strright(Strright(oldID,"~"),"~"))			
+				
+				If Cint(Instr(strID,"~")) &gt; 0 Or ( Cint(Instr(strID,"~")) = 0 And Len(strID) &gt; 0 ) Then
+					strID = "~"+strID
+				End If
+				
+				newID = appID +  "~" + Cstr(appVer) + strID
+				
+				Call AppJSONEntryStore.ReplaceItemValue(keyEntry, "ApplicationVersion", Cstr(appVer))	
+				Call AppJSONEntryStore.ReplaceItemValue(keyEntry, "id", newID)
+				
+			'now update the keys
+				Call updateKeyIDs(AppJSONEntryStore, keyEntry )
+			End If
+		End If
+		
+	End Forall
+	
+End Function
+
+</lotusscript></code><code event='returnResponse'><lotusscript>Function returnResponse(bSuccess As Boolean, strAction As String, strParam As String)
+	Const csCONTENT_TYPE_JSON = "Content-Type:application/json"	
+	Dim strJSON As String
+	
+	strJSON = | {"Success":"| + Cstr(bSuccess) + |", "Action":"| + strAction + |", "Message":"| + strParam + |"}|
+	
+	Print csCONTENT_TYPE_JSON
+	Print strJSON
+End Function
+
+</lotusscript></code><code event='updateKeyIDs'><lotusscript>Function updateKeyIDs(AppJSONEntryStore As MIMEJSONEntryStore, JSONEntry As JSONObject )
+	Dim keyEntries As Variant, keyEntry As JSONObject , oldID As String, newID As String, strID As String
+	
+	'need to cleanup all key values
+	If  AppJSONEntryStore.HasItem(JSONEntry , "Key") Then
+		Set keyEntry =  AppJSONEntryStore.GetItemValue(JSONEntry , "Key")
+		
+		oldID =  AppJSONEntryStore.GetItemFirstValue(keyEntry, "id")
+		strID = Cstr(Strright(Strright(oldID,"~"),"~"))			
+		
+		If Cint(Instr(strID,"~")) &gt; 0 Or ( Cint(Instr(strID,"~")) = 0 And Len(strID) &gt; 0 ) Then
+			strID = "~"+strID
+		End If
+		
+		newID = appID +  "~" + Cstr(appVer) + strID
+		
+		Call AppJSONEntryStore.ReplaceItemValue(keyEntry, "ApplicationVersion", Cstr(appVer))	
+		Call AppJSONEntryStore.ReplaceItemValue(keyEntry, "id", newID)
+		
+	End If
+End Function
+
+</lotusscript></code><code event='revertStage'><lotusscript>Function revertStage(sourceDocument As NotesDocument, strOldStage As String)
+	Dim EmptyJSONArray As New JSONArray 
+	Dim strAppType As String
+', strOldStage As String
+	
+	Set AppJSONEntryStore = New MIMEJSONEntryStore(sourceDocument, "JSONMIMEFILE" ,"JSON.txt")
+	
+	If Not AppJSONEntryStore.IsEmptyStore Then
+		Set JSONEntry = AppJSONEntryStore.GetFirstJSONEntry
+		While Not (JSONEntry Is Nothing)
+			Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "IsActiveVersion", "1")	
+			
+			If AppJSONEntryStore.GetItemFirstValue(JSONEntry, "Type") = "Application" Then
+				strAppType = AppJSONEntryStore.GetItemFirstValue(JSONEntry, "ClinicalTrialType")				
+				Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ValidationStatus", "1")
+				Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "IsValid", "1")
+				Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "IsSubmitted", "1")
+				Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "IsPushBackTriggered", "0")
+				Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "IsPushBackSubmittedBack", "0")
+				Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ApplicationStatus", strStatus)
+				Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ApplicationStage", strStage)
+			End If
+			
+			If AppJSONEntryStore.GetItemFirstValue(JSONEntry, "Type") = "Part2" Then			
+				If strAppType = "CTX" And strStage = "2" Then				
+					Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ContactName", "")
+					Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ContactEmail", "")
+					Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ContactFax", "")
+					Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ContactPhone", "")
+				End If
+			End If
+			
+			If AppJSONEntryStore.GetItemFirstValue(JSONEntry, "Type") = "Completion" Then			
+				If strStage = "3" Then				
+					
+					Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "CompletionDetails", "")
+					Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "CompletionReason", "")
+					Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ContactEmail", "")
+					Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ContactFax", "")
+					Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ContactName", "")
+					Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ContactPhone", "")
+					Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ContactPosition", "")
+					Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "TrialCompletionDate", "")
+					
+				End If
+			End If
+			
+			If sourceDocument.ApplicationStage(0) = "4" Or sourceDocument.ApplicationStage(0) = "5" Then
+				Call updateTopLevelIDs (AppJSONEntryStore, JSONEntry)
+			End If
+			
+			Set JSONEntry = AppJSONEntryStore.GetNextJSONEntry
+		Wend
+		
+		Call AppJSONEntryStore.SaveJSONToMime()
+		
+		sourceDocument.ApplicationStatus = strStatus
+		sourceDocument.ApplicationStage = strStage
+		sourceDocument.ApplicationVersion = appVer 'INC-77727
+		sourceDocument.IsSubmitted = "1"
+		sourceDocument.IsPushBackTriggered = "0"
+		sourceDocument.IsPushBackSubmittedBack = "0"
+		'Call setSecurity(draftDocument)
+		sourceDocument.save True, False
+		
+	End If
+	
+End Function
+
+</lotusscript></code><code event='updateAttachmentIDs'><lotusscript>Function updateAttachmentIDs(luKey As String)
+	'Dim s As New notessession
+	Dim db As NotesDatabase
+	Dim dc As NotesDocumentCollection
+	Dim doc As NotesDocument
+	Dim vwLookup As NotesView
+	Dim oldID As String, newID As String, strID As String
+	
+	Set db = fdbGetDatabase("CTF_Path")
+	Set vwLookup = db.GetView("LookupAllByApplicationID")
+	Set dc = vwLookup.GetAllDocumentsByKey(luKey)
+	Set doc = dc.GetFirstDocument
+	
+	While Not doc Is Nothing
+		
+		oldID =  doc.AttachmentContext(0)
+		strID = Cstr(Strright(Strright(oldID,"~"),"~"))			
+		
+		If Cint(Instr(strID,"~")) &gt; 0 Or ( Cint(Instr(strID,"~")) = 0 And Len(strID) &gt; 0 ) Then
+			strID = "~"+strID
+		End If
+		
+		newID = appID +  "~" + Cstr(appVer) + strID
+		
+		Call doc.ReplaceItemValue("AttachmentContext",newID)
+		Call doc.ReplaceItemValue("LinkedSourceVersionNumbers",Cint(appVer))
+		Call doc.Save(True,True)
+		
+		Set doc = dc.GetNextDocument(doc)
+		
+	Wend
+	
+End Function</lotusscript></code>
+<rundata processeddocs='0' exitcode='0'>
+<agentmodified><datetime dst='true'>20190109T153256,10+11</datetime></agentmodified></rundata>
+<item name='$POID'><datetime>20160620T120209,71+10</datetime></item></agent>
+

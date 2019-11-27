@@ -1,0 +1,603 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xp:view xmlns:xp="http://www.ibm.com/xsp/core" dojoTheme="true"
+	dojoParseOnLoad="true" xmlns:xc="http://www.ibm.com/xsp/custom">
+	<xp:this.resources>
+		<xp:styleSheet href="/applicationLayout.css"></xp:styleSheet>
+		<xp:styleSheet href="/applicationForm.css"></xp:styleSheet>
+		<xp:styleSheet href="/applicationIcons.css"></xp:styleSheet>
+		<xp:styleSheet href="/developer.css"></xp:styleSheet>
+	</xp:this.resources>
+
+
+	<xp:this.data>
+		<xp:dominoDocument var="biological" action="editDocument"
+			formName="Biological"
+			documentId="#{javascript:viewScope.biologicalUNID}">
+		</xp:dominoDocument>
+	</xp:this.data>
+	
+	
+	<xp:this.afterPageLoad><![CDATA[#{javascript:viewScope.put("parentexplicitkey", bioB.getExplicitKey());}]]></xp:this.afterPageLoad>
+	<xp:panel>
+		<xp:div id="hiddenData">
+			<xp:table>
+				<xp:tr>
+					<xp:td>
+						<xp:inputText id="type"
+							value="#{biological.type}" styleClass="hiddenField"
+							dojoType="dijit.form.TextBox" defaultValue="Biological">
+						</xp:inputText>
+					</xp:td>
+					<xp:td>
+						<xp:inputText
+							value="#{biological.clinicalTrialType}" id="ClinicalTrialType"
+							dojoType="dijit.form.TextBox" styleClass="hiddenField"
+							defaultValue="CTN">
+						</xp:inputText>
+					</xp:td>
+					<xp:td>
+						<xp:inputText id="applicationId"
+							value="#{biological.applicationId}" styleClass="hiddenField"
+							dojoType="dijit.form.TextBox">
+						</xp:inputText>
+					</xp:td>
+					<xp:td>
+						<xp:inputText
+							value="#{biological.applicationVersion}" id="applicationVersion"
+							defaultValue="1" styleClass="hiddenField">
+						</xp:inputText>
+					</xp:td>
+					<xp:td>
+						<xp:inputText id="isActiveVersion"
+							value="#{biological.isActiveVersion}" styleClass="hiddenField"
+							defaultValue="1">
+						</xp:inputText>
+					</xp:td>
+				</xp:tr>
+				<xp:tr>
+					<xp:td></xp:td>
+					<xp:td></xp:td>
+					<xp:td></xp:td>
+					<xp:td></xp:td>
+					<xp:td></xp:td>
+				</xp:tr>
+				<xp:tr>
+					<xp:td>
+						<xp:inputText value="#{biological.explicitKey}"
+							id="explicitKey1" styleClass="hiddenField">
+						</xp:inputText>
+					</xp:td>
+					<xp:td>
+						<xp:inputTextarea id="webReaders"
+							value="#{biological.webReaders}" styleClass="hiddenField"
+							multipleSeparator="#{javascript:@NewLine();}">
+							<xp:this.defaultValue><![CDATA[${javascript:var username = @Name("[CN]", @UserName());
+	CID = sessionScope.clientid;
+	//This assumes that the groups are prefixed with SIME, these groups are created by the process new user Agent in the User Management DB};
+	username = "SIME" + CID;
+	var readers = new Array(username, "[Admin]","[TGA]","[SIMEReader]","[System Profile]","LocalDomainServers", "OtherDomainServers");
+	return readers;}]]></xp:this.defaultValue>
+						</xp:inputTextarea>
+					</xp:td>
+					<xp:td>
+						<xp:inputTextarea id="webAuthors"
+							value="#{biological.webAuthors}" styleClass="hiddenField"
+							multipleSeparator="#{javascript:@NewLine();}">
+							<xp:this.defaultValue><![CDATA[${javascript:var username = @Name("[CN]", @UserName());
+	CID = sessionScope.clientid;
+	//This assumes that the groups are prefixed with SIME, these groups are created by the process new user Agent in the User Management DB};
+	username = "SIME" + CID;
+	var authors = new Array(username, "[Admin]","[TGA]","[SIMEReader]","[System Profile]","LocalDomainServers", "OtherDomainServers");
+	return authors;}]]></xp:this.defaultValue>
+						</xp:inputTextarea>
+					</xp:td>
+					<xp:td></xp:td>
+					<xp:td></xp:td>
+				</xp:tr>
+			</xp:table>
+		</xp:div>
+		<xp:div id="biologicalDetails">
+			<xp:table border="0" styleClass="formTable">
+				<xp:tr>
+					<xp:td styleClass="labelCell" colspan="3">
+						<xp:span styleClass="mandatory">
+							<xp:span styleClass="mandatory">*</xp:span>
+						</xp:span>
+						<xp:text escape="true" id="computedField1"
+							styleClass="instructions">
+							<xp:this.value><![CDATA[#{javascript:"Always Required"}]]></xp:this.value>
+						</xp:text>
+						&#160;&#160;
+						<xp:span styleClass="conditionalMandatory">
+							*
+						</xp:span>
+						<xp:text escape="true" id="computedField4"
+							styleClass="instructions">
+							<xp:this.value><![CDATA[#{javascript:" Required under certain conditions"}]]></xp:this.value>
+						</xp:text>
+					</xp:td>
+					<xp:td styleClass="helperCell"></xp:td>
+				</xp:tr>
+			</xp:table>
+			<xp:table border="0" styleClass="formTable">
+				<xp:tr>
+					<xp:td styleClass="labelCellLarge"></xp:td>
+					<xp:td></xp:td>
+					<xp:td>
+
+					</xp:td>
+					<xp:td></xp:td>
+				</xp:tr>
+				<xp:tr>
+					<xp:td styleClass="labelCell">
+
+						<xp:label value="Trade/Product/Code Name:"
+							id="lblProductName" for="productName">
+						</xp:label>
+					</xp:td>
+					<xp:td styleClass="validationCell">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:td>
+					<xp:td styleClass="fieldCell">
+
+						<xp:inputText id="productName"
+							value="#{biological.productName}"
+							dojoType="dijit.form.TextBox">
+						</xp:inputText>
+					</xp:td>
+					<xp:td styleClass="helperCell"></xp:td>
+				</xp:tr>
+				<xp:tr>
+					<xp:td styleClass="labelCell">
+
+						<xp:label value="Is this a combination product?"
+							id="lblIsAComboProduct" for="isAComboProduct">
+						</xp:label>
+					</xp:td>
+					<xp:td styleClass="validationCell">
+						<xp:span styleClass="mandatory">
+							<xp:span styleClass="mandatory">*</xp:span>
+						</xp:span>
+					</xp:td>
+					<xp:td styleClass="fieldCell">
+						<xp:radioGroup id="isAComboProduct"
+							value="#{biological.isAComboProduct}">
+							<xp:selectItem itemLabel="Yes"
+								itemValue="Yes" id="selectItem1">
+							</xp:selectItem>
+							<xp:selectItem itemLabel="No" itemValue="No"
+								id="selectItem2">
+							</xp:selectItem>
+						</xp:radioGroup>
+					</xp:td>
+					<xp:td styleClass="helperCell"></xp:td>
+				</xp:tr>
+				<xp:tr>
+					<xp:td styleClass="labelCell">
+						<xp:label id="lblPresentation"
+							value="Type of container:" for="presentation">
+						</xp:label>
+					</xp:td>
+					<xp:td styleClass="validationCell">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:td>
+					<xp:td styleClass="fieldCell">
+						<xp:inputText id="presentation"
+							value="#{biological.presentation}"
+							dojoType="dijit.form.TextBox">
+						</xp:inputText>
+					</xp:td>
+					<xp:td styleClass="helperCell">
+
+
+					</xp:td>
+				</xp:tr>
+
+				<xp:tr>
+					<xp:td styleClass="labelCell">
+
+						<xp:label value="Dosage Form:"
+							id="lblDosageForm" for="biologicalDosageFormLU">
+						</xp:label>
+					</xp:td>
+					<xp:td styleClass="validationCell">
+						<xp:span styleClass="mandatory">
+							<xp:span styleClass="mandatory">*</xp:span>
+						</xp:span>
+					</xp:td>
+					<xp:td styleClass="fieldCell">
+						<xp:panel id="biologicalDosageFormLU">
+							<xp:eventHandler event="onClientLoad"
+								submit="false" id="eventHandler2">
+								<xp:this.script><![CDATA[try {
+	var db = getNSFBase().toLowerCase();
+	var xagent = 'xAgentLookupCT.xsp';
+	var params = 'S=N&T=DOSAGE&type=json';
+	var fullurl = db + '/' + xagent + '?' + params + '&R=' + Math.random();
+	var jsonDosageStore = new dojo.data.ItemFileReadStore({url:fullurl});
+	var fieldid = getItemId('','biologicalDosageFormLU');
+	
+	field = new dijit.form.FilteringSelect({
+			store: jsonDosageStore,
+			placeHolder: 'Select a value',
+			required: false,
+			class: 'dijitComboBoxWidthLarge',
+			value: bioDose.value,
+			onChange: function(x){
+				onChangeEvents(this);
+			},
+			selectOnClick: true
+		}, fieldid);
+	field.startup();
+	
+}catch(e){
+	console.log(e);
+}
+
+function onChangeEvents(itmtst){
+	try {
+		var dosageformid = getItemId('','dosageForm');
+		var dosageformlabelid = getItemId('','dosageForm_Label');
+		var dosageform = dojo.byId(dosageformid);
+		var dosageformlabel = dojo.byId(dosageformlabelid);
+		dosageform.value = itmtst.value;
+		dosageformlabel.value = itmtst.displayedValue;
+	} catch (e) {
+		console.log("biologicalDosageFormLU onChange event() - error: " + e); 
+	} 		
+}]]></xp:this.script>
+							</xp:eventHandler>
+						</xp:panel>
+					</xp:td>
+					<xp:td styleClass="helperCell">
+						<xp:inputText id="dosageForm"
+							value="#{biological.dosageForm}" styleClass="hiddenField"
+							dojoType="dijit.form.TextBox">
+							<xp:this.dojoAttributes>
+								<xp:dojoAttribute name="jsId"
+									value="bioDose">
+								</xp:dojoAttribute>
+							</xp:this.dojoAttributes>
+						</xp:inputText>
+						<xp:br></xp:br>
+						<xp:inputText id="dosageForm_Label"
+							value="#{biological.dosageForm_Label}" styleClass="hiddenField"
+							dojoType="dijit.form.TextBox">
+							<xp:this.dojoAttributes>
+								<xp:dojoAttribute name="jsId"
+									value="bioDoseLabel">
+								</xp:dojoAttribute>
+							</xp:this.dojoAttributes>
+						</xp:inputText>
+					</xp:td>
+				</xp:tr>
+				<xp:tr>
+					<xp:td>
+						<xp:label value="Route of Administration:"
+							id="lblRouteOfAdmin" for="biologicalRouteOfAdminLU">
+						</xp:label>
+					</xp:td>
+					<xp:td>
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:td>
+					<xp:td>
+						<xp:panel id="biologicalRouteOfAdminLU">
+							<xp:eventHandler event="onClientLoad"
+								submit="false" id="eventHandler1">
+								<xp:this.script><![CDATA[try {
+	var db = getNSFBase().toLowerCase();
+	var xagent = 'xAgentLookupCT.xsp';
+	var params = 'S=N&T=ROA&type=json';
+	var fullurl = db + '/' + xagent + '?' + params + '&R=' + Math.random();
+	var jsonROAStore = new dojo.data.ItemFileReadStore({url:fullurl});
+	var fieldid = getItemId('','biologicalRouteOfAdminLU');
+	
+	field = new dijit.form.FilteringSelect({
+			store: jsonROAStore,
+			placeHolder: 'Select a value',
+			required: false,
+			class: 'dijitComboBoxWidthLarge',
+			value: bioROA.value,
+			onChange: function(x){
+				onChangeEvents(this);
+			},
+			selectOnClick: true
+		}, fieldid);
+	field.startup();
+	
+}catch(e){
+	console.log(e);
+}
+
+function onChangeEvents(itmtst){
+	try {
+		var routeofadminid = getItemId('','routeOfAdmin');
+		var routeofadminlabelid = getItemId('','routeOfAdmin_Label');
+		var routeofadmin = dojo.byId(routeofadminid);
+		var routeofadminlabel = dojo.byId(routeofadminlabelid);
+		routeofadmin.value = itmtst.value;
+		routeofadminlabel.value = itmtst.displayedValue;
+	} catch (e) {
+		console.log("biologicalRouteOfAdminLU onChange event() - error: " + e); 
+	} 		
+}]]></xp:this.script>
+							</xp:eventHandler>
+						</xp:panel>
+					</xp:td>
+					<xp:td>
+						<xp:inputText id="routeOfAdmin"
+							value="#{biological.routeOfAdmin}" styleClass="hiddenField"
+							dojoType="dijit.form.TextBox">
+							<xp:this.dojoAttributes>
+								<xp:dojoAttribute name="jsId"
+									value="bioROA">
+								</xp:dojoAttribute>
+							</xp:this.dojoAttributes>
+						</xp:inputText>
+						<xp:br></xp:br>
+						<xp:inputText id="routeOfAdmin_Label"
+							value="#{biological.routeOfAdmin_Label}" styleClass="hiddenField"
+							dojoType="dijit.form.TextBox">
+							<xp:this.dojoAttributes>
+								<xp:dojoAttribute name="jsId"
+									value="bioROALabel">
+								</xp:dojoAttribute>
+							</xp:this.dojoAttributes>
+						</xp:inputText>
+					</xp:td>
+				</xp:tr>
+
+				<xp:tr>
+					<xp:td></xp:td>
+					<xp:td></xp:td>
+					<xp:td>
+						<xp:button value="Add Ingredient"
+							id="btnAddBiologicalIngredients" dojoType="dijit.form.Button" disabled="#{javascript:bioB.isNewNote();}">
+							
+							<xp:eventHandler event="onclick"
+								submit="true" immediate="true" refreshMode="partial"
+								refreshId="refreshmePanel">
+								<xp:this.action><![CDATA[#{javascript:addBiologicalIngredientDetail();}]]></xp:this.action>
+							</xp:eventHandler>
+						</xp:button>
+						<xp:button value="Remove selected ingredient(s)"
+							id="btnRemoveBiologicalIngredients" dojoType="dijit.form.Button"
+							title="Remove Selected Biological(s)">
+							<xp:eventHandler event="onclick"
+								submit="true" id="eventHandler13" disableValidators="true"
+								onStart="//showWaitDialog('Deletion in progress ...');"
+								refreshMode="partial" refreshId="gridBiologicalIngredients"
+								onError="//hideWaitDialog();">
+								<xp:this.script><![CDATA[try{
+	var grid = dijit.byId('#{id:gridBiologicalIngredients}');
+	var items = grid.selection.getSelected();
+	if (items.length) {
+		if (XSP.confirm("Please confirm you would like to remove the selected Biological ingredient(s)?")) { 
+			var UNID_Array = new Array();
+			i = 0;
+			dojo.forEach(items, function(selectedItem) {
+				if (selectedItem !== null) {
+					UNID_Array[i] = grid.store.getValue(selectedItem, "unid").toString();
+					i++;
+				}
+			});
+			XSP.getElementById("#{id:unidstoreL2EOS}").value = UNID_Array;
+			grid.rowSelectCell.toggleAllSelection(false);
+			setToDraft();
+			return true;
+		} else {
+			return false;
+		} 
+	}else{
+		XSP.alert("Please select the Biological ingredients(s) you would like to remove.");
+		return false;
+	}
+	
+}catch(e){
+	alert(e);
+	console.log(e);
+}]]></xp:this.script>
+								<xp:this.action><![CDATA[#{javascript:try {
+	print("Remove ingredients button clicked");
+	removeL2SubDocuments(biological);
+} catch(e){
+	print(database.getTitle() + " Biologicals CC Biologicals remove btn click error: " + e);
+}}]]></xp:this.action>
+								<xp:this.onComplete><![CDATA[try{
+	var refreshIDList = new Array();
+	refreshIDList[0] = "#{id:gridBiologicalIngredients}";
+	refreshIDList[1] = "#{id:refreshPanelEOS}";
+	
+	partialRefreshMulti(refreshIDList, 0);
+}catch(e){
+	console.log(e);
+} finally {
+	//hideWaitDialog();
+	setToDraft();
+}]]></xp:this.onComplete>
+							</xp:eventHandler>
+						</xp:button>
+					</xp:td>
+					<xp:td></xp:td>
+				</xp:tr>
+				<xp:tr>
+					<xp:td>
+						<xp:label id="bioingredLabel"
+							value="Ingredients:" for="gridBiologicalIngredients">
+						</xp:label>
+					</xp:td>
+					<xp:td>
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:td>
+					<xp:td>
+						<xp:panel id="gridBiologicalIngredients">
+							<xp:eventHandler event="onClientLoad"
+								submit="false">
+								<xp:this.script><![CDATA[try {
+	var appid_id = getItemId('','applicationId');
+	var appid = dojo.byId(appid_id);
+	
+	var db = getNSFBase().toLowerCase();
+	var xagent = 'xAgentBiologicalIngredients.xsp'; 
+	if(appid.value == ""){
+		var applicationid = '';
+	}else{
+		var applicationid = '#{javascript:viewScope.parentexplicitkey}';
+	}
+	var params = 'applicationid=' + applicationid + '&stage=';
+	var fullurl = db + '/' + xagent + '?' + params + '&R=' + Math.random();
+	var jsonBiologicalIngredientStore = new dojo.data.ItemFileReadStore({url:fullurl});
+	
+	var gridId = getItemId('','gridBiologicalIngredients');
+	var grid1 = null;
+	
+	dojo.addOnLoad(function(){
+		var layout1 = [{
+			defaultCell: {editable: false, type: dojox.grid.cells._Widget},
+			rows:[
+			{field: "name", name: "Name", width: 20},
+			{field: "quantity", name: "Quantity", width: 5},
+			{field: "unit", name: "Unit", width: 10},
+			{field: "countries", name: "Country of Origin", width: 20},
+			{get:formatterButtonEdit, name: "Open", width: 5}
+			]
+		}];	 
+		
+		// Grid selection tracker
+		//gridSelectionManager.addGrid(gridId);
+		
+		grid1 = new dojox.grid.EnhancedGrid({
+			store: jsonBiologicalIngredientStore,
+			structure: layout1,
+			autoHeight: true,
+			autoWidth: true,
+			keepSelection: true,
+			plugins:{indirectSelection: true, dnd: true},
+			noDataMessage: 'No Biological Ingredient data available'
+		}, gridId);
+		
+		grid1.focus._delayedCellFocus = function(){};
+		grid1.startup();
+		
+		dojo.connect(grid1, '_onFetchComplete', function(){gridFetchComplete()});
+		grid1.selection.clickSelectEvent = function() {};  // Disable click events
+		
+		dojo.connect(grid1, "onRowDblClick", function(evt){
+			var idx = evt.rowIndex;         
+	  		var item  = this.getItem(idx); 
+	  		var value = this.store.getValue(item, "unid");
+	  		
+	  		XSP.getElementById("#{id:unidstoreL2EOS}").value = value;
+	  		XSP.getElementById("#{id:unidnameEOS}").value = "biologicalIngredientUNID";
+	  		XSP.getElementById("#{id:dialogEOS}").value = "biologicalIngredientDetailDialog";
+	  		onGridDoubleClickEOS();
+	  	});
+		dojo.connect(grid1, 'onSelected', function(rowIdx) {
+			// Disable default onSelect behaviour
+			grid1.updateRow(rowIdx);
+		});
+		dojo.connect(grid1, 'onDeselected', function(rowIdx) {
+			// Disable default onDeselect behaviour
+			grid1.updateRow(rowIdx);
+		});
+//	  	dojo.connect(grid1, 'onCellClick', function(evt) {
+//			// Custom function to handle select / deselect events
+//			gridSelectionManager.trackRowSelection(evt, gridId);
+//		});	  	
+//		dojo.connect(grid1, 'onEndSelect', function(type, startPoint, endPoint) {
+//			// Custom function to handle multiple row selection events
+//			gridSelectionManager.trackMultiRowSelection(gridId, type, startPoint, endPoint);
+//		});		
+//		dojo.connect(grid1, 'onEndDeselect', function(type, startPoint, endPoint) {
+//			// Custom function to handle multiple row deselection events
+//			gridSelectionManager.trackMultiRowDeSelection(gridId, type, startPoint, endPoint);
+//		});
+	});
+} catch(e) {
+	console.log("Biological custom control: gridBiologicalIngredients onClientLoad error: " + e);
+}
+
+function gridFetchComplete(){ 
+	try {  
+			var grid = dijit.byId(gridId);
+			if(grid.rowCount > 0) { 			     
+			    dijit.byId("#{id:btnRemoveBiologicalIngredients}").setAttribute('disabled',false);
+			} else { 			    
+				dijit.byId("#{id:btnRemoveBiologicalIngredients}").setAttribute('disabled',true);
+			} 
+	} catch (e) {
+		XSP.error("gridBiologicalIngredients gridFetchComplete() - error: " + e); 
+	} 		
+}]]></xp:this.script>
+
+							</xp:eventHandler>
+						</xp:panel>
+					</xp:td>
+					<xp:td></xp:td>
+				</xp:tr>
+			</xp:table>
+		</xp:div>
+		<xp:div id="actionBar" styleClass="dijitDialogPaneActionBar">
+			<xp:this.dojoAttributes>
+				<xp:dojoAttribute name="region" value="bottom">
+				</xp:dojoAttribute>
+			</xp:this.dojoAttributes>
+
+			<xp:button value="Save" id="btnDialogSave"
+				dojoType="dijit.form.Button"
+				rendered="#{javascript:!bioB.isNewNote();}">
+				<xp:this.dojoAttributes>
+					<xp:dojoAttribute name="iconClass"
+						value="appIcon appIconSave">
+					</xp:dojoAttribute>
+				</xp:this.dojoAttributes>
+				<xp:eventHandler event="onclick" submit="true"
+					refreshMode="partial" refreshId="gridBiologicals"
+					disableValidators="true">
+					<xp:this.action><![CDATA[#{javascript:saveBiological(biological);}]]></xp:this.action>
+				</xp:eventHandler>
+			</xp:button>
+			<xp:button value="Save &amp; Close" id="btnDialogSaveClose"
+				dojoType="dijit.form.Button">
+				<xp:this.dojoAttributes>
+					<xp:dojoAttribute name="iconClass"
+						value="appIcon appIconSave">
+					</xp:dojoAttribute>
+				</xp:this.dojoAttributes>
+				<xp:eventHandler event="onclick" submit="true"
+					refreshMode="partial" refreshId="gridBiologicals"
+					onComplete="XSP.closeDialog(getItemId('','biologicalDetailDialog'));"
+					disableValidators="true">
+					<xp:this.action><![CDATA[#{javascript:saveBiological(biological);}]]></xp:this.action>
+				</xp:eventHandler>
+			</xp:button>
+			<xp:button value="Close" id="btnDialogClose"
+				dojoType="dijit.form.Button" styleClass="cannotbedisabled">
+				<xp:this.dojoAttributes>
+					<xp:dojoAttribute name="iconClass"
+						value="appIcon appIconClose">
+					</xp:dojoAttribute>
+				</xp:this.dojoAttributes>
+				<xp:eventHandler event="onclick" submit="false"
+					immediate="true" save="false">
+					<xp:this.script><![CDATA[XSP.closeDialog(getItemId('','biologicalDetailDialog'))]]></xp:this.script>
+				</xp:eventHandler>
+			</xp:button>
+		</xp:div>
+	</xp:panel>
+	<xp:scriptBlock id="biologicalDetailDlgScriptBlock"
+		type="text/javascript">
+		<xp:this.value>
+			<![CDATA[dojo.addOnLoad(function() {
+	// Make sure focus is set to first field in dialog.
+	try {
+		setTimeout(function () {
+			xSetFocus(getItemId('','productName'));
+		}, 500);
+	} catch (e) {
+		console.log("Biological Detail Dialog addOnLoad error: " + e);
+	}
+});]]>
+		</xp:this.value>
+	</xp:scriptBlock>
+</xp:view>

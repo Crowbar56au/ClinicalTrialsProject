@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(Edit DB Profile)' alias='dbprofile' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='web v3'
+ publicaccess='false' designerversion='7'>
+<noteinfo noteid='49e' unid='D105B07E3085F8CACA257F7700070CB6' sequence='13'>
+<created><datetime dst='true'>20160315T121700,06+11</datetime></created>
+<modified><datetime>20160628T151506,21+10</datetime></modified>
+<revised><datetime>20160628T151506,20+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,20+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,90+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<designchange><datetime>20160628T151506,26+10</datetime></designchange>
+<trigger type='actionsmenu'/>
+<documentset type='runonce'/><code event='action'>
+<simpleaction action='runformula'><formula>@Command([EditProfile];"dbprofile");
+SELECT @All</formula></simpleaction></code>
+<item name='$Readers' sign='true' readers='true'><textlist><text>LocalDomainServers</text><text
+>[Admin]</text><text>$Notes Support</text><text>CN=Sean McDermott/OU=DEVELOPER/O=TTRADEV</text><text
+>LocalDomainAdmins</text><text>[System Profile]</text></textlist></item>
+<item name='$POID'><datetime>20160620T120209,58+10</datetime></item></agent>
+

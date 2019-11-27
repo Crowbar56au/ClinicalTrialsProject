@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(updateapplicationidxpages)' alias='updateapplicationidxpages'
+ xmlns='http://www.lotus.com/dxl' version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780'
+ hide='v3' runaswebuser='true' publicaccess='false' designerversion='8.5.3'
+ restrictions='unrestricted'>
+<noteinfo noteid='806' unid='DE15A6BFB09AFC7ECA257FE0001E4DEE' sequence='21'>
+<created><datetime>20160628T153100,30+10</datetime></created>
+<modified><datetime>20190917T154513,92+10</datetime></modified>
+<revised><datetime>20190917T154513,90+10</datetime></revised>
+<lastaccessed><datetime>20190917T154513,90+10</datetime></lastaccessed>
+<addedtofile><datetime>20160628T153100,32+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20190917T154513,75+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+Option Declare
+
+Use "PrintErrorReport"
+Use "IDsAndSequences"
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+%REM
+Date: 29/6/2016
+Author: Bruce Langner
+
+Comments:
+This agent sets the Application ID on the current application where it has not been set already.
+It is called from Application.java saveData(). Modified from agent (updateapplicationid).
+
+Revisions:
+Date                   Author                          Comments
+=========================================================================================
+
+%END REM
+	
+	On Error Goto ErrHandle
+	
+	Dim Session As New NotesSession     
+	Dim db As NotesDatabase
+	Dim appdoc As NotesDocument
+	'MsgBox "CTDrafts - agent(updateapplicationidxpages): variables declared"
+	
+	Set db = session.currentdatabase     
+	Set appdoc = session.DocumentContext
+	'MsgBox "CTDrafts - agent(updateapplicationidxpages): db and appdoc set"
+	
+	'Get ApplicationID from Profile Doc
+	If appdoc.ApplicationID(0) = "" Then
+		'MsgBox "CTDrafts - agent(updateapplicationid): appdoc.ApplicationId(0) is empty"
+		appdoc.ApplicationID = GetID(CT_APPLICATION_SEQUENCE_KEY, CT_SEQUENCE_SYSTEMTYPE, CTN_APPTYPE)
+		'MsgBox "CTDrafts - agent(updateapplicationid): appdoc.ApplicationId(0) is: " + appdoc.ApplicationID(0)
+		appdoc.ExplicitKey = appdoc.ApplicationID(0)
+		'MsgBox "CTDrafts - agent(updateapplicationid): appdoc.ExplicitKey is: " + appdoc.ExplicitKey(0)
+	End If
+	
+	Exit Sub
+	
+ErrHandle:
+	Call sPrintErrorReport(db)
+	Exit Sub  
+	
+End Sub</lotusscript></code>
+<rundata processeddocs='0' exitcode='0'>
+<agentmodified><datetime>20190917T154513,92+10</datetime></agentmodified>
+<agentrun><datetime>20190920T105356,37+10</datetime></agentrun>
+<runlog>Started running agent '(updateapplicationidxpages)|updateapplicationidxpages' on 20/09/2019 10:53:56 AM
+Ran LotusScript code
+Done running agent '(updateapplicationidxpages)|updateapplicationidxpages' on 20/09/2019 10:53:56 AM
+</runlog></rundata>
+<item name='$POID'><datetime>20150909T111135,86+10</datetime></item></agent>
+

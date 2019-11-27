@@ -1,0 +1,966 @@
+'++LotusScript Development Environment:2:5:(Options):0:74
+Option Public
+Option Declare
+'++LotusScript Development Environment:2:5:(Forward):0:1
+Declare Sub InitViewObj(dbThis As NotesDatabase)
+Declare Sub load_tblApplication()
+Declare Sub load_tblManufacturer()
+Declare Sub load_tblProduct()
+Declare Sub load_tblStartingIngredient()
+Declare Sub load_tblStartingIngredientAnimalDetail()
+Declare Sub load_tblContainer()
+Declare Sub load_tblFormulation()
+Declare Sub load_tblFormulationAnimalDetail()
+Declare Sub load_tblComponent()
+Declare Sub ConstructAppJSON(stream As notesstream, Appid As String)
+Declare Sub writeJSONRowData(doc As NotesDocument, TableDefArray As Variant, stream As notesstream)
+Declare Function EncodeJSONData(JSONDataValue As String) As String 
+Declare Private Function xmlfilter(strText As String) As String
+Declare Sub initEscapedArray
+Declare Private Function FormatDate(p_sInput As String) As String
+Declare Function getFormatDateFormula(FieldName As String) As String 
+Declare Function getAllMonths(FormatStr) As String 
+Declare Function GetWebVariable (querystring As String, argname As String) As String
+
+'++LotusScript Development Environment:2:5:(Declarations):0:10
+'(appjson.js)|appjson.js:
+Dim tblApplication(45,2) As String
+Dim tblManufacturer(13,2) As String
+Dim tblProduct(23,2) As String
+Dim tblStartingIngredient(9,2) As String
+Dim tblStartingIngredientAnimalDetail(15,2) As String
+Dim tblContainer(16,2) As String
+Dim tblFormulation(17,2) As String
+Dim tblFormulationAnimalDetail(16,2) As String
+Dim tblComponent(7,2) As String
+
+Dim vwApplication As NotesView
+Dim vwComponent As NotesView
+Dim vwContainer As NotesView
+Dim vwFormulation As NotesView
+Dim vwFormulationAnimalDetail As NotesView
+Dim vwManufacturer As NotesView
+Dim vwProduct As NotesView
+Dim vwStartingIngredient As NotesView
+Dim vwStartingIngredientAnimalDetail As NotesView
+
+Dim EscapedArray(7,1)  As String 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'++LotusScript Development Environment:2:2:InitViewObj:1:8
+Sub InitViewObj(dbThis As NotesDatabase)
+	On Error Goto ErrorHandler
+	Set vwApplication = dbThis.getView("JSONApplication")
+	Set vwComponent = dbThis.getView("JSONComponent")
+	Set vwContainer = dbThis.getView("JSONContainer")
+	Set vwFormulation = dbThis.getView("JSONFormulation")
+	Set vwFormulationAnimalDetail = dbThis.getView("JSONFormulationAnimalDetail")
+	Set vwManufacturer = dbThis.getView("JSONManufacturer")
+	Set vwProduct = dbThis.getView("JSONProduct")
+	Set vwStartingIngredient = dbThis.getView("JSONStartingIngredient")
+	Set vwStartingIngredientAnimalDetail = dbThis.getView("JSONStartingIngredientAnimalDetail")
+	Call load_tblApplication()
+	Call load_tblManufacturer()
+	Call load_tblProduct()
+	Call load_tblStartingIngredient()
+	Call load_tblStartingIngredientAnimalDetail()
+	Call load_tblContainer()
+	Call load_tblFormulation()
+	Call load_tblFormulationAnimalDetail()
+	Call load_tblComponent()
+	Call initEscapedArray()
+ErrorResume:
+	Exit Sub
+ErrorHandler:
+	Print "Error #"+Cstr(Err) + ": "+ Error(Err) + " at line #"+Cstr(Erl)
+End Sub
+'++LotusScript Development Environment:2:2:load_tblApplication:1:8
+Sub load_tblApplication()
+	Dim ctr As Integer 
+	
+	tblApplication(0,0) = "RecordUNID"
+	tblApplication(1,0) = "ApplicantName"
+	tblApplication(2,0) = "ApplicationFees"
+	tblApplication(3,0) = "ApplicationId"
+	tblApplication(4,0) = "ApplicationVersion"
+	tblApplication(5,0) = "ContactEmail"
+	tblApplication(6,0) = "ContactFax"
+	tblApplication(7,0) = "ContactName"
+	tblApplication(8,0) = "ContactPhone"
+	tblApplication(9,0) = "CreatedBy"
+	tblApplication(10,0) = "CreatedOn"
+	tblApplication(11,0) = "ApplicationPurpose"
+	tblApplication(12,0) = "IsARTGVariation"
+	tblApplication(13,0) = "IsNewBiologicalApplication"
+	tblApplication(14,0) = "IsNewExportBiologicalApplication"
+	tblApplication(15,0) = "LastEdited"
+	tblApplication(16,0) = "LastEditor"
+	tblApplication(17,0) = "PaymentExemptionNo"
+	tblApplication(18,0) = "SponsorAddressBA"
+	tblApplication(19,0) = "SponsorAddressBA_Id"
+	tblApplication(20,0) = "SponsorAddressPA"
+	tblApplication(21,0) = "SponsorAddressPA_Id"
+	tblApplication(22,0) = "SponsorAddressRA"
+	tblApplication(23,0) = "SponsorAddressRA_Id"
+	tblApplication(24,0) = "SponsorID"
+	tblApplication(25,0) = "SponsorName"
+	tblApplication(26,0) = "Type"
+	tblApplication(27,0) = "ClientReference"
+	
+	tblApplication(28,0) = "AttachmentIds"
+	tblApplication(29,0) = "AttachmentNames"
+	tblApplication(30,0) = "BiologicalClass"
+	tblApplication(31,0) = "ChangeReport"
+	tblApplication(32,0) = "ErrorReport"
+	tblApplication(33,0) = "IsMultiProduct"
+	tblApplication(34,0) = "IsSingleProduct"
+	tblApplication(35,0) = "LabelName"
+	tblApplication(36,0) = "ProductStandards"
+	tblApplication(37,0) = "ProductsTypeCode"
+	tblApplication(38,0) = "ProductsTypeDesc"
+	tblApplication(39,0) = "IsValidated"
+	tblApplication(40,0) = "IsValid"
+	tblApplication(41,0) = "IsActiveVersion"
+	tblApplication(42,0) = "AttachmentDBServer"
+	tblApplication(43,0) = "AttachmentDBName"
+	tblApplication(44,0) = "BiologicalClass_Id"
+	tblApplication(45,0) = "ProductStandards_Id"
+	
+	'Set type of Value Single or Multi - Default single
+	For ctr=0 To Ubound(tblApplication)
+		tblApplication(ctr, 1) = "single"
+	Next
+	
+	tblApplication(28, 1) = "multi"
+	tblApplication(29, 1) = "multi"
+	tblApplication(36, 1) = "multi"
+	tblApplication(45, 1) = "multi"
+	
+	'Set value derivation for the Item or property - Set default to  ItemName itself , this formula retries the first value for the list
+	For ctr=0 To Ubound(tblApplication)
+		'Single Value Example
+		tblApplication(ctr, 2) = |"\"" + @Subset(| + tblApplication(ctr, 0) + |;1) + "\"" |
+	Next
+	'MultiValue example
+	'tblApplication(11, 2) = |@Implode((("\"" + | + tblApplication(ctr, 0) + |) + "\"");",")|
+	
+	'RecordUNID
+	tblApplication(0,2) = |"\"" + ApplicationId + "\""|
+	'tblApplication(0, 2) = |"\"" + ApplicationId + "~" + @Text(ApplicationVersion;"G") + "\""|
+	
+	'ApplicationVersion
+	tblApplication(4,2) =| @Text(@Subset(| + tblApplication(4, 0) + |;1);"G") |
+	
+	tblApplication(2,2) = | @Subset(@Text(| + tblApplication(2, 0) + |;"F2");1) |
+	tblApplication(11,2) = |"\"" + @If(IsNewBiologicalApplication="1";"Create a new Biological ARTG entry";IsNewExportBiologicalApplication="1";"Create a new Export Only Biological entry";IsARTGVariation="1";"Vary a current Biological (or Export only) entry";"INVALID UNKNOWN VALUE") + "\""|
+	tblApplication(10,2) = getFormatDateFormula("@Created")
+	tblApplication(15,2) = getFormatDateFormula("@Modified")
+	
+	tblApplication(28, 2) = |@Implode((("\"" + | + tblApplication(1, 0) + |) + "\"");",")|
+	tblApplication(29, 2) = |@Implode((("\"" + | + tblApplication(2, 0) + |) + "\"");",")|
+	tblApplication(36, 2) = |@Implode((("\"" + | + tblApplication(9, 0) + |) + "\"");",")|
+	tblApplication(45, 2) = |@Implode((("\"" + | + tblApplication(21, 0) + |) + "\"");",")|
+	tblApplication(39,2) = |"\"0\""|
+	tblApplication(40,2) = |"\"0\""|
+End Sub
+'++LotusScript Development Environment:2:2:load_tblManufacturer:1:8
+Sub load_tblManufacturer()
+	Dim ctr As Integer 
+	
+	tblManufacturer(0,0) = "RecordUNID"
+	tblManufacturer(1,0) = "ApplicationId"
+	tblManufacturer(2,0) = "ApplicationVersion"
+	tblManufacturer(3,0) = "GMPConditions"
+	tblManufacturer(4,0) = "GMPReference"
+	tblManufacturer(5,0) = "GMPStatus"
+	tblManufacturer(6,0) = "ManufacturerId"
+	tblManufacturer(7,0) = "ManufacturerName"
+	tblManufacturer(8,0) = "ManufacturingSiteAddress"
+	tblManufacturer(9,0) = "ManufacturingSiteId"
+	tblManufacturer(10,0) = "ManufacturingStepCode"
+	tblManufacturer(11,0) = "ManufacturingStepDesc"
+	tblManufacturer(12,0) = "Type"
+	tblManufacturer(13,0) = "IsActiveVersion"
+	
+	'Set type of Value Single or Multi - Default single
+	For ctr=0 To 13
+		tblManufacturer(ctr, 1) = "single"
+	Next
+	tblManufacturer(10, 1) = "multi"
+	tblManufacturer(11, 1) = "multi"
+	
+	'Set value derivation for the Item or property - Set default to  ItemName itself , this formula retries the first value for the list
+	For ctr=0 To 13
+		'Single Value Example
+		tblManufacturer(ctr, 2) = |"\"" + @Subset(| + tblManufacturer(ctr, 0) + |;1) + "\"" |
+	Next
+	'MultiValue example
+	'tblManufacturer(11, 2) = |@Implode((("\"" + | + tblManufacturer(11, 0) + |) + "\"");",")|
+	
+	'RecordUNID
+	tblManufacturer(0, 2) = |"\"" + ApplicationId + "~" + @Text(ApplicationVersion;"G") + "~" + @Text(ManufacturerId;"G") + "\""|
+	
+	'ApplicationVersion
+	tblManufacturer(2,2) =| @Text(@Subset(| + tblManufacturer(2, 0) + |;1);"G") |
+	
+	tblManufacturer(10, 2) = |@Implode((("\"" + | + tblManufacturer(10, 0) + |) + "\"");",")|
+	tblManufacturer(11, 2) = |@Implode((("\"" + | + tblManufacturer(11, 0) + |) + "\"");",")|
+End Sub
+'++LotusScript Development Environment:2:2:load_tblProduct:1:8
+Sub load_tblProduct()
+	Dim ctr As Integer
+	
+	tblProduct(0,0) = "RecordUNID"
+	tblProduct(1,0) = "Type"
+	tblProduct(2,0) = "ApplicationId"
+	tblProduct(3,0) = "ApplicationVersion"
+	tblProduct(4,0) = "ProductEntryID"
+	tblProduct(5,0) = "AdditionalShelfLifeInfo"
+	tblProduct(6,0) = "BioBurdenSterilisationMethod"
+	tblProduct(7,0) = "BioBurdenSterilisationMethodCode"
+	tblProduct(8,0) = "DosageFormCode"
+	tblProduct(9,0) = "DosageForm"
+	tblProduct(10,0) = "IntendedUseCode"
+	tblProduct(11,0) = "IntendedUse"
+	tblProduct(12,0) = "IsAscepticallyProcessed"
+	tblProduct(13,0) = "IsBioBurdenReduction"
+	tblProduct(14,0) = "IsStartMaterialAnimalPresent"
+	tblProduct(15,0) = "IsTerminallySterilised"
+	tblProduct(16,0) = "PackSizeText"
+	tblProduct(17,0) = "ProductName"
+	tblProduct(18,0) = "RouteOfAdminCode"
+	tblProduct(19,0) = "RouteOfAdminDesc"
+	tblProduct(20,0) = "TerminallySterilisationMethod"
+	tblProduct(21,0) = "TerminallySterilisationMethodCd"
+	tblProduct(22,0) = "TherapeuticIndications"
+	tblProduct(23,0) = "IsActiveVersion"
+	
+	'Set type of Value Single or Multi - Default single
+	For ctr=0 To 23
+		tblProduct(ctr, 1) = "single"
+	Next
+	tblProduct(18, 1) = "multi"
+	tblProduct(19, 1) = "multi"
+	
+	
+	'Set value derivation for the Item or property - Set default to  ItemName itself , this formula retries the first value for the list
+	For ctr=0 To 23
+		'Single Value Example
+		tblProduct(ctr, 2) = |"\"" + @Subset(| + tblProduct(ctr, 0) + |;1) + "\"" |
+	Next
+	'MultiValue example
+	'tblProduct(11, 2) = |@Implode((("\"" + | + tblProduct(11, 0) + |) + "\"");",")|
+	
+	'RecordUNID
+	tblProduct(0, 2) = |"\"" + ApplicationId + "~" + @Text(ApplicationVersion;"G") + "~" + @Text(ProductEntryID;"G") + "\""|
+	
+	'ApplicationVersion
+	tblProduct(3,2) =| @Text(@Subset(| + tblProduct(3, 0) + |;1);"G") |
+	
+	tblProduct(18, 2) = |@Implode((("\"" + | + tblProduct(18, 0) + |) + "\"");",")|
+	tblProduct(19, 2) = |@Implode((("\"" + | + tblProduct(19, 0) + |) + "\"");",")|
+End Sub
+'++LotusScript Development Environment:2:2:load_tblStartingIngredient:1:8
+Sub load_tblStartingIngredient()
+	Dim ctr As Integer
+	
+	tblStartingIngredient(0,0) = "RecordUNID"
+	tblStartingIngredient(1,0) = "Type"
+	tblStartingIngredient(2,0) = "ApplicationId"
+	tblStartingIngredient(3,0) = "ApplicationVersion"
+	tblStartingIngredient(4,0) = "ProductEntryID"
+	tblStartingIngredient(5,0) = "IngredientID"
+	tblStartingIngredient(6,0) = "AdditionalInformation"
+	tblStartingIngredient(7,0) = "IngredientName"
+	tblStartingIngredient(8,0) = "IsAnimalOrigin"
+	tblStartingIngredient(9,0) = "IsActiveVersion"
+	
+	'Set type of Value Single or Multi - Default single
+	For ctr=0 To 9
+		tblStartingIngredient(ctr, 1) = "single"
+	Next
+	
+	'Set value derivation for the Item or property - Set default to  ItemName itself , this formula retries the first value for the list
+	For ctr=0 To 9
+		'Single Value Example
+		tblStartingIngredient(ctr, 2) = |"\"" + @Subset(| + tblStartingIngredient(ctr, 0) + |;1) + "\"" |
+	Next
+	'MultiValue example
+	'tblStartingIngredient(5, 2) = |@Implode((("\"" + | + tblStartingIngredient(5, 0) + |) + "\"");",")|
+	
+	'RecordUNID
+	tblStartingIngredient(0, 2) = |"\"" + ApplicationId + "~" + @Text(ApplicationVersion;"G") + "~" + @Text(ProductEntryID;"G") + "~" + @Text(IngredientID;"G") + "\""|
+End Sub
+'++LotusScript Development Environment:2:2:load_tblStartingIngredientAnimalDetail:1:8
+Sub load_tblStartingIngredientAnimalDetail()
+	Dim ctr As Integer
+	
+	tblStartingIngredientAnimalDetail(0,0) = "RecordUNID"
+	tblStartingIngredientAnimalDetail(1,0) = "Type"
+	tblStartingIngredientAnimalDetail(2,0) = "ApplicationId"
+	tblStartingIngredientAnimalDetail(3,0) = "ApplicationVersion"
+	tblStartingIngredientAnimalDetail(4,0) = "ProductEntryID"
+	tblStartingIngredientAnimalDetail(5,0) = "IngredientID"
+	tblStartingIngredientAnimalDetail(6,0) = "StartingIngredientAnimalDetailId"
+	tblStartingIngredientAnimalDetail(7,0) = "AnimalOriginCode"
+	tblStartingIngredientAnimalDetail(8,0) = "AnimalOriginDesc"
+	tblStartingIngredientAnimalDetail(9,0) = "AnimalPartCode"
+	tblStartingIngredientAnimalDetail(10,0) = "AnimalPartText"
+	tblStartingIngredientAnimalDetail(11,0) = "AnimalPreparationCode"
+	tblStartingIngredientAnimalDetail(12,0) = "AnimalPreparationText"
+	tblStartingIngredientAnimalDetail(13,0) = "Country"
+	tblStartingIngredientAnimalDetail(14,0) = "CountryCode"
+	tblStartingIngredientAnimalDetail(15,0) = "IsActiveVersion"
+	
+	'Set type of Value Single or Multi - Default single
+	For ctr=0 To 15
+		tblStartingIngredientAnimalDetail(ctr, 1) = "single"
+	Next
+	
+	tblStartingIngredientAnimalDetail(13, 1) = "multi"
+	tblStartingIngredientAnimalDetail(14, 1) = "multi"
+	
+	
+	'Set value derivation for the Item or property - Set default to  ItemName itself , this formula retries the first value for the list
+	For ctr=0 To 15
+		'Single Value Example
+		tblStartingIngredientAnimalDetail(ctr, 2) = |"\"" + @Subset(| + tblStartingIngredientAnimalDetail(ctr, 0) + |;1) + "\"" |
+	Next
+	'MultiValue example
+	'tblStartingIngredientAnimalDetail(5, 2) = |@Implode((("\"" + | + tblStartingIngredientAnimalDetail(5, 0) + |) + "\"");",")|
+	
+	'RecordUNID
+	tblStartingIngredientAnimalDetail(0, 2) = |"\"" + ApplicationId + "~" + @Text(ApplicationVersion;"G") + "~" + @Text(ProductEntryID;"G") + "~" + @Text(IngredientID;"G") + "~" + @Text(startingingredientanimaldetailid;"G") + "\""|
+	
+	tblStartingIngredientAnimalDetail(13, 2) = |@Implode((("\"" + | + tblStartingIngredientAnimalDetail(13, 0) + |) + "\"");",")|
+	tblStartingIngredientAnimalDetail(14, 2) = |@Implode((("\"" + | + tblStartingIngredientAnimalDetail(14, 0) + |) + "\"");",")|
+End Sub
+'++LotusScript Development Environment:2:2:load_tblContainer:1:8
+Sub load_tblContainer()
+	'This is ProductContainer
+	Dim ctr As Integer
+	
+	tblContainer(0,0) = "RecordUNID"
+	tblContainer(1,0) = "Type"
+	tblContainer(2,0) = "ApplicationId"
+	tblContainer(3,0) = "ApplicationVersion"
+	tblContainer(4,0) = "ProductEntryID"
+	tblContainer(5,0) = "ContainerCode"
+	tblContainer(6,0) = "ContainerDesc"
+	tblContainer(7,0) = "ContainerMaterialCode"
+	tblContainer(8,0) = "ContainerMaterialDesc"
+	tblContainer(9,0) = "ShelfLifeConditionCode"
+	tblContainer(10,0) = "ShelfLifeConditionDesc"
+	tblContainer(11,0) = "ShelfLifeTemperatureCode"
+	tblContainer(12,0) = "ShelfLifeTemperatureDesc"
+	tblContainer(13,0) = "ShelfLifeTime"
+	tblContainer(14,0) = "ShelfLifeTimeCode"
+	tblContainer(15,0) = "ShelfLifeTimeDesc"
+	tblContainer(16,0) = "IsActiveVersion"
+	
+	'Set type of Value Single or Multi - Default single
+	For ctr=0 To 16
+		tblContainer(ctr, 1) = "single"
+	Next
+	
+	tblContainer(9, 1) = "multi"
+	tblContainer(10, 1) = "multi"
+	
+	'Set value derivation for the Item or property - Set default to  ItemName itself , this formula retries the first value for the list
+	For ctr=0 To 16
+		'Single Value Example
+		tblContainer(ctr, 2) = |"\"" + @Subset(| + tblContainer(ctr, 0) + |;1) + "\"" |
+	Next
+	'MultiValue example
+	'tblContainer(5, 2) = |@Implode((("\"" + | + tblContainer(5, 0) + |) + "\"");",")|
+	
+	'RecordUNID
+	tblContainer(0, 2) = |"\"" + ApplicationId + "~" + @Text(ApplicationVersion;"G") + "~" + @Text(ProductEntryID;"G") + "~" + @Text(ContainerCode;"G") + "\""|
+	
+	tblContainer(9, 2) = |@Implode((("\"" + | + tblContainer(9, 0) + |) + "\"");",")|
+	tblContainer(10, 2) = |@Implode((("\"" + | + tblContainer(10, 0) + |) + "\"");",")|
+End Sub
+'++LotusScript Development Environment:2:2:load_tblFormulation:1:8
+Sub load_tblFormulation()
+	Dim ctr As Integer
+	
+	tblFormulation(0,0) = "RecordUNID"
+	tblFormulation(1,0) = "Type"
+	tblFormulation(2,0) = "ApplicationId"
+	tblFormulation(3,0) = "ApplicationVersion"
+	tblFormulation(4,0) = "ProductEntryID"
+	tblFormulation(5,0) = "ComponentEntryID"
+	tblFormulation(6,0) = "IngredientID"
+	tblFormulation(7,0) = "AdditionalInformation"
+	tblFormulation(8,0) = "FormulationIngredientType"
+	tblFormulation(9,0) = "FormulationType"
+	tblFormulation(10,0) = "IngredientName"
+	tblFormulation(11,0) = "IsAnimalOrigin"
+	tblFormulation(12,0) = "QuantityFrom"
+	tblFormulation(13,0) = "QuantityTo"
+	tblFormulation(14,0) = "QuantityOptions"
+	tblFormulation(15,0) = "UnitProportionCode"
+	tblFormulation(16,0) = "UnitProportionDescription"
+	tblFormulation(17,0) = "IsActiveVersion"
+	
+	'Set type of Value Single or Multi - Default single
+	For ctr=0 To 17
+		tblFormulation(ctr, 1) = "single"
+	Next
+	
+	'Set value derivation for the Item or property - Set default to  ItemName itself , this formula retries the first value for the list
+	For ctr=0 To 17
+		'Single Value Example
+		tblFormulation(ctr, 2) = |"\"" + @Subset(| + tblFormulation(ctr, 0) + |;1) + "\"" |
+	Next
+	'MultiValue example
+	'tblFormulation(5, 2) = |@Implode((("\"" + | + tblFormulation(5, 0) + |) + "\"");",")|
+	
+	'RecordUNID
+	tblFormulation(0, 2) = |"\"" + ApplicationId + "~" + @Text(ApplicationVersion;"G") + "~" + @Text(ProductEntryID;"G") + "~" + @Text(ComponentEntryID;"G") + "~" + @Text(IngredientID;"G") + "\""|
+End Sub
+'++LotusScript Development Environment:2:2:load_tblFormulationAnimalDetail:1:8
+Sub load_tblFormulationAnimalDetail()
+	Dim ctr As Integer
+	
+	tblFormulationAnimalDetail(0,0) = "RecordUNID"
+	tblFormulationAnimalDetail(1,0) = "Type"
+	tblFormulationAnimalDetail(2,0) = "ApplicationId"
+	tblFormulationAnimalDetail(3,0) = "ApplicationVersion"
+	tblFormulationAnimalDetail(4,0) = "ComponentEntryID"
+	tblFormulationAnimalDetail(5,0) = "ProductEntryID"
+	tblFormulationAnimalDetail(6,0) = "IngredientID"
+	tblFormulationAnimalDetail(7,0) = "FormulationAnimalDetailId"
+	tblFormulationAnimalDetail(8,0) = "AnimalOriginCode"
+	tblFormulationAnimalDetail(9,0) = "AnimalOriginDesc"
+	tblFormulationAnimalDetail(10,0) = "AnimalPartCode"
+	tblFormulationAnimalDetail(11,0) = "AnimalPartDesc"
+	tblFormulationAnimalDetail(12,0) = "AnimalPreparationCode"
+	tblFormulationAnimalDetail(13,0) = "AnimalPreparationDesc"
+	tblFormulationAnimalDetail(14,0) = "Country"
+	tblFormulationAnimalDetail(15,0) = "CountryCode"
+	tblFormulationAnimalDetail(16,0) = "IsActiveVersion"
+	
+	'Set type of Value Single or Multi - Default single
+	For ctr=0 To 16
+		tblFormulationAnimalDetail(ctr, 1) = "single"
+	Next
+	
+	tblFormulationAnimalDetail(14, 1) = "multi"
+	tblFormulationAnimalDetail(15, 1) = "multi"
+	
+	'Set value derivation for the Item or property - Set default to  ItemName itself , this formula retries the first value for the list
+	For ctr=0 To 16
+		'Single Value Example
+		tblFormulationAnimalDetail(ctr, 2) = |"\"" + @Subset(| + tblFormulationAnimalDetail(ctr, 0) + |;1) + "\"" |
+	Next
+	'MultiValue example
+	'tblFormulationAnimalDetail(5, 2) = |@Implode((("\"" + | + tblFormulationAnimalDetail(5, 0) + |) + "\"");",")|
+	
+	'RecordUNID
+	tblFormulationAnimalDetail(0, 2) = |"\"" + ApplicationId + "~" + @Text(ApplicationVersion;"G") + "~" + @Text(ProductEntryID;"G") + "~" + @Text(ComponentEntryID;"G") + "~" + @Text(IngredientID;"G") + "~" + @Text(FormulationAnimalDetailId;"G") + "\""|
+	
+	tblFormulationAnimalDetail(14, 2) = |@Implode((("\"" + | + tblFormulationAnimalDetail(14, 0) + |) + "\"");",")|
+	tblFormulationAnimalDetail(15, 2) = |@Implode((("\"" + | + tblFormulationAnimalDetail(15, 0) + |) + "\"");",")|
+	
+End Sub
+'++LotusScript Development Environment:2:2:load_tblComponent:1:8
+Sub load_tblComponent()
+	Dim ctr As Integer
+	
+	tblComponent(0,0) = "RecordUNID"
+	tblComponent(1,0) = "Type"
+	tblComponent(2,0) = "ApplicationId"
+	tblComponent(3,0) = "ApplicationVersion"
+	tblComponent(4,0) = "ComponentEntryID"
+	tblComponent(5,0) = "ProductEntryID"
+	tblComponent(6,0) = "ComponentDescription"
+	tblComponent(7,0) = "IsActiveVersion"
+	
+	'Set type of Value Single or Multi - Default single
+	For ctr=0 To 7
+		tblComponent(ctr, 1) = "single"
+	Next
+	
+	'Set value derivation for the Item or property - Set default to  ItemName itself , this formula retries the first value for the list
+	For ctr=0 To 7
+		'Single Value Example
+		tblComponent(ctr, 2) = |"\"" + @Subset(| + tblComponent(ctr, 0) + |;1) + "\"" |
+	Next
+	'MultiValue example
+	'tblComponent(5, 2) = |@Implode((("\"" + | + tblComponent(5, 0) + |) + "\"");",")|
+	
+	'RecordUNID
+	tblComponent(0, 2) = |"\"" + ApplicationId + "~" + @Text(ApplicationVersion;"G") + "~" + @Text(ProductEntryID;"G") + "~" + @Text(ComponentEntryID;"G") + "\""|
+End Sub
+'++LotusScript Development Environment:2:2:ConstructAppJSON:1:8
+Sub ConstructAppJSON(stream As notesstream, Appid As String)
+	Dim Key As Variant, ProductKey As Variant, formulationlkupKey As Variant , formulationAnimallkupKey As Variant, StartingIngredientlkupKey As Variant 
+	Dim docApplication As NotesDocument
+	Dim docManufacturers As NotesDocumentCollection, docManufacturer As NotesDocument
+	Dim docProducts As NotesDocumentCollection, docProduct As NotesDocument
+	Dim docComponents As NotesDocumentCollection, docComponent As NotesDocument
+	Dim docFormulations As NotesDocumentCollection, docFormulation As NotesDocument
+	Dim docFormulationAnimalDetails As NotesDocumentCollection, docFormulationAnimalDetail As NotesDocument
+	Dim docStartingIngredients As NotesDocumentCollection, docStartingIngredient As NotesDocument
+	Dim docStartingIngredientAnimalDetails As NotesDocumentCollection, docStartingIngredientAnimalDetail As NotesDocument
+	Dim docContainers As NotesDocumentCollection, docContainer As NotesDocument
+	Dim s As New notessession
+	
+	Call Stream.WriteText( |{"identifier":"RecordUNID","label":"RecordUNID","items":{| , EOL_NONE)
+	
+	'// need to deal with Appid="new"
+	vwApplication.refresh
+	Set docApplication = vwApplication.GetDocumentByKey(Appid, True)
+	If Not (docApplication Is Nothing) Then
+		Call writeJSONRowData(docApplication, tblApplication, stream)
+		
+		key = Evaluate(|ApplicationId + "~" + @Text(ApplicationVersion;"G")|, docApplication) 'RecordUNID Column maintains the Key FieldName
+		'START MANUFACTURER
+		Call Stream.WriteText( |,"Manufacturers":{"label":"ManufacturerName","items":[| , EOL_NONE)
+		
+		Set docManufacturers = vwManufacturer.GetAllDocumentsByKey(key, True)
+		If docManufacturers.Count > 0 Then
+			Set docManufacturer = docManufacturers.GetFirstDocument
+			While Not (docManufacturer Is Nothing)
+				
+				Call Stream.WriteText( |{| , EOL_NONE) 'Start of One single Manufacturer
+				Call writeJSONRowData(docManufacturer, tblManufacturer, stream)
+				Call Stream.WriteText( |}| , EOL_NONE) 'End of One single Manufacturer
+				
+				Set docManufacturer = docManufacturers.GetNextDocument(docManufacturer)
+				If Not (docManufacturer Is Nothing) Then
+					Call Stream.WriteText( |,| , EOL_NONE) 'Comma Seperator
+				End If
+			Wend
+		End If
+		Call Stream.WriteText( |]}| , EOL_NONE) 'End the Manufacturers Object
+		'END MANUFACTURER
+		
+		
+		'START PRODUCT
+		Call Stream.WriteText( |,"Products":{"identifier":"RecordUNID","label":"ProductName","items":[| , EOL_NONE)
+		Set docProducts = vwProduct.GetAllDocumentsByKey(key, True)
+		If docProducts.Count > 0 Then
+			Set docProduct = docProducts.GetFirstDocument
+			While Not(docProduct Is Nothing)
+				
+				Call Stream.WriteText( |{| , EOL_NONE) 'Start of One single Product
+				Call writeJSONRowData(docProduct, tblProduct, stream)
+				
+				'INSERT COMPONENT
+				'START Component
+				Call Stream.WriteText( |,"Components":{"identifier":"RecordUNID","label":"ComponentDescription","items":[| , EOL_NONE)
+				
+				ProductKey = Evaluate(|@ReplaceSubString(| + tblProduct(0, 2)  + |;"\"";"")|,docProduct) 'Use the RecordUNID Column and STRIP of the quotes
+				Set docComponents = vwComponent.GetAllDocumentsByKey(ProductKey, True)
+				If docComponents.Count > 0 Then
+					Set docComponent = docComponents.GetFirstDocument
+					While Not(docComponent Is Nothing)
+						
+						Call Stream.WriteText( |{| , EOL_NONE) 'Start of One single Component
+						Call writeJSONRowData(docComponent, tblComponent, stream)
+						
+						'INSERT FORMULATION
+						'START FORMULATION
+						Call Stream.WriteText( |,"Formulations":{"identifier":"RecordUNID","label":"IngredientName","items":[| , EOL_NONE)
+						
+						formulationlkupKey  = Evaluate(|@ReplaceSubString(| + tblComponent(0, 2)  + |;"\"";"")|,docComponent) 'Use the RecordUNID Column and STRIP of the quotes
+						Set docFormulations = vwFormulation.GetAllDocumentsByKey(formulationlkupKey, True)
+						If docFormulations.Count > 0 Then
+							Set docFormulation = docFormulations.GetFirstDocument
+							While Not (docFormulation Is Nothing)
+								Call Stream.WriteText( |{| , EOL_NONE) 'Start of One single Formulation
+								Call writeJSONRowData(docFormulation, tblFormulation, stream)
+								
+								'INSERT FORMULATIONANIMALDETAILS
+								'START FORMULATIONANIMALDETAILS
+								Call Stream.WriteText( |,"FormulationAnimalDetails":{"identifier":"RecordUNID","label":"AnimalOriginDesc","items":[| , EOL_NONE)
+								
+								formulationAnimallkupKey = Evaluate(|@ReplaceSubString(| + tblFormulation(0, 2)  + |;"\"";"")|,docFormulation) 'Use the RecordUNID Column and STRIP of the quotes
+								Set docFormulationAnimalDetails = vwFormulationAnimalDetail.GetAllDocumentsByKey(formulationAnimallkupKey, True)
+								If docFormulationAnimalDetails.Count > 0 Then
+									Set docFormulationAnimalDetail = docFormulationAnimalDetails.GetFirstDocument
+									While Not(docFormulationAnimalDetail Is Nothing)
+										Call Stream.WriteText( |{| , EOL_NONE) 'Start of One single FormulationAnimalDetails
+										Call writeJSONRowData(docFormulationAnimalDetail, tblFormulationAnimalDetail, stream)
+										Call Stream.WriteText( |}| , EOL_NONE) 'End of One single FormulationAnimalDetails
+										
+										Set docFormulationAnimalDetail = docFormulationAnimalDetails.GetNextDocument(docFormulationAnimalDetail)
+										If Not (docFormulationAnimalDetail Is Nothing) Then
+											Call Stream.WriteText( |,| , EOL_NONE) 'Comma Seperator
+										End If
+									Wend
+								End If
+								Call Stream.WriteText( |]}| , EOL_NONE) 'End the FormulationAnimal Object
+								'END FORMULATIONANIMALDETAILS
+								
+								'DUMMY Objects to make it compliant to the Formulation Object
+								Call Stream.WriteText( |,"FormulationEquivalents":{"identifier":"RecordUNID","label":"RecordUNID","items":[]}| , EOL_NONE)
+								Call Stream.WriteText( |,"FormulationExtractionSteps":{"identifier":"RecordUNID","label":"RecordUNID","items":[]}| , EOL_NONE)
+								Call Stream.WriteText( |,"FormulationPlantsDetails":{"identifier":"RecordUNID","label":"RecordUNID","items":[]}| , EOL_NONE)
+								Call Stream.WriteText( |,"FormulationCarriers ":{"identifier":"RecordUNID","label":"RecordUNID","items":[]}| , EOL_NONE)
+								'ENDDUMMY Objects
+								
+								Call Stream.WriteText( |}| , EOL_NONE) 'End of One single Formulation
+								
+								Set docFormulation = docFormulations.GetNextDocument(docFormulation)
+								If Not (docFormulation Is Nothing) Then
+									Call Stream.WriteText( |,| , EOL_NONE) 'Comma Seperator
+								End If
+							Wend
+						End If
+						Call Stream.WriteText( |]}| , EOL_NONE) 'End the Formulation Object
+						'END FORMULATION
+						
+						'DUMMY Objects to make it compliant to the COMPONENT Object
+						Call Stream.WriteText( |,"ComponentContainers":{"identifier":"RecordUNID","label":"RecordUNID","items":[]}| , EOL_NONE)
+						Call Stream.WriteText( |,"ComponentManufacturers":{"identifier":"RecordUNID","label":"RecordUNID","items":[]}| , EOL_NONE)
+						Call Stream.WriteText( |,"ComponentAnimalsDetails":{"identifier":"RecordUNID","label":"RecordUNID","items":[]}| , EOL_NONE)
+						'ENDDUMMY Objects
+						
+						Call Stream.WriteText( |}| , EOL_NONE) 'End of One single Component
+						
+						Set docComponent = docComponents.GetNextDocument(docComponent)
+						If Not (docComponent Is Nothing) Then
+							Call Stream.WriteText( |,| , EOL_NONE) 'Comma Seperator
+						End If
+					Wend
+				End If
+				
+				Call Stream.WriteText( |]}| , EOL_NONE) 'End the Component Object
+				'END Component
+				
+				'INSERT STARTINGINGREDIENT
+				'START STARTINGINGREDIENT
+				Call Stream.WriteText( |,"StartingIngredients":{"identifier":"RecordUNID","label":"IngredientName","items":[| , EOL_NONE)
+				'ProductKey Value is already populated by the Component structure above
+				Set docStartingIngredients = vwStartingIngredient.GetAllDocumentsByKey(ProductKey, True)
+				If docStartingIngredients.Count > 0 Then
+					Set docStartingIngredient = docStartingIngredients.GetFirstDocument
+					While Not (docStartingIngredient Is Nothing)
+						Call Stream.WriteText( |{| , EOL_NONE) 'Start of One single StartingIngredient
+						Call writeJSONRowData(docStartingIngredient, tblStartingIngredient, stream)
+						
+						'INSERT STARTINGINGREDIENTAnimalDetails
+						'START STARTINGINGREDIENTAnimalDetails
+						Call Stream.WriteText( |,"StartingIngredientAnimalDetails":{"identifier":"RecordUNID","label":"AnimalOriginDesc","items":[| , EOL_NONE)
+						
+						StartingIngredientlkupKey = Evaluate(|@ReplaceSubString(| + tblStartingIngredient(0, 2)  + |;"\"";"")|,docStartingIngredient) 'Use the RecordUNID Column and STRIP of the quotes
+						Set docStartingIngredientAnimalDetails = vwStartingIngredientAnimalDetail.GetAllDocumentsByKey(StartingIngredientlkupKey, True)
+						If docStartingIngredientAnimalDetails.Count > 0 Then
+							Set docStartingIngredientAnimalDetail = docStartingIngredientAnimalDetails.GetFirstDocument
+							
+							While Not (docStartingIngredientAnimalDetail Is Nothing)
+								Call Stream.WriteText( |{| , EOL_NONE) 'Start of One single StartingIngredientAnimalDetail
+								Call writeJSONRowData(docStartingIngredientAnimalDetail, tblStartingIngredientAnimalDetail, stream)
+								Call Stream.WriteText( |}| , EOL_NONE) 'End of One single StartingIngredientAnimalDetail
+								
+								Set docStartingIngredientAnimalDetail = docStartingIngredientAnimalDetails.GetNextDocument(docStartingIngredientAnimalDetail)
+								If Not (docStartingIngredientAnimalDetail Is Nothing) Then
+									Call Stream.WriteText( |,| , EOL_NONE) 'Comma Seperator
+								End If
+							Wend
+						End If
+						Call Stream.WriteText( |]}| , EOL_NONE) 'End the STARTINGINGREDIENTAnimalDetails Object
+						'END STARTINGINGREDIENTAnimalDetails
+						
+						Call Stream.WriteText( |}| , EOL_NONE) 'End of One single StartingIngredient
+						
+						Set docStartingIngredient = docStartingIngredients.GetNextDocument(docStartingIngredient)
+						If Not (docStartingIngredient Is Nothing) Then
+							Call Stream.WriteText( |,| , EOL_NONE) 'Comma Seperator
+						End If
+					Wend
+				End If	
+				
+				Call Stream.WriteText( |]}| , EOL_NONE) 'End the STARTINGINGREDIENT Object
+				'END STARTINGINGREDIENT
+				
+				'INSERT CONTAINER
+				'START CONTAINER
+				Call Stream.WriteText( |,"ProductContainers":{"identifier":"RecordUNID","label":"ContainerDesc","items":[| , EOL_NONE)
+				'ProductKey Value is already populated by the Component structure above
+				Set docContainers = vwContainer.GetAllDocumentsByKey(ProductKey, True)
+				If docContainers.Count > 0 Then
+					Set docContainer = docContainers.GetFirstDocument
+					While Not (docContainer Is Nothing)
+						Call Stream.WriteText( |{| , EOL_NONE) 'Start of One single CONTAINER
+						Call writeJSONRowData(docContainer, tblContainer, stream)
+						Call Stream.WriteText( |}| , EOL_NONE) 'End of One single CONTAINER
+						
+						Set docContainer = docContainers.GetNextDocument(docContainer)
+						If Not (docContainer Is Nothing) Then
+							Call Stream.WriteText( |,| , EOL_NONE) 'Comma Seperator
+						End If
+					Wend
+					
+				End If
+				Call Stream.WriteText( |]}| , EOL_NONE) 'End the STARTINGINGREDIENT Object
+				'END CONTAINER
+				
+				'DUMMY Objects to make it compliant to the Product Object
+				Call Stream.WriteText( |,"ProductIVDs":{"identifier":"RecordUNID","label":"RecordUNID","items":[]}| , EOL_NONE)
+				Call Stream.WriteText( |,"ProductExceptions":{"identifier":"RecordUNID","label":"RecordUNID","items":[]}| , EOL_NONE)
+				'END DUMMY Object
+				
+				Call Stream.WriteText( |}| , EOL_NONE) 'End of One single Product
+				Set docProduct = docProducts.GetNextDocument(docProduct)
+				If Not (docProduct Is Nothing) Then
+					Call Stream.WriteText( |,| , EOL_NONE) 'Comma Seperator
+				End If
+			Wend
+		End If
+		Call Stream.WriteText( |]}| , EOL_NONE) 'End the Product Object
+		'END PRODUCT
+		
+	End If
+	
+	Call Stream.WriteText( |}}| , EOL_NONE) 'End the Application Object and the JSON Object
+	
+End Sub
+'++LotusScript Development Environment:2:2:writeJSONRowData:1:8
+Sub writeJSONRowData(doc As NotesDocument, TableDefArray As Variant, stream As notesstream)
+	Dim NameLabel As String, DataValueType As String, ValueFormula As String, DataValue As Variant  
+	Dim arrMax As Integer, ctr As Integer
+	Dim outString As String 
+	
+	arrMax = Ubound(TableDefArray)
+	For ctr=0 To arrMax
+		NameLabel = |"| + TableDefArray(ctr,0) + |"|
+		DataValueType = TableDefArray(ctr,1)
+		ValueFormula =  TableDefArray(ctr,2)
+		
+		outString=""
+		If DataValueType = "single" Then
+			DataValue = Evaluate(ValueFormula, doc)
+			
+			outString =  NameLabel + |:| + EncodeJSONData((DataValue(0)))
+		Elseif DataValueType = "multi" Then
+					'make sure the formula here returns a value delimitted by commas see example on load_tblApplication
+			DataValue = Evaluate(ValueFormula, doc)
+			
+			outString = NameLabel + |:[| + DataValue(0) + |]|
+		End If
+		
+		If ctr < arrMax Then
+			outString = outString + |,|
+		End If
+		
+		Call Stream.WriteText(outString, EOL_NONE)
+		
+		If ctr=0 Then
+			outString = |"id"| + + |:| + DataValue(0) + |,|
+			Call Stream.WriteText(outString, EOL_NONE)
+		End If
+	Next
+End Sub
+'++LotusScript Development Environment:2:1:EncodeJSONData:1:8
+Function EncodeJSONData(JSONDataValue As String) As String 
+	Dim retVal As String 
+	Dim strlen As Integer, ctr As Integer 
+	Dim pos As Integer
+	
+	Dim parsedStr As String
+	
+	Dim encodedVal As Variant
+	
+	If Left(JSONDataValue,1) = |"| And Right(JSONDataValue,1) = |"| Then
+		strlen = Len(JSONDataValue)
+		JSONDataValue = Left(JSONDataValue,strlen-1)
+		JSONDataValue = Right(JSONDataValue,strlen-2)
+		
+		strlen = strlen - 2
+		For ctr = 0 To 7
+			pos = 1
+			While pos > 0 And pos < strlen
+				pos = Instr(pos, JSONDataValue, EscapedArray(ctr , 0))	
+				If pos > 0 Then
+					strlen = Len(JSONDataValue)
+					JSONDataValue = Left(JSONDataValue, (pos - 1)) + EscapedArray(ctr , 1) + Right(JSONDataValue, (strlen - pos))
+					pos = pos + 2
+				End If
+			Wend
+		Next
+		
+		retVal = |"| + JSONDataValue + |"|
+	Else
+		retVal = xmlfilter(JSONDataValue)	
+	End If
+	
+	EncodeJSONData = retVal
+End Function
+'++LotusScript Development Environment:2:1:xmlfilter:1:8
+Private Function xmlfilter(strText As String) As String
+	On Error Goto ErrorHandler
+	Dim lngTextPos As Long
+	Dim strIn As String
+	Dim strOut As String
+	Dim strNew As String
+	
+	If Len(strText) < 1 Then Exit Function
+	
+	For lngTextPos = 1 To Len(strText)
+		strIn = Mid(strText, lngTextPos, 1)
+		Select Case strIn
+		Case "&"		'what about url encoded ascii notation?
+			strOut = "&amp;"
+			If Lcase(Mid(strText, lngTextPos, 5) = "&amp;") Then
+				lngTextPos = lngTextPos+4
+			Elseif Lcase(Mid(strText, lngTextPos, 4) = "&lt;") Then
+				lngTextPos = lngTextPos+3
+				strOut = "&lt;"
+			Elseif Lcase(Mid(strText, lngTextPos, 4) = "&gt;") Then
+				lngTextPos = lngTextPos+3
+				strOut = "&gt;"
+			End If
+		Case "<"
+			strOut = "&lt;"
+		Case ">"
+			strOut = "&gt;"
+		Case Else
+			strOut = strIn
+		End Select
+		strNew = strNew + strOut
+	Next
+	xmlfilter = strNew
+ErrorResume:
+	Exit Function
+ErrorHandler:
+	Print "Error in " & Lsi_info(2) +"/"+ Lsi_info(12) + " at line #" + Cstr(Erl) + ": (" + Cstr(Err) + ") " + Error(Err)
+	xmlfilter = "Error"
+	Resume ErrorResume
+End Function
+'++LotusScript Development Environment:2:2:initEscapedArray:1:8
+Sub initEscapedArray
+	EscapedArray(0,0) = |"|
+	EscapedArray(1,0) = |\|
+	EscapedArray(2,0) = |/|
+	EscapedArray(3,0) = Chr(8)
+	EscapedArray(4,0) = Chr(9)
+	EscapedArray(5,0) = Chr(10)
+	EscapedArray(6,0) = Chr(12)
+	EscapedArray(7,0) = Chr(13)
+	
+	EscapedArray(0,1) = |\"|
+	EscapedArray(1,1) = |\\|
+	EscapedArray(2,1) = |\/|
+	EscapedArray(3,1) = |\b|
+	EscapedArray(4,1) = |\t|
+	EscapedArray(5,1) = |\n|
+	EscapedArray(6,1) = |\f|
+	EscapedArray(7,1) = |\r|
+End Sub
+'++LotusScript Development Environment:2:1:FormatDate:1:8
+Private Function FormatDate(p_sInput As String) As String
+	'*********************************************************************************************
+	'* Purpose:	This function formats the date in the following way:
+	'*						yyyy/mm/dd hh:mm:ss UTC+|-hh:mm
+	'*
+	'* Inuput:		p_sInput:	The date string to format
+	'*
+	' Output:		The formatted date string
+	'*********************************************************************************************
+	Dim ndate As NotesDateTime
+	Dim sUTC As String
+	Dim sHour As String
+	Dim sZone As String
+	Dim sMinute As String	
+	Dim sDirection As String
+	
+	Set ndate = New NotesDateTime(p_sInput)
+	sZone = Abs(ndate.TimeZone)
+	If Len(sZone) > 2 Then
+		sHour = Right(sZone, 2)
+		sMinute = Left(sZone, 2)
+	Else
+		sHour = sZone
+		sMinute = "00"
+	End If
+	
+	If ndate.IsDST Then
+		sHour = Abs(-(Cint(sHour)) + 1)
+	End If
+	If ndate.TimeZone < 0 Then
+		sDirection = "+"
+	Else
+		sDirection = "-"
+	End If
+	FormatDate = Format(p_sInput, "yyyy/mm/dd hh:mm:ss") + " UTC" & sDirection & Format(sHour, "00") & Format(sMinute, "00")
+	
+End Function
+'++LotusScript Development Environment:2:1:getFormatDateFormula:1:8
+Function getFormatDateFormula(FieldName As String) As String 
+	Dim strMonths As String 
+	Dim formula As String 
+	
+	strMonths = getAllMonths("mmm")
+	
+	Formula = Formula + |"{\"DateTypeObject\":"|
+	Formula = Formula + |+ "{\"DateValue\":\""|
+	Formula = Formula + |+ @Select(@Month(| + FieldName + |);| + strMonths + |) + " " |
+	Formula = Formula + |+ @Text(@Day(| + FieldName + |);"G") + " " |
+	Formula = Formula + |+ @Text(@Year(| + FieldName + |);"G") + " " |
+	Formula = Formula + |+ @Text(@Hour(| + FieldName + |);"G") + ":" |
+	Formula = Formula + |+ @Text(@Minute(| + FieldName + |);"G") + ":" |
+	Formula = Formula + |+ @Text(@Second(| + FieldName + |);"G") + " " |
+	Formula = Formula + |+ @Do(_zoneVal := @Zone(| + FieldName + |);_absVal := @Abs(_zoneVal); _intVal := @Integer(_absVal);"UTC" + @If(_zoneVal < 0;"+";"-") + @Text(@If(_absVal > _intVal;_intVal+1;_intVal))) + "\""|
+	Formula = Formula + |+ ",\"IsDST\":" |
+	Formula = Formula + |+ @Do(_zoneVal := @Zone(| + FieldName + |);@If(@Integer(_zoneVal) <>_zoneVal;"1";"0"))|
+	Formula = Formula + |+ "}}"|
+	
+	getFormatDateFormula = Formula
+End Function
+'++LotusScript Development Environment:2:1:getAllMonths:1:8
+Function getAllMonths(FormatStr) As String 
+	Dim dt As NotesDateTime
+	Dim n As Integer, resultStr As String 
+	
+	Set dt = New NotesDateTime("01/01/2000")
+	
+	For n=1 To 12
+		resultStr = resultStr + |"| + Format(dt.DateOnly,FormatStr) + |"|
+		If n < 12 Then
+			resultStr = resultStr + |;| 
+		End If
+		dt.AdjustMonth(1)
+	Next
+	
+	getAllMonths = resultStr
+End Function
+'++LotusScript Development Environment:2:1:GetWebVariable:1:8
+Function GetWebVariable (querystring As String, argname As String) As String
+	Dim tmpstr As String	, argname_pos As Long
+	
+	GetWebVariable = ""
+	argname_pos = Instr(Ucase(querystring), Ucase(argname)+"=")
+	If argname_pos <> 0 Then
+		tmpstr = Mid(querystring, argname_pos+Len(argname)+1)
+	End If
+	If Instr(tmpstr, "&") <> 0 Then
+		GetWebVariable = Strleft(tmpstr, "&")
+	Else
+		GetWebVariable = tmpstr
+	End If
+End Function

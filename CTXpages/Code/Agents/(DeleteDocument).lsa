@@ -1,0 +1,320 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(DeleteDocument)' xmlns='http://www.lotus.com/dxl' version='9.0'
+ maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3' runaswebuser='true'
+ publicaccess='false' designerversion='8.5.3' restrictions='unrestricted'>
+<noteinfo noteid='9b82' unid='6C4635AB99117485CA25837D00190A37' sequence='25'>
+<created><datetime dst='true'>20190109T153330,15+11</datetime></created>
+<modified><datetime>20191002T092753,99+10</datetime></modified>
+<revised><datetime>20191002T092753,97+10</datetime></revised>
+<lastaccessed><datetime>20191002T092753,97+10</datetime></lastaccessed>
+<addedtofile><datetime dst='true'>20190109T153330,21+11</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20191002T092754,14+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+Option Declare
+Use "PrintErrorReport"
+
+
+
+
+</lotusscript></code><code event='declarations'><lotusscript>Public Const FORM_CTNAPP = "Application"
+
+Public Const FORM_SITE = "Site" 
+Public Const FORM_BIOLOGICAL = "Biological"
+Public Const FORM_BIOLOGICALINGREDIENT = "BiologicalIngredient"
+Public Const FORM_MEDICINE = "Medicine"
+Public Const FORM_MEDICINEINGREDIENT = "MedicineIngredient"
+Public Const FORM_ANIMALEXCIPIENT = "AnimalExcipient"
+Public Const FORM_COMPARATOR = "Comparator"
+Public Const FORM_PLACEBO = "Placebo"
+Public Const FORM_DEVICE = "Device"
+Public Const FORM_TRIALCONDUCTEDINCOUNTRY = "TrialConductedInCountry"
+Public Const FORM_ATTACHMENT = "Attachment"
+Public Const FORM_MFR = "Man"
+Public Const FORM_MFRSTEPS = "ManSteps"
+
+Public Const VIEW_APPLICATIONSUBS = "$ApplicationSubs"
+Public Const VIEW_MANUFACTURERSUBS = "$ManufacturerSubs"
+Public Const VIEW_ALLBYAPPID = "$AllByApplicationID"
+Public Const VIEW_APPHEADERS = "$ApplicationHeaders"
+
+Public Const LEN_UNID = 32
+
+Public Const STATUS_DRAFT = "Draft"
+Public Const FIELD_LASTEDITED = "LastEdited"
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	On Error Goto errHandler
+	
+%REM
+Date: 25/05/01
+Author: Yang Truong
+
+Comments:
+This agent will delete the specified document and all of its sub documents.
+
+Revisions:
+Date                   Author                          Comments
+=========================================================================================
+11Oct07			Paul Blackman				Made agent AOS portal compatible
+
+%END REM
+	
+	Dim nsSession As New NotesSession
+	Dim ndbCurrent As NotesDatabase
+	Dim ndocContext As NotesDocument
+	Dim ndocCurrent As NotesDocument
+	Dim nvwView As NotesView
+	Dim ndocParent As NotesDocument
+	Dim ndcForDeletion As NotesDocumentCollection
+	Dim ndocMedAUSTL As NotesDocument
+	Dim nvwAllByAppID As NotesView
+	Dim collDrafts As NotesDocumentCollection
+	
+	Dim strQueryString As String
+	Dim intPos As Integer
+	Dim sglResult As Single
+	Dim strUNID As String
+	Dim astrFormTypes() As String
+	Dim strViewName As String
+	Dim strKey As String
+	Dim strTmpPath As String          
+	Dim intRandom As Integer          
+	Dim strFormDocID As String
+	Dim strAppID As String
+	Dim i As Integer     
+	Dim intResetStatus As Integer
+	Dim IsLodgementPage As Variant     
+	Dim strAnchor As String
+	Dim isXPages As Boolean
+	
+	Set ndocContext = nsSession.DocumentContext
+	Set ndbCurrent = nsSession.CurrentDatabase
+	
+    'check to see if the database is in a directory and swap the slash directions
+	
+	strTmpPath = fstrSwapPathSlashes(ndbCurrent.filepath)
+	
+	strQueryString = ndocContext.Query_String(0)
+	
+    ' Get the current document
+	strUNID = GetWebVariable(strQueryString, "thisunid")
+	'Added 21FEB2013 Bruce Langner
+	If strUNID = "" Then
+		strUNID = ndocContext.thisunid(0)
+		'MsgBox "(DeleteDocument) agent thisunid: " + strUNID
+	End If
+	
+	If ndocContext.HasItem("xPages") Then
+		' Agent has been called from xPages
+		isXPages = True
+	End If
+	
+     'Test to see if there is no unid for the return doc. If there isn't doc comes from drafts view
+	sglResult = Instr( 1, strUNID, "noreturn" )
+	
+	If sglResult = 0 Then
+          'From application or form
+		Set ndocCurrent = ndbCurrent.GetDocumentByUNID(strUNID)
+		IsLodgementPage = True
+	Else 
+          'From drafts
+		Set ndocCurrent = ndocContext
+		ndocCurrent.Form = "WebDrafts"
+	End If
+     ' Get the UNID of the document to delete (format of the querystring is openagent&amp;thisUNID=xxxxxxxx&amp;deleteUNID=xxxxxxxx)
+	strUNID = GetWebVariable(strQueryString, "deleteunid")
+	If strUNID = "" Then
+		strUNID = ndocContext.deleteunid(0)
+	End If
+	MsgBox "(DeleteDocument) agent deleteunid: " + strUNID
+	
+     ' Get the document to delete
+	Set ndocParent = ndbCurrent.GetDocumentByUNID(strUNID)
+	
+	strViewName = ""
+	
+	intResetStatus = True
+	
+	
+     ' Delete the form's sub docs 
+	Select Case ndocParent.Form(0)
+	Case FORM_CTNAPP
+		
+		Redim astrFormTypes(21) As String    'SMS 18/02/08 eBS change form added below. Reinitialised array
+        ' Set the form types that can be sub docs of the document to delete          
+		
+		astrFormTypes(0) = FORM_SITE
+		astrFormTypes(1) = FORM_BIOLOGICAL
+		astrFormTypes(2) = FORM_BIOLOGICALINGREDIENT
+		astrFormTypes(3) = FORM_MEDICINE
+		astrFormTypes(4) = FORM_MEDICINEINGREDIENT
+		astrFormTypes(5) = FORM_ATTACHMENT
+		astrFormTypes(6) = FORM_ANIMALEXCIPIENT
+		astrFormTypes(7) = FORM_COMPARATOR
+		astrFormTypes(8) = FORM_PLACEBO
+		astrFormTypes(9) = FORM_DEVICE
+		astrFormTypes(10) = FORM_TRIALCONDUCTEDINCOUNTRY
+		astrFormTypes(11) = FORM_ATTACHMENT
+		
+		' Set the view to find them in
+		strViewName = VIEW_APPLICATIONSUBS     
+			
+		' build up key
+		strKey = ndocParent.ApplicationID(0)
+			
+		' don't need to reset status if deleting the entire application
+		intResetStatus = False
+		
+	Case FORM_MFR
+		
+		Redim astrFormTypes(0) As String
+		
+		'Set the form types that can be sub docs of the document to delete
+		astrFormTypes(0) = FORM_MFRSTEPS
+			
+		'Set the view to find them in
+		strViewName = VIEW_MANUFACTURERSUBS     
+		
+        ' build up key
+		strKey = ndocParent.ApplicationID(0) &amp; ndocParent.FormulationID(0) &amp; ndocParent.ManufacturerID(0)          
+		
+		
+	                    
+	End Select
+	
+	If strViewName &lt;&gt; "" Then  
+		
+     ' Set the view
+		Set nvwView = ndbCurrent.GetView(strViewName)
+		
+          ' Forall form types
+		Forall x In astrFormTypes
+			
+          	' Get a collection of documents to delete for this form type
+			Set ndcForDeletion = nvwView.GetAllDocumentsByKey(strKey &amp; x, True)
+			
+	          ' Delete the documents
+			If ndcForDeletion.Count &gt; 0 Then
+				
+                    ' if form = MEDAUSTL then check to see if there are any draft applications hanging off it. Delete all draft docs
+				
+				
+				Call ndcForDeletion.RemoveAll(True)
+				
+			End If
+			
+		End Forall
+	End If
+	
+	strAppID = ndocParent.ApplicationID(0)
+	
+	
+     ' if deleting subdocuments, we need to reset the status of the header document
+	If IsLodgementPage And intResetStatus Then
+		
+		Call SetLastEdited(strAppID, ndocContext, ndbCurrent)
+		
+	End If
+	
+     ' Delete the target document     
+	Call ndocParent.Remove(True)
+	
+	If Not isXPages Then
+		' Generate random number to avoid page being cached     
+		intRandom = Second(Time) * Minute(Time) 
+		strFormDocID = ndocCurrent.UniversalID		
+		If IsLodgementPage Then
+			' Deletions made on the lodgement page, we need to jump to the correct anchor
+			Print "[" &amp; strTmppath &amp; "/$AllByUNID/" &amp; strFormDocID &amp; "?EditDocument&amp;" &amp; intRandom &amp; "&amp;login" &amp; strAnchor &amp; "]"       
+		Else
+			' Called from portal
+			Call returnResponse(True, "Refresh", "")
+		End If
+	End If
+	
+	Exit Sub
+	
+errHandler:
+	If isXPages Then
+		Msgbox "DeleteDocument agent - Initialize(): Error on line " &amp; Trim(Cstr(Erl)) &amp; ": " &amp; Error$ &amp; " (" &amp; Trim(Cstr(Err)) &amp; ")"
+	Elseif IsLodgementPage Then
+		Call sPrintErrorReport(ndbCurrent)
+	Else
+		Call returnResponse(False, "", "There was an unexpected error while attempting to delete the document requested: Error " &amp; Err &amp; " at line " &amp; Erl &amp; " - " &amp; Error)
+	End If
+	
+End Sub
+
+</lotusscript></code><code event='SetLastEdited'><lotusscript>Sub SetLastEdited(strAppID As String, ndocContext As NotesDocument, ndbELF As NotesDatabase)
+	
+    ' Set the last edited date on the application header document and set the status to DRAFT.
+	
+	Dim nvwAppHeaders As NotesView     
+	Dim ndtNow As New NotesDateTime("Today")
+	Dim ndocHeader As NotesDocument
+	Dim varUserName As Variant
+	Dim varRemoteUser As Variant
+	
+	
+	Call ndtNow.SetNow
+	
+	varRemoteUser = ndocContext.Remote_User
+	
+	Set nvwAppHeaders = ndbELF.GetView(VIEW_APPHEADERS)
+	
+	Set ndocHeader = nvwAppHeaders.GetDocumentByKey(strAppID, True)
+	
+	If Not (ndocHeader Is Nothing) Then
+		
+		Call ndocHeader.ReplaceItemValue(FIELD_LASTEDITED, ndtNow)
+		ndocHeader.ApplicationStatus = STATUS_DRAFT
+		'Jia Mao - 26/09/02
+		'need to set appication type to "New" as well (for variation &amp; grouping applications)
+		'ndocHeader.ApplicationType = GetNewApplicationType()
+		
+		' set last editor to the current username
+		'     varUserName = Evaluate("@Name( [CN] ; " &amp; {"} &amp; nsSession.EffectiveUserName &amp; {"} &amp; ");")
+		'          ndocHeader.LastEditor = varUserName(0)
+		ndocHeader.LastEditor = varRemoteUser(0)
+		
+		' save the header
+		Call ndocHeader.Save(True, True)
+		
+	End If
+	
+End Sub
+
+</lotusscript></code><code event='returnResponse'><lotusscript>Function returnResponse(bSuccess As Boolean, strAction As String, strParam As String)
+	Const csCONTENT_TYPE_JSON = "Content-Type:application/json"	
+	Dim strJSON As String
+	
+	strJSON = | {"Success":"| + Cstr(bSuccess) + |", "Action":"| + strAction + |", "Message":"| + strParam + |"}|
+	
+	Print csCONTENT_TYPE_JSON
+	Print strJSON
+	
+End Function
+
+</lotusscript></code><code event='GetWebVariable'><lotusscript>Function GetWebVariable (querystring As String, argname As String) As String
+	Dim tmpstr As String	
+	GetWebVariable = ""
+	tmpstr = Strright(querystring, argname + "=")
+	
+	If (Instr(tmpstr, "&amp;") &lt;&gt; 0) Then
+		GetWebVariable = Strleft(tmpstr, "&amp;")
+	Else
+		GetWebVariable = tmpstr
+	End If
+End Function</lotusscript></code>
+<rundata processeddocs='0' exitcode='0'>
+<agentmodified><datetime>20191002T092753,99+10</datetime></agentmodified>
+<agentrun><datetime>20191002T113511,86+10</datetime></agentrun>
+<runlog>Started running agent 'DeleteDocument' on 02/10/2019 11:35:11 AM
+Ran LotusScript code
+Done running agent 'DeleteDocument' on 02/10/2019 11:35:11 AM
+</runlog></rundata>
+<item name='$POID'><datetime>20170410T144828,01+10</datetime></item></agent>
+

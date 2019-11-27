@@ -1,0 +1,612 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xp:view xmlns:xp="http://www.ibm.com/xsp/core" dojoTheme="true"
+	dojoParseOnLoad="true">
+	<xp:this.resources>
+		<xp:styleSheet href="/applicationLayout.css"></xp:styleSheet>
+		<xp:styleSheet href="/applicationForm.css"></xp:styleSheet>
+		<xp:styleSheet href="/applicationIcons.css"></xp:styleSheet>
+		<xp:styleSheet href="/developer.css"></xp:styleSheet>
+	</xp:this.resources>
+
+	<xp:this.data>
+		<xp:dominoDocument var="part1" formName="Part1" action="editDocument" requestParamPrefix="partone" />
+	</xp:this.data>
+	
+	<xp:panel>
+		<xp:div id="hiddenData">
+			<xp:table>
+				<xp:tr>
+					<xp:td>
+
+					</xp:td>
+					<xp:td>
+
+					</xp:td>
+					<xp:td>
+
+					</xp:td>
+					<xp:td></xp:td>
+					<xp:td></xp:td>
+				</xp:tr>
+			</xp:table>
+		</xp:div>
+		<xp:table border="0" styleClass="formTable">
+			<xp:tr>
+				<xp:td styleClass="labelCell" colspan="3">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+					<xp:text escape="true" id="computedField2"
+						styleClass="instructions">
+						<xp:this.value><![CDATA[#{javascript:"Always Required"}]]></xp:this.value>
+					</xp:text>
+					&#160;&#160;
+					<xp:span styleClass="conditionalMandatory">
+						<xp:span styleClass="conditionalMandatory">
+							*
+						</xp:span>
+					</xp:span>
+					<xp:text escape="true" id="computedField3"
+						styleClass="instructions">
+						<xp:this.value><![CDATA[#{javascript:" Required under certain conditions"}]]></xp:this.value>
+					</xp:text>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+		</xp:table>
+		<xp:table border="0" styleClass="formTable">
+			<xp:tr>
+				<xp:td styleClass="labelCellLarge">
+					<xp:label value="Contact Name:"
+						id="lblPart1ContactName" for="contactName">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td>
+					<xp:inputText id="contactName"
+						value="#{part1.contactName}" dojoType="dijit.form.TextBox"
+						styleClass="dijitTextBox">
+						<xp:this.dojoAttributes>
+							<xp:dojoAttribute name="placeHolder"
+								value="eg: Joan Johnson">
+							</xp:dojoAttribute>
+						</xp:this.dojoAttributes>
+					</xp:inputText>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td styleClass="labelCellLarge">
+					<xp:label value="Contact Phone:"
+						id="lblContactPhone" for="contactPhone">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td>
+					<xp:inputText id="contactPhone"
+						value="#{part1.contactPhone}" dojoType="dijit.form.TextBox"
+						styleClass="dijitTextBox">
+						<xp:this.dojoAttributes>
+							<xp:dojoAttribute name="placeHolder"
+								value="eg: 0987654321">
+							</xp:dojoAttribute>
+						</xp:this.dojoAttributes>
+					</xp:inputText>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td>
+					<xp:label value="Contact Email:"
+						id="lblContactEmail" for="contactEmail" styleClass="label">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td>
+					<xp:inputText id="contactEmail"
+						value="#{part1.contactEmail}" dojoType="dijit.form.TextBox"
+						styleClass="dijitTextBox">
+						<xp:this.dojoAttributes>
+							<xp:dojoAttribute name="placeHolder"
+								value="email.address@domain.com.au">
+							</xp:dojoAttribute>
+						</xp:this.dojoAttributes>
+					</xp:inputText>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td>
+					<xp:label value="Confirm Email:"
+						id="lblConfirmEmail" styleClass="label" for="confirmEmail">
+					</xp:label>
+				</xp:td>
+				<xp:td></xp:td>
+				<xp:td>
+					<xp:inputText id="confirmEmail"
+						styleClass="dijitTextBox">
+					</xp:inputText>
+				</xp:td>
+				<xp:td></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td>
+					<xp:label value="Trial Details" id="lblTrialDetails"
+						styleClass="instructionsInlineBold">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory"></xp:span>
+				</xp:td>
+				<xp:td></xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td>
+					<xp:label value="Protocol Number:"
+						id="lblProtocolNumber" for="protocolNumber" styleClass="label">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td>
+					<xp:inputText value="#{part1.protocolNumber}"
+						id="protocolNumber" dojoType="dijit.form.TextBox"
+						styleClass="dijitTextBox">
+					</xp:inputText>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td>
+					<xp:label value="Expected Trial Start Date:"
+						id="lblPt1ExpectedStartDate" for="startDate">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td>
+					<xp:inputText value="#{part1.startDate}"
+						id="startDate" dojoType="dijit.form.DateTextBox">
+						<xp:this.dojoAttributes>
+							<xp:dojoAttribute name="placeHolder"
+								value="22/04/1931">
+							</xp:dojoAttribute>
+							<xp:dojoAttribute
+								value="Use the dd/MM/yyyy format if entering the date manually"
+								name="promptMessage">
+							</xp:dojoAttribute>
+							<xp:dojoAttribute name="jsId"
+								value="startDate">
+							</xp:dojoAttribute>
+							<xp:dojoAttribute name="constraints">
+								<xp:this.value><![CDATA[#{javascript:try{
+	var day = @Text(@Day(@Today()));
+	day = @If(@Length(day) == 1, "0"+day, day);
+	var month = @Text(@Month(@Today()));
+	month = @If(@Length(month) == 1, "0"+month, month);
+	var thisday = @Text(@Year(@Today())) + "/" + month + "/" + day;
+	var thisday = @Text(@Year(@Today())) + "-" + month + "-" + day;
+	return "{min:" + thisday + ",datePattern:'dd/MM/yyyy'}";
+} catch(e) {
+	print(e);
+}}]]></xp:this.value>
+							</xp:dojoAttribute>
+						</xp:this.dojoAttributes>
+						<xp:dateTimeHelper id="dateTimeHelper1">
+						</xp:dateTimeHelper>
+						<xp:this.converter>
+							<xp:convertDateTime type="date">
+							</xp:convertDateTime>
+						</xp:this.converter>
+					</xp:inputText>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td>
+					<xp:label value="Expected Completion Date:"
+						id="lblPt1ExpectedCompletionDate" for="startDate">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td>
+					<xp:inputText
+						value="#{part1.expectedCompletionDate}"
+						id="ExpectedCompletionDate" dojoType="dijit.form.DateTextBox">
+						<xp:this.dojoAttributes>
+							<xp:dojoAttribute name="placeHolder"
+								value="19/12/1990">
+							</xp:dojoAttribute>
+							<xp:dojoAttribute
+								value="Use the dd/MM/yyyy format if entering the date manually"
+								name="promptMessage">
+							</xp:dojoAttribute>
+							<xp:dojoAttribute name="jsId"
+								value="startDate">
+							</xp:dojoAttribute>
+							<xp:dojoAttribute name="constraints">
+								<xp:this.value><![CDATA[#{javascript:try{
+	var day = @Text(@Day(@Today()));
+	day = @If(@Length(day) == 1, "0"+day, day);
+	var month = @Text(@Month(@Today()));
+	month = @If(@Length(month) == 1, "0"+month, month);
+	var thisday = @Text(@Year(@Today())) + "/" + month + "/" + day;
+	var thisday = @Text(@Year(@Today())) + "-" + month + "-" + day;
+	return "{min:" + thisday + ",datePattern:'dd/MM/yyyy'}";
+} catch(e) {
+	print(e);
+}}]]></xp:this.value>
+							</xp:dojoAttribute>
+						</xp:this.dojoAttributes>
+						<xp:dateTimeHelper id="dateTimeHelper2">
+						</xp:dateTimeHelper>
+						<xp:this.converter>
+							<xp:convertDateTime type="date">
+							</xp:convertDateTime>
+						</xp:this.converter>
+					</xp:inputText>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td>
+					<xp:label value="Potential use of restricted goods:"
+						id="lblIsPotentialRestrictedGoodUsed"
+						for="IsPotentialRestrictedGoodUsed">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td>
+					<xp:radioGroup id="IsPotentialRestrictedGoodUsed"
+						value="#{part1.isPotentialRestrictedGoodUsed}">
+						<xp:selectItem itemLabel="Yes" itemValue="Yes"
+							id="selectItem1">
+						</xp:selectItem>
+						<xp:selectItem itemLabel="No" itemValue="No"
+							id="selectItem2">
+						</xp:selectItem>
+					</xp:radioGroup>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td>
+					<xp:label value="Title of Study:"
+						id="lblTitleOfStudy" for="titleOfStudy">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td>
+					<xp:inputText id="titleOfStudy"
+						value="#{part1.titleOfStudy}" dojoType="dijit.form.TextBox"
+						styleClass="dijitComboBoxWidthLarge">
+					</xp:inputText>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td>
+					<xp:label value="Trial Type:" id="lblTrialType"
+						for="trialType">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td>
+					<xp:checkBoxGroup id="trialType"
+						value="#{part1.trialType}">
+						<xp:selectItem itemLabel="Phase 1"
+							itemValue="1">
+						</xp:selectItem>
+						<xp:selectItem itemLabel="Phase 2"
+							itemValue="2">
+						</xp:selectItem>
+						<xp:selectItem itemLabel="Phase 3"
+							itemValue="3">
+						</xp:selectItem>
+						<xp:selectItem itemLabel="Phase 4"
+							itemValue="4">
+						</xp:selectItem>
+						<xp:selectItem
+							itemLabel="Bioavailability/Bioequivalence" itemValue="B">
+						</xp:selectItem>
+						<xp:selectItem itemLabel="Device"
+							itemValue="D">
+						</xp:selectItem>
+					</xp:checkBoxGroup>
+				</xp:td>
+				<xp:td styleClass="helperCell"></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td>
+					<xp:label id="lblTrialTypeDescription"
+						value="Brief Description of Trial:" for="trialTypeDescription">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td>
+					<xp:inputText id="trialTypeDescription"
+						value="#{part1.trialTypeDescription}"
+						dojoType="dijit.form.TextBox"
+						styleClass="dijitComboBoxWidthLarge">
+					</xp:inputText>
+				</xp:td>
+				<xp:td></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td>
+					<xp:label value="This Trial:" id="lblThisTrial"
+						for="trialClassification">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td>
+					<xp:checkBoxGroup id="trialClassification"
+						value="#{part1.trialClassification}" layout="pageDirection">
+						<xp:selectItem
+							itemLabel="Involves Animal excipients" itemValue="3">
+							<xp:this.attrs>
+								<xp:attr name="dojoType"
+									value="dijit.form.CheckBox">
+								</xp:attr>
+							</xp:this.attrs>
+						</xp:selectItem>
+						<xp:selectItem
+							itemLabel="Is being conducted in other countries"
+							itemValue="4">
+							<xp:this.attrs>
+								<xp:attr name="dojoType"
+									value="dijit.form.CheckBox">
+								</xp:attr>
+							</xp:this.attrs>
+						</xp:selectItem>
+						<xp:selectItem
+							itemLabel="Involves a product containing nanoparticles"
+							itemValue="9">
+							<xp:this.attrs>
+								<xp:attr name="dojoType"
+									value="dijit.form.CheckBox">
+								</xp:attr>
+							</xp:this.attrs>
+						</xp:selectItem>
+						<xp:selectItem
+							itemLabel="Involves the use of a Medicine" itemValue="1">
+						</xp:selectItem>
+						<xp:selectItem
+							itemLabel="Involves the use of a Biological" itemValue="0">
+						</xp:selectItem>
+						<xp:selectItem
+							itemLabel="Involves the use of a Therapeutic Device"
+							itemValue="2">
+						</xp:selectItem>
+					</xp:checkBoxGroup>
+				</xp:td>
+				<xp:td></xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td>
+					<xp:label
+						value="Total number of participants to be enrolled in the trial:"
+						id="lblTotalPatients" for="totalPatientsLU">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td>
+					<xp:panel id="totalPatientsLU">
+						<xp:eventHandler event="onClientLoad"
+							submit="false">
+							<xp:this.script><![CDATA[try {
+	var db = getNSFBase().toLowerCase();
+	var xagent = 'xAgentLookupCT.xsp';
+	var params = 'S=N&T=TOTALPATIENTS&type=json';
+	var fullurl = db + '/' + xagent + '?' + params + '&R=' + Math.random();
+	var jsonTotalPatientsStore = new dojo.data.ItemFileReadStore({url:fullurl});
+	var fieldid = getItemId('','totalPatientsLU');
+	
+	field = new dijit.form.FilteringSelect({
+			store: jsonTotalPatientsStore,
+			placeHolder: 'Select a value',
+			required: false,
+			class: 'dijitComboBoxWidthLarge',
+			value: totalPatients.value,
+			onChange: function(x){
+				onChangeEvents(this);
+			},
+			selectOnClick: true
+		}, fieldid);
+	field.startup();
+	
+}catch(e){
+	console.log(e);
+}
+
+function onChangeEvents(itmtp){
+	try {
+		var totalpatientsid = getItemId('','totalPatients');
+		var totalpatients = dojo.byId(totalpatientsid);
+		totalpatients.value = itmtp.value;
+	} catch (e) {
+		console.log("totalPatientsLU onChange event() - error: " + e); 
+	} 		
+}]]></xp:this.script>
+						</xp:eventHandler>
+					</xp:panel>
+				</xp:td>
+				<xp:td id="totalPatientsTD">
+					<xp:inputText id="totalPatients"
+						value="#{part1.totalPatients}" styleClass="hiddenField"
+						dojoType="dijit.form.TextBox">
+						<xp:this.dojoAttributes>
+							<xp:dojoAttribute name="jsId"
+								value="totalPatients">
+							</xp:dojoAttribute>
+						</xp:this.dojoAttributes>
+					</xp:inputText>
+				</xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td>
+					<xp:label value="Therapeutic Area:"
+						id="lblTherapeuticArea" for="trialTherapeuticAreaLU">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td>
+					<xp:panel id="trialTherapeuticAreaLU">
+						<xp:eventHandler event="onClientLoad"
+							submit="false">
+							<xp:this.script><![CDATA[try {
+	var db = getNSFBase().toLowerCase();
+	var xagent = 'xAgentLookupCT.xsp';
+	var params = 'S=N&T=THERAAREA&type=json';
+	var fullurl = db + '/' + xagent + '?' + params + '&R=' + Math.random();
+	var jsonTheraAreaStore = new dojo.data.ItemFileReadStore({url:fullurl});
+	var fieldid = getItemId('','trialTherapeuticAreaLU');
+	
+	field = new dijit.form.FilteringSelect({
+			store: jsonTheraAreaStore,
+			placeHolder: 'Select a value',
+			required: false,
+			class: 'dijitComboBoxWidthLarge',
+			value: therapeuticArea.value,
+			onChange: function(x){
+				onChangeEvents(this);
+			},
+			selectOnClick: true
+		}, fieldid);
+	field.startup();
+	
+}catch(e){
+	console.log(e);
+}
+
+function onChangeEvents(itmtap){
+	try {
+		var trialtherapeuticareaid = getItemId('','trialTherapeuticArea');
+		var trialtherapeuticarea = dojo.byId(trialtherapeuticareaid);
+		trialtherapeuticarea.value = itmtap.value;
+	} catch (e) {
+		console.log("trialTherapeuticAreaLU onChange event() - error: " + e); 
+	} 		
+}]]></xp:this.script>
+						</xp:eventHandler>
+					</xp:panel>
+				</xp:td>
+				<xp:td id="trialTherapeuticAreaTD">
+					<xp:inputText id="trialTherapeuticArea"
+						styleClass="hiddenField" value="#{part1.trialTherapeuticArea}"
+						dojoType="dijit.form.TextBox">
+						<xp:this.dojoAttributes>
+							<xp:dojoAttribute name="jsId"
+								value="therapeuticArea">
+							</xp:dojoAttribute>
+						</xp:this.dojoAttributes>
+					</xp:inputText>
+				</xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td styleClass="labelCellLarge">
+					<xp:label id="lblGMP"
+						value="Details of Genetically Modified Organism:" for="GMO">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td>
+					<xp:inputTextarea id="gmo" value="#{part1.GMO}"
+						dojoType="dijit.form.Textarea">
+					</xp:inputTextarea>
+				</xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td styleClass="labelCellLarge">
+					<xp:label value="Details of Nanoparticles:"
+						id="lblNanoparticles" for="Nanoparticles">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td>
+					<xp:inputTextarea id="Nanoparticles"
+						value="#{part1.nanoparticles}" dojoType="dijit.form.Textarea">
+					</xp:inputTextarea>
+				</xp:td>
+			</xp:tr>
+			<xp:tr>
+				<xp:td styleClass="labelCellLarge">
+					<xp:label id="lblGeneTherapy"
+						value="Details of Gene Therapy:" for="GeneTherapyDetails">
+					</xp:label>
+				</xp:td>
+				<xp:td styleClass="validationCell">
+					<xp:span styleClass="mandatory">
+						<xp:span styleClass="mandatory">*</xp:span>
+					</xp:span>
+				</xp:td>
+				<xp:td>
+					<xp:inputTextarea id="GeneTherapyDetails"
+						value="#{part1.geneTherapyDetails}"
+						dojoType="dijit.form.Textarea">
+					</xp:inputTextarea>
+				</xp:td>
+			</xp:tr>
+		</xp:table>
+	</xp:panel>
+
+</xp:view>

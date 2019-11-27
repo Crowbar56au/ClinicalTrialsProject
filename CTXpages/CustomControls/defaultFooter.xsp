@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xp:view xmlns:xp="http://www.ibm.com/xsp/core">
+		<!-- Footer Region -->
+		<xp:div dojoType="dijit.layout.ContentPane" id="footerPane"
+			styleClass="footer">
+			<xp:this.dojoAttributes>
+				<xp:dojoAttribute name="region" value="bottom"></xp:dojoAttribute>
+			</xp:this.dojoAttributes>
+
+			<!--  Left Footer Region -->
+			<xp:div styleClass="left">
+
+			<xp:label value="Last Updated:" id="lblFooterLastUpdate"></xp:label>
+			<xp:text escape="true" id="cfdFooterLastModifiedDate"><xp:this.value><![CDATA[#{javascript:return @Text(@Modified());
+day = @Text(@Day(@Modified()));
+nmonth = @Text(@Month(@Modified()));
+month = @If(nmonth = "1", "January",
+nmonth = "2", "February",
+nmonth = "3", "March",
+nmonth = "4", "April",
+nmonth = "5", "May",
+nmonth = "6", "June",
+nmonth = "7", "July",
+nmonth = "8", "August",
+nmonth = "9", "September",
+nmonth = "10", "October",
+nmonth = "11", "November", "December");
+year = @Text(@Year(@Modified()));
+day + " " + month + " " + year}]]></xp:this.value></xp:text><xp:br />
+			<xp:text escape="true" id="cfdFooterURL" value="#{javascript:context.getUrl()}">
+				
+			</xp:text>
+			</xp:div>
+
+			<!--  Right Footer Region -->
+			<xp:div styleClass="right">
+				<p>
+				<xp:text escape="false" id="cfdFooterHTML" value="#{sessionScope.footerhtml}"></xp:text></p>
+			</xp:div>
+			
+		</xp:div>
+</xp:view>

@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form name='(TrialConductedInCountry)' alias='TrialConductedInCountry' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='web mobile'
+ nocompose='true' noquery='true' publicaccess='false' designerversion='7'
+ comment='Notes Site form' renderpassthrough='true'>
+<noteinfo noteid='5be' unid='719535F7E8640F31CA257FD8000B2A19' sequence='14'>
+<created><datetime>20160620T120156,73+10</datetime></created>
+<modified><datetime>20160628T151506,99+10</datetime></modified>
+<revised><datetime>20160628T151506,98+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,98+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,44+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='windowtitle'><formula>Type + " - " + ApplicationId</formula></code>
+<actionbar bgcolor='#f0f0f0' bordercolor='black'>
+<actionbuttonstyle bgcolor='#f0f0f0'/><font size='9pt' color='system'/><border
+ style='solid' width='0px 0px 1px'/></actionbar>
+<body><richtext>
+<pardef id='1' leftmargin='0.7868in' spacebefore='1.5' hide='notes web mobile'/><subformref
+ name='CommonActionButtons'/>
+<pardef id='2' leftmargin='0.7500in' hide='notes web mobile'/>
+<par def='2'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'/></run></par>
+<table widthtype='fitmargins' cellbordercolor='#e1e1e1' leftmargin='0.9896in'
+ colorstyle='altrows' bgcolor='white' altbgcolor='#efefef' rowspacing='0.0396in'
+ refwidth='10.5104in'><tablecolumn width='22.0174%'/><tablecolumn width='77.9826%'/>
+<tablerow>
+<tablecell valign='center' borderwidth='1px 0px'>
+<pardef id='4' align='right' leftmargin='1%' rightmargin='99%' tabs='R3.7396in'
+ keepwithnext='true' keeptogether='true'/>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Is Active Version:</run></par></tablecell>
+<tablecell valign='center' borderwidth='1px 0px'>
+<pardef id='5' leftmargin='1%' keepwithnext='true' keeptogether='true'/>
+<par def='5'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'/></run><run
+><font name='Arial' pitch='variable' truetype='true' familyid='20'/><sharedfieldref
+ name='IsActiveVersion'/></run><run><font name='Arial' pitch='variable' truetype='true'
+ familyid='20'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell valign='center' borderwidth='1px 0px'>
+<pardef id='6' align='right' leftmargin='1%' rightmargin='99%' tabs='L0.5000in L1in'
+ keepwithnext='true' keeptogether='true'/>
+<par def='6'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Trial Conducted in Country Code:</run></par></tablecell>
+<tablecell valign='center' borderwidth='1px 0px'>
+<par def='5'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='TrialConductedInCountry'><code
+ event='defaultvalue'><formula>@ThisValue</formula></code></field></run><run
+><font name='Arial' pitch='variable' truetype='true' familyid='20'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell valign='center' borderwidth='1px 0px'>
+<par def='6'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Trial Conducted in Country Label:</run></par></tablecell>
+<tablecell valign='center' borderwidth='1px 0px'>
+<par def='5'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='TrialConductedInCountry_Label'><code
+ event='defaultvalue'><formula>@ThisValue</formula></code></field></run><run
+><font name='Arial' pitch='variable' truetype='true' familyid='20'/></run></par></tablecell></tablerow></table>
+<pardef id='7' leftmargin='0.9896in'/>
+<par def='7'><run><font size='8pt' name='Verdana' pitch='variable' truetype='true'
+ familyid='20'/></run></par>
+<pardef id='8' leftmargin='1in' hide='notes web'/><subformref name='Sponsor Web Security'/>
+<par def='8'/></richtext></body>
+<item name='ExpectedStartDate' summary='false' sign='true'>
+<rawitemdata type='400'>
+AAAAAAAAAAA=
+</rawitemdata></item>
+<item name='ExpectedSiteStartDate' summary='false' sign='true'>
+<rawitemdata type='400'>
+AAAAAAAAAAA=
+</rawitemdata></item>
+<item name='$SubForm_RepIDs' sign='true'><textlist><text>0000000000000000</text><text
+>0000000000000000</text></textlist></item>
+<item name='$$ScriptName' summary='false' sign='true'><text>TrialConductedInCountry</text></item></form>
+

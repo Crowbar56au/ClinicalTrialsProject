@@ -1,0 +1,35 @@
+'++LotusScript Development Environment:2:5:(Options):0:74
+Option Public
+Option Declare
+
+%REM
+This class is currently not being used.
+%END REM
+
+'++LotusScript Development Environment:2:5:(Forward):0:1
+Declare Class JSONBaseClass
+
+'++LotusScript Development Environment:2:5:(Declarations):0:10
+Class JSONBaseClass
+	Private m_sThreadList List As String
+	Private m_sErrorMessage As String
+	Private m_iErrorCount As Integer
+	
+	Private Sub RaiseError(p_sMsg As String)
+		Dim sErrorMsg As String
+		Dim x As Integer
+		On Error Goto 0
+		
+		Me.m_iErrorCount = Me.m_iErrorCount + 1
+		Me.m_sThreadList(Me.m_iErrorCount) = "<" & Getthreadinfo(10) & ": line " & Erl & ">" 
+		If Me.m_sErrorMessage = "" Then
+			Me.m_sErrorMessage = "ERROR: " & Err & ": " & p_sMsg & "."
+		End If
+		
+		For x = Me.m_iErrorCount To 1 Step -1
+			sErrorMsg = sErrorMsg & Me.m_sThreadList(x)
+		Next
+		sErrorMsg = "<CLASS:" & Typename(Me) & ">" & sErrorMsg & " " & Me.m_sErrorMessage
+		Error Err, sErrorMsg
+	End Sub
+End Class

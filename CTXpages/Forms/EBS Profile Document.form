@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form name='EBS Profile Document' alias='frmEBSProfile' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' nocompose='true'
+ publicaccess='false' designerversion='8.5.3' renderpassthrough='true'>
+<noteinfo noteid='7f2' unid='5803863FB4C72C8DCA257FE0001BE33B' sequence='2'>
+<created><datetime>20160628T150436,43+10</datetime></created>
+<modified><datetime>20160628T150605,86+10</datetime></modified>
+<revised><datetime>20160628T150605,85+10</datetime></revised>
+<lastaccessed><datetime>20160628T150605,85+10</datetime></lastaccessed>
+<addedtofile><datetime>20160628T150436,41+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='windowtitle'><formula>"eBS Profile Document"</formula></code>
+<body><richtext>
+<pardef id='1'/>
+<par def='1'><run><font size='12pt' style='bold underline'/>eBS Profile</run></par>
+<par def='1'><run><font style='bold'/></run></par>
+<par def='1'/>
+<table cellbordercolor='silver' widthtype='fixedleft' rowspacing='0.0597in'
+ columnspacing='0.0597in' refwidth='12.1583in'><tablecolumn width='1.6972in'/><tablecolumn
+ width='5.0514in'/><tablecolumn width='5.0514in'/>
+<tablerow>
+<tablecell>
+<pardef id='3' keepwithnext='true' keeptogether='true'/>
+<par def='3'><run><font size='9pt' style='bold' name='Arial' pitch='variable'
+ truetype='true' familyid='20'/>Debug</run></par></tablecell>
+<tablecell>
+<pardef id='4' hide='read print preview' keepwithnext='true' keeptogether='true'/>
+<par def='4'><run><font size='9pt' name='Arial' pitch='variable' truetype='true'
+ familyid='20'/></run><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20'/><field borderstyle='none' lookupeachchar='false'
+ lookupaddressonrefresh='false' type='keyword' kind='editable' name='Debug'><keywords
+ helperbutton='false' columns='2' ui='radiobutton'><textlist><text>On</text><text
+>Off</text></textlist></keywords></field></run><run><font size='9pt' name='Arial'
+ pitch='variable' truetype='true' familyid='20'/></run></par>
+<pardef id='5' hide='edit previewedit' keepwithnext='true' keeptogether='true'/>
+<par def='5'><run><font size='9pt' name='Arial' pitch='variable' truetype='true'
+ familyid='20'/></run><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20'/><field type='keyword' kind='computedfordisplay'
+ name='DispDebug'><keywords ui='dialoglist'><textlist><text>On</text><text
+>Off</text></textlist></keywords><code event='defaultvalue'><formula>Debug</formula></code></field></run><run
+><font size='9pt' name='Arial' pitch='variable' truetype='true' familyid='20'/></run></par></tablecell>
+<tablecell>
+<pardef id='6' keepwithnext='true' keeptogether='true'/>
+<par def='6'><run><font size='9pt' name='Arial' pitch='variable' truetype='true'
+ familyid='20'/></run></par></tablecell></tablerow></table>
+<pardef id='2' firstlineleftmargin='1in'/>
+<par def='2'/></richtext></body>
+<item name='ArchivingInterval' summary='false'><number>0</number></item>
+<item name='$$ScriptName' summary='false' sign='true'><text>frmEBSProfile</text></item></form>
+

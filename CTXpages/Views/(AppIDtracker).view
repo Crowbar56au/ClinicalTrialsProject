@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='utf-8'?>
+<view name='(AppIDtracker)' alias='AppIDtracker' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' showinmenu='false'
+ publicaccess='false' designerversion='8.5.3' unreadmarks='none' onopengoto='top'
+ onrefresh='refresh' headers='beveled' opencollapsed='true' showresponsehierarchy='false'
+ showmargin='false' shrinkrows='false' extendlastcolumn='false' showhierarchies='false'
+ unreadcolor='black' rowlinecount='1' headerlinecount='1' rowspacing='1' bgcolor='white'
+ altrowcolor='#efefef' totalscolor='gray' headerbgcolor='white' boldunreadrows='false'
+ evaluateactions='false' allownewdocuments='false' allowcustomizations='false'
+ hidemarginborder='false' marginwidth='0px' marginbgcolor='white' uniquekeys='false'
+ indexrefresh='automatic' indexdiscard='inactivebyinterval' indexdiscardinterval='24'
+ initialbuildrestricted='false' noemptycategories='false' formatnoteid='913D51000E43FA73CA2577F1007BC361'>
+<noteinfo noteid='426' unid='E603755733B2618ACA257F770006FF6F' sequence='14'>
+<created><datetime dst='true'>20160315T121626,07+11</datetime></created>
+<modified><datetime>20160628T151505,91+10</datetime></modified>
+<revised><datetime>20160628T151505,90+10</datetime></revised>
+<lastaccessed><datetime dst='true'>20191127T020255,00+11</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,67+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='selection'><formula>SELECT (type="AppIDplaceholder")</formula></code>
+<actionbar bgcolor='navy' bordercolor='black'>
+<actionbuttonstyle showdropdown='true' bgcolor='#6260a1'/><font size='9pt'
+ color='white'/><border width='0px 0px 1px'/>
+<action title='Categori_ze' showinbar='false' systemcommand='categorize'/>
+<action title='_Edit Document' showinbar='false' systemcommand='edit'/>
+<action title='Send Docu_ment' showinbar='false' systemcommand='send'/>
+<action title='_Forward' showinbar='false' systemcommand='forward'/>
+<action title='_Move To Folder...' showinbar='false' systemcommand='movetofolder'/>
+<action title='_Remove From Folder' showinbar='false' systemcommand='removefromfolder'/></actionbar>
+<column sort='descending' hidedetailrows='false' itemname='id' width='16.2500'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='true' sortnocase='true'
+ showaslinks='false'><columnheader title='ID'><font size='9pt' style='bold'/></columnheader><datetimeformat
+ show='datetime' date='yearmonthday' fourdigityearfor21stcentury='true' time='hourminutesecond'
+ zone='never' dateformat='weekdaydaymonthyear' dayformat='twodigitday' monthformat='twodigitmonth'
+ yearformat='fourdigityear' weekdayformat='shortname' dateseparator1=' ' dateseparator2='/'
+ dateseparator3='/' timeseparator=':' preference='usersetting'/><numberformat
+ legacy='true' format='general' varying='true' punctuated='false' parens='false'
+ percent='false' bytes='false'/></column>
+<column hidedetailrows='false' itemname='Date' width='10' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='true' sortnocase='true' showaslinks='false'><columnheader
+ title='Date'><font size='9pt' style='bold'/></columnheader><datetimeformat
+ show='date' date='yearmonthday' fourdigityear='true' time='hourminutesecond'
+ zone='never' dateformat='weekdaydaymonthyear' dayformat='twodigitday' monthformat='twodigitmonth'
+ yearformat='fourdigityear' weekdayformat='shortname' dateseparator1=' ' dateseparator2='/'
+ dateseparator3='/' timeseparator=':' preference='usersetting'/><numberformat
+ format='general' punctuated='false' parens='false' percent='false' bytes='false'/><code
+ event='value'><formula>@Created</formula></code></column></view>
+

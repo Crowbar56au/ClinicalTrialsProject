@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='utf-8'?>
+<view name='Applications\By Application Type' alias='AppsByApplicationType'
+ xmlns='http://www.lotus.com/dxl' version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780'
+ showinmenu='false' publicaccess='false' designerversion='8.5.3' comment='All Submitted Applications by Application Id'
+ unreadmarks='none' onopengoto='lastopened' onrefresh='displayindicator' headers='beveled'
+ opencollapsed='true' showresponsehierarchy='true' showmargin='true' shrinkrows='true'
+ extendlastcolumn='false' showhierarchies='false' unreadcolor='black' rowlinecount='8'
+ headerlinecount='1' rowspacing='1.25' bgcolor='white' altrowcolor='#f7f7f7'
+ totalscolor='black' headerbgcolor='#b2b2b2' boldunreadrows='false' evaluateactions='false'
+ allownewdocuments='false' allowcustomizations='true' hidemarginborder='false'
+ marginwidth='0px' marginbgcolor='#b2b2b2' uniquekeys='false' formatnoteid='DF37F98E2D4A9A29CA2577A30082CDB1'>
+<noteinfo noteid='19a' unid='6C271F41C5F8E874CA257F770006FD8C' sequence='14'>
+<created><datetime dst='true'>20160315T121621,24+11</datetime></created>
+<modified><datetime>20160628T151503,43+10</datetime></modified>
+<revised><datetime>20160628T151503,42+10</datetime></revised>
+<lastaccessed><datetime>20160628T151503,42+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152008,70+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='selection'><formula>SELECT Type="Application" &amp; Form="Application"</formula></code><code
+ event='form'><formula>"Application"</formula></code>
+<actionbar bgcolor='navy' bordercolor='black'><actionbarstyle height='4.4290ex'><font
+ size='9pt' name='Verdana' pitch='variable' truetype='true' familyid='20'/></actionbarstyle>
+<actionbuttonstyle bgcolor='system'/><font size='9pt' color='system'/><border
+ style='solid' width='0px 0px 1px' color='navy'/>
+<action title='Print' icon='147' align='right'><code event='click'><formula
+>@Command([ToolsRunMacro]; "(PrintApplicationNotes)")</formula></code></action>
+<action title='Help' icon='45' showinmenu='false' align='right'><code event='options'><lotusscript
+>Option Declare
+Use "HelpScripts"
+</lotusscript></code><code event='click'><lotusscript>Sub Click(Source As Button)
+     Call GetViewHelpDoc("LM_V_SAP_All_Applications_by_Application_Id")
+End Sub
+</lotusscript></code></action></actionbar>
+<column sort='ascending' hidedetailrows='false' itemname='$8' width='1' resizable='true'
+ separatemultiplevalues='true' sortnoaccent='false' sortnocase='true' showaslinks='false'
+ categorized='true' twisties='true'><font style='bold'/><columnheader><font
+ size='9pt' style='bold'/></columnheader><code event='value'><formula>@If(ClinicalTrialType="CTX"; "Clinical Trial Exemption"; "Clinical Trial Notification")</formula></code></column>
+<column sort='ascending' resort='descending' hidedetailrows='false' itemname='ApplicationId'
+ width='17.8750' resizable='true' separatemultiplevalues='false' sortnoaccent='false'
+ sortnocase='true' showaslinks='false'><font name='Verdana' pitch='variable'
+ truetype='true' familyid='20'/><columnheader align='center' title='Application ID.'><font
+ size='9pt' style='bold' name='Verdana' pitch='variable' truetype='true' familyid='20'/></columnheader></column>
+<column align='center' sort='ascending' hidedetailrows='false' itemname='ApplicationVersion'
+ width='5.7500' resizable='true' separatemultiplevalues='false' sortnoaccent='true'
+ sortnocase='true' showaslinks='false'><font name='Verdana' pitch='variable'
+ truetype='true' familyid='20'/><columnheader align='center' title='Version'><font
+ size='9pt' style='bold' name='Verdana' pitch='variable' truetype='true' familyid='20'/></columnheader></column>
+<column resort='both' resort2='ascending' resort2column='1' hidedetailrows='false'
+ itemname='SubmissionId' width='15' resizable='true' separatemultiplevalues='false'
+ sortnoaccent='false' sortnocase='true' showaslinks='false'><font name='Verdana'
+ pitch='variable' truetype='true' familyid='20'/><columnheader align='center'
+ title='Submission ID'><font size='9pt' style='bold' name='Verdana' pitch='variable'
+ truetype='true' familyid='20'/></columnheader></column>
+<column resort='both' resort2='ascending' resort2column='1' hidedetailrows='false'
+ itemname='SponsorName' width='30' resizable='true' separatemultiplevalues='false'
+ sortnoaccent='false' sortnocase='true' showaslinks='false'><font name='Verdana'
+ pitch='variable' truetype='true' familyid='20'/><columnheader align='center'
+ title='Sponsor Name'><font size='9pt' style='bold' name='Verdana' pitch='variable'
+ truetype='true' familyid='20'/></columnheader></column>
+<column resort='both' resort2='ascending' resort2column='1' hidedetailrows='false'
+ itemname='titleofstudy' width='40' resizable='true' separatemultiplevalues='false'
+ sortnoaccent='false' sortnocase='true' showaslinks='false'><font name='Verdana'
+ pitch='variable' truetype='true' familyid='20'/><columnheader align='center'
+ title='Title Of Study'><font size='9pt' style='bold' name='Verdana' pitch='variable'
+ truetype='true' familyid='20'/></columnheader></column>
+<column resort='both' resort2='ascending' resort2column='1' hidedetailrows='false'
+ itemname='ApplicationStatus' width='10' resizable='true' separatemultiplevalues='false'
+ sortnoaccent='false' sortnocase='true' showaslinks='false'><font name='Verdana'
+ pitch='variable' truetype='true' familyid='20'/><columnheader align='center'
+ title='Status'><font size='9pt' style='bold' name='Verdana' pitch='variable'
+ truetype='true' familyid='20'/></columnheader></column></view>
+

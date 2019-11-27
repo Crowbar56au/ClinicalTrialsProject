@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(PrintApplicationNotes)' xmlns='http://www.lotus.com/dxl' version='9.0'
+ maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3' publicaccess='false'
+ designerversion='7' restrictions='unrestricted'>
+<noteinfo noteid='576' unid='825AE207AA556235CA257F7700070C1A' sequence='14'>
+<created><datetime dst='true'>20160315T121658,50+11</datetime></created>
+<modified><datetime>20160628T151506,87+10</datetime></modified>
+<revised><datetime>20160628T151506,86+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,86+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,32+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151506,93+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='selected'/><code event='options'><lotusscript>Option Public
+Option Declare
+Use "GetDatabases"
+Use "PrintApplication"
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	
+     'Jia Mao - 09/09/02
+     'Print Applications - Notes
+	
+	Dim ws As New notesuiworkspace    
+	Dim fileNum As Integer
+	Dim fileName As String
+	Dim col As NotesDocumentCollection
+	
+	Set session = New NotesSession
+	Set dbCurrent = session.CurrentDatabase
+	Set col = dbCurrent.UnprocessedDocuments
+	If col.count = 0 Or col.count &gt; 1 Then
+		Msgbox("You must select one document from the view")
+		Exit Sub
+	End If
+	
+	Set cdoc = col.GetFirstDocument()
+	
+	Call SetDirectory (fileName)
+	
+     'Get a handle to a file
+	filenum = Freefile()
+	If Not filenum &gt; 0 Then
+		Error 1010, "Unable to Obtain File Handle. Notify your Adminsitrator"
+	End If
+	
+	Print "Generating Application Print HTML ..."
+	
+     'Open the file
+	Open fileName For Output As filenum
+	
+	Call PrintApplicationFromNotes(filenum)
+	
+     'Close off the file
+	Close filenum
+	Print " "
+	
+	Call ws.URLOpen("file:///" + Filename)
+	
+End Sub
+</lotusscript></code><code event='SetDirectory'><lotusscript>Sub SetDirectory (strFile As String)
+	
+	Dim strFindFile As String
+	
+	strFile=Environ("Temp") + "\PrintApplication.html"
+	
+     'Check for the existence of the file, if it exists delete it
+	strFindFile = Dir$(strFile)
+	If Not strFindFile = "" Then
+		Kill strFile  
+	End If
+	
+End Sub</lotusscript></code>
+<item name='$POID'><datetime>20160620T120208,52+10</datetime></item></agent>
+

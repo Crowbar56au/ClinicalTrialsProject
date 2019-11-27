@@ -1,0 +1,1923 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form name='Clinical Trials (Web)' alias='ct' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='mobile'
+ nocompose='true' treatashtml='true' publicaccess='false' designerversion='8.5.3'
+ comment='from the rel template' signdocuments='true' renderpassthrough='true'
+ conflictaction='mergenoconflicts'>
+<noteinfo noteid='236' unid='3D705B6459E95B0ECA257FD8000B29DC' sequence='15'>
+<created><datetime>20160620T120156,12+10</datetime></created>
+<modified><datetime>20191003T114539,81+10</datetime></modified>
+<revised><datetime>20191003T114539,80+10</datetime></revised>
+<lastaccessed><datetime>20191003T114539,80+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152009,34+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='webqueryopen'><formula>qsd := @LowerCase(query_string_decoded);
+x1 := @If(@Contains(qsdlc; "&amp;id="); @Right(qsdlc; "&amp;ID="); "new");
+x2 := @If(@Contains(x1; "&amp;"); @Left(x1; "&amp;"); x1);
+@If( @LowerCase(X2) = "new" | ApplicationID = ""; @Command([ToolsRunMacro]; "(updateapplicationid)"); "")</formula></code>
+<body><richtext>
+<pardef id='1' leftmargin='1.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'><parstyle
+ name='function' incyclekey='true'><font size='10pt' color='blue' name='sans-serif'/></parstyle></pardef>
+<pardef id='2' leftmargin='2.9521in' firstlineleftmargin='0.7500in' hide='web'
+ tabs='L1.1438in L1.5375in L1.9313in L2.3250in L2.7188in L3.1125in L3.5063in L3.9000in L4.2938in L4.6875in L5.0813in L5.4750in L5.8688in L6.2625in L6.6563in L7.0500in L7.4438in L7.8375in L8.2313in L8.6250in'/>
+<section onread='collapse' onpreview='collapse' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='2' borderstyle='shadow' color='black'><text>hidden from web browsers, NOTES FIELDS HEADER</text></sectiontitle>
+<pardef id='3' leftmargin='2.9521in' firstlineleftmargin='1in' hide='web'
+ tabs='L1.1438in L1.5375in L1.9313in L2.3250in L2.7188in L3.1125in L3.5063in L3.9000in L4.2938in L4.6875in L5.0813in L5.4750in L5.8688in L6.2625in L6.6563in L7.0500in L7.4438in L7.8375in L8.2313in L8.6250in'/>
+<par def='3'><run><font size='8pt' color='red'/></run><run><font size='8pt'/><field
+ type='text' kind='computed' name='Form'><code event='defaultvalue'><formula
+>"ct"</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='10' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='8pt' color='red'/></run><run
+><font size='8pt'/><field type='text' kind='computedfordisplay' name='query_string_decoded'><code
+ event='defaultvalue'><formula>@ThisValue</formula></code></field></run><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='19' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='8pt'
+ color='red'/></run><run><font size='8pt'/><field type='text' kind='computedfordisplay'
+ name='query_string' htmlid='query_string'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65402'
+ nexttype='222' afterparcount='29' containertype='65418' aftercontainercount='2'
+ afterbegincount='4'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='8pt' color='red'/></run><run
+><font size='8pt'/><field type='text' kind='computedfordisplay' name='Server_Protocol_Name'><code
+ event='defaultvalue'><formula>@If(@Contains(HTTP_Referer;"/"); @Left(HTTP_Referer;"/"); HTTP_Referer)</formula></code></field></run><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='38' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='8pt'
+ color='red'/></run><run><font size='8pt'/><field type='text' kind='computedfordisplay'
+ name='SaveOptions'><code event='defaultvalue'><formula>"0"</formula></code></field></run><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='47' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='8pt'
+ color='red'/></run><run><font size='8pt'/><field type='text' kind='computedfordisplay'
+ name='HTTP_User_Agent'><code event='defaultvalue'><formula>@ThisValue</formula></code></field></run><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='56' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='8pt'
+ color='red'/></run><run><font size='8pt'/><field type='text' kind='computedfordisplay'
+ name='Server_Name'><code event='defaultvalue'><formula>@ThisValue</formula></code></field></run><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='65' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='8pt'/></run><run
+><font size='8pt'/><field type='text' kind='computedwhencomposed' name='ClientName'
+ htmlid='AgentName' htmlclass='L98P'><code event='defaultvalue'><formula>str := @IfError(@DbLookup(""; "":@GetProfileField("System Profile Document";"ClientWebDB"); "LUClientType"; @Right(@UserName; "_"); "ClientName"; [FailSilent]);"Error");
+@ReplaceSubstring(str; "\"":"/":"\\"; "\\\"": "\\/":"\\")</formula></code></field></run><compositedata
+ type='98' prevtype='65402' nexttype='222' afterparcount='72' containertype='65418'
+ aftercontainercount='2' afterbegincount='4'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='8pt'/></run><run
+><font size='8pt'/><field type='text' kind='computedwhencomposed' name='ClientId'
+ htmlid='ClientId'><code event='defaultvalue'><formula>@IfError(@Text(@DbLookup( "" : "NoCache" ; "":@GetProfileField("System Profile Document";"SUM_DB"); "LULM" ; @Name( [CN] ;
+@UserName ) ; "ClientID" )); "User not found")</formula></code></field></run><compositedata
+ type='98' prevtype='65402' nexttype='222' afterparcount='79' containertype='65418'
+ aftercontainercount='2' afterbegincount='4'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='8pt'/><field
+ type='text' kind='computed' name='IsTGAUser' htmlid='ClientId_1'><code event='defaultvalue'><formula
+>@If(@IsMember("[TGA]"; @UserRoles);"1";"0")</formula></code></field></run><compositedata
+ type='98' prevtype='65402' nexttype='222' afterparcount='86' containertype='65418'
+ aftercontainercount='2' afterbegincount='4'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='8pt'/><field
+ type='text' kind='computed' name='ApplicationId'><code event='defaultvalue'><formula
+>ApplicationID</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='92' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='8pt'/></run><run><font
+ size='8pt'/><field type='text' kind='computed' name='ApplicationVersion'><code
+ event='defaultvalue'><formula>ApplicationVersion</formula></code></field></run><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='98' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='8pt'/></run><run
+><font size='8pt'/><field type='text' kind='computed' name='ApplicationStatus'><code
+ event='defaultvalue'><formula>ApplicationStatus</formula></code></field></run><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='104' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font color='red'/></run></par></section>
+<pardef id='4' leftmargin='0.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='4' borderstyle='single' color='#ff0041'><text>&lt;doctype&gt;&lt;html&gt;&lt;head&gt;&lt;title&gt;&lt;meta&gt;&lt;link&gt;&lt;script&gt;</text></sectiontitle>
+<pardef id='5' leftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='5'>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"&gt;&lt;html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"&gt;</par>
+<par def='5'>&lt;head&gt;&lt;title&gt;Clinical Trials Application&lt;/title&gt;</par>
+<par def='5'>&lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8"&gt;&lt;/meta&gt;</par>
+<pardef id='6' leftmargin='1.1806in' firstlineleftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='6'>&lt;meta http-equiv="X-UA-Compatible" content="IE=8"&gt;&lt;/meta&gt;</par>
+<pardef id='7' leftmargin='2.9521in' firstlineleftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='7'>&lt;link rel="stylesheet" type="text/css" href="basestyle.css" &gt;&lt;/link&gt;</par>
+<par def='7'>&lt;link rel="stylesheet" type="text/css" href="/domjs/dojo-1.5.0/ebs/resources/animations.css" &gt;&lt;/link&gt;</par>
+<par def='5'>&lt;link rel="stylesheet" type="text/css" href="/xsp/.ibmxspres/dojoroot/dojox/grid/resources/Grid.css"&gt;&lt;/link&gt;</par>
+<par def='5'>&lt;link rel="stylesheet" type="text/css" href="/xsp/.ibmxspres/dojoroot/dojox/grid/resources/claroGrid.css" &gt;&lt;/link&gt;</par>
+<par def='6'>&lt;link rel="stylesheet" type="text/css" href="/xsp/.ibmxspres/dojoroot/dojox/grid/enhanced/resources/claro/EnhancedGrid.css" &gt;&lt;/link&gt;</par>
+<par def='5'>&lt;link rel="stylesheet" type="text/css" href= "/domjs/dojo-1.5.0/ebs/resources/CheckedMultiSelect.css"&gt;&lt;/link&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="classes_ct.js"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="dialog_util.js"&gt;&lt;/script&gt;</par>
+<par def='7'>&lt;script type="text/javascript" src="val_util.js"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="standard.js"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="fixdata.js"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="jsonxml.js"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="ct.js"&gt;&lt;/script&gt;</par>
+<par def='5'/>
+<par def='5'>&lt;script type="text/javascript" defer=true SRC="xAgentLookupSponsorData.xsp?NAME=storeSponsorList&amp;c=<computedtext
+><code event='value'><formula>x:=@Name([CN];@UserName);
+@If(@Contains(x;"_");@Right(x;"_"); x)</formula></code></computedtext>&amp;d=<computedtext
+><code event='value'><formula>@Text(@Year(@Today))+@Text(@Month(@Today))+@Text(@Day(@Today))</formula></code></computedtext>&amp;user=<computedtext
+><code event='value'><formula>@Name([CN]; @UserName)</formula></code></computedtext>" &gt;&lt;/script&gt;</par>
+<par def='5'/>
+<par def='6'>&lt;script type="text/javascript" src="/domjs/dojo-1.5.0/dojo/dojo.js" djConfig="isDebug:false, parseOnLoad: false, locale:'en'"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="/domjs/dojo-1.5.0/ebs/resources/dojorequires.js"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="/domjs/dojo-1.5.0/ebs/resources/audit_util.js"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="/domjs/dojo-1.5.0/ebs/resources/loads_data.js<computedtext
+><code event='value'><formula>@If(@Left(@Name([CN];@ServerName);4)="EWDZ"; "?r="+@Text(@Random(1));"")</formula></code></computedtext>"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="/domjs/dojo-1.5.0/ebs/resources/json_util.js<computedtext
+><code event='value'><formula>@If(@Left(@Name([CN];@ServerName);4)="EWDZ"; "?r="+@Text(@Random(1));"")</formula></code></computedtext>"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="/domjs/dojo-1.5.0/ebs/resources/misc_util.js"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="/domjs/dojo-1.5.0/ebs/resources/attach_util.js"&gt;&lt;/script&gt;</par>
+<par def='7'>&lt;script type="text/javascript" src="/domjs/dojo-1.5.0/ebs/resources/tooltip_util.js"&gt;&lt;/script&gt;</par>
+<par def='7'>&lt;script type="text/javascript" src="/domjs/dojo-1.5.0/ebs/resources/sarissa.js"&gt;&lt;/script&gt;</par>
+<par def='5'>&lt;script type="text/javascript" src="/domjs/dojo-1.5.0/ebs/resources/XMLProcessor.js"&gt;&lt;/script&gt;</par>
+<par def='5'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='4' borderstyle='double' hidewhenexpanded='true' color='#c20041'><text
+>// ComputedText Globals, Constants and dojo.subscribes</text></sectiontitle>
+<par def='7'>&lt;script type="text/javascript"&gt;</par>
+<pardef id='8' leftmargin='3.2021in' firstlineleftmargin='1.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='8'>gFileRepoDB = "<run><font color='red'/><computedtext><code event='value'><formula
+>x1 := @IfError(@GetProfileField("System Profile Document"; "CTF_Db"); "");
+"/" + @ReplaceSubstring( @If(x1=""; "ebs/trials/filerepo.nsf"; x1); "\\"; "/")</formula></code></computedtext></run>";</par>
+<par def='8'>gValidationDB = "<run><font color='red'/><computedtext><code
+ event='value'><formula>x1 := @IfError(@GetProfileField("System Profile Document"; "CTV_Db"); "");
+x2 := @If(x1=""; "ebs/trials/validation.nsf"; @ReplaceSubstring(x1;"\\"; "/"));
+"/" + x2</formula></code></computedtext></run>";</par>
+<par def='8'>gResourcesDB = "<run><font color='red'/><computedtext><code event='value'><formula
+>x1 := @IfError(@GetProfileField("System Profile Document"; "RES_Db"); "");
+x2 := @If(x1=""; "/ebs/Common/Resource.nsf"; @ReplaceSubstring(x1;"\\"; "/"));
+x2</formula></code></computedtext></run>";</par>
+<par def='8'>gSrcDB_escaped = "<run><font color='red'/><computedtext><code
+ event='value'><formula>@ReplaceSubstring(@WebDbName; " "; "%20")</formula></code></computedtext></run>";</par>
+<pardef id='9' leftmargin='3.4521in' firstlineleftmargin='1.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='9'>isTGAUser= "<run><font color='red'/><computedtext><code event='value'><formula
+>IsTGAUser</formula></code></computedtext></run>";</par>
+<pardef id='10' leftmargin='1.2500in' rightmargin='100%'/>
+<par def='10'>xslt = Sarissa.getDomDocument();</par>
+<par def='10'>xml = Sarissa.getDomDocument();</par>
+<par def='10'>xslt.async = false;</par>
+<par def='10'>xml.async = false;</par>
+<par def='10'>var results1 = {};</par>
+<par def='9'/>
+<par def='9'>dojo.addOnLoad( function() {</par>
+<pardef id='11' leftmargin='3.7021in' firstlineleftmargin='1.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='11'>ctOnLoad();</par>
+<par def='9'>});</par>
+<par def='9'/>
+<par def='5'>&lt;/script&gt;</par>
+<par def='4'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='4' borderstyle='triple' hidewhenexpanded='true' color='#c20041'><text
+>// Application functions</text></sectiontitle>
+<par def='5'>&lt;script type="text/javascript"&gt;</par>
+<par def='8'>function initializeApplicationData(theStatus, isNew) {</par>
+<pardef id='12' leftmargin='1.5000in' rightmargin='100%'/>
+<par def='12'>initializeCTApplicationData(theStatus, isNew, "<run><font color='red'/><computedtext
+><code event='value'><formula>ClientName</formula></code></computedtext></run>", "<run
+><font color='red'/><computedtext><code event='value'><formula>ClientID</formula></code></computedtext></run>", "<run
+><font color='red'/><computedtext><code event='value'><formula>@Name([CN]; @UserName)</formula></code></computedtext></run>");</par>
+<pardef id='13' leftmargin='1.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='13'>}</par>
+<par def='5'>&lt;/script&gt;</par>
+<par def='5'/>
+<par def='6'>&lt;script type="text/javascript" defer=true SRC="LookupData?openagent&amp;F=TTHELP&amp;S=N&amp;NAME=tooltipHelp&amp;ONCOMPLETE=Y&amp;R=<computedtext
+><code event='value'><formula>@Text(@Second(@Now) * @Minute(@Now) * @Random+1)</formula></code></computedtext>"&gt;&lt;/script&gt;</par>
+<par def='5'/></section>
+<par def='6'/>
+<pardef id='14' leftmargin='1.3778in' firstlineleftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='14'>&lt;/head&gt;</par>
+<par def='14'>&lt;body class="claro"&gt;</par>
+<pardef id='15' leftmargin='0.7500in' tabs='L1in'/>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='15' hidewhenexpanded='true' color='#c2ff91' borderstyle='tabdiag'><text
+>div - Splash Screen</text></sectiontitle>
+<pardef id='16'/>
+<par def='16'>&lt;div id="uiSplashScreen1" style="background-color:#f0f0f0; padding:0; margin:0; position:absolute; top:0; left:0; width:100%; height:100%; z-index:999; filter: alpha(opacity=100); opacity: 1.0; vertical-align:middle;"&gt;&lt;/div&gt;</par>
+<par def='16'>&lt;div id="uiSplashScreen2" style="position:absolute; top:50%; left:40%; height:32px; text-align:center; z-index:999; vertical-align:center;"&gt;</par>
+<pardef id='17' leftmargin='1.2500in'/>
+<par def='17'>&lt;table&gt;</par>
+<pardef id='18' leftmargin='1.5000in'/>
+<par def='18'>&lt;tr&gt;</par>
+<pardef id='19' leftmargin='1.7500in'/>
+<par def='19'>&lt;td&gt;&lt;img src='/domjs/dojo-1.5.0/ebs/resources/loader_lg.gif'/&gt;&lt;/td&gt;</par>
+<par def='19'>&lt;td id="uiSplashScreen1_label" nowrap style="padding:8px 15px 8px 15px;"&gt;Clinical Trial loading, please wait ...&lt;/td&gt;</par>
+<par def='18'>&lt;/tr&gt;</par>
+<par def='17'>&lt;/table&gt;</par>
+<par def='16'>&lt;/div&gt;</par>
+<pardef id='20' leftmargin='1in' tabs='L1in'/>
+<par def='20'/></section>
+<par def='20'>&lt;div dojoType="dijit.layout.BorderContainer" id="djborder_Main" style="width:100%; height:100%"&gt;</par>
+<pardef id='21' leftmargin='2.9521in' firstlineleftmargin='1in'/>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='21' hidewhenexpanded='true' color='#f1f1b4' borderstyle='tabdiag'><text
+>Content Header Pane</text></sectiontitle>
+<pardef id='22' leftmargin='2.9521in' firstlineleftmargin='1.2500in'/>
+<par def='22'>&lt;div dojoType="dijit.layout.ContentPane" region="top" &gt;</par>
+<pardef id='23' leftmargin='2.7021in' firstlineleftmargin='1.5000in'/>
+<par def='23'>&lt;table border="0" cellspacing="0" cellpadding="0" width="100%"&gt;</par>
+<pardef id='24' leftmargin='2.9521in' firstlineleftmargin='1.7500in'/>
+<par def='24'>&lt;tr&gt;</par>
+<pardef id='25' leftmargin='3.2021in' firstlineleftmargin='2in'/>
+<par def='25'>&lt;td nowrap width="10%"&gt;&lt;img src = "<run><font color='red'/><computedtext
+><code event='value'><formula>x1 := @IfError(@GetProfileField("System Profile Document"; "GRA_Db"); "");
+"/" + @ReplaceSubstring( @If(x1=""; "ebs/graphics.nsf"; x1); "\\"; "/")</formula></code></computedtext></run>/smLogo.gif?openimageresource" alt="logo" /&gt;&lt;/td&gt;</par>
+<pardef id='26' leftmargin='2in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='26'>&lt;td width="80%"&gt;</par>
+<pardef id='27' leftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='27'>&lt;span style="margin:0; text-align:middle; vertical-align:top; font-weight:bold; font-size:15pt;"&gt;Clinical Trial <computedtext
+><code event='value'><formula>@If(@LowerCase(clinicaltrialtype)="ctx" | @Contains(@LowerCase(query_string);"ctx") | @Contains(@LowerCase(query_string);"&amp;type=ctx");"Exemption"; "Notification")</formula></code></computedtext>&lt;/span&gt;</par>
+<par def='26'>&lt;/td&gt;</par>
+<par def='26'>&lt;td nowrap width="10%"&gt;</par>
+<par def='27'>&lt;table width="100%"&gt;</par>
+<pardef id='28' leftmargin='2.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='28'>&lt;tr&gt;</par>
+<pardef id='29' leftmargin='2.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='29'>&lt;td nowrap style="text-align:right;color:#000080;"&gt;Application ID:&lt;/td&gt;</par>
+<par def='29'>&lt;td colspan="2" nowrap&gt;&lt;span id="ApplicationId"&gt;<run
+><font color='red'/><computedtext><code event='value'><formula>ApplicationID</formula></code></computedtext></run>&lt;/span&gt; v&lt;span id="ApplicationVersion"&gt;<run
+><font color='red'/><computedtext><code event='value'><formula>ApplicationVersion</formula></code></computedtext></run>&lt;/span&gt;&lt;/td&gt;</par>
+<par def='28'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='29'>&lt;td nowrap width="40%" style="text-align:right; color:#000080"&gt;Status:&lt;/td&gt;</par>
+<par def='29'>&lt;td nowrap width="40%"&gt;&lt;div id="ApplicationStatus"&gt;<run
+><font color='red'/><computedtext><code event='value'><formula>@If(ApplicationStatus = ""; "Draft"; ApplicationStatus)</formula></code></computedtext></run>&lt;/div&gt;&lt;/td&gt;</par>
+<par def='29'>&lt;td nowrap width="20%" style="text-alight:right;"&gt;&lt;div id="DataStatus" style="overflow:hidden; text-alight:right;"&gt;Initialising&lt;/div&gt;&lt;/td&gt;</par>
+<par def='28'>&lt;/tr&gt;</par>
+<par def='27'>&lt;/table&gt;</par>
+<par def='26'>&lt;/td&gt;</par>
+<pardef id='30' leftmargin='1.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='30'>&lt;/tr&gt;</par>
+<pardef id='31' leftmargin='1.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='31'>&lt;/table&gt;</par>
+<pardef id='32' leftmargin='2.9521in' firstlineleftmargin='1.5000in' tabs='L1in'/>
+<par def='32'>&lt;table style="margin-top:5" border="0" cellspacing="0" cellpadding="0" width="100%"&gt;</par>
+<pardef id='33' leftmargin='3.2021in' firstlineleftmargin='1.7500in' tabs='L1in'/>
+<par def='33'>&lt;tr&gt;</par>
+<pardef id='34' leftmargin='3.4521in' firstlineleftmargin='2in' tabs='L1in'/>
+<par def='34'>&lt;td width="80%"&gt;</par>
+<pardef id='35' leftmargin='3.4521in' firstlineleftmargin='2.2500in'/>
+<par def='35'>&lt;div dojoType="dijit.form.Button" onClick="appClose(this)" id="Application_Button_Close" label="Close" title="Hotkey Ctrl + O"&gt;&lt;/div&gt;</par>
+<par def='35'>&lt;div dojoType="dijit.form.Button" onClick="appSave(this)" id="Application_Button_Save" label="Save" title="Hotkey Ctrl + S"&gt;&lt;/div&gt;</par>
+<par def='35'>&lt;div dojoType="dijit.form.Button" onClick="appValidate(this)" id="Application_Button_Validate" label="Validate" title="Hotkey Ctrl + A"&gt;&lt;/div&gt;</par>
+<par def='35'>&lt;div dojoType="dijit.form.Button" onClick="printPreview(this)" id="Application_Button_PrintPreview" label="Print Preview" title="Hotkey Ctrl + P"&gt;&lt;/div&gt;</par>
+<par def='35'>&lt;b&gt;&lt;div dojoType="dijit.form.Button" onClick="appGuide(this)" id="Application_Button_Guide" label="How to use the online CTN form" title="Hotkey Ctrl + U"&gt;&lt;/div&gt;&lt;/b&gt;</par>
+<pardef id='36' leftmargin='3.4521in' firstlineleftmargin='2in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='36'>&lt;/td&gt;</par>
+<par def='36'>&lt;td width="20%" nowrap&gt;</par>
+<par def='27'>&lt;span style="color:#000080"&gt;Client Reference: &lt;/span&gt;&lt;span dojoType="dijit.form.TextBox" id="Application_ClientReference" class="_data_ClientReference" name="ClientReference" maxLength="50" wrap="virtual" placeHolder="Reference for Client use only (not visible to TGA)" &gt;&lt;/span&gt;</par>
+<par def='26'>&lt;/td&gt;</par>
+<par def='30'>&lt;/tr&gt;</par>
+<par def='31'>&lt;/table&gt;</par>
+<par def='22'>&lt;/div&gt;</par>
+<par def='22'/></section>
+<par def='22'>&lt;div dojoType="dijit.layout.TabContainer" id="djborder_Tabs" region="center"&gt;</par>
+<pardef id='37' leftmargin='2.9521in' firstlineleftmargin='1.2500in' tabs='L1in'/>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='37' hidewhenexpanded='true' color='#c0e1ff' borderstyle='tabdiag'><text
+>Tab: Application</text></sectiontitle>
+<pardef id='38' leftmargin='2.9521in' rightmargin='100%' firstlineleftmargin='1.5000in'/>
+<par def='38'>&lt;div dojoType="dijit.layout.ContentPane" id="djtabs_Application" title="Application" selected="true" &gt;</par>
+<pardef id='39' leftmargin='1.7500in' tabs='L1in'/>
+<par def='39'/>
+<pardef id='40' leftmargin='2.9521in' rightmargin='100%' firstlineleftmargin='1.7500in'/>
+<par def='40'>&lt;table width="100%"&gt;</par>
+<par def='26'>&lt;tr&gt;&lt;td class="m1header"&gt;Always Required&lt;/td&gt;&lt;td class="c1header"&gt;Required under certain conditions&lt;/td&gt;&lt;/tr&gt;</par>
+<pardef id='41' leftmargin='2.7021in' rightmargin='100%' firstlineleftmargin='1.7500in'
+ hide='web'/>
+<section onread='collapse' onpreview='collapse' onedit='collapse' onprint='collapse'><sectiontitle
+ pardef='41' borderstyle='twoline' color='red'><font color='green'/><text
+>&lt;!-- hidden from browser --&gt;   &lt;tr&gt;&lt;td class="c1"&gt;Applicant Name&lt;/td&gt;&lt;td&gt;</text></sectiontitle>
+<pardef id='42' leftmargin='2.9521in' rightmargin='100%' firstlineleftmargin='2in'
+ hide='web'/>
+<par def='42'><run><font color='green'/>&lt;tr&gt;&lt;td class="n1"&gt;Applicant Name&lt;/td&gt;&lt;td&gt;</run><run
+><font color='green'/><computedtext><code event='value'><formula>ClientName</formula></code></computedtext></run><run
+><font color='green'/>&lt;/td&gt;&lt;/tr&gt;</run></par></section>
+<pardef id='43' leftmargin='2.9521in' rightmargin='100%' firstlineleftmargin='2in'/>
+<par def='43'>&lt;tr&gt;</par>
+<pardef id='44' leftmargin='2.9521in' rightmargin='100%' firstlineleftmargin='2.2500in'/>
+<par def='44'>&lt;td nowrap style="width:10%" class="n1"&gt;Sponsor Name&lt;/td&gt;</par>
+<par def='27'>&lt;td  style="width:90%"&gt;</par>
+<pardef id='45' leftmargin='2.5000in' rightmargin='100%'/>
+<par def='45'>&lt;div dojoType="dijit.form.FilteringSelect" class="textbox1" name="Application_SponsorName" id="Application_SponsorName"  pageSize="100" hasDownArrow="true" highlightMatch="first" searchDelay="200" fetchProperties="{sort:{attribute: 'id', descending: true}}" placeHolder="Select a sponsor..." &gt;</par>
+<par def='29'><run><font color='red'/>&lt;!-- Section processes migrated clinical trials --&gt;</run></par>
+<par def='29'>&lt;script type="dojo/method"  event="onChange"&gt;</par>
+<pardef id='46' leftmargin='3in' rightmargin='100%'/>
+<par def='46'>Application_SponsorName_OnChange(this);</par>
+<pardef id='47' leftmargin='3.2021in' rightmargin='100%' firstlineleftmargin='2.7500in'/>
+<par def='47'>&lt;/script&gt;</par>
+<pardef id='48' leftmargin='2.9521in' rightmargin='100%' firstlineleftmargin='2.5000in'/>
+<par def='48'>&lt;/div&gt;</par>
+<par def='44'>&lt;/td&gt;</par>
+<par def='43'>&lt;/tr&gt;</par>
+<par def='43'>&lt;tr&gt;</par>
+<par def='44'>&lt;td nowrap class="n1"&gt;Sponsor Address&lt;/td&gt;</par>
+<par def='44'>&lt;td&gt;</par>
+<pardef id='49' leftmargin='2.5000in'/>
+<par def='49'>&lt;div dojoType="dijit.form.FilteringSelect" id="Application_SponsorAddress" class="textbox1 _data_SponsorAddress"  pageSize="100" hasDownArrow="true" highlightMatch="first" searchDelay="200" fetchProperties="{sort:{attribute: 'id', descending: true}}" placeHolder="Select a Sponsor then addresses will be selectable..." onChange="SponsorAddress_onChange(this);" &gt;&lt;/div&gt;<break
+/>&lt;div dojoType="dijit.form.TextBox" type="hidden" id="Application_SponsorAddress_Id" class="_data_SponsorAddress_Id"&gt;&lt;/div&gt;<break
+/>&lt;div dojoType="dijit.form.TextBox" type="hidden" id="Application_SponsorAddress_Label" class="_data_SponsorAddress_Label"&gt;&lt;/div&gt;</par>
+<par def='44'>&lt;/td&gt;</par>
+<par def='43'>&lt;/tr&gt;</par>
+<par def='41'><run><font color='green'/></run></par>
+<section onread='collapse' onpreview='collapse' onedit='collapse' onprint='collapse'><sectiontitle
+ pardef='41' borderstyle='twoline' hidewhenexpanded='true' color='red'><font
+ color='green'/><text>&lt;!-- currently this section of green is hidden from the web --&gt;</text></sectiontitle>
+<par def='42'><run><font color='green'/>&lt;tr&gt;</run></par>
+<pardef id='50' leftmargin='2.9521in' rightmargin='100%' firstlineleftmargin='2.2500in'
+ hide='web'/>
+<par def='50'><run><font color='green'/>&lt;td nowrap class="n1"&gt;Sponsor Preferred Billing Address&lt;/td&gt;</run></par>
+<par def='50'><run><font color='green'/>&lt;td&gt;</run></par>
+<pardef id='51' leftmargin='2.5000in' rightmargin='100%' hide='web'/>
+<par def='51'><run><font color='green'/>&lt;div dojoType="dijit.form.FilteringSelect" id="Application_SponsorAddressBA" class="textbox1 _data_SponsorAddressBA" pageSize="100" hasDownArrow="true" highlightMatch="first" searchDelay="200" fetchProperties="{sort:{attribute: 'id', descending: true}}" placeHolder="Select a Sponsor then addresses will be selectable..." onChangex="SponsorAddress_onChange(this);" &gt;&lt;/div&gt;</run></par>
+<par def='50'><run><font color='green'/>&lt;/td&gt;</run></par>
+<par def='42'><run><font color='green'/>&lt;/tr&gt;&lt;tr&gt;</run></par>
+<par def='50'><run><font color='green'/>&lt;td nowrap class="n1"&gt;Sponsor Regulatory Correspondence Address&lt;/td&gt;</run></par>
+<par def='50'><run><font color='green'/>&lt;td&gt;</run></par>
+<par def='51'><run><font color='green'/>&lt;div dojoType="dijit.form.FilteringSelect" id="Application_SponsorAddressRA" class="textbox1 _data_SponsorAddressRA" pageSize="100" hasDownArrow="true" highlightMatch="first" searchDelay="200" fetchProperties="{sort:{attribute: 'id', descending: true}}" placeHolder="Select a Sponsor then addresses will be selectable..." onChangex="SponsorAddress_onChange(this);" &gt;&lt;/div&gt;</run></par>
+<par def='50'><run><font color='green'/>&lt;/td&gt;</run></par>
+<par def='42'><run><font color='green'/>&lt;/tr&gt;</run></par>
+<par def='42'><run><font color='green'/></run></par></section>
+<par def='43'>&lt;tr&gt;</par>
+<par def='44'>&lt;td nowrap class="n1"&gt;Notification Fee&lt;/td&gt;</par>
+<par def='44'>&lt;td&gt;</par>
+<par def='45'>&lt;div dojoType="dijit.form.CurrencyTextBox" readOnly="true" constraints="{fractional:false}" currency="AUD" invalidMessage="Invalid application fee amount." id="Application_ApplicationFees" &gt;&lt;/div&gt;</par>
+<par def='44'>&lt;/td&gt;</par>
+<par def='43'>&lt;/tr&gt;</par>
+<par def='40'>&lt;/table&gt;</par>
+<par def='41'><run><font color='red'/>&lt;!-- subform SponsorDetails (shows for non-validated migration data) --&gt;</run></par><subformref
+><code event='value'><formula>@If(clinicaltrialtype="CTN" | @Contains(@LowerCase(query_string);"ctn") | @Contains(@LowerCase(query_string);"&amp;type=ctn"); "SponsorDetails"; "")</formula></code></subformref>
+<par def='38'>&lt;/div&gt;</par>
+<par def='43'/></section>
+<pardef id='52' leftmargin='1.2500in' tabs='L1in'/>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='52' hidewhenexpanded='true' color='#c0e1ff' borderstyle='tabdiag'><text
+>Tab: Part 1</text></sectiontitle>
+<pardef id='53' leftmargin='1.5000in' tabs='L1in'/>
+<par def='53'>&lt;div dojoType="dijit.layout.ContentPane" title="<computedtext
+><code event='value'><formula>@If(@LowerCase(clinicaltrialtype)="ctx" | @Contains(@LowerCase(query_string);"ctx") | @Contains(@LowerCase(query_string);"&amp;type=ctx");"Part 1"; "Trial Details")</formula></code></computedtext>" id="djtabs_Part1"&gt;</par>
+<par def='39'>&lt;table width="99%" style="overflow-x: hidden;"&gt;</par>
+<par def='26'>&lt;tr&gt;&lt;td class="m1header"&gt;Always Required&lt;/td&gt;&lt;td class="c1header"&gt;Required under certain conditions&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='43'>&lt;tr&gt;</par>
+<pardef id='54' leftmargin='2.2500in' rightmargin='100%'/>
+<par def='54'>&lt;td nowrap  class="n1" style="width:10%"&gt;Contact Name&lt;/td&gt;&lt;td style="width:90%"&gt;&lt;div dojoType="dijit.form.TextBox" class="_data_Part1__ContactName" id="Part1_ContactName" name="Part1_ContactName" placeHolder="eg: Joan Johnson" maxLength="150"&gt;&lt;/div&gt;&lt;/td&gt;</par>
+<par def='43'>&lt;/tr&gt;</par>
+<par def='43'>&lt;tr&gt;</par>
+<par def='54'>&lt;td nowrap class="n1"&gt;Contact Phone Number&lt;/td&gt;&lt;td&gt;&lt;div dojoType="dijit.form.ValidationTextBox" id="Part1_ContactPhone" class="_data_Part1__ContactPhone" name="Part1_ContactPhone" placeHolder="eg: 0987654321" required=true maxLength="10" regExp="^\({0,1}((0|\+61)(2|4|3|7|8)){0,1}\){0,1}(\ |-){0,1}[0-9]{2}(\ |-){0,1}[0-9]{2}(\ |-){0,1}[0-9]{1}(\ |-){0,1}[0-9]{3}$" required=true&gt;&lt;/div&gt;&lt;/td&gt;</par>
+<par def='43'>&lt;/tr&gt;</par>
+<par def='43'>&lt;tr&gt;</par>
+<par def='54'>&lt;td nowrap class="n1"&gt;Contact Email&lt;/td&gt;&lt;td&gt;&lt;div dojoType="dijit.form.ValidationTextBox" style="width:300px;" id="Part1_ContactEmail" name="Part1_ContactEmail" class="_data_Part1__ContactEmail" placeHolder="email.address@domain.com.au" required=true&gt;&lt;/div&gt;&lt;/td&gt;</par>
+<par def='43'>&lt;/tr&gt;</par>
+<par def='43'>&lt;tr&gt;</par>
+<par def='54'>&lt;td nowrap class="n1"&gt;Confirm Email&lt;/td&gt;&lt;td&gt;&lt;div dojoType="dijit.form.ValidationTextBox" style="width:300px;" id="Part1_ConfirmEmail" name="Part1_ConfirmEmail" class="_data_Part1__ConfirmEmail" placeHolder="email.address@domain.com.au" required=true&gt;&lt;/div&gt;&lt;/td&gt;</par>
+<par def='43'>&lt;/tr&gt;</par>
+<par def='43'>&lt;tr&gt;</par>
+<pardef id='55' leftmargin='3.2021in' rightmargin='100%' firstlineleftmargin='2.2500in'/>
+<par def='55'>&lt;td colspan=2&gt;</par>
+<pardef id='56' leftmargin='3.4521in' rightmargin='100%' firstlineleftmargin='2.5000in'/>
+<par def='56'>&lt;hr /&gt;</par>
+<par def='55'>&lt;/td&gt;</par>
+<par def='43'>&lt;/tr&gt;</par>
+<par def='43'>&lt;tr&gt;</par>
+<pardef id='57' leftmargin='2.7500in' firstlineleftmargin='2.2500in' tabs='L1in'/>
+<par def='57'>&lt;td colspan="2" style="text-align:left; font-weight:bold;"&gt;Trial Details&lt;/td&gt;</par>
+<pardef id='58' leftmargin='2in' tabs='L1in'/>
+<par def='58'>&lt;/tr&gt;</par>
+<pardef id='59' leftmargin='3.2021in' rightmargin='100%' firstlineleftmargin='2.2500in'
+ hide='web'/>
+<par def='59'><run><font color='red'/>&lt;!-- subform ClinicalTrial_Part1Notifications --&gt;</run></par><subformref
+><code event='value'><formula>@If(clinicaltrialtype="CTN" | @Contains(@LowerCase(query_string);"ctn") | @Contains(@LowerCase(query_string);"&amp;type=ctn"); "ClinicalTrial_Part1Notifications"; "")</formula></code></subformref>
+<par def='59'><run><font color='red'/>&lt;!-- subform ClinicalTrial_Part1StudyPatientsTrialType --&gt;</run></par><subformref
+><code event='value'><formula>@If(clinicaltrialtype="CTN" | @Contains(@LowerCase(query_string);"ctn") | @Contains(@LowerCase(query_string);"&amp;type=ctn"); "ClinicalTrial_Part1StudyPatientsTrialType"; "")</formula></code></subformref>
+<par def='58'>&lt;tr&gt;</par>
+<pardef id='60' leftmargin='2.2500in' tabs='L1in'/>
+<par def='60'>&lt;td nowrap class="n1"&gt;This Trial&lt;/td&gt;</par>
+<par def='60'>&lt;td&gt;&lt;span id="Part1_TrialClassification"&gt;&lt;/span&gt;</par>
+<pardef id='61' leftmargin='2.5000in' tabs='L1in'/>
+<par def='61'>&lt;table style="border: 1px solid #ccc;"&gt;</par>
+<pardef id='62' leftmargin='3.7931in' firstlineleftmargin='2.7500in' tabs='L1in'/>
+<par def='62'>&lt;tr&gt;</par>
+<pardef id='63' leftmargin='3in' tabs='L1in'/>
+<par def='63'>&lt;td&gt;&lt;input type="checkbox" onClick="Part1Display();" dojoType="dijit.form.CheckBox" class="_data_Part1__TrialClassification" name="Part1_TrialClassification" id="Part1_TrialClassification3" value="3" /&gt;&lt;/td&gt;</par>
+<par def='63'>&lt;td&gt;&lt;label for="Part1_TrialClassification3"&gt;Involves Animal excipients&lt;/label&gt;&lt;/td&gt;</par>
+<par def='63'>&lt;td&gt;&lt;input type="checkbox" onClick="Part1Display();" dojoType="dijit.form.CheckBox" class="_data_Part1__TrialClassification" name="Part1_TrialClassification" id="Part1_TrialClassification4" value="4" /&gt;&lt;/td&gt;</par>
+<par def='63'>&lt;td&gt;&lt;label for="Part1_TrialClassification4"&gt;Is being conducted in other countries&lt;/label&gt;&lt;/td&gt;</par>
+<par def='63'>&lt;td style="display:none"&gt;&lt;input type="checkbox" onClick="Part1Display();" dojoType="dijit.form.CheckBox" class="_data_Part1__TrialClassification" name="Part1_TrialClassification" id="Part1_TrialClassification9" value="9" /&gt;&lt;/td&gt;</par>
+<par def='63'>&lt;td style="display:none"&gt;&lt;label for="Part1_TrialClassification9"&gt;Involves a product containing nanoparticles&lt;/label&gt;&lt;/td&gt;</par>
+<par def='62'>&lt;/tr&gt;</par>
+<par def='62'>&lt;tr&gt;</par>
+<par def='63'>&lt;td&gt;&lt;input type="checkbox" onClick="Part1Display();" dojoType="dijit.form.CheckBox" class="_data_Part1__TrialClassification" name="Part1_TrialClassification" id="Part1_TrialClassification1" value="1" /&gt;&lt;/td&gt;</par>
+<par def='63'>&lt;td&gt;&lt;label for="Part1_TrialClassification1"&gt;Involves the use of a Medicine&lt;/label&gt;&lt;/td&gt;</par>
+<par def='63'>&lt;td&gt;&lt;input type="checkbox" onClick="Part1Display();" dojoType="dijit.form.CheckBox" class="_data_Part1__TrialClassification" name="Part1_TrialClassification" id="Part1_TrialClassification0" value="0" /&gt;&lt;/td&gt;</par>
+<par def='63'>&lt;td&gt;&lt;label for="Part1_TrialClassification0"&gt;Involves the use of a Biological&lt;/label&gt;&lt;/td&gt;</par>
+<par def='62'>&lt;/tr&gt;</par>
+<par def='62'>&lt;tr&gt;</par>
+<par def='63'>&lt;td&gt;&lt;input type="checkbox" onClick="Part1Display();" dojoType="dijit.form.CheckBox" class="_data_Part1__TrialClassification" name="Part1_TrialClassification" id="Part1_TrialClassification2" value="2" /&gt;&lt;/td&gt;</par>
+<par def='63'>&lt;td&gt;&lt;label for="Part1_TrialClassification2"&gt;Involves the use of a Therapeutic Device&lt;/label&gt;&lt;/td&gt;</par>
+<par def='63'>&lt;td&gt;&lt;input type="checkbox" onClick="Part1Display();" dojoType="dijit.form.CheckBox" class="_data_Part1__TrialClassification" name="Part1_TrialClassification" id="Part1_TrialClassification2A" value="2A" /&gt;&lt;/td&gt;</par>
+<par def='63'>&lt;td&gt;&lt;label for="Part1_TrialClassification2A"&gt;Involves the use of a Medical Device&lt;/label&gt;&lt;/td&gt;</par>
+<par def='62'>&lt;/tr&gt;</par>
+<pardef id='64' leftmargin='3.7021in' rightmargin='100%' firstlineleftmargin='2.7500in'
+ hide='web'/>
+<par def='64'><run><font color='red'/>&lt;!-- subform ClinicalTrial_Part1ThisTrial --&gt;</run></par><subformref
+><code event='value'><formula>@If(clinicaltrialtype="CTN" | @Contains(@LowerCase(query_string);"ctn") | @Contains(@LowerCase(query_string);"&amp;type=ctn"); "ClinicalTrial_Part1ThisTrial"; "")</formula></code></subformref>
+<par def='62'>&lt;tr&gt;</par>
+<par def='63'>&lt;td&gt;&lt;input type="checkbox" onClick="Part1Display();" dojoType="dijit.form.CheckBox" class="_data_Part1__TrialClassification" name="Part1_TrialClassification" id="Part1_TrialClassification8" value="8" /&gt;&lt;/td&gt;</par>
+<par def='63'>&lt;td&gt;&lt;label for="Part1_TrialClassification8"&gt;Involves a Genetically Modified Organism&lt;/label&gt;&lt;/td&gt;</par>
+<par def='63'>&lt;td&gt;&lt;input type="checkbox" onClick="Part1Display();" dojoType="dijit.form.CheckBox" class="_data_Part1__TrialClassification" name="Part1_TrialClassification" id="Part1_TrialClassification11" value="11" /&gt;&lt;/td&gt;</par>
+<par def='63'>&lt;td&gt;&lt;label for="Part1_TrialClassification11"&gt;Involves gene therapy&lt;/label&gt;&lt;/td&gt;</par>
+<par def='62'>&lt;/tr&gt;</par>
+<par def='62'>&lt;tr&gt;</par>
+<par def='63'>&lt;td&gt;&lt;input type="checkbox" onClick="Part1Display();" dojoType="dijit.form.CheckBox" class="_data_Part1__TrialClassification" name="Part1_TrialClassification" id="Part1_TrialClassification10" value="10" /&gt;&lt;/td&gt;</par>
+<par def='63'>&lt;td&gt;&lt;label for="Part1_TrialClassification10"&gt;Is a multicentre trial in Australia&lt;/label&gt;&lt;/td&gt;</par>
+<par def='63'>&lt;td&gt;&lt;input type="checkbox" onClick="Part1Display();" dojoType="dijit.form.CheckBox" class="_data_Part1__TrialClassification" name="Part1_TrialClassification" id="Part1_TrialClassification5" value="5" /&gt;&lt;/td&gt;</par>
+<par def='63'>&lt;td&gt;&lt;label for="Part1_TrialClassification5"&gt;Has relevant preceding trials&lt;/label&gt;&lt;/td&gt;</par>
+<par def='62'>&lt;/tr&gt;</par>
+<par def='61'>&lt;/table&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr&gt;</par>
+<par def='60'>&lt;td class="n1"&gt;Total number of participants&lt;br /&gt;to be enrolled in the Trial&lt;/td&gt;&lt;td&gt;&lt;div dojoType="dijit.form.ComboBox" id="Part1_TotalPatients" class="_data_Part1__TotalPatients"  store="djstore_TotalPatients" style="width:100px;" /&gt;&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr&gt;</par>
+<pardef id='65' leftmargin='3in' firstlineleftmargin='2.2500in' tabs='L1in'/>
+<par def='65'>&lt;td class="n1"&gt;Therapeutic Area&lt;/td&gt;</par>
+<par def='65'>&lt;td&gt;&lt;div dojoType="dijit.form.ComboBox"  id="Part1_TrialTherapeuticArea" class="_data_Part1__TrialTherapeuticArea" store="djstore_Theraarea" style="width:300px;" /&gt;&lt;/td&gt;</par>
+<pardef id='66' leftmargin='2.7500in' firstlineleftmargin='2in' tabs='L1in'/>
+<par def='66'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="part1_gmo_row1" style="display:none"&gt;</par>
+<par def='60'>&lt;td class="n1"&gt;Details of Genetically Modified Organism&lt;/td&gt;</par>
+<par def='60'>&lt;td&gt;</par>
+<par def='61'>&lt;textarea dojoType="dijit.form.Textarea" id="Part1_GMO" class="_data_Part1__GMO" style="width:100%;" maxLength="5000"&gt;&lt;/textarea&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="part1_nanoparticles_row1" style="display:none"&gt;</par>
+<par def='60'>&lt;td class="n1"&gt;Details of Nanoparticles&lt;/td&gt;</par>
+<par def='60'>&lt;td&gt;</par>
+<par def='61'>&lt;textarea dojoType="dijit.form.Textarea" id="Part1_Nanoparticles" class="_data_Part1__Nanoparticles" style="width:100%;" maxLength="5000"&gt;&lt;/textarea&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="part1_genetherapy_row1" style="display:none"&gt;</par>
+<par def='60'>&lt;td class="n1"&gt;Details of Gene Therapy&lt;/td&gt;</par>
+<par def='60'>&lt;td&gt;</par>
+<par def='61'>&lt;textarea dojoType="dijit.form.Textarea" id="Part1_GeneTherapyDetails" class="_data_Part1__GeneTherapyDetails" style="width:100%;" maxLength="500"&gt;&lt;/textarea&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par><subformref><code event='value'><formula>@If(clinicaltrialtype="CTN" | @Contains(@LowerCase(query_string);"ctn") | @Contains(@LowerCase(query_string);"&amp;type=ctn"); ""; "ClinicalTrial_Part1Pages")</formula></code></subformref>
+<pardef id='67' leftmargin='2in' firstlineleftmargin='1.7500in' tabs='L1in'/>
+<par def='67'>&lt;/table&gt;</par>
+<par def='67'>&lt;table width="100%"&gt;</par>
+<par def='58'>&lt;tr&gt;</par>
+<par def='60'>&lt;td colspan=2&gt;&lt;hr /&gt;&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;&lt;tr id="heading_biodevmed_row1"&gt;</par>
+<par def='27'>&lt;td colspan="2" style="text-align:left; font-weight:bold;"&gt;Biologicals / Devices / Medicine Details&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='26'/>
+<par def='26'>&lt;tr id="part1_biologicals_row4" style="display:none"&gt;</par>
+<par def='27'>&lt;td colspan="2"&gt;&amp;nbsp;&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='26'>&lt;tr id="part1_biologicals_row1" style="display:none"&gt;</par>
+<par def='60'>&lt;td nowrap class="m1"&gt; Biological Details&lt;/td&gt;&lt;td&gt;</par>
+<par def='61'>&lt;div dojoType="dijit.form.Button" label="Add Biological" id="Part1_Button_AddBiological"&gt;</par>
+<pardef id='68' leftmargin='2.7500in' tabs='L1in'/>
+<par def='68'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='63'>Part1_Button_AddBiological_onClick();</par>
+<par def='68'>&lt;/script&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='61'>&lt;div dojoType="dijit.form.Button" label="Remove Selected  Biological(s)" id="Part1_Button_RemoveBiological"&gt;</par>
+<par def='68'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='63'>Part1_Button_RemoveBiological_onClick();</par>
+<pardef id='69' leftmargin='3in' firstlineleftmargin='2.7500in' tabs='L1in'/>
+<par def='69'>&lt;/script&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="part1_biologicals_row2" style="display:none"&gt;</par>
+<par def='60'>&lt;td colspan="2"&gt;</par>
+<par def='28'>&lt;script&gt;</par>
+<par def='29'>var make_Country_Label = function(rowIndex, item){</par>
+<pardef id='70' leftmargin='3in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='70'>makeCountryLabel(item);</par>
+<pardef id='71' leftmargin='3in' firstlineleftmargin='2.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='71'>}</par>
+<par def='28'>&lt;/script&gt;</par>
+<par def='28'>&lt;div style="border:1px solid #8BA0BD"&gt;</par>
+<par def='29'>&lt;div dojoType="dojox.grid.EnhancedGrid" id="Part1_Biologicals" structure="[{name: 'Trade/Product/Code Name', field: 'ProductName', width: 'auto' },{ name: 'Dosage Form', field: 'DosageForm_Label', width: 'auto' },{ name: 'Route of Administration', field: 'RouteOfAdmin_Label', width: 'auto' },{name:'Open',get:formatterButtonEdit}]" query="{RecordUNID:'*'}" minChars="3" plugins="{indirectSelection:true}" style="height:140px; width:100%;" noDataMessage="Biological Details"&gt;</par>
+<par def='68'>&lt;script type="dojo/method"  event="onDblClick"&gt;</par>
+<par def='70'>Part1_Biologicals_onDblClick(this);</par>
+<par def='68'>&lt;/script&gt;</par>
+<par def='29'>&lt;/div&gt;</par>
+<par def='28'>&lt;/div&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='26'>&lt;tr id="part1_biologicals_row3" style="display:none"&gt;</par>
+<par def='60'>&lt;td nowrap  class="n1"&gt;Product Description&lt;/td&gt;</par>
+<par def='60'>&lt;td&gt;</par>
+<par def='61'>&lt;textarea dojoType="dijit.form.Textarea" style="width:100%" id="Part1_BiologicalProductDescription" class="_data_Part1__BiologicalProductDescription" maxLength="5000" wrap="soft"&gt;&lt;/textarea&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='26'>&lt;tr id="part1_biologicals_row5" style="display:none"&gt;</par>
+<par def='60'>&lt;td nowrap  class="n1"&gt;For a biological not in Phase 1, is the biological manufactured in Australia?&lt;/td&gt;</par>
+<par def='60'>&lt;td&gt;&lt;span id="Part1_BiologicalNotInPhaseOne"&gt;</par>
+<par def='29'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="Part1_BiologicalNotInPhaseOne" id="Part1_BiologicalNotInPhaseOneYes" class="_data_Part1__BiologicalNotInPhaseOne" value="Yes" /&gt;</par>
+<par def='29'>&lt;label for="Part1_BiologicalNotInPhaseOneYes" id="Part1_BiologicalNotInPhaseOneYes_label"&gt;Yes&lt;/label&gt;</par>
+<par def='29'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="Part1_BiologicalNotInPhaseOne" id="Part1_BiologicalNotInPhaseOneNo" class="_data_Part1__BiologicalNotInPhaseOne" value="No" /&gt;</par>
+<par def='29'>&lt;label for="Part1_BiologicalNotInPhaseOneNo" id="Part1_BiologicalNotInPhaseOneNo_label"&gt;No&lt;/label&gt;</par>
+<par def='28'>&lt;/span&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='26'>&lt;tr id="part1_biologicals_row6" style="display:none"&gt;</par>
+<par def='60'>&lt;td nowrap  class="n1"&gt;Manufacturer details (name, address and/or GMP licence)&lt;/td&gt;</par>
+<par def='60'>&lt;td&gt;</par>
+<par def='61'>&lt;textarea dojoType="dijit.form.Textarea" style="width:100%" id="Part1_BiologicalManufacturerDetails" class="_data_Part1__BiologicalManufacturerDetails" maxLength="1000" wrap="soft"&gt;&lt;/textarea&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="part1_medicine_row3" style="display:none"&gt;&lt;td colspan="2"&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="part1_medicine_row1" style="display:none"&gt;</par>
+<par def='60'>&lt;td class="m1"&gt;Medicine Details&lt;/td&gt;&lt;td&gt;</par>
+<par def='61'>&lt;div dojoType="dijit.form.Button" label="Add Medicine" id="Part1_Button_AddMedicine"&gt;</par>
+<par def='68'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='63'>Part1_Button_AddMedicine_onClick();</par>
+<par def='68'>&lt;/script&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='61'>&lt;div dojoType="dijit.form.Button" label="Remove Selected Medicine(s)" id="Part1_Button_RemoveMedicine"&gt;</par>
+<par def='68'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='63'>Part1_Button_RemoveMedicine_onClick();</par>
+<par def='69'>&lt;/script&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="part1_medicine_row2" style="display:none"&gt;</par>
+<par def='60'>&lt;td colspan="2"&gt;</par>
+<par def='28'>&lt;div style="border:1px solid #8BA0BD"&gt;</par>
+<par def='29'>&lt;div dojoType="dojox.grid.EnhancedGrid" id="Part1_Medicines" style="height:140px; width:100%" structure="[{name:'Trade/Product/Code Name', field:'TradeCodeName', width:'auto'},{name:'Dosage Form',field:'DosageForm_Label',width:'auto'},{name:'Route of Administration', field:'RouteOfAdmin_Label',width:'auto'},{name:'Intended Use',field:'IntendedUse_Label',width:'auto'},{name:'Open',get:formatterButtonEdit}]" query="{RecordUNID:'*'}" minChars="3" plugins="{indirectSelection:true}" noDataMessage="Medicines Details"&gt;</par>
+<par def='29'>&lt;script type="dojo/method"  event="onDblClick"&gt;</par>
+<par def='70'>Part1_Medicines_onDblClick(this);</par>
+<par def='68'>&lt;/script&gt;</par>
+<par def='68'>&lt;/div&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="part1_excipients_row3" style="display:none"&gt;&lt;td colspan="2"&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="part1_excipients_row1" style="display:none"&gt;</par>
+<par def='60'>&lt;td nowrap  class="m1"&gt;Animal Excipient Details&lt;/td&gt;&lt;td&gt;</par>
+<par def='61'>&lt;div dojoType="dijit.form.Button" label="Add Animal Excipient" id="Part1_Button_AddAnimalExcipient"&gt;</par>
+<par def='68'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='63'>Part1_Button_AddAnimalExcipient_onClick();</par>
+<par def='68'>&lt;/script&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='61'>&lt;div dojoType="dijit.form.Button" label="Remove Selected Excipient(s)" id="Part1_Button_RemoveAnimalExcipient"&gt;</par>
+<par def='68'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='63'>Part1_Button_RemoveAnimalExcipient_onClick();</par>
+<par def='69'>&lt;/script&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="part1_excipients_row2" style="display:none"&gt;</par>
+<par def='60'>&lt;td colspan="2"&gt;</par>
+<par def='28'>&lt;div style="border:1px solid #8BA0BD"&gt;</par>
+<par def='29'>&lt;div dojoType="dojox.grid.EnhancedGrid" id="Part1_AnimalExcipients" structure="[{name: 'Product Name', field: 'ProductName', width: 'auto' },{name: 'Species of Origin', field: 'AnimalOrigin_Label', width: 'auto' },{name: 'Tissue', field: 'AnimalPart_Label', width: 'auto' },{name: 'Preparation', field: 'AnimalPreparation_Label', width: 'auto' },{name: 'Country of Origin', field: 'Country_Label', width: 'auto' },{name:'Open',get:formatterButtonEdit}]" query="{RecordUNID:'*'}" minChars="3" plugins="{indirectSelection:true}" style="height:140px; width:100%;" noDataMessage="Animal Excipient Details"&gt;</par>
+<par def='29'>&lt;script type="dojo/method"  event="onDblClick"&gt;</par>
+<par def='70'>Part1_AnimalExcipients_onDblClick(this);</par>
+<par def='68'>&lt;/script&gt;</par>
+<par def='29'>&lt;/div&gt;</par>
+<par def='28'>&lt;/div&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="part1_devices_row3" style="display:none"&gt;&lt;td colspan="2"&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="part1_devices_row1" style="display:none"&gt;</par>
+<par def='60'>&lt;td nowrap class="m1"&gt;Device Details&lt;/td&gt;&lt;td&gt;</par>
+<par def='61'>&lt;div dojoType="dijit.form.Button" label="Add Device" id="Part1_Button_AddDevices"&gt;</par>
+<par def='68'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='63'>Part1_Button_AddDevices_onClick();</par>
+<par def='68'>&lt;/script&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='61'>&lt;div dojoType="dijit.form.Button" label="Remove Selected Device(s)" id="Part1_Button_RemoveDevices"&gt;</par>
+<par def='68'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='63'>Part1_Button_RemoveDevices_onClick();</par>
+<par def='69'>&lt;/script&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="part1_devices_row2" style="display:none"&gt;</par>
+<par def='60'>&lt;td colspan="2"&gt;</par>
+<par def='28'>&lt;div style="border:1px solid #8BA0BD"&gt;</par>
+<par def='29'>&lt;div dojoType="dojox.grid.EnhancedGrid" id="Part1_Devices" structure="[{name: 'Product Name', field: 'ProductName', width: 'auto' },{name: 'Manufacturer', field: 'Manufacturer', width: 'auto' },{name: 'Description', field: 'Description', width: 'auto' },{get: formatterIntendedUse, name:'Intended Purpose',width:'auto'},{name:'Open',get:formatterButtonEdit}]" plugins="{indirectSelection:true}" query="{RecordUNID:'*'}" minChars="3" style="height:140px; width:100%;" noDataMessage="Devices Details"&gt;</par>
+<par def='29'>&lt;script type="dojo/method"  event="onDblClick"&gt;</par>
+<par def='70'>Part1_Devices_onDblClick(this);</par>
+<par def='68'>&lt;/script&gt;</par>
+<par def='29'>&lt;/div&gt;</par>
+<par def='28'>&lt;/div&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='26'>&lt;tr id="part1_countries_row1" style="display:none"&gt;&lt;td colspan="2"&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='26'>&lt;tr id="part1_countries_row2" style="display:none"&gt;</par>
+<par def='27'>&lt;td class="m1"&gt;This trial is being conducted in the following Countries&lt;/td&gt;</par>
+<par def='27'>&lt;td&gt;</par>
+<par def='28'>&lt;div id="Part1_TrialConductedinCountryList" placeHolder="Select Country then Click Add" dojoType="dijit.form.FilteringSelect" store="djstore_Countries" autocomplete="true" style="width:275px" required="false"&gt;&lt;/div&gt;</par>
+<par def='28'>&lt;div dojoType="dijit.form.Button" label="Add Country" id="Part1_Button_AddCountry" onClick="TrialCountriesAdd('Part1')"&gt;&lt;/div&gt;</par>
+<par def='28'>&lt;div dojoType="dijit.form.Button" label="Remove Country(ies)" id="Part1_Button_RemoveCountry"&gt;</par>
+<par def='29'>&lt;script type="dojo/method" event="onClick"&gt;</par>
+<par def='70'>Part1_Button_RemoveCountry_onClick();</par>
+<par def='29'>&lt;/script&gt;</par>
+<par def='28'>&lt;/div&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="part1_countries_row3" style="display:none"&gt;</par>
+<par def='60'>&lt;td colspan="2"&gt;</par>
+<par def='28'>&lt;div style="border:1px solid #8BA0BD; width:100%;"&gt;</par>
+<par def='28'>&lt;div dojoType="dojox.grid.EnhancedGrid" plugins="{indirectSelection:true}" class="_data_Part1__TrialConductedInCountries" style="height:140px; width:100%;" id="Part1_TrialConductedInCountries" structure="[ {name:'Countries Selected', field:'TrialConductedInCountry_Label', width:'auto' }]" clientSort="true" noDataMessage="Trial Countries List"&gt;&lt;/div&gt;</par>
+<par def='28'>&lt;/div&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='26'/>
+<par def='42'><run><font color='red'/>&lt;!-- subform ClinicalTrial_Part1Placebo --&gt;</run></par><subformref
+><code event='value'><formula>@If(clinicaltrialtype="CTN" | @Contains(@LowerCase(query_string);"ctn") | @Contains(@LowerCase(query_string);"&amp;type=ctn"); "ClinicalTrial_Part1Placebo"; "")</formula></code></subformref>
+<pardef id='72' leftmargin='2.2500in' firstlineleftmargin='2in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='72'>&lt;tr  id="part1_trials_row2" style="display:none"&gt;</par>
+<pardef id='73' leftmargin='3.4521in' rightmargin='100%' firstlineleftmargin='2.2500in'/>
+<par def='73'>&lt;td colspan="2"&gt;</par>
+<pardef id='74' leftmargin='3.7021in' rightmargin='100%' firstlineleftmargin='2.5000in'/>
+<par def='74'>&lt;hr /&gt;</par>
+<par def='73'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='26'>&lt;tr id="part1_trials_row1" style="display:none"&gt;</par>
+<par def='27'>&lt;td class="n1" style="vertical-align:top;"&gt;Preceding Trials&lt;/td&gt;</par>
+<par def='27'>&lt;td&gt;</par>
+<par def='28'>&lt;select multiple="multiple" dojoType="dojox.form.CheckedMultiSelect" id="Part1_PrecedingTrials" style="width:480px;max-height:300px;overflow:auto;" store= "djstore_PrecedingTrials" class="_data_Part1__PrecedingTrials"&gt;&lt;/select&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='72'>&lt;/tr&gt;</par>
+<pardef id='75' leftmargin='3.2021in' rightmargin='100%' firstlineleftmargin='2in'/>
+<par def='75'><run><font color='green'/>&lt;!-- no preceding trials --&gt;</run></par>
+<par def='75'>&lt;tr id="part1_no_trials_row1" style="display:none"&gt;</par>
+<par def='73'>&lt;td class="n1" style="vertical-align:top;"&gt;Preceding Trials&lt;/td&gt;</par>
+<par def='73'>&lt;td&gt;&lt;span id="no_pt"&gt;&lt;/span&gt;&lt;/td&gt;</par>
+<pardef id='76' leftmargin='3.4521in' rightmargin='100%' firstlineleftmargin='2in'/>
+<par def='76'>&lt;/tr&gt;</par>
+<pardef id='77' leftmargin='3.7021in' rightmargin='100%' firstlineleftmargin='2in'/>
+<par def='77'>&lt;tr  id="part1_no_trials_row2"&gt;</par>
+<pardef id='78' leftmargin='3.7021in' rightmargin='100%' firstlineleftmargin='2.2500in'/>
+<par def='78'>&lt;td colspan=2&gt;</par>
+<pardef id='79' leftmargin='3.9521in' rightmargin='100%' firstlineleftmargin='2.5000in'/>
+<par def='79'>&lt;hr /&gt;</par>
+<par def='78'>&lt;/td&gt;</par>
+<par def='77'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="part1_sites_row3" style="display:none"&gt;</par>
+<par def='60'>&lt;td colspan="2"&gt;&amp;nbsp;&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="part1_sites_row1" style="display:none"&gt;</par>
+<par def='60'>&lt;td nowrap class="m1"&gt;Trial Site Details&lt;/td&gt;</par>
+<par def='60'>&lt;td&gt;</par>
+<par def='61'>&lt;div dojoType="dijit.form.Button" label="Add Site" id="Part1_Button_AddSite"&gt;</par>
+<par def='68'>&lt;script type="dojo/method" event="onClick"&gt;</par>
+<par def='63'>Part1_Button_AddSite_onClick();</par>
+<par def='68'>&lt;/script&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='61'>&lt;div dojoType="dijit.form.Button" label="Remove Selected Site(s)" id="Part1_Button_RemoveSite"&gt;</par>
+<par def='68'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='63'>Part1_Button_RemoveSite_onClick();</par>
+<par def='69'>&lt;/script&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='61'/>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="part1_sites_row2" style="display:none"&gt;</par>
+<par def='60'>&lt;td colspan="2"&gt;</par>
+<par def='28'>&lt;div style="border:1px solid #8BA0BD"&gt;</par>
+<par def='29'>&lt;div dojoType="dojox.grid.EnhancedGrid" id="Part1_Sites" structure="[{name:'Site', field:'TrialSite', width:'auto'}, {name:'Site Address', field:'TrialSiteAddress', width:'auto'}, {name:'State', field:'TrialSiteState_Label', width:'auto'},{name:'Principal Investigator', field:'PrincipalInvestigatorName', width:'auto'}, {name:'HREC Name', field:'HRECName', width:'auto'}, {name:'HREC Code', field:'HRECCode', width:'auto'}, {name:'Approving Authority', field:'ApprovingAuthorityName', width:'auto'},{name:'Open',get:formatterButtonEdit}]" plugins="{indirectSelection:true}" query="{RecordUNID:'*'}" minChars="3" style="height:140px; width:100%;" noDataMessage="Trial Sites Details"&gt;</par>
+<par def='29'>&lt;script type="dojo/method"  event="onDblClick"&gt;</par>
+<par def='70'>Part1_Sites_onDblClick(this);</par>
+<par def='68'>&lt;/script&gt;</par>
+<par def='29'>&lt;/div&gt;</par>
+<par def='28'>&lt;/div&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='43'>&lt;/tr&gt;</par>
+<par def='39'>&lt;/table&gt;</par>
+<par def='53'>&lt;/div&gt;</par>
+<par def='52'/></section><subformref><code event='value'><formula>@If(clinicaltrialtype="CTX" | @Contains(@LowerCase(query_string);"ctx") | @Contains(@LowerCase(query_string);"&amp;type=ctx"); "ClinicalTrial_Part2"; "")</formula></code></subformref>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='52' hidewhenexpanded='true' color='#c0e1ff' borderstyle='tabdiag'><text
+>Tab: Change to Trial Details</text></sectiontitle>
+<par def='53'>&lt;div dojoType="dijit.layout.ContentPane" title="Change to Trial Details" id="djtabs_UpdateDetails"&gt;</par>
+<par def='39'>&lt;table width="100%"&gt;</par>
+<par def='26'>&lt;tr&gt;&lt;td class="m1header"&gt;Always Required&lt;/td&gt;&lt;td class="c1header"&gt;Required under certain conditions&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='58'>&lt;tr&gt;</par>
+<par def='60'>&lt;td nowrap class="n1" style="width:10%"&gt;Contact Name&lt;/td&gt;&lt;td style="width:90%"&gt;&lt;div dojoType="dijit.form.ValidationTextBox" id="UpdateDetails_ContactName" class="_data_UpdateDetails__ContactName" style="width:300px;" maxLength="150" placeHolder="eg: Joan Johnson" &gt;&lt;/div&gt;&lt;/td&gt;</par>
+<pardef id='80' leftmargin='2.6118in' firstlineleftmargin='2in' tabs='L1in'/>
+<par def='80'>&lt;/tr&gt;</par>
+<par def='80'>&lt;tr&gt;</par>
+<par def='60'>&lt;td nowrap class="n1"&gt;Contact Phone Number&lt;/td&gt;&lt;td&gt;&lt;div dojoType="dijit.form.ValidationTextBox" id="UpdateDetails_ContactPhone" class="_data_UpdateDetails__ContactPhone" placeHolder="eg: 0912345678" maxLength=10 regExp="^\({0,1}((0|\+61)(2|4|3|7|8)){0,1}\){0,1}(\ |-){0,1}[0-9]{2}(\ |-){0,1}[0-9]{2}(\ |-){0,1}[0-9]{1}(\ |-){0,1}[0-9]{3}$" required=true&gt;&lt;/div&gt;&lt;/td&gt;</par>
+<par def='80'>&lt;/tr&gt;</par>
+<par def='80'>&lt;tr&gt;</par>
+<par def='60'>&lt;td nowrap class="n1"&gt;Contact Email&lt;/td&gt;&lt;td&gt;&lt;div dojoType="dijit.form.ValidationTextBox" style="width:300px;" class="_data_UpdateDetails__ContactEmail" id="UpdateDetails_ContactEmail" placeHolder="email.address@domain.com.au" required=true&gt;&lt;/div&gt;&lt;/td&gt;</par>
+<par def='80'>&lt;/tr&gt;</par>
+<par def='43'>&lt;tr&gt;</par>
+<par def='54'>&lt;td nowrap class="n1"&gt;Confirm Email&lt;/td&gt;&lt;td&gt;&lt;div dojoType="dijit.form.ValidationTextBox" style="width:300px;" id="UpdateDetails_ConfirmEmail" name="UpdateDetails_ConfirmEmail" class="_data_UpdateDetails__ConfirmEmail" placeHolder="email.address@domain.com.au" required=true&gt;&lt;/div&gt;&lt;/td&gt;</par>
+<par def='43'>&lt;/tr&gt;</par>
+<par def='43'>&lt;tr&gt;</par>
+<par def='55'>&lt;td colspan=2&gt;</par>
+<par def='56'>&lt;hr /&gt;</par>
+<par def='55'>&lt;/td&gt;</par>
+<par def='43'>&lt;/tr&gt;</par>
+<par def='43'>&lt;tr&gt;</par>
+<par def='57'>&lt;td colspan="2" style="text-align:left; font-weight:bold;"&gt;Trial Details&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='43'>&lt;tr&gt;</par>
+<par def='59'><run><font color='red'/>&lt;!-- subform </run><run><font color='red'/>ClinicalTrial_UpdateDetailsNotifications</run><run
+><font color='red'/> --&gt;</run></par><subformref><code event='value'><formula
+>@If(clinicaltrialtype="CTN" | @Contains(@LowerCase(query_string);"ctn") | @Contains(@LowerCase(query_string);"&amp;type=ctn"); "ClinicalTrial_UpdateDetailsNotifications";"")</formula></code></subformref>
+<par def='59'><run><font color='red'/>&lt;!-- subform ClinicalTrial_UpdateDetailsStudyPatientsTrialType --&gt;</run></par><subformref
+><code event='value'><formula>@If(clinicaltrialtype="CTN" | @Contains(@LowerCase(query_string);"ctn") | @Contains(@LowerCase(query_string);"&amp;type=ctn"); "ClinicalTrial_UpdateDetailsStudyPatientsTrialType"; "")</formula></code></subformref>
+<par def='43'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr&gt;</par>
+<par def='60'>&lt;td nowrap class="n1"&gt;This Trial&lt;/td&gt;</par>
+<par def='60'>&lt;td&gt;&lt;span id="UpdateDetails_TrialClassification"&gt;&lt;/span&gt;</par>
+<par def='61'>&lt;table style="border: 1px solid #ccc;"&gt;</par>
+<par def='62'>&lt;tr&gt;</par>
+<par def='63'>&lt;td&gt;&lt;input type="checkbox" onClick="UpdateDetailsDisplay();" dojoType="dijit.form.CheckBox" class="_data_UpdateDetails__TrialClassification" name="UpdateDetails_TrialClassification" id="UpdateDetails_TrialClassification3" value="3" /&gt;&lt;/td&gt;</par>
+<pardef id='81' leftmargin='3.7931in' firstlineleftmargin='3in' tabs='L1in'/>
+<par def='81'>&lt;td&gt;&lt;label for="UpdateDetails_TrialClassification3"&gt;Involves Animal excipients&lt;/label&gt;&lt;/td&gt;</par>
+<par def='63'>&lt;td&gt;&lt;input type="checkbox" onClick="UpdateDetailsDisplay();" dojoType="dijit.form.CheckBox" class="_data_UpdateDetails__TrialClassification" name="UpdateDetails_TrialClassification" id="UpdateDetails_TrialClassification4" value="4" /&gt;&lt;/td&gt;</par>
+<par def='81'>&lt;td&gt;&lt;label for="UpdateDetails_TrialClassification4"&gt;Is being conducted in other countries&lt;/label&gt;&lt;/td&gt;</par>
+<par def='81'/>
+<par def='63'>&lt;td style="display:none"&gt;&lt;input type="checkbox" onClick="UpdateDetailsDisplay();" dojoType="dijit.form.CheckBox" class="_data_UpdateDetails__TrialClassification" name="UpdateDetails_TrialClassification" id="UpdateDetails_TrialClassification9" value="9" /&gt;&lt;/td&gt;</par>
+<par def='81'>&lt;td style="display:none"&gt;&lt;label for="UpdateDetails_TrialClassification9"&gt;Involves a product containing nanoparticles&lt;/label&gt;&lt;/td&gt;</par>
+<par def='81'/>
+<par def='62'>&lt;/tr&gt;</par>
+<par def='62'>&lt;tr&gt;</par>
+<par def='63'>&lt;td&gt;&lt;input type="checkbox" onClick="UpdateDetailsDisplay();" dojoType="dijit.form.CheckBox" class="_data_UpdateDetails__TrialClassification" name="UpdateDetails_TrialClassification" id="UpdateDetails_TrialClassification1" value="1" /&gt;&lt;/td&gt;</par>
+<par def='81'>&lt;td&gt;&lt;label for="UpdateDetails_TrialClassification1"&gt;Involves the use of a Medicine&lt;/label&gt;&lt;/td&gt;</par>
+<par def='63'>&lt;td&gt;&lt;input type="checkbox" onClick="UpdateDetailsDisplay();" dojoType="dijit.form.CheckBox" class="_data_UpdateDetails__TrialClassification" name="UpdateDetails_TrialClassification" id="UpdateDetails_TrialClassification0" value="0" /&gt;&lt;/td&gt;</par>
+<par def='81'>&lt;td&gt;&lt;label for="UpdateDetails_TrialClassification0"&gt;Involves the use of a Biological&lt;/label&gt;&lt;/td&gt;</par>
+<par def='62'>&lt;/tr&gt;</par>
+<par def='62'>&lt;tr&gt;</par>
+<par def='63'>&lt;td&gt;&lt;input type="checkbox" onClick="UpdateDetailsDisplay();" dojoType="dijit.form.CheckBox" class="_data_UpdateDetails__TrialClassification" name="UpdateDetails_TrialClassification" id="UpdateDetails_TrialClassification2" value="2" /&gt;&lt;/td&gt;</par>
+<pardef id='82' leftmargin='4.0431in' firstlineleftmargin='3in' tabs='L1in'/>
+<par def='82'>&lt;td&gt;&lt;label for="UpdateDetails_TrialClassification2"&gt;Involves the use of a Therapeutic Device&lt;/label&gt;&lt;/td&gt;</par>
+<par def='63'>&lt;td&gt;&lt;input type="checkbox" onClick="UpdateDetailsDisplay();" dojoType="dijit.form.CheckBox" class="_data_UpdateDetails__TrialClassification" name="UpdateDetails_TrialClassification" id="UpdateDetails_TrialClassification2A" value="2A" /&gt;&lt;/td&gt;</par>
+<par def='82'>&lt;td&gt;&lt;label for="UpdateDetails_TrialClassification2A"&gt;Involves the use of a Medical Device&lt;/label&gt;&lt;/td&gt;</par>
+<par def='62'>&lt;/tr&gt;</par>
+<par def='64'><run><font color='red'/>&lt;!-- subform ClinicalTrial_UpdateDetailsThisTrial --&gt;</run></par><subformref
+><code event='value'><formula>@If(clinicaltrialtype="CTN" | @Contains(@LowerCase(query_string);"ctn") | @Contains(@LowerCase(query_string);"&amp;type=ctn"); "ClinicalTrial_UpdateDetailsThisTrial"; "")</formula></code></subformref>
+<par def='62'>&lt;tr&gt;</par>
+<par def='63'>&lt;td&gt;&lt;input type="checkbox" onClick="UpdateDetailsDisplay();" dojoType="dijit.form.CheckBox" class="_data_UpdateDetails__TrialClassification" name="UpdateDetails_TrialClassification" id="UpdateDetails_TrialClassification8" value="8" /&gt;&lt;/td&gt;</par>
+<par def='81'>&lt;td&gt;&lt;label for="UpdateDetails_TrialClassification8"&gt;Involves a Genetically Modified Organism&lt;/label&gt;&lt;/td&gt;</par>
+<par def='63'>&lt;td&gt;&lt;input type="checkbox" onClick="UpdateDetailsDisplay();" dojoType="dijit.form.CheckBox" class="_data_UpdateDetails__TrialClassification" name="UpdateDetails_TrialClassification" id="UpdateDetails_TrialClassification11" value="11" /&gt;&lt;/td&gt;</par>
+<par def='81'>&lt;td&gt;&lt;label for="UpdateDetails_TrialClassification11"&gt;Involves gene therapy&lt;/label&gt;&lt;/td&gt;</par>
+<par def='81'/>
+<par def='62'>&lt;/tr&gt;</par>
+<par def='62'>&lt;tr&gt;</par>
+<par def='63'>&lt;td&gt;&lt;input type="checkbox" onClick="UpdateDetailsDisplay();" dojoType="dijit.form.CheckBox" class="_data_UpdateDetails__TrialClassification" name="UpdateDetails_TrialClassification" id="UpdateDetails_TrialClassification10" value="10" /&gt;&lt;/td&gt;</par>
+<par def='81'>&lt;td&gt;&lt;label for="UpdateDetails_TrialClassification10"&gt;Is a multicentre trial in Australia&lt;/label&gt;&lt;/td&gt;</par>
+<par def='63'>&lt;td&gt;&lt;input type="checkbox" onClick="UpdateDetailsDisplay();" dojoType="dijit.form.CheckBox" class="_data_UpdateDetails__TrialClassification" name="UpdateDetails_TrialClassification" id="UpdateDetails_TrialClassification5" value="5" /&gt;&lt;/td&gt;</par>
+<par def='81'>&lt;td&gt;&lt;label for="UpdateDetails_TrialClassification5"&gt;Has relevant preceding trials&lt;/label&gt;&lt;/td&gt;</par>
+<par def='81'/>
+<par def='62'>&lt;/tr&gt;</par>
+<par def='61'>&lt;/table&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='80'>&lt;tr&gt;</par>
+<par def='60'>&lt;td nowrap class="n1"&gt;Expected Trial Start Date&lt;/td&gt;&lt;td&gt;&lt;input type="text" dojoType="dijit.form.DateTextBox" id="UpdateDetails_TrialStartDate" class="_data_UpdateDetails__TrialStartDate" constraints={datePattern:'dd/MM/yyyy'} placeHolder="22/04/1931" promptMessage="Use the dd/MM/yyyy format if entering the date manually. It cannot  be a date in the past." style="width:75px;" onChange="var myDate = new Date(arguments[0]); dijit.byId('UpdateDetails_TrialFinishDate').constraints.min = myDate.setDate(myDate.getDate()+1); dijit.byId('dialog_Site_ExpectedSiteStartDate').constraints.min = myDate.setDate(myDate.getDate()-1)"  /&gt;&lt;/td&gt;</par>
+<par def='80'>&lt;/tr&gt;</par>
+<par def='80'>&lt;tr&gt;</par>
+<par def='60'>&lt;td nowrap class="n1"&gt;Expected Completion Date&lt;/td&gt;&lt;td&gt;&lt;input type="text" dojoType="dijit.form.DateTextBox" id="UpdateDetails_TrialFinishDate" class="_data_UpdateDetails__TrialFinishDate" constraints={datePattern:'dd/MM/yyyy'} placeHolder="19/12/1990" promptMessage="Use the dd/MM/yyyy format if entering the date manually. It cannot  be a date in the past." style="width:75px;"  onChange="var myDate = new Date(arguments[0]); dijit.byId('dialog_Site_ExpectedSiteStartDate').constraints.max = myDate.setDate(myDate.getDate());" /&gt;&lt;/td&gt;</par>
+<par def='80'>&lt;/tr&gt;</par>
+<par def='80'>&lt;tr&gt;</par>
+<par def='60'>&lt;td nowrap class="n1"&gt;Total number of participants&lt;br /&gt;to be enrolled in the Trial&lt;/td&gt;</par>
+<par def='60'>&lt;td&gt;&lt;div dojoType="dijit.form.ComboBox" store="djstore_TotalPatients" id="UpdateDetails_TotalPatients" class="_data_UpdateDetails__TotalPatients" style="width:100px;" &gt;&lt;/div&gt;&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr&gt;</par>
+<par def='65'>&lt;td class="n1"&gt;Therapeutic Area&lt;/td&gt;</par>
+<par def='65'>&lt;td&gt;&lt;div dojoType="dijit.form.ComboBox" store="djstore_Theraarea" id="UpdateDetails_TrialTherapeuticArea" class="_data_UpdateDetails__TrialTherapeuticArea" style="width:300px;" /&gt;&lt;/td&gt;</par>
+<par def='66'>&lt;/tr&gt;</par>
+<par def='66'/>
+<par def='58'>&lt;tr id="updatedetails_gmo_row1" style="display:none"&gt;</par>
+<par def='60'>&lt;td class="n1"&gt;Details of Genetically Modified Organism&lt;/td&gt;</par>
+<par def='60'>&lt;td&gt;</par>
+<par def='61'>&lt;textarea dojoType="dijit.form.Textarea" id="UpdateDetails_GMO" class="_data_UpdateDetails__GMO" style="width:100%;" maxLength="5000" &gt;&lt;/textarea&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="updatedetails_nanoparticles_row1" style="display:none"&gt;</par>
+<par def='60'>&lt;td class="n1"&gt;Details of Nanoparticles&lt;/td&gt;</par>
+<par def='60'>&lt;td&gt;</par>
+<par def='61'>&lt;textarea dojoType="dijit.form.Textarea" id="UpdateDetails_Nanoparticles" class="_data_UpdateDetails__Nanoparticles" style="width:100%;" maxLength="5000"&gt;&lt;/textarea&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="updatedetails_genetherapy_row1" style="display:none"&gt;</par>
+<par def='60'>&lt;td class="n1"&gt;Details of Gene Therapy&lt;/td&gt;</par>
+<par def='60'>&lt;td&gt;</par>
+<par def='61'>&lt;textarea dojoType="dijit.form.Textarea" id="UpdateDetails_GeneTherapyDetails" class="_data_UpdateDetails__GeneTherapyDetails" style="width:100%;" maxLength="500"&gt;&lt;/textarea&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'/>
+<par def='58'>&lt;tr&gt;</par>
+<par def='60'>&lt;td nowrap class="n1"&gt;Additional Trial Site Details&lt;/td&gt;</par>
+<par def='60'>&lt;td&gt;</par>
+<par def='61'>&lt;div dojoType="dijit.form.Button" label="Add Site" id="UpdateDetails_Button_AddSite"&gt;</par>
+<par def='68'>&lt;script type="dojo/method" event="onClick"&gt;</par>
+<par def='63'>UpdateDetails_Button_AddSite_onClick();</par>
+<par def='68'>&lt;/script&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='61'>&lt;div dojoType="dijit.form.Button" label="Remove Selected Site(s)" id="UpdateDetails_Button_RemoveSite"&gt;</par>
+<par def='68'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='63'>UpdateDetails_Button_RemoveSite_onClick();</par>
+<par def='69'>&lt;/script&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='61'/>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr&gt;</par>
+<par def='60'>&lt;td colspan="2"&gt;</par>
+<par def='28'>&lt;div style="border:1px solid #8BA0BD"&gt;</par>
+<par def='29'>&lt;div dojoType="dojox.grid.EnhancedGrid" id="UpdateDetails_Sites" structure="[{name:'Site', field:'TrialSite', width:'auto'}, {name:'Site Address', field:'TrialSiteAddress', width:'auto'}, {name:'State', field:'TrialSiteState_Label', width:'auto'},{name:'Principal Investigator', field:'PrincipalInvestigatorName', width:'auto'}, {name:'HREC Name', field:'HRECName', width:'auto'}, {name:'HREC Code', field:'HRECCode', width:'auto'}, {name:'Approving Authority', field:'ApprovingAuthorityName', width:'auto'},{name:'Open',get:formatterButtonEdit}]" plugins="{indirectSelection:true}" query="{RecordUNID:'*'}" minChars="3" style="height:140px; width:100%; border:1px solid #8BA0BD !important" noDataMessage="Trial Sites Details"&gt;</par>
+<par def='29'>&lt;script type="dojo/method"  event="onDblClick"&gt;</par>
+<par def='70'>UpdateDetails_Sites_onDblClick(this);</par>
+<par def='68'>&lt;/script&gt;</par>
+<par def='29'>&lt;/div&gt;</par>
+<par def='28'>&lt;/div&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='67'>&lt;/table&gt;</par>
+<par def='67'>&lt;table width="100%"&gt;</par>
+<par def='58'>&lt;tr&gt;</par>
+<par def='60'>&lt;td colspan=2&gt;&lt;hr /&gt;&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;&lt;tr id="heading_biodevmed_row1UD"&gt;</par>
+<par def='27'>&lt;td colspan="2" style="text-align:left; font-weight:bold;"&gt;Biologicals / Devices / Medicine Details&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="updatedetails_biologicals_row4" style="display:none"&gt;&lt;td colspan="2"&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="updatedetails_biologicals_row1" style="display:none"&gt;</par>
+<par def='60'>&lt;td nowrap class="n1"&gt;Biological Details&lt;/td&gt;&lt;td&gt;</par>
+<par def='61'>&lt;div dojoType="dijit.form.Button" label="Add Biological" id="UpdateDetails_Button_AddBiological"&gt;</par>
+<par def='68'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='63'>UpdateDetails_Button_AddBiological_onClick();</par>
+<par def='68'>&lt;/script&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='61'>&lt;div dojoType="dijit.form.Button" label="Remove Selected Biological(s)" id="UpdateDetails_Button_RemoveBiological"&gt;</par>
+<par def='68'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='63'>UpdateDetails_Button_RemoveBiological_onClick();</par>
+<par def='69'>&lt;/script&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="updatedetails_biologicals_row2" style="display:none"&gt;</par>
+<par def='60'>&lt;td colspan="2"&gt;</par>
+<par def='28'>&lt;script&gt;</par>
+<par def='29'>var make_Country_Label = function(rowIndex, item){</par>
+<par def='70'>makeCountryLabel(item);</par>
+<par def='71'>}</par>
+<par def='28'>&lt;/script&gt;</par>
+<par def='28'>&lt;div style="border:1px solid #8BA0BD"&gt;</par>
+<par def='29'>&lt;div dojoType="dojox.grid.EnhancedGrid" id="UpdateDetails_Biologicals" structure="[{name: 'Trade/Product/Code Name', field: 'ProductName', width: 'auto' }, { name: 'Dosage Form', field: 'DosageForm_Label', width: 'auto' },{ name: 'Route of Administration', field: 'RouteOfAdmin_Label', width: 'auto' },{name:'Open',get:formatterButtonEdit}]" plugins="{indirectSelection:true}" query="{RecordUNID:'*'}" minChars="3" style="height:140px; width:100%; border:1px solid #8BA0BD !important" noDataMessage=" Biological Details"&gt;</par>
+<par def='68'>&lt;script type="dojo/method"  event="onDblClick"&gt;</par>
+<pardef id='83' leftmargin='3.2500in' firstlineleftmargin='3in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='83'>UpdateDetails_Biologicals_onDblClick(this);</par>
+<par def='68'>&lt;/script&gt;</par>
+<par def='29'>&lt;/div&gt;</par>
+<par def='28'>&lt;/div&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='26'>&lt;tr id="updatedetails_biologicals_row3" style="display:none"&gt;</par>
+<par def='60'>&lt;td nowrap  class="n1"&gt;Product Description&lt;/td&gt;</par>
+<par def='60'>&lt;td&gt;</par>
+<par def='61'>&lt;textarea dojoType="dijit.form.Textarea" style="width:100%" id="UpdateDetails_BiologicalProductDescription" class="_data_UpdateDetails__BiologicalProductDescription" maxLength="5000" wrap="soft"&gt;&lt;/textarea&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='26'>&lt;tr id="updatedetails_biologicals_row5" style="display:none"&gt;</par>
+<par def='60'>&lt;td nowrap  class="n1"&gt;For a biological not in Phase 1, is the biological manufactured in Australia?&lt;/td&gt;</par>
+<par def='60'>&lt;td&gt;&lt;span id="UpdateDetails_BiologicalNotInPhaseOne"&gt;</par>
+<par def='28'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="UpdateDetails_BiologicalNotInPhaseOne" id="UpdateDetails_BiologicalNotInPhaseOneYes" class="_data_UpdateDetails__BiologicalNotInPhaseOne" value="Yes" /&gt;</par>
+<par def='28'>&lt;label for="UpdateDetails_BiologicalNotInPhaseOneYes" id="UpdateDetails_BiologicalNotInPhaseOneYes_label"&gt;Yes&lt;/label&gt;</par>
+<par def='28'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="UpdateDetails_BiologicalNotInPhaseOne" id="UpdateDetails_BiologicalNotInPhaseOneNo" class="_data_UpdateDetails__BiologicalNotInPhaseOne" value="No"/&gt;</par>
+<par def='28'>&lt;label for="UpdateDetails_BiologicalNotInPhaseOneNo" id="UpdateDetails_BiologicalNotInPhaseOneNo_label"&gt;No&lt;/label&gt;</par>
+<par def='28'>&lt;/span&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='26'>&lt;tr id="updatedetails_biologicals_row6" style="display:none"&gt;</par>
+<par def='60'>&lt;td nowrap  class="n1"&gt;Manufacturer details (name, address and/or GMP licence)&lt;/td&gt;</par>
+<par def='60'>&lt;td&gt;</par>
+<par def='61'>&lt;textarea dojoType="dijit.form.Textarea" style="width:100%" id="UpdateDetails_BiologicalManufacturerDetails" class="_data_UpdateDetails__BiologicalManufacturerDetails" maxLength="1000" wrap="soft"&gt;&lt;/textarea&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="updatedetails_excipients_row3" style="display:none"&gt;&lt;td colspan="2"&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="updatedetails_excipients_row1" style="display:none"&gt;</par>
+<par def='60'>&lt;td nowrap  class="n1"&gt;Animal Excipient Details&lt;/td&gt;&lt;td&gt;</par>
+<par def='61'>&lt;div dojoType="dijit.form.Button" label="Add Animal Excipient" id="UpdateDetails_Button_AddAnimalExcipient"&gt;</par>
+<par def='68'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='63'>UpdateDetails_Button_AddAnimalExcipient_onClick();</par>
+<par def='68'>&lt;/script&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='61'>&lt;div dojoType="dijit.form.Button" label="Remove Selected Excipient(s)" id="UpdateDetails_Button_RemoveAnimalExcipient"&gt;</par>
+<par def='68'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='63'>UpdateDetails_Button_RemoveAnimalExcipient_onClick();</par>
+<par def='69'>&lt;/script&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="updatedetails_excipients_row2" style="display:none"&gt;</par>
+<par def='60'>&lt;td colspan="2"&gt;</par>
+<par def='28'>&lt;div style="border:1px solid #8BA0BD"&gt;</par>
+<par def='29'>&lt;div dojoType="dojox.grid.EnhancedGrid" id="UpdateDetails_AnimalExcipients" structure="[{name: 'Product Name', field: 'ProductName', width: 'auto' },{name: 'Species of Origin', field: 'AnimalOrigin_Label', width: 'auto' },{name: 'Tissue', field: 'AnimalPart_Label', width: 'auto' },{name: 'Preparation', field: 'AnimalPreparation_Label', width: 'auto' },{name: 'Country of Origin', field: 'Country_Label', width: 'auto' },{name:'Open',get:formatterButtonEdit}]" query="{RecordUNID:'*'}" minChars="3" plugins="{indirectSelection:true}" style="height:140px; width:100%;" noDataMessage="Animal Excipient Details"&gt;</par>
+<par def='29'>&lt;script type="dojo/method"  event="onDblClick"&gt;</par>
+<par def='70'>UpdateDetails_AnimalExcipients_onDblClick(this);</par>
+<par def='68'>&lt;/script&gt;</par>
+<par def='29'>&lt;/div&gt;</par>
+<par def='28'>&lt;/div&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="updatedetails_medicine_row3" style="display:none"&gt;&lt;td colspan="2"&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="updatedetails_medicine_row1" style="display:none"&gt;</par>
+<par def='60'>&lt;td nowrap class="n1"&gt;Medicine Details&lt;/td&gt;&lt;td&gt;</par>
+<par def='61'>&lt;div dojoType="dijit.form.Button" label="Add Medicine" id="UpdateDetails_Button_AddMedicine"&gt;</par>
+<par def='68'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='63'>UpdateDetails_Button_AddMedicine_onClick();</par>
+<par def='68'>&lt;/script&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='61'>&lt;div dojoType="dijit.form.Button" label="Remove Selected Medicine(s)" id="UpdateDetails_Button_RemoveMedicine"&gt;</par>
+<par def='68'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='63'>UpdateDetails_Button_RemoveMedicine_onClick();</par>
+<par def='69'>&lt;/script&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="updatedetails_medicine_row2" style="display:none"&gt;</par>
+<par def='60'>&lt;td colspan="2"&gt;</par>
+<par def='28'>&lt;div style="border:1px solid #8BA0BD"&gt;</par>
+<par def='29'>&lt;div dojoType="dojox.grid.EnhancedGrid" id="UpdateDetails_Medicines" structure="[{name:'Trade/Product/Code Name', field:'TradeCodeName', width:'auto'},{name:'Dosage Form',field:'DosageForm_Label',width:'auto'},{name:'Route of Administration', field:'RouteOfAdmin_Label',width:'auto'},{get: formatterIntendedUse, name:'Intended Use',width:'auto'},{name:'Open',get:formatterButtonEdit}]" plugins="{indirectSelection:true}" query="{RecordUNID:'*'}" minChars="3" style="height:140px; width:100%; border:1px solid #8BA0BD !important" noDataMessage="Medicine Details"&gt;</par>
+<par def='29'>&lt;script type="dojo/method"  event="onDblClick"&gt;</par>
+<par def='70'>UpdateDetails_Medicines_onDblClick(this);</par>
+<par def='68'>&lt;/script&gt;</par>
+<par def='68'>&lt;/div&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="updatedetails_devices_row3" style="display:none"&gt;&lt;td colspan="2"&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="updatedetails_devices_row1" style="display:none"&gt;</par>
+<par def='60'>&lt;td nowrap class="n1"&gt;Device Details&lt;/td&gt;&lt;td&gt;</par>
+<par def='61'>&lt;div dojoType="dijit.form.Button" label="Add Device" id="UpdateDetails_Button_AddDevices"&gt;</par>
+<par def='68'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='63'>UpdateDetails_Button_AddDevices_onClick();</par>
+<par def='68'>&lt;/script&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='61'>&lt;div dojoType="dijit.form.Button" label="Remove Selected Device(s)" id="UpdateDetails_Button_RemoveDevices"&gt;</par>
+<par def='68'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='63'>UpdateDetails_Button_RemoveDevices_onClick();</par>
+<par def='69'>&lt;/script&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="updatedetails_devices_row2" style="display:none"&gt;</par>
+<par def='60'>&lt;td colspan="2"&gt;</par>
+<par def='28'>&lt;div style="border:1px solid #8BA0BD"&gt;</par>
+<par def='29'>&lt;div dojoType="dojox.grid.EnhancedGrid" id="UpdateDetails_Devices" structure="[{name: 'Product Name', field: 'ProductName', width: 'auto' },{name: 'Manufacturer', field: 'Manufacturer', width: 'auto' },{name: 'Description', field: 'Description', width: 'auto' },{get: formatterIntendedUse, name:'Intended Purpose',width:'auto'},{name:'Open',get:formatterButtonEdit}]" plugins="{indirectSelection:true}" query="{RecordUNID:'*'}" minChars="3" style="height:140px; width:100%; border:1px solid #8BA0BD !important" noDataMessage="Devices Details"&gt;</par>
+<par def='29'>&lt;script type="dojo/method"  event="onDblClick"&gt;</par>
+<par def='70'>UpdateDetails_Devices_onDblClick(this);</par>
+<par def='68'>&lt;/script&gt;</par>
+<par def='29'>&lt;/div&gt;</par>
+<par def='28'>&lt;/div&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='26'>&lt;tr id="updatedetails_countries_row1" style="display:none"&gt;&lt;td colspan="2"&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='26'>&lt;tr id="updatedetails_countries_row2" style="display:none"&gt;</par>
+<par def='27'>&lt;td class="n1"&gt;This trial is being conducted in the following Countries&lt;/td&gt;</par>
+<par def='27'>&lt;td&gt;</par>
+<par def='28'>&lt;div id="UpdateDetails_TrialConductedinCountryList" placeHolder="Select Country then Click Add" dojoType="dijit.form.FilteringSelect" autocomplete="true" style="width:275px" required="false" store="djstore_Countries" &gt;&lt;/div&gt;</par>
+<par def='28'>&lt;div dojoType="dijit.form.Button" label="Add Country" id="UpdateDetails_Button_AddCountry" onClick="TrialCountriesAdd('UpdateDetails')"&gt;&lt;/div&gt;</par>
+<par def='28'>&lt;div dojoType="dijit.form.Button" label="Remove Country(ies)" id="UpdateDetails_Button_RemoveCountry"&gt;</par>
+<par def='29'>&lt;script type="dojo/method" event="onClick"&gt;</par>
+<par def='70'>UpdateDetails_Button_RemoveCountry_onClick();</par>
+<par def='29'>&lt;/script&gt;</par>
+<par def='28'>&lt;/div&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr id="updatedetails_countries_row3" style="display:none"&gt;</par>
+<par def='60'>&lt;td colspan="2"&gt;</par>
+<par def='28'>&lt;div style="border:1px solid #8BA0BD; width:100%;"&gt;</par>
+<par def='28'>&lt;div dojoType="dojox.grid.EnhancedGrid" plugins="{indirectSelection:true}" class="_data_UpdateDetails__TrialConductedInCountries" style="height:140px; width:100%;" id="UpdateDetails_TrialConductedInCountries" structure="[ {name:'Countries Selected', field:'TrialConductedInCountry_Label', width:'auto' }]" clientSort="true" noDataMessage="Trial Countries List"&gt;&lt;/div&gt;</par>
+<par def='28'>&lt;/div&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='42'><run><font color='red'/>&lt;!-- subform ClinicalTrial_UpdateDetailsPlacebo --&gt;</run></par><subformref
+><code event='value'><formula>@If(clinicaltrialtype="CTN" | @Contains(@LowerCase(query_string);"ctn") | @Contains(@LowerCase(query_string);"&amp;type=ctn"); "ClinicalTrial_UpdateDetailsPlacebo"; "")</formula></code></subformref>
+<par def='72'>&lt;tr  id="updatedetails_trials_row2" style="display:none"&gt;</par>
+<par def='73'>&lt;td colspan="2"&gt;</par>
+<par def='74'>&lt;hr /&gt;</par>
+<par def='73'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='26'>&lt;tr id="updatedetails_trials_row1" style="display:none"&gt;</par>
+<par def='27'>&lt;td class="n1" style="vertical-align:top;"&gt;Preceding Trials&lt;/td&gt;</par>
+<par def='27'>&lt;td&gt;</par>
+<par def='28'>&lt;select multiple="multiple" dojoType="dojox.form.CheckedMultiSelect" id="UpdateDetails_PrecedingTrials" style="width:480px;max-height:300px;overflow:auto;" store= "djstore_PrecedingTrials" class="_data_UpdateDetails__PrecedingTrials"&gt;&lt;/select&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='72'>&lt;/tr&gt;</par>
+<par def='75'><run><font color='green'/>&lt;!-- no preceding trials --&gt;</run></par>
+<par def='75'>&lt;tr id="updatedetails_no_trials_row1" style="display:none"&gt;</par>
+<par def='73'>&lt;td class="n1" style="vertical-align:top;"&gt;Preceding Trials&lt;/td&gt;</par>
+<par def='73'>&lt;td&gt;&lt;span id="ud_no_pt"&gt;&lt;/span&gt;&lt;/td&gt;</par>
+<par def='76'>&lt;/tr&gt;</par>
+<par def='77'>&lt;tr  id="updatedetails_no_trials_row2"&gt;</par>
+<par def='78'>&lt;td colspan=2&gt;</par>
+<par def='79'>&lt;hr /&gt;</par>
+<par def='78'>&lt;/td&gt;</par>
+<par def='77'>&lt;/tr&gt;</par>
+<pardef id='84' leftmargin='2in' firstlineleftmargin='1.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='84'>&lt;/table&gt;</par>
+<par def='53'>&lt;/div&gt;</par>
+<par def='53'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='52' hidewhenexpanded='true' color='#c0e1ff' borderstyle='tabdiag'><text
+>Tab: Completion</text></sectiontitle>
+<par def='53'>&lt;div dojoType="dijit.layout.ContentPane" title="Completion" id="djtabs_Completion"&gt;</par>
+<par def='39'>&lt;table width="100%"&gt;</par>
+<par def='26'>&lt;tr&gt;&lt;td class="m1header"&gt;Always Required&lt;/td&gt;&lt;td class="c1header"&gt;Required under certain conditions&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='58'>&lt;tr&gt;</par>
+<par def='60'>&lt;td nowrap class="n1" style="width:10%"&gt;Name&lt;/td&gt;&lt;td style="width:90%"&gt;&lt;div dojoType="dijit.form.ValidationTextBox" class="_data_Completion__ContactName" id="Completion_ContactName" style="width:300px;" maxLength="150" &gt;&lt;/div&gt;&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='60'>&lt;td nowrap class="n1"&gt;Position&lt;/td&gt;&lt;td&gt;&lt;div dojoType="dijit.form.ValidationTextBox" class="_data_Completion__ContactPosition" id="Completion_ContactPosition" style="width:300px;" maxLength="150" &gt;&lt;/div&gt;&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='60'>&lt;td nowrap class="n1"&gt;Contact Phone Number&lt;/td&gt;&lt;td&gt;&lt;div dojoType="dijit.form.ValidationTextBox" class="_data_Completion__ContactPhone" id="Completion_ContactPhone" placeHolder="eg: 0912345678" maxLength="10" regExp="^\({0,1}((0|\+61)(2|4|3|7|8)){0,1}\){0,1}(\ |-){0,1}[0-9]{2}(\ |-){0,1}[0-9]{2}(\ |-){0,1}[0-9]{1}(\ |-){0,1}[0-9]{3}$" required=true&gt;&lt;/div&gt;&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='60'>&lt;td nowrap class="n1"&gt;Contact Email&lt;/td&gt;&lt;td&gt;&lt;div dojoType="dijit.form.ValidationTextBox" class="_data_Completion__ContactEmail" style="width:300px;" id="Completion_ContactEmail" placeHolder="email.address@domain.com.au" required=true&gt;&lt;/div&gt;&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='60'>&lt;td nowrap class="n1"&gt;Date Trial Completed&lt;/td&gt;&lt;td&gt;&lt;input type="text" dojoType="dijit.form.DateTextBox" class="_data_Completion__TrialCompletionDate" id="Completion_TrialCompletionDate" constraints={datePattern:'dd/MM/yyyy'} placeHolder="19/12/1990" promptMessage="Use the dd/MM/yyyy format if entering the date manually" style="width:75px;" /&gt;&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='60'>&lt;td nowrap class="n1"&gt;Completion Reason&lt;/td&gt;&lt;td&gt;&lt;div dojoType="dijit.form.ComboBox" class="_data_Completion__CompletionReason" store="djstore_CompDet" id="Completion_CompletionReason" onChange="CompletionDisplay(this)" style="width:300px;" required=true&gt;&lt;/div&gt;&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;&lt;tr id="completion_details_row1" style="display:none;"&gt;</par>
+<par def='60'>&lt;td class="n1"&gt;Completion Details&lt;/td&gt;</par>
+<par def='60'>&lt;td&gt;</par>
+<par def='61'>&lt;textarea dojoType="dijit.form.Textarea" id="Completion_CompletionDetails" class="_data_Completion__CompletionDetails" style="height:3.5em; width:100%" maxSize="500" maxLength="500" wrap="soft"&gt;&lt;/textarea&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<pardef id='85' leftmargin='2.2500in' firstlineleftmargin='1.7500in' tabs='L1in'/>
+<par def='85'>&lt;/table&gt;</par>
+<par def='53'>&lt;/div&gt;</par>
+<par def='52'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='37' hidewhenexpanded='true' color='#c0e1ff' borderstyle='tabdiag'><text
+>Tab: Validation</text></sectiontitle>
+<pardef id='86' leftmargin='2.7021in' rightmargin='100%' firstlineleftmargin='1.5000in'/>
+<par def='86'>&lt;div dojoType="dijit.layout.LayoutContainer" id="djtabs_Validation" title="Validation messages" &gt;</par>
+<pardef id='87' leftmargin='2.7021in' rightmargin='100%' firstlineleftmargin='1.7500in'/>
+<par def='87'>&lt;div dojoType="dijit.layout.ContentPane" sizeShare="9" minSize="400px" layoutAlign="client" style="height:100%; width:100%;"&gt;</par>
+<pardef id='88' leftmargin='2.7021in' rightmargin='100%' firstlineleftmargin='2in'/>
+<par def='88'>&lt;div dojoType="dojox.grid.EnhancedGrid" id="djgrid_Validation" structure="[{field: 'ErrorMessage', name: 'Validation Messages', width: 'auto'}]" style="height:100%; width:100%;" noDataMessage="No validation messages to display"&gt;</par>
+<par def='88'>&lt;/div&gt;</par>
+<par def='87'>&lt;/div&gt;</par>
+<par def='86'>&lt;/div&gt;</par>
+<par def='38'/></section>
+<pardef id='89' leftmargin='2.7021in' rightmargin='100%' firstlineleftmargin='1.2500in'/>
+<par def='89'>&lt;/div&gt;</par>
+<pardef id='90' leftmargin='2.9521in' firstlineleftmargin='1in' tabs='L1in'/>
+<par def='90'>&lt;/div&gt;</par>
+<pardef id='91' leftmargin='0.7500in'/>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='91' color='#e1e1e1' borderstyle='tabdiag'><text>&lt;!-- dialog_Biological --&gt;</text></sectiontitle>
+<pardef id='92' leftmargin='1in'/>
+<par def='92'>&lt;div id="dialog_Biological" dojoType="dijit.Dialog" title="Biological Details" class="dialogBox1" style="width:800px;"&gt;</par>
+<par def='17'>&lt;div dojoType="dijit.layout.ContentPane" layoutAlign="client" sizeShare="9" style="overflow:auto;" minSize="250px"&gt;</par>
+<par def='53'>&lt;table&gt;</par>
+<par def='30'>&lt;tr&gt;&lt;td class="m1header"&gt;Always Required&lt;/td&gt;&lt;td class="c1header"&gt;Required under certain conditions&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='39'>&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;Trade/Product/Code Name&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;</par>
+<par def='60'>&lt;div required="true" dojoType="dijit.form.ValidationTextBox" id="dialog_Biological_ProductName" style="width:300px;" placeHolder="Please enter a Product Name"&gt;&lt;/div&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;</par><subformref><code event='value'><formula>@If(ApplicationStage = "5";
+@If(clinicaltrialtype="CTN" | @Contains(@LowerCase(query_string);"ctn") | @Contains(@LowerCase(query_string);"&amp;type=ctn"); "BiologicalTextforProcessing "; "");"")</formula></code></subformref>
+<par def='39'>&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;Is this a combination product?&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;</par>
+<par def='60'>&lt;span id="dialog_Biological_IsAComboProduct" &gt;</par>
+<par def='28'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="dialog_Biological_IsAComboProduct" id="dialog_Biological_IsAComboProductYes" value="Yes" /&gt;</par>
+<par def='28'>&lt;label for="dialog_Biological_IsAComboProductYes" id="dialog_Biological_IsAComboProductYes_Label"&gt;Yes&lt;/label&gt;</par>
+<par def='28'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="dialog_Biological_IsAComboProduct" id="dialog_Biological_IsAComboProductNo"  value="No" /&gt;</par>
+<par def='28'>&lt;label for="dialog_Biological_IsAComboProductNo" id="dialog_Biological_IsAComboProductNo_Label"&gt;No&lt;/label&gt;</par>
+<par def='27'>&lt;/span&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;</par>
+<par def='39'>&lt;tr&gt;</par>
+<par def='26'>&lt;td class="n1"&gt;Type of container&lt;/td&gt;</par>
+<par def='26'>&lt;td&gt;</par>
+<par def='27'>&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_Biological_Presentation" placeHolder="" required="true" maxLength="500" style="width:400px;"&gt;&lt;/div&gt;</par>
+<par def='26'>&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;</par>
+<par def='39'>&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;Dosage Form&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ComboBox" id="dialog_Biological_DosageForm" store="djstore_Dosage" style="width:300px;" placeHolder="Select a Dosage Form" required="true"&gt;&lt;/div&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;Route of Administration&lt;/td&gt;</par>
+<pardef id='93' leftmargin='2in'/>
+<par def='93'>&lt;td&gt;</par>
+<pardef id='94' leftmargin='2.2500in'/>
+<par def='94'>&lt;div dojoType="dijit.form.ComboBox" id="dialog_Biological_RouteOfAdmin" store="djstore_RouteOfAdministration" style="width:300px;" placeHolder="Select the Route of Administration" required="true"&gt;&lt;/div&gt;</par>
+<par def='93'>&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;</par>
+<par def='30'>&lt;tr&gt;</par>
+<par def='26'>&lt;td&gt;&amp;nbsp;&lt;/td&gt;</par>
+<par def='26'>&lt;td&gt;</par>
+<par def='27'>&lt;div dojoType="dijit.form.Button" id="dialog_BiologicalIngredients_Add" label="Add ingredients" &gt;</par>
+<par def='28'>&lt;script type="dojo/method" event="onClick"&gt;</par>
+<par def='29'>dialog_BiologicalIngredients_Add_onClick();</par>
+<par def='28'>&lt;/script&gt;</par>
+<par def='27'>&lt;/div&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.Button" label="Remove Selected Ingredient (s)" id="dialog_BiologicalIngredients_Remove"&gt;</par>
+<par def='61'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='68'>dialog_BiologicalIngredients_Remove_onClick();</par>
+<pardef id='95' leftmargin='2.7500in' firstlineleftmargin='2.5000in' tabs='L1in'/>
+<par def='95'>&lt;/script&gt;</par>
+<par def='60'>&lt;/div&gt;</par>
+<par def='26'>&lt;/td&gt;</par>
+<par def='30'>&lt;/tr&gt;</par>
+<par def='30'>&lt;tr id="Part1_BiologicalIngredientsGrid"&gt;</par>
+<par def='26'>&lt;td class="n1"&gt;Ingredients&lt;/td&gt;</par>
+<par def='26'>&lt;td colspan="2"&gt;</par>
+<par def='27'>&lt;div style="border:1px solid #8BA0BD"&gt;</par>
+<par def='28'>&lt;div dojoType="dojox.grid.EnhancedGrid" id="Part1_BiologicalIngredients" style="height:150px; width:598px; position:relative;" structure="[{name:'Name', field:'Name', width:'160px'},{name:'Quantity', field:'Quantity', width:'60px'},{name:'Unit',field:'Unit_Label',width:'100px'},{name: 'Country of origin', get:formatterCountry,width:'100px'},{name:'Open',get:formatterButtonEdit}]" query="{RecordUNID:'*'}" minChars="3" plugins="{indirectSelection:true}" noDataMessage="Biolgical Ingredients Details."&gt;</par>
+<par def='29'>&lt;script type="dojo/method"  event="onDblClick"&gt;</par>
+<par def='70'>Part1_BiologicalIngredients_onDblClick(this);</par>
+<par def='29'>&lt;/script&gt;</par>
+<par def='28'>&lt;/div&gt;</par>
+<par def='27'>&lt;/div&gt;</par>
+<par def='26'>&lt;/td&gt;</par>
+<par def='30'>&lt;/tr&gt;</par>
+<par def='30'>&lt;tr id="UpdateDetails_BiologicalIngredientsGrid"&gt;</par>
+<par def='26'>&lt;td class="n1"&gt;Ingredients&lt;/td&gt;</par>
+<par def='26'>&lt;td colspan="2"&gt;</par>
+<par def='27'>&lt;div style="border:1px solid #8BA0BD"&gt;</par>
+<par def='28'>&lt;div dojoType="dojox.grid.EnhancedGrid" id="UpdateDetails_BiologicalIngredients" style="height:150px; width:598px; position:relative;" structure="[{name:'Name', field:'Name', width:'160px'},{name:'Quantity', field:'Quantity', width:'60px'},{name:'Unit',field:'Unit_Label',width:'100px'},{name:'Open',get:formatterButtonEdit}]" query="{RecordUNID:'*'}" minChars="3" plugins="{indirectSelection:true}" noDataMessage="Change Biological Ingredients Details."&gt;</par>
+<par def='29'>&lt;script type="dojo/method"  event="onDblClick"&gt;</par>
+<par def='70'>UpdateDetails_BiologicalIngredients_onDblClick(this);</par>
+<par def='29'>&lt;/script&gt;</par>
+<par def='28'>&lt;/div&gt;</par>
+<par def='27'>&lt;/div&gt;</par>
+<par def='26'>&lt;/td&gt;</par>
+<par def='30'>&lt;/tr&gt;</par>
+<par def='30'>&lt;tr&gt;</par>
+<par def='26'>&lt;td class="n1"&gt;</par>
+<par def='27'>&lt;div dojoType="dijit.form.Button" id="dialog_Biological_Add" label="Save &amp; Close" &gt;</par>
+<par def='28'>&lt;script type="dojo/method" event="onClick"&gt;</par>
+<par def='29'>dialog_Functions_Add('dialog_Biological');</par>
+<pardef id='96' leftmargin='4.8007in' firstlineleftmargin='2.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='96'>appSave();</par>
+<par def='28'>&lt;/script&gt;</par>
+<par def='27'>&lt;/div&gt;</par>
+<par def='26'>&lt;/td&gt;</par>
+<par def='26'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.Button" id="dialog_Biological_Close" label="Close" &gt;</par>
+<par def='61'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='68'>dialog_Biological_Close_onClick();</par>
+<par def='61'>&lt;/script&gt;</par>
+<par def='60'>&lt;/div&gt;</par>
+<par def='26'>&lt;/td&gt;</par>
+<par def='30'>&lt;/tr&gt;</par>
+<par def='53'>&lt;/table&gt;</par>
+<par def='52'>&lt;/div&gt;</par>
+<par def='52'>&lt;script type="dojo/method" event="onShow"&gt;</par>
+<par def='12'>dialog_Biological_onShow();</par>
+<par def='52'>&lt;/script&gt;</par>
+<par def='92'>&lt;/div&gt;</par>
+<par def='92'/>
+<par def='92'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'
+ expanded='true'><sectiontitle pardef='91' color='#e1e1e1' borderstyle='tabdiag'><text
+>&lt;!-- dialog_BiologicalIngredient --&gt;</text></sectiontitle>
+<par def='5'>&lt;div id="dialog_BiologicalIngredient" dojoType="dijit.Dialog" class="dialogBox1"  title="Biological Ingredient Details"&gt;</par>
+<par def='13'>&lt;div dojoType="dijit.layout.ContentPane" layoutAlign="client" sizeShare="9" style="overflow:auto;" minSize="250px"&gt;</par>
+<par def='31'>&lt;table&gt;</par>
+<par def='30'>&lt;tr&gt;&lt;td class="m1header"&gt;Always Required&lt;/td&gt;&lt;td class="c1header"&gt;Required under certain conditions&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='30'>&lt;tr&gt;</par>
+<par def='26'>&lt;td class="n1"&gt;Ingredient Name&lt;/td&gt;</par>
+<par def='26'>&lt;td&gt;&lt;div dojoType="dijit.form.Textarea" id="dialog_BiologicalIngredient_Name" style="width:300px;" placeHolder="Enter Ingredient name." required="true" maxLength="500"&gt;&lt;/div&gt;&lt;/td&gt;</par>
+<par def='30'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='26'>&lt;td class="n1"&gt;Quantity&lt;/td&gt;</par>
+<par def='26'>&lt;td&gt;&lt;div dojoType="dijit.form.NumberTextBox" id="dialog_BiologicalIngredient_Quantity"   constraints="{min:0,max:1000000000,places:'0,6'}"   style="width:30%;"  placeHolder="Please enter the strength" required="true"  promptMessage="Only numbers will be accepted, up to 6 decimal digits"&gt;&lt;/div&gt;&lt;/td&gt;</par>
+<par def='30'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='26'>&lt;td class="n1"&gt;Unit&lt;/td&gt;</par>
+<par def='26'>&lt;td&gt;&lt;div dojoType="dijit.form.ComboBox" id="dialog_BiologicalIngredient_Unit" store="djstore_Unitsprop" style="width:69%;" required="true"&gt;&lt;/div&gt;&lt;/td&gt;</par>
+<par def='30'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='26'>&lt;td class="n1"&gt;Country of Origin&lt;/td&gt;</par>
+<par def='26'>&lt;td&gt;</par>
+<par def='27'>&lt;div id="dialog_BiologicalIngredientLookup_Countries" placeHolder="Select Country then Click Add" dojoType="dijit.form.FilteringSelect" autocomplete="true" store="djstore_Countries" required="false" style="width:69%;"&gt;&lt;/div&gt;</par>
+<par def='26'>&lt;/td&gt;</par>
+<par def='30'>&lt;/tr&gt;&lt;tr&gt;</par>
+<pardef id='97' leftmargin='2.5000in' rightmargin='100%' firstlineleftmargin='2in'/>
+<par def='97'>&lt;td&gt;&amp;nbsp;&lt;/td&gt;</par>
+<pardef id='98' leftmargin='2.2500in' rightmargin='100%' firstlineleftmargin='2in'/>
+<par def='98'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.Button" label="Add Country" id="dialog_BiologicalIngredient_Button_AddCountry"&gt;</par>
+<par def='61'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='68'>dialog_BiologicalIngredient_Button_AddCountry_onClick();</par>
+<par def='61'>&lt;/script&gt;</par>
+<par def='60'>&lt;/div&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.Button" label="Remove Country(ies)" id="dialog_BiologicalIngredient_Button_RemoveCountry"&gt;</par>
+<par def='61'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='68'>dialog_BiologicalIngredient_Button_RemoveCountry_onClick();</par>
+<par def='95'>&lt;/script&gt;</par>
+<par def='60'>&lt;/div&gt;</par>
+<pardef id='99' leftmargin='2.2500in' firstlineleftmargin='2in' tabs='L1in'/>
+<par def='99'>&lt;/td&gt;</par>
+<par def='85'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='99'>&lt;td&gt;&amp;nbsp;&lt;/td&gt;&lt;td&gt;</par>
+<par def='54'>&lt;div style="border:1px solid #8BA0BD"&gt;</par>
+<par def='45'>&lt;div dojoType="dojox.grid.EnhancedGrid" saveAsArray="true" plugins="{indirectSelection:true}" class="_dialog_BiologicalIngredient__CountryList" style="height:140px; width:100%;" id="dialog_BiologicalIngredient_CountryList" structure="[ {field:'label', name:'Countries Selected', width:'auto' } ]" noDataMessage="Country of Biological Origin" clientSort="true" clearOnClose="true"&gt;&lt;/div&gt;</par>
+<par def='54'>&lt;/div&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;</par>
+<par def='39'>&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;</par>
+<par def='27'>&lt;div dojoType="dijit.layout.ContentPane" layoutAlign="bottom" sizeShare="1" style="overflow:none;" minSize="30px"&gt;</par>
+<par def='28'>&lt;div dojoType="dijit.form.Button" id="dialog_BiologicalIngredient_Add" label="Save &amp; Close" &gt;</par>
+<par def='29'>&lt;script type="dojo/method" event="onClick"&gt;</par>
+<par def='70'>dialog_BiologicalIngredient_Add_onClick();</par>
+<par def='29'>&lt;/script&gt;</par>
+<par def='28'>&lt;/div&gt;</par>
+<par def='27'>&lt;/div&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;</par>
+<par def='27'>&lt;div dojoType="dijit.form.Button" id="dialog_BiologicalIngredient_Close" label="Close"&gt;</par>
+<par def='28'>&lt;script type="dojo/method" event="onClick"&gt;dijit.byId('dialog_BiologicalIngredient').hide(); &lt;/script&gt;</par>
+<par def='27'>&lt;/div&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;</par>
+<par def='31'>&lt;/table&gt;</par>
+<par def='13'>&lt;/div&gt;</par>
+<par def='13'>&lt;script type="dojo/method" event="onShow"&gt;dialog_Functions_onShow('dialog_BiologicalIngredient');&lt;/script&gt;</par>
+<par def='5'>&lt;/div&gt;</par>
+<par def='5'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='91' color='#e1e1e1' borderstyle='tabdiag'><text>&lt;!-- dialog_Medicine --&gt;</text></sectiontitle>
+<par def='92'>&lt;div id="dialog_Medicine" dojoType="dijit.Dialog" title="Medicine Details" class="dialogBox1" style="width:800px"&gt;</par>
+<par def='18'>&lt;div dojoType="dijit.layout.ContentPane" layoutAlign="client" sizeShare="9" style="overflow:auto;" minSize="300px"&gt;</par>
+<par def='39'>&lt;table&gt;</par>
+<par def='26'>&lt;tr&gt;&lt;td class="m1header"&gt;Always Required&lt;/td&gt;&lt;td class="c1header"&gt;Required under certain conditions&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='58'>&lt;tr&gt;</par>
+<par def='60'>&lt;td class="n1"&gt;Trade/Product/Code Name&lt;/td&gt;</par>
+<par def='60'>&lt;td&gt;&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_Medicine_TradeCodeName" style="width:400px;" placeHolder="Please enter a Trade/Product/Code Name" required="true" &gt;&lt;/div&gt;&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='60'>&lt;td class="n1"&gt;Is this a combination product?&lt;/td&gt;</par>
+<par def='60'>&lt;td&gt;</par>
+<par def='61'>&lt;span id="dialog_Medicine_IsAComboProduct" &gt;</par>
+<par def='29'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="dialog_Medicine_IsAComboProduct" id="dialog_Medicine_IsAComboProductYes" value="Yes" label="Yes" /&gt;</par>
+<par def='29'>&lt;label for="dialog_Medicine_IsAComboProductYes" id="dialog_Medicine_IsAComboProductYes_Label"&gt;Yes&lt;/label&gt;</par>
+<par def='29'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="dialog_Medicine_IsAComboProduct" id="dialog_Medicine_IsAComboProductNo"  value="No" label="No" /&gt;</par>
+<par def='29'>&lt;label for="dialog_Medicine_IsAComboProductNo" id="dialog_Medicine_IsAComboProductNo_Label"&gt;No&lt;/label&gt;</par>
+<par def='28'>&lt;/span&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr&gt;</par>
+<par def='27'>&lt;td class="n1"&gt;Type of container&lt;/td&gt;</par>
+<par def='27'>&lt;td&gt;</par>
+<par def='28'>&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_Medicine_Presentation" placeHolder="" required="true" maxLength="500" style="width:400px;"&gt;&lt;/div&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr&gt;</par>
+<par def='60'>&lt;td class="n1"&gt;Dosage Form&lt;/td&gt;</par>
+<par def='60'>&lt;td&gt;</par>
+<par def='61'>&lt;div dojoType="dijit.form.ComboBox" id="dialog_Medicine_DosageForm" store="djstore_Dosage" style="width:400px;" placeHolder="Select Dosage Form from drop down list" required="true"&gt;&lt;/div&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='58'>&lt;tr&gt;</par>
+<par def='60'>&lt;td class="n1"&gt;Route of Administration&lt;/td&gt;</par>
+<par def='94'>&lt;td&gt;</par>
+<par def='49'>&lt;div dojoType="dijit.form.ComboBox" id="dialog_Medicine_RouteOfAdmin" store="djstore_RouteOfAdministration" style="width:300px;" placeHolder="Select the Route of Administration" required="true"&gt;&lt;/div&gt;</par>
+<par def='94'>&lt;/td&gt;</par>
+<par def='58'>&lt;/tr&gt;</par>
+<par def='42'><run><font color='red'/>&lt;!-- subform MedicineTextforProcessingActiveName --&gt;</run></par><subformref
+><code event='value'><formula>@If(clinicaltrialtype="CTN" | @Contains(@LowerCase(query_string);"ctn") | @Contains(@LowerCase(query_string);"&amp;type=ctn"); "MedicineTextforProcessingActiveName "; "")</formula></code></subformref>
+<par def='42'><run><font color='red'/>&lt;!-- subform MedicineTextforProcessingProductStrength--&gt;</run></par><subformref
+><code event='value'><formula>@If(clinicaltrialtype="CTN" | @Contains(@LowerCase(query_string);"ctn") | @Contains(@LowerCase(query_string);"&amp;type=ctn"); "MedicineTextforProcessingProductStrength"; "")</formula></code></subformref>
+<par def='26'>&lt;tr&gt;</par>
+<par def='27'>&lt;td&gt;&lt;/td&gt;</par>
+<par def='27'>&lt;td&gt;</par>
+<par def='28'>&lt;div dojoType="dijit.form.Button" id="dialog_MedicineIngredients_Add" label="Add ingredients" &gt;</par>
+<par def='29'>&lt;script type="dojo/method" event="onClick"&gt;</par>
+<par def='70'>dialog_MedicineIngredients_Add_onClick();</par>
+<par def='29'>&lt;/script&gt;</par>
+<par def='28'>&lt;/div&gt;</par>
+<par def='61'>&lt;div dojoType="dijit.form.Button" label="Remove Selected Ingredient (s)" id="dialog_MedicineIngredients_Remove"&gt;</par>
+<par def='68'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='63'>dialog_MedicineIngredients_Remove_onClick();</par>
+<par def='69'>&lt;/script&gt;</par>
+<par def='61'>&lt;/div&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='26'>&lt;tr  id="Part1_MedicineIngredientsGrid"&gt;</par>
+<par def='27'>&lt;td class="n1"&gt;Formulation&lt;/td&gt;</par>
+<par def='27'>&lt;td colspan="2"&gt;</par>
+<par def='28'>&lt;div style="border:1px solid #8BA0BD"&gt;</par>
+<par def='29'>&lt;div dojoType="dojox.grid.EnhancedGrid" id="Part1_MedicineIngredients" style="height:150px; width:495px;" structure="[{name:'Ingredient Name', field:'Name', width:'160px'},{name:'Quantity', field:'Quantity', width:'60px'},{name:'Unit',field:'Unit_Label',width:'100px'},{name:'Open',get:formatterButtonEdit}]" query="{RecordUNID:'*'}" minChars="3" plugins="{indirectSelection:true}" noDataMessage="Medicine Ingredients Details."&gt;</par>
+<par def='70'>&lt;script type="dojo/method"  event="onDblClick"&gt;</par>
+<pardef id='100' leftmargin='3.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='100'>Part1_MedicineIngredients_onDblClick(this);</par>
+<par def='70'>&lt;/script&gt;</par>
+<par def='29'>&lt;/div&gt;</par>
+<par def='28'>&lt;/div&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='26'>&lt;tr id="UpdateDetails_MedicineIngredientsGrid"&gt;</par>
+<par def='27'>&lt;td class="n1"&gt;Formulation&lt;/td&gt;</par>
+<par def='27'>&lt;td colspan="2"&gt;</par>
+<par def='28'>&lt;div style="border:1px solid #8BA0BD"&gt;</par>
+<par def='29'>&lt;div dojoType="dojox.grid.EnhancedGrid" id="UpdateDetails_MedicineIngredients" style="height:150px; width:495px;" structure="[{name:'Name', field:'Name', width:'auto'},{name:'Quantity', field:'Quantity', width:'60px'},{name:'Unit',field:'Unit_Label',width:'100px'},{name:'Open',get:formatterButtonEdit}]" query="{RecordUNID:'*'}" minChars="3" plugins="{indirectSelection:true}" noDataMessage="Change Medicine Ingredients Details."&gt;</par>
+<par def='70'>&lt;script type="dojo/method"  event="onDblClick"&gt;</par>
+<par def='100'>UpdateDetails_MedicineIngredients_onDblClick(this);</par>
+<par def='70'>&lt;/script&gt;</par>
+<par def='29'>&lt;/div&gt;</par>
+<par def='28'>&lt;/div&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='26'>&lt;tr&gt;</par>
+<par def='60'>&lt;td class="n1"&gt;Indication&lt;/td&gt;</par>
+<par def='27'>&lt;td&gt;</par>
+<par def='61'>&lt;textarea dojoType="dijit.form.Textarea" style="width:400px;" id="dialog_Medicine_Indication" class="_data_Medicine__Indication" maxLength="4000" wrap="soft"&gt;&lt;/textarea&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='26'>&lt;tr&gt;</par>
+<par def='60'>&lt;td class="n1"&gt;Dosage and Frequency&lt;/td&gt;</par>
+<par def='27'>&lt;td&gt;</par>
+<par def='61'>&lt;textarea dojoType="dijit.form.Textarea" style="width:400px;" id="dialog_Medicine_DosageFrequency" class="_data_Medicine__DosageFrequency" maxLength="500" wrap="soft"&gt;&lt;/textarea&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='26'>&lt;tr&gt;</par>
+<par def='60'>&lt;td class="n1"&gt;Intended Use&lt;/td&gt;</par>
+<par def='27'>&lt;td&gt;&lt;span id="dialog_Medicine_IntendedUse" &gt;</par>
+<par def='61'>&lt;table&gt;</par>
+<par def='68'>&lt;tr&gt;&lt;td&gt;</par>
+<par def='70'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="dialog_Medicine_IntendedUse" id="dialog_Medicine_IntendedUseC" value="C" label="Comparator" /&gt;</par>
+<par def='70'>&lt;label for="dialog_Medicine_IntendedUseC"&gt;Comparator&lt;/label&gt;</par>
+<par def='29'>&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='68'>&lt;tr&gt;&lt;td&gt;</par>
+<par def='70'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="dialog_Medicine_IntendedUse" id="dialog_Medicine_IntendedUseI"  value="I" label="Investigational Medicinal Product" /&gt;</par>
+<par def='70'>&lt;label for="dialog_Medicine_IntendedUseI"&gt;Investigational Medicinal Product&lt;/label&gt;</par>
+<par def='29'>&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='68'>&lt;tr&gt;&lt;td&gt;</par>
+<par def='70'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="dialog_Medicine_IntendedUse" id="dialog_Medicine_IntendedUseS"  value="S" label="Standard Care Therapy" /&gt;</par>
+<par def='70'>&lt;label for="dialog_Medicine_IntendedUseS"&gt;Standard Care Therapy&lt;/label&gt;</par>
+<par def='29'>&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='28'>&lt;/table&gt;</par>
+<par def='28'>&lt;/span&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='26'>&lt;tr&gt;</par>
+<par def='60'>&lt;td nowrap  class="n1"&gt;Is the medicine manufactured in Australia?&lt;/td&gt;</par>
+<par def='60'>&lt;td valign="top"&gt;</par>
+<par def='28'>&lt;span id="dialog_Medicine_MedicineNotInPhaseOne" &gt;</par>
+<par def='29'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="dialog_Medicine_MedicineNotInPhaseOne" id="dialog_Medicine_MedicineNotInPhaseOneYes" value="Yes" label="Yes" /&gt;</par>
+<par def='29'>&lt;label for="dialog_Medicine_MedicineNotInPhaseOneYes" id="dialog_Medicine_MedicineNotInPhaseOneYes_Label"&gt;Yes&lt;/label&gt;</par>
+<par def='29'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="dialog_Medicine_MedicineNotInPhaseOne" id="dialog_Medicine_MedicineNotInPhaseOneNo"  value="No" label="No"  checked /&gt;</par>
+<par def='29'>&lt;label for="dialog_Medicine_MedicineNotInPhaseOneNo" id="dialog_Medicine_MedicineNotInPhaseOneNo_Label"&gt;No&lt;/label&gt;</par>
+<par def='28'>&lt;/span&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='26'>&lt;tr&gt;&lt;td&gt;&amp;nbsp;&lt;/td&gt;&lt;td&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='26'>&lt;tr&gt;</par>
+<par def='60'>&lt;td nowrap  class="n1"&gt;Manufacturer details &lt;br /&gt;(Please provide name, address and/or &lt;br /&gt;GMP licence number or relevant exemption)&lt;/td&gt;</par>
+<par def='60'>&lt;td valign="top"&gt;</par>
+<par def='61'>&lt;textarea dojoType="dijit.form.Textarea" style="width:400px;" id="dialog_Medicine_MedicineManufacturerDetails" class="_data_Medicine_MedicineManufacturerDetails" maxLength="1000" wrap="soft"&gt;&lt;/textarea&gt;</par>
+<par def='60'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='26'>&lt;tr&gt;&lt;td&gt;&amp;nbsp;&lt;/td&gt;&lt;td&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='26'>&lt;tr&gt;</par>
+<par def='27'>&lt;td class="n1"&gt;</par>
+<par def='28'>&lt;div dojoType="dijit.form.Button" id="dialog_Medicine_Add" label="Save &amp; Close" &gt;</par>
+<pardef id='101' leftmargin='3in' firstlineleftmargin='2.7257in' tabs='L1in'/>
+<par def='101'>&lt;script type="dojo/method" event="onClick"&gt;</par>
+<pardef id='102' leftmargin='3.2500in' firstlineleftmargin='2.9757in' tabs='L1in'/>
+<par def='102'>dialog_Functions_Add('dialog_Medicine');</par>
+<pardef id='103' leftmargin='5.0507in' firstlineleftmargin='3in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='103'>appSave();</par>
+<par def='101'>&lt;/script&gt;</par>
+<pardef id='104' leftmargin='2.7500in' firstlineleftmargin='2.4757in' tabs='L1in'/>
+<par def='104'>&lt;/div&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='27'>&lt;td&gt;</par>
+<par def='28'>&lt;div dojoType="dijit.form.Button" id="dialog_Medicine_Close" label="Close" &gt;</par>
+<par def='101'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='70'>dialog_Medicine_Close_onClick();</par>
+<par def='101'>&lt;/script&gt;</par>
+<par def='104'>&lt;/div&gt;</par>
+<par def='27'>&lt;/td&gt;</par>
+<par def='26'>&lt;/tr&gt;</par>
+<par def='30'>&lt;/table&gt;</par>
+<par def='18'>&lt;/div&gt;</par>
+<par def='52'/>
+<par def='52'>&lt;script type="dojo/method" event="onShow"&gt;</par>
+<par def='53'>dialog_Medicine_onShow();	</par>
+<par def='52'>&lt;/script&gt;</par>
+<par def='92'>&lt;/div&gt;</par>
+<par def='92'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='91' color='#e1e1e1' borderstyle='tabdiag'><text>&lt;!-- dialog_MedicineIngredient --&gt;</text></sectiontitle>
+<pardef id='105' leftmargin='0.5000in' firstlineleftmargin='1.1729in'/>
+<par def='105'>&lt;div id="dialog_MedicineIngredient" dojoType="dijit.Dialog" class="dialogBox1"  title="Medicine Ingredient Details"&gt;</par>
+<pardef id='106' leftmargin='1.2500in' firstlineleftmargin='1.4229in'/>
+<par def='106'>&lt;div dojoType="dijit.layout.ContentPane" layoutAlign="client" sizeShare="9" style="overflow:auto;" minSize="250px"&gt;</par>
+<pardef id='107' leftmargin='1.7500in' firstlineleftmargin='1.6729in' tabs='L1in'/>
+<par def='107'>&lt;table&gt;</par>
+<par def='30'>&lt;tr&gt;&lt;td class="m1header"&gt;Always Required&lt;/td&gt;&lt;td class="c1header"&gt;Required under certain conditions&lt;/td&gt;&lt;/tr&gt;</par>
+<pardef id='108' leftmargin='2.2500in' firstlineleftmargin='1.9229in' tabs='L1in'/>
+<par def='108'>&lt;tr&gt;</par>
+<pardef id='109' leftmargin='2.7500in' firstlineleftmargin='2.1729in' tabs='L1in'/>
+<par def='109'>&lt;td class="n1"&gt;Ingredient Name&lt;/td&gt;</par>
+<pardef id='110' leftmargin='2.1729in' tabs='L1in'/>
+<par def='110'>&lt;td&gt;</par>
+<pardef id='111' leftmargin='2.4229in' tabs='L1in'/>
+<par def='111'>&lt;div dojoType="dijit.form.Textarea" id="dialog_MedicineIngredient_Name" style="width:300px;" placeHolder="Enter Ingredient name." required="true" maxLength="500"&gt;&lt;/div&gt;</par>
+<par def='110'>&lt;/td&gt;</par>
+<par def='108'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='109'>&lt;td class="n1"&gt;Quantity&lt;/td&gt;</par>
+<par def='110'>&lt;td&gt;</par>
+<par def='111'>&lt;div dojoType="dijit.form.NumberTextBox" id="dialog_MedicineIngredient_Quantity"    constraints="{min:0,max:1000000000,places:'0,6'}"  style="width:30%;"  placeHolder="Please enter the strength" required="true" promptMessage="Only numbers will be accepted, up to 6 decimal digits"&gt;&lt;/div&gt;</par>
+<par def='110'>&lt;/td&gt;</par>
+<par def='108'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='109'>&lt;td class="n1"&gt;Unit&lt;/td&gt;</par>
+<par def='109'>&lt;td&gt;&lt;div dojoType="dijit.form.ComboBox" id="dialog_MedicineIngredient_Unit" store="djstore_Unitsprop" style="width:69%;" required="true"&gt;&lt;/div&gt;&lt;/td&gt;</par>
+<par def='108'>&lt;/tr&gt;</par>
+<par def='107'>&lt;/table&gt;</par>
+<pardef id='112' leftmargin='1.2500in' firstlineleftmargin='1.4229in' tabs='L1in'/>
+<par def='112'>&lt;/div&gt;</par>
+<par def='106'>&lt;div dojoType="dijit.layout.ContentPane" layoutAlign="bottom" sizeShare="1" style="overflow:none;" minSize="30px"&gt;</par>
+<pardef id='113' leftmargin='1.2500in' firstlineleftmargin='1.1729in' tabs='L1in'/>
+<par def='113'>			&lt;div dojoType="dijit.form.Button" id="dialog_MedicineIngredient_Add" label="Save &amp; Close" &gt;</par>
+<pardef id='114' leftmargin='2.2500in' firstlineleftmargin='2.1729in' tabs='L1in'/>
+<par def='114'>&lt;script type="dojo/method" event="onClick"&gt;</par>
+<pardef id='115' leftmargin='2.5000in' firstlineleftmargin='2.4229in' tabs='L1in'/>
+<par def='115'>dialog_MedicineIngredient_Add_onClick();</par>
+<par def='114'>&lt;/script&gt;</par>
+<pardef id='116' leftmargin='2in' firstlineleftmargin='1.9229in' tabs='L1in'/>
+<par def='116'>&lt;/div&gt;</par>
+<par def='107'>&lt;div dojoType="dijit.form.Button" id="dialog_MedicineIngredient_Close" label="Close" &gt;</par>
+<par def='116'>&lt;script type="dojo/method"  event="onClick"&gt;dijit.byId('dialog_MedicineIngredient').hide(); &lt;/script&gt;</par>
+<par def='107'>&lt;/div&gt;</par>
+<par def='112'>&lt;/div&gt;</par>
+<pardef id='117' leftmargin='1in' firstlineleftmargin='1.4229in' tabs='L1in'/>
+<par def='117'>&lt;script type="dojo/method" event="onShow"&gt;dialog_Functions_onShow('dialog_MedicineIngredient');&lt;/script&gt;</par>
+<par def='105'>&lt;/div&gt;</par></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='91' color='#e1e1e1' borderstyle='tabdiag'><text>&lt;!-- dialog_AnimalExcipient --&gt;</text></sectiontitle>
+<par def='92'>&lt;div id="dialog_AnimalExcipient" dojoType="dijit.Dialog" title="Animal Excipient Details" class="dialogBox1"&gt;</par>
+<par def='17'>&lt;div dojoType="dijit.layout.ContentPane" layoutAlign="client" sizeShare="9" style="overflow:auto;" minSize="250px"&gt;</par>
+<par def='53'>&lt;table&gt;</par>
+<par def='30'>&lt;tr&gt;&lt;td class="m1header"&gt;Always Required&lt;/td&gt;&lt;td class="c1header"&gt;Required under certain conditions&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='39'>&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;Product Name&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_AnimalExcipient_ProductName" style="width:300px;" required="true" &gt;&lt;/div&gt;&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;Species of Origin&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ComboBox" id="dialog_AnimalExcipient_AnimalOrigin" style="width:300px;" placeHolder="Select the Origin of the Species" store="djstore_Aorigin" required="true"&gt;&lt;/div&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;Tissue&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ComboBox" id="dialog_AnimalExcipient_AnimalPart" store="djstore_Aparts" style="width:300px;" placeHolder="Select the Tissue" required="true"&gt;&lt;/div&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;Preparation&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ComboBox" id="dialog_AnimalExcipient_AnimalPreparation" store="djstore_Aprep" style="width:300px;" placeHolder="Select the Preparation" required="true"&gt;&lt;/div&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;Country of Origin&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ComboBox" id="dialog_AnimalExcipient_Country" style="width:300px;" placeHolder="Select the Country of Origin" store="djstore_Countries" required="true"&gt;&lt;/div&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;</par>
+<par def='53'>&lt;/table&gt;</par>
+<par def='52'>&lt;/div&gt;</par>
+<par def='17'>&lt;div dojoType="dijit.layout.ContentPane" layoutAlign="bottom" sizeShare="1" style="overflow:none;" minSize="30px"&gt;</par>
+<par def='53'>&lt;div dojoType="dijit.form.Button" id="dialog_AnimalExcipient_Add" label="Save &amp; Close" &gt;</par>
+<par def='39'>&lt;script type="dojo/method" event="onClick"&gt;</par>
+<par def='58'>dialog_Functions_Add('dialog_AnimalExcipient');</par>
+<pardef id='118' leftmargin='4.0507in' firstlineleftmargin='2in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='118'>appSave();</par>
+<par def='39'>&lt;/script&gt;</par>
+<par def='53'>&lt;/div&gt;</par>
+<par def='53'>&lt;div dojoType="dijit.form.Button" id="dialog_AnimalExcipient_Close" label="Close" &gt;</par>
+<par def='39'>&lt;script type="dojo/method"  event="onClick"&gt;dijit.byId('dialog_AnimalExcipient').hide(); &lt;/script&gt;</par>
+<par def='53'>&lt;/div&gt;</par>
+<par def='52'>&lt;/div&gt;</par>
+<par def='52'>&lt;script type="dojo/method" event="onShow"&gt;dialog_Functions_onShow('dialog_AnimalExcipient');&lt;/script&gt;</par>
+<par def='92'>&lt;/div&gt;</par>
+<par def='92'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='91' color='#e1e1e1' borderstyle='tabdiag'><text>&lt;!-- dialog_Placebo --&gt;</text></sectiontitle>
+<par def='92'>&lt;div id="dialog_Placebo" dojoType="dijit.Dialog" title="Placebo Details" class="dialogBox1"&gt;</par>
+<par def='17'>&lt;div dojoType="dijit.layout.ContentPane" layoutAlign="client" sizeShare="9" style="overflow:auto;" minSize="250px"&gt;</par>
+<par def='53'>&lt;table&gt;</par>
+<par def='30'>&lt;tr&gt;&lt;td class="m1header"&gt;Always Required&lt;/td&gt;&lt;td class="c1header"&gt;Required under certain conditions&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='39'>&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;Product Name&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_Placebo_ProductName" style="width:300px;" placeHolder="Please enter a Product Name" required="true"&gt;&lt;/div&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;</par>
+<par def='39'>&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;Route of Administration&lt;/td&gt;</par>
+<par def='93'>&lt;td&gt;</par>
+<par def='94'>&lt;div dojoType="dijit.form.ComboBox" id="dialog_Placebo_RouteOfAdmin" store="djstore_RouteOfAdministration" style="width:300px;" placeHolder="Select RoA from drop down list" required="true"&gt;&lt;/div&gt;</par>
+<par def='93'>&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;</par>
+<par def='39'>&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;Description (including dosage form)&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;</par>
+<par def='60'>&lt;textarea  dojoType="dijit.form.Textarea" id="dialog_Placebo_PlaceboDescription" style="width:300px;" minSize="1" maxLength="500"&gt;&lt;/textarea&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='58'/>
+<par def='39'>&lt;/tr&gt;</par>
+<par def='53'>&lt;/table&gt;</par>
+<par def='52'>&lt;/div&gt;</par>
+<par def='17'>&lt;div dojoType="dijit.layout.ContentPane" layoutAlign="bottom" sizeShare="1" style="overflow:none;" minSize="30px"&gt;</par>
+<par def='53'>&lt;div dojoType="dijit.form.Button" id="dialog_Placebo_Add" label="Save &amp; Close" &gt;</par>
+<par def='39'>&lt;script type="dojo/method" event="onClick"&gt;</par>
+<par def='58'>dialog_Functions_Add('dialog_Placebo');</par>
+<par def='118'>appSave();</par>
+<par def='39'>&lt;/script&gt;</par>
+<par def='53'>&lt;/div&gt;</par>
+<par def='53'>&lt;div dojoType="dijit.form.Button" id="dialog_Placebo_Close" label="Close" &gt;</par>
+<par def='39'>&lt;script type="dojo/method"  event="onClick"&gt;dijit.byId('dialog_Placebo').hide(); &lt;/script&gt;</par>
+<par def='53'>&lt;/div&gt;</par>
+<par def='52'>&lt;/div&gt;</par>
+<par def='52'>&lt;script type="dojo/method" event="onShow"&gt;dialog_Functions_onShow('dialog_Placebo');&lt;/script&gt;</par>
+<par def='92'>&lt;/div&gt;</par></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='91' color='#e1e1e1' borderstyle='tabdiag'><text>&lt;!-- dialog_Device --&gt;</text></sectiontitle>
+<par def='92'>&lt;div id="dialog_Device" dojoType="dijit.Dialog" title="Device Details" class="dialogBox1"&gt;</par>
+<par def='17'>&lt;div dojoType="dijit.layout.ContentPane" layoutAlign="client" sizeShare="9" style="overflow:auto;" minSize="250px"&gt;</par>
+<par def='53'>&lt;table&gt;</par>
+<par def='30'>&lt;tr&gt;&lt;td class="m1header"&gt;Always Required&lt;/td&gt;&lt;td class="c1header"&gt;Required under certain conditions&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='39'>&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;Product Name&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_Device_ProductName" style="width:300px;" placeHolder="Enter Product name (trade name if applicable)" required="true" maxLength="150"&gt;&lt;/div&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<pardef id='119' leftmargin='2.9153in' firstlineleftmargin='2in' tabs='L1in'/>
+<par def='119'>&lt;td&gt;&amp;nbsp;&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;</par>
+<par def='39'>&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;Is this a:&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;</par>
+<par def='60'>&lt;span id="dialog_Device_IsAKit" &gt;</par>
+<par def='61'>&lt;table&gt;</par>
+<par def='68'>&lt;tr&gt;</par>
+<par def='70'>&lt;td&gt;</par>
+<par def='100'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="dialog_Device_IsAKit" id="dialog_Device_IsAKitSingle" value="Single Device" label="Single Device"/&gt;</par>
+<par def='100'>&lt;label for="dialog_Device_IsAKitSingle" id="dialog_Device_IsAKitSingle_Label"&gt;Single Device&lt;/label&gt;</par>
+<par def='70'>&lt;/td&gt;</par>
+<par def='29'>&lt;/tr&gt;</par>
+<par def='29'>&lt;tr&gt;</par>
+<par def='70'>&lt;td&gt;</par>
+<par def='100'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="dialog_Device_IsAKit" id="dialog_Device_IsAKitSystem" value="System" label="System"/&gt;</par>
+<par def='100'>&lt;label for="dialog_Device_IsAKitSystem" id="dialog_Device_IsAKitSystem_Label"&gt;System&lt;/label&gt;</par>
+<par def='70'>&lt;/td&gt;</par>
+<par def='29'>&lt;/tr&gt;</par>
+<par def='29'>&lt;tr&gt;</par>
+<par def='70'>&lt;td&gt;</par>
+<par def='100'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="dialog_Device_IsAKit" id="dialog_Device_IsAKitProcedure" value="Procedure Pack" label="Procedure Pack"/&gt;</par>
+<par def='100'>&lt;label for="dialog_Device_IsAKitProcedure" id="dialog_Device_IsAKitProcedure_Label"&gt;Procedure Pack&lt;/label&gt;</par>
+<par def='70'>&lt;/td&gt;</par>
+<par def='29'>&lt;/tr&gt;</par>
+<par def='70'>&lt;td&gt;</par>
+<par def='100'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="dialog_Device_IsAKit" id="dialog_Device_IsAKitSoftware" value="Software" label="Software"/&gt;</par>
+<par def='100'>&lt;label for="dialog_Device_IsAKitSoftware" id="dialog_Device_IsAKitSoftware_Label"&gt;Software&lt;/label&gt;</par>
+<par def='70'>&lt;/td&gt;</par>
+<par def='29'>&lt;/tr&gt;</par>
+<par def='28'>&lt;/table&gt;</par>
+<par def='13'>		&lt;/span&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='119'>&lt;td&gt;&amp;nbsp;&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;</par>
+<par def='39'>&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;Manufacturer&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_Device_Manufacturer" style="width:300px;" placeHolder="Enter the Name of the Manufacturer for this Device" required="true" maxLength="150"&gt;&lt;/div&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='119'>&lt;td&gt;&amp;nbsp;&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;</par>
+<par def='39'>&lt;tr id="gmdnsearch"&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;GMDN Search Context&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;</par>
+<par def='94'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="dialog_Device_GMDNContext" value="N" label="GMDN Name" checked="checked" jsId="dialog_Device_GMDNContextN" id="dialog_Device_GMDNContextN" /&gt;</par>
+<par def='94'>&lt;label for="dialog_Device_GMDNContextN"&gt;GMDN name&lt;/label&gt;</par>
+<par def='94'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="dialog_Device_GMDNContext" value="C" label="GMDN Code" jsId="dialog_Device_GMDNContextC"  id="dialog_Device_GMDNContextC" /&gt;</par>
+<par def='94'>&lt;label for="dialog_Device_GMDNContextC"&gt;GMDN Code&lt;/label&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='119'>&lt;td&gt;&amp;nbsp;&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;</par>
+<pardef id='120' leftmargin='2.6653in' firstlineleftmargin='1.7500in' tabs='L1in'/>
+<par def='120'>&lt;tr&gt;</par>
+<par def='119'>&lt;td&gt;&amp;nbsp;&lt;/td&gt;</par>
+<par def='119'>&lt;td&gt;&lt;span  id="searchResults"&gt;&lt;/span&gt;&lt;/td&gt;</par>
+<par def='119'>&lt;td&gt;&amp;nbsp;&lt;/td&gt;</par>
+<par def='120'>&lt;/tr&gt;</par>
+<par def='39'>&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;GMDN&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;</par>
+<pardef id='121' leftmargin='3.1653in' firstlineleftmargin='2.2500in' tabs='L1in'/>
+<par def='121'>&lt;div dojoType="dijit.form.TextBox" id="dialog_Device_GMDNName" style="width:300px;"&gt;&lt;/div&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ComboBox"  id="dialog_Device_GMDNS" style="width:300px; display:none;" searchAttr="name" placeHolder="Please wait... loading search results..." pageSize="100" /&gt;&lt;/div&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='119'>&lt;td valign="top"&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.Button" id="dialog_Device_SearchButton" label="Search"&gt;</par>
+<par def='28'>&lt;script type="dojo/method" event="onClick"&gt;</par>
+<par def='68'>dialog_Device_SearchButton_onClick();</par>
+<par def='28'>&lt;/script&gt;</par>
+<par def='60'>&lt;/div&gt;</par>
+<par def='119'>&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;</par>
+<par def='39'>&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;Description&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;</par>
+<par def='60'>&lt;textarea  dojoType="dijit.form.Textarea" id="dialog_Device_Description" style="width:306px;" placeHolder="Type in a description of this Device..." minSize="1" maxLength="2500"&gt;&lt;/textarea&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='119'>&lt;td&gt;&amp;nbsp;&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;</par>
+<par def='30'>&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;Intended Purpose&lt;/td&gt;</par>
+<par def='26'>&lt;td&gt;</par>
+<par def='60'>&lt;span id="dialog_Device_IntendedUse" &gt;</par>
+<par def='61'>&lt;table&gt;</par>
+<par def='68'>&lt;tr&gt;&lt;td&gt;</par>
+<par def='70'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="dialog_Device_IntendedUse" id="dialog_Device_IntendedUseC" value="C"  label="Comparator" /&gt;</par>
+<par def='70'>&lt;label for="dialog_Device_IntendedUseC"&gt;Comparator&lt;/label&gt;</par>
+<par def='29'>&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='68'>&lt;tr&gt;&lt;td&gt;</par>
+<par def='70'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="dialog_Device_IntendedUse" id="dialog_Device_IntendedUseI"  value="I" label="Investigational Product" /&gt;</par>
+<par def='70'>&lt;label for="dialog_Device_IntendedUseI"&gt;Investigational Product&lt;/label&gt;</par>
+<par def='29'>&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='68'>&lt;tr&gt;&lt;td&gt;</par>
+<par def='70'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="dialog_Device_IntendedUse" id="dialog_Device_IntendedUseS"  value="S" label="Standard Care Therapy" /&gt;</par>
+<par def='70'>&lt;label for="dialog_Device_IntendedUseS"&gt;Standard Care Therapy&lt;/label&gt;</par>
+<par def='29'>&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='29'>&lt;tr&gt;&lt;td&gt;</par>
+<par def='70'>&lt;input type="radio" dojoType="dijit.form.RadioButton" name="dialog_Device_IntendedUse" id="dialog_Device_IntendedUseO"  value="O" label="Other" /&gt;</par>
+<par def='70'>&lt;label for="dialog_Device_IntendedUseO"&gt;Other&lt;/label&gt;</par>
+<par def='29'>&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='28'>&lt;/table&gt;</par>
+<par def='27'>&lt;/span&gt;</par>
+<par def='26'>&lt;/td&gt;</par>
+<par def='119'>&lt;td&gt;&amp;nbsp;&lt;/td&gt;</par>
+<par def='30'>&lt;/tr&gt;</par>
+<par def='30'>&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;If 'Other' please provide a description&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;</par>
+<par def='60'>&lt;textarea  dojoType="dijit.form.Textarea" id="dialog_Device_IntendedUseOtherDescription" style="width:306px;" placeHolder="" minSize="1" maxLength="500"&gt;&lt;/textarea&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='119'>&lt;td&gt;&amp;nbsp;&lt;/td&gt;</par>
+<par def='30'>&lt;/tr&gt;</par>
+<par def='53'>&lt;/table&gt;</par>
+<par def='52'>&lt;/div&gt;</par>
+<par def='17'>&lt;div dojoType="dijit.layout.ContentPane" layoutAlign="bottom" sizeShare="1" style="overflow:none;" minSize="30px"&gt;</par>
+<par def='53'>&lt;div dojoType="dijit.form.Button" id="dialog_Device_Add" label="Save &amp; Close" &gt;</par>
+<par def='39'>&lt;script type="dojo/method" event="onClick"&gt;</par>
+<par def='58'>dialog_Device_Add_onClick();</par>
+<par def='39'>&lt;/script&gt;</par>
+<par def='53'>&lt;/div&gt;</par>
+<par def='53'>&lt;div dojoType="dijit.form.Button" id="dialog_Device_Close" label="Close" &gt;</par>
+<par def='39'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='58'>dijit.byId('dialog_Device').hide();</par>
+<par def='39'>&lt;/script&gt;</par>
+<par def='53'>&lt;/div&gt;</par>
+<par def='52'>&lt;/div&gt;</par>
+<par def='52'>&lt;script type="dojo/method" event="onShow"&gt;</par>
+<par def='53'>ctOnShow();</par>
+<par def='52'>&lt;/script&gt;</par>
+<par def='92'>&lt;/div&gt;</par>
+<par def='92'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='91' color='#e1e1e1' borderstyle='tabdiag'><text>&lt;!-- dialog_Site --&gt;</text></sectiontitle>
+<par def='92'>&lt;div id="dialog_Site" dojoType="dijit.Dialog" title="Site Details" class="dialogBox1"&gt;</par>
+<par def='17'>&lt;div dojoType="dijit.layout.ContentPane" layoutAlign="client" sizeShare="9" style="overflow:auto;" minSize="550px" &gt;</par>
+<par def='53'>&lt;table&gt;</par>
+<par def='30'>&lt;tr&gt;&lt;td class="m1header"&gt;Always Required&lt;/td&gt;&lt;td class="c1header"&gt;Required under certain conditions&lt;/td&gt;&lt;/tr&gt;</par>
+<pardef id='122' leftmargin='2.5000in' firstlineleftmargin='1.7500in' tabs='L1in'/>
+<par def='122'>&lt;tr&gt;</par>
+<par def='66'>&lt;th colspan="2" style="text-align:center; font-weight:bold;"&gt;Site Details&lt;/th&gt;</par>
+<par def='39'>&lt;/tr&gt;</par>
+<par def='39'>&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;Site Name&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_Site_TrialSite" style="width:300px;" placeHolder="Enter name of site" required="true"&gt;&lt;/div&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;Site Physical Location&lt;/td&gt;</par>
+<par def='60'>&lt;td&gt;&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_Site_TrialSiteAddress" style="width:300px;" placeHolder="Enter Site address (physical location)" required="true"&gt;&lt;/div&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;State/Territory&lt;/td&gt;&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.FilteringSelect" id="dialog_Site_TrialSiteState" style="width:300px;" store="djstore_States" required="true" placeHolder="Select a State/Territory from drop down list"&gt;&lt;/div&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='60'>&lt;td class="n1"&gt;Expected Site Start Date&lt;/td&gt;&lt;td&gt;&lt;div dojoType="dijit.form.DateTextBox" id="dialog_Site_ExpectedSiteStartDate" constraints={min:'<computedtext
+><code event='value'><formula>day := @Text(@Day(@Today));
+day := @If(@Length(day) = 1; "0" + day; day);
+month := @Text(@Month(@Today));
+month := @If(@Length(month) = 1; "0" + month; month);
+@Text(@Year(@Today))+"-"+ month +"-"+@Text(day)</formula></code></computedtext>',datePattern:'dd/MM/yyyy'} placeHolder="22/04/1931" promptMessage="Use the dd/MM/yyyy format if entering the date manually" style="width:75px;"&gt;&lt;/div&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='39'>&lt;/tr&gt;</par>
+<par def='53'>&lt;/table&gt;</par>
+<par def='53'/>
+<pardef id='123' leftmargin='1.7500in' firstlineleftmargin='1.5000in' tabs='L1in'/>
+<par def='123'>&lt;table&gt;</par>
+<par def='67'>&lt;tr&gt;</par>
+<par def='99'>&lt;th colspan="2" style="text-align:center; font-weight:bold;"&gt;Principal Investigator Details&lt;/th&gt;</par>
+<par def='67'>&lt;/tr&gt;</par>
+<par def='67'>&lt;tr&gt;</par>
+<par def='99'>&lt;td class="n1"&gt;Name&lt;/td&gt;</par>
+<par def='99'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_Site_PrincipalInvestigatorName" style="width:300px;" placeHolder="Please specify a Principal Investigator Name" required="true"&gt;&lt;/div&gt;</par>
+<pardef id='124' leftmargin='2.5000in' firstlineleftmargin='2in' tabs='L1in'/>
+<par def='124'>&lt;/td&gt;</par>
+<par def='67'>&lt;/tr&gt;</par>
+<par def='67'>&lt;tr&gt;</par>
+<par def='99'>&lt;td class="n1"&gt;Contact Phone Number&lt;/td&gt;</par>
+<par def='99'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_Site_PrincipalInvestigatorContactPhone" style="width:300px;" placeHolder="eg: 0987654321" maxLength="10" regExp="^\({0,1}((0|\+61)(2|4|3|7|8)){0,1}\){0,1}(\ |-){0,1}[0-9]{2}(\ |-){0,1}[0-9]{2}(\ |-){0,1}[0-9]{1}(\ |-){0,1}[0-9]{3}$" required="true"&gt;&lt;/div&gt;</par>
+<par def='124'>&lt;/td&gt;</par>
+<par def='67'>&lt;/tr&gt;</par>
+<par def='67'>&lt;tr&gt;</par>
+<par def='99'>&lt;td class="n1"&gt;Contact Email&lt;/td&gt;</par>
+<par def='99'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_Site_PrincipalInvestigatorContactEmail" style="width:300px;"placeHolder="email.address@domain.com.au" required="true"&gt;&lt;/div&gt;</par>
+<par def='124'>&lt;/td&gt;</par>
+<par def='67'>&lt;/tr&gt;</par>
+<par def='123'>&lt;/table&gt;</par>
+<par def='123'>&lt;table&gt;</par>
+<par def='85'>&lt;tr&gt;</par>
+<par def='124'>&lt;th colspan="2" style="text-align:center; font-weight:bold;"&gt;Human Research Ethics Committee (HREC) Details&lt;/th&gt;</par>
+<par def='67'>&lt;/tr&gt;</par>
+<par def='67'>&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;HREC Name&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_Site_HRECName" style="width:300px;" placeHolder="Please specify an HREC Name" maxLength="50" required="true"&gt;&lt;/div&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='67'>&lt;/tr&gt;</par>
+<par def='84'>&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;HREC Code&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_Site_HRECCode" style="width:150px;" placeHolder="Please enter a HREC Code"  maxLength="12" required="true"&gt;&lt;/div&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='67'>&lt;/tr&gt;</par>
+<par def='67'>&lt;tr&gt;</par>
+<par def='58'>&lt;td class="n1"&gt;HREC Contact Officer&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_Site_HRECContactOfficer" style="width:300px;" placeHolder="Please specify an HREC Contact Officer" maxLength="50" required="true"&gt;&lt;/div&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='67'>&lt;/tr&gt;</par>
+<par def='67'>&lt;tr&gt;</par>
+<par def='99'>&lt;td class="n1"&gt;Position&lt;/td&gt;</par>
+<par def='99'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_Site_HRECPosition" style="width:300px;" placeHolder="Please specify a position" maxLength="50" required="true"&gt;&lt;/div&gt;</par>
+<par def='124'>&lt;/td&gt;</par>
+<par def='67'>&lt;/tr&gt;</par>
+<par def='67'>&lt;tr&gt;</par>
+<par def='99'>&lt;td class="n1"&gt;Contact Phone&lt;/td&gt;</par>
+<par def='99'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_Site_HRECContactPhone" style="width:300px;" placeHolder="eg: 0987654321" maxLength="10" regExp="^\({0,1}((0|\+61)(2|4|3|7|8)){0,1}\){0,1}(\ |-){0,1}[0-9]{2}(\ |-){0,1}[0-9]{2}(\ |-){0,1}[0-9]{1}(\ |-){0,1}[0-9]{3}$" required="true"&gt;&lt;/div&gt;</par>
+<par def='124'>&lt;/td&gt;</par>
+<par def='67'>&lt;/tr&gt;</par>
+<par def='67'>&lt;tr&gt;</par>
+<par def='99'>&lt;td class="n1"&gt;Contact Email&lt;/td&gt;</par>
+<par def='99'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_Site_HRECContactEmail" style="width:300px;"placeHolder="email.address@domain.com.au" required="true"&gt;&lt;/div&gt;</par>
+<par def='124'>&lt;/td&gt;</par>
+<par def='67'>&lt;/tr&gt;</par>
+<par def='123'>&lt;/table&gt;</par>
+<par def='123'>&lt;table&gt;</par>
+<par def='122'>&lt;tr&gt;</par>
+<par def='66'>&lt;th colspan="2" style="text-align:center; font-weight:bold;"&gt;Approving Authority Details&lt;/th&gt;</par>
+<par def='67'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='99'>&lt;td class="n1"&gt;Name of Approving Authority&lt;/td&gt;</par>
+<par def='58'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_Site_ApprovingAuthorityName" style="width:300px;" placeHolder="Please enter the Approving Authority Name" required="true"&gt;&lt;/div&gt;</par>
+<par def='58'>&lt;/td&gt;</par>
+<par def='67'>&lt;/tr&gt;</par>
+<par def='67'>&lt;tr&gt;</par>
+<par def='99'>&lt;td class="n1"&gt;Approving Authority Contact Officer&lt;/td&gt;</par>
+<par def='99'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_Site_ApprovingAuthorityOfficer" style="width:300px;" placeHolder="Please specify a contact name" maxLength="50" required="true"&gt;&lt;/div&gt;</par>
+<par def='99'>&lt;/td&gt;</par>
+<par def='67'>&lt;/tr&gt;</par>
+<par def='67'>&lt;tr&gt;</par>
+<par def='99'>&lt;td class="n1"&gt;Position&lt;/td&gt;</par>
+<par def='99'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_Site_ApprovingAuthorityPosition" style="width:300px;" placeHolder="Please specify a position" maxLength="50" required="true"&gt;&lt;/div&gt;</par>
+<par def='124'>&lt;/td&gt;</par>
+<par def='67'>&lt;/tr&gt;</par>
+<par def='67'>&lt;tr&gt;</par>
+<par def='99'>&lt;td class="n1"&gt;Contact Phone&lt;/td&gt;</par>
+<par def='99'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_Site_ApprovingAuthorityContactPhone" style="width:300px;" placeHolder="eg: 0987654321" maxLength="10" regExp="^\({0,1}((0|\+61)(2|4|3|7|8)){0,1}\){0,1}(\ |-){0,1}[0-9]{2}(\ |-){0,1}[0-9]{2}(\ |-){0,1}[0-9]{1}(\ |-){0,1}[0-9]{3}$" required="true"&gt;&lt;/div&gt;</par>
+<par def='124'>&lt;/td&gt;</par>
+<par def='67'>&lt;/tr&gt;</par>
+<par def='67'>&lt;tr&gt;</par>
+<par def='99'>&lt;td class="n1"&gt;Contact Email&lt;/td&gt;</par>
+<par def='99'>&lt;td&gt;</par>
+<par def='60'>&lt;div dojoType="dijit.form.ValidationTextBox" id="dialog_Site_ApprovingAuthorityContactEmail" style="width:300px;"placeHolder="email.address@domain.com.au" required="true"&gt;&lt;/div&gt;</par>
+<par def='124'>&lt;/td&gt;</par>
+<par def='67'>&lt;/tr&gt;</par>
+<par def='123'>&lt;/table&gt;</par>
+<par def='52'>&lt;/div&gt;</par>
+<par def='52'/>
+<par def='17'>&lt;div dojoType="dijit.layout.ContentPane" layoutAlign="bottom" sizeShare="1" style="overflow:none;" minSize="30px"&gt;</par>
+<par def='53'>&lt;div dojoType="dijit.form.Button" id="dialog_Site_Add" label="Save &amp; Close" &gt;</par>
+<par def='39'>&lt;script type="dojo/method" event="onClick"&gt;</par>
+<par def='58'>dialog_Functions_Add('dialog_Site');</par>
+<par def='118'>appSave();</par>
+<par def='39'>&lt;/script&gt;</par>
+<par def='53'>&lt;/div&gt;</par>
+<par def='53'>&lt;div dojoType="dijit.form.Button" id="dialog_Site_Close" label="Close" &gt;</par>
+<par def='39'>&lt;script type="dojo/method"  event="onClick"&gt;dijit.byId('dialog_Site').hide(); &lt;/script&gt;</par>
+<par def='53'>&lt;/div&gt;</par>
+<par def='52'>&lt;/div&gt;</par>
+<par def='52'>&lt;script type="dojo/method" event="onShow"&gt;dialog_Functions_onShow('dialog_Site');&lt;/script&gt;</par>
+<par def='52'>&lt;script type="dojo/method" event="onHide"&gt;</par>
+<par def='52'>	dialog_Functions_onHide('dialog_Site');</par>
+<par def='52'>&lt;/script&gt;</par>
+<par def='92'>&lt;/div&gt;</par>
+<par def='92'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='91' color='#e1e1e1' borderstyle='tabdiag'><text>&lt;!-- dialog_Confirm --&gt;</text></sectiontitle>
+<par def='5'>&lt;div id="dialog_Confirm" dojoType="dijit.Dialog" title="Confirm" style="display:none;width:300px;"&gt;</par>
+<par def='13'>&lt;p align="center" id="confirmText"&gt;&lt;/p&gt;</par>
+<par def='13'>&lt;p align="center"&gt;</par>
+<par def='31'>&lt;button dojoType="dijit.form.Button" iconClass="icons iconYes" type="submit"&gt;Yes&lt;/button&gt;</par>
+<par def='31'>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;</par>
+<par def='31'>&lt;button dojoType="dijit.form.Button" iconClass="icons iconNo" onClick="dijit.byId('dialog_Confirm').onCancel();"&gt;No&lt;/button&gt;</par>
+<par def='13'>&lt;/p&gt;</par>
+<par def='5'>&lt;/div&gt;</par></section>
+<pardef id='125' leftmargin='2.9521in' firstlineleftmargin='0.7500in' tabs='L1in'/>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='125' hidewhenexpanded='true' color='#e1e1e1' borderstyle='tabdiag'><text
+>&lt;!-- dialog_AttachmentPage --&gt;</text></sectiontitle>
+<par def='90'>&lt;div dojoType="dijit.Dialog" title="Upload a Document" id="dialog_AttachmentPage" class="dialogBox1" style="width:500px; height:300px;" doLayout="true"&gt;</par>
+<par def='52'>&lt;iframe frameBorder="0" marginHeight="0" marginWidth="0" scrolling="no" src="" id="jsiframe_attachment" style="border:1px solid #aaa; width:100%; height:220px;"&gt;&lt;br /&gt;Please wait, preparing Application for file upload...&lt;/iframe&gt;</par>
+<pardef id='126' leftmargin='2.9521in' firstlineleftmargin='1.2500in' hide='web'
+ tabs='L1in'/>
+<par def='126'>&lt;table width="100%"&gt;</par>
+<pardef id='127' leftmargin='3.2021in' firstlineleftmargin='1.5000in' hide='web'
+ tabs='L1in'/>
+<par def='127'>&lt;tr&gt;</par>
+<pardef id='128' leftmargin='3.4521in' firstlineleftmargin='1.7500in' hide='web'
+ tabs='L1in'/>
+<par def='128'>&lt;td style="text-align:right;"&gt;</par>
+<pardef id='129' leftmargin='3.7021in' firstlineleftmargin='2in' hide='web'
+ tabs='L1in'/>
+<par def='129'>&lt;div dojoType="dijit.form.Button" onClick="dialog_AttachmentPage_Functions(1);" label="Close" &gt;&lt;/div&gt;</par>
+<par def='128'>&lt;/td&gt;</par>
+<par def='127'>&lt;/tr&gt;</par>
+<par def='126'>&lt;/table&gt;</par>
+<par def='90'>&lt;/div&gt;</par>
+<par def='90'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='125' hidewhenexpanded='true' color='#e1e1e1' borderstyle='tabdiag'><text
+>&lt;!-- dialog_Message --&gt;</text></sectiontitle>
+<pardef id='130' leftmargin='1.2500in' firstlineleftmargin='1in'/>
+<par def='130'>&lt;div id="id_dialog" dojoType="dijit.Dialog" title="Confirmation Dialog"&gt;</par>
+<pardef id='131' leftmargin='1.5000in' firstlineleftmargin='1.2500in'/>
+<par def='131'>&lt;div id="id_dialog_text"&gt;&lt;/div&gt;</par>
+<pardef id='132' leftmargin='1.7500in' firstlineleftmargin='1.5000in'/>
+<par def='132'>&lt;div class="dijitDialogPaneActionBar"&gt;</par>
+<pardef id='133' leftmargin='2in' firstlineleftmargin='1.7500in'/>
+<par def='133'>&lt;button <break/>dojoType="dijit.form.Button" <break/>type="submit" <break
+/>id="id_dialog_button_1"&gt;</par>
+<par def='133'>affirmative</par>
+<par def='133'>&lt;/button&gt;<break/>&lt;button <break/>dojoType="dijit.form.Button" <break
+/>type="button" <break/>onClick="dijit.byId('id_dialog').onCancel();" <break
+/>id="id_dialog_button_2"&gt;</par>
+<par def='133'>negative</par>
+<par def='133'>&lt;/button&gt;</par>
+<par def='132'>&lt;/div&gt;</par>
+<par def='130'>&lt;/div&gt;</par>
+<par def='130'/></section>
+<par def='6'>&lt;script type="text/javascript" defer=true SRC="LookupData?openagent&amp;F=APPDATA&amp;ID=<computedtext
+><code event='value'><formula>ApplicationID</formula></code></computedtext>&amp;V=<computedtext
+><code event='value'><formula>ApplicationVersion</formula></code></computedtext>&amp;NAME=storeApplicationData&amp;R=<computedtext
+><code event='value'><formula>@Text(@Second(@Now) * @Minute(@Now) * @Random+1)</formula></code></computedtext>"&gt;&lt;/script&gt;</par>
+<par def='7'>&lt;/body&gt;</par>
+<par def='7'>&lt;/html&gt;</par>
+<pardef id='134' leftmargin='1in' hide='notes web'/><subformref name='Sponsor Web Security'/>
+<par def='134'/></richtext></body>
+<item name='$SubForm_RepIDs' sign='true'><textlist><text>0000000000000000</text><text
+>0000000000000000</text></textlist></item>
+<item name='$HFFlags'><text>1</text></item>
+<item name='$$ScriptName' summary='false' sign='true'><text>ct</text></item></form>
+

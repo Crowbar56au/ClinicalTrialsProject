@@ -1,0 +1,697 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(LookupData)' alias='LookupData' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3'
+ runaswebuser='true' publicaccess='false' designerversion='8.5.3' comment='Lookup data from all over the place, one agent to rule them all'>
+<noteinfo noteid='512' unid='80F7FCFDC4C1B809CA257F7700070C6E' sequence='16'>
+<created><datetime dst='true'>20160315T121659,34+11</datetime></created>
+<modified><datetime dst='true'>20171019T111825,67+11</datetime></modified>
+<revised><datetime dst='true'>20171019T111825,66+11</datetime></revised>
+<lastaccessed><datetime dst='true'>20171019T111825,66+11</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,12+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime dst='true'>20171019T111825,69+11</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+Option Declare
+Use "GetDatabases"
+Use "DraftToJSON"
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	On Error Goto ErrorHandler
+	Dim s As New NotesSession, dbSrc As NotesDatabase
+	Dim dc As Notesdocumentcollection, doc As NotesDocument, vdoc As NotesDocument
+	Dim docContext As NotesDocument, view As NotesView
+	Dim strQueryString As String, strKey As String, strSystem As String
+	Dim strTableCode As String, TypeOfData As String, strView As String
+	Dim strAttachmentList As String, datacolumn As Long, strLU As String
+	Dim strOnComplete As String, strOnSubmit As String, strVarName As String
+	Dim maxCount As Long, StartNum As Long, EntryCount As Long, resultcount As Long
+	Dim tmpVar As Variant, tmpVarSpon As Variant, UserData List As String, searchstring As String
+	Dim applistCount As Integer
+	Dim vec As NotesViewEntryCollection
+	Dim ventry As NotesViewEntry
+	Dim stream As notesstream
+	Dim buffer As String
+	Dim id_from_url As String
+	Dim tmpJSON_Identifier As String, tmpJSON_Label As String
+	Dim itemMask As NotesItem, x As Long
+	
+	Set stream = S.CreateStream
+	Set docContext = s.DocumentContext
+	Set dbSrc = s.currentdatabase
+	strQueryString = docContext.Query_String_Decoded(0)
+	TypeOfData = Trim(GetWebVariable(strQueryString, "F"))
+	strView = Trim(GetWebVariable(strQueryString, "V"))
+	strSystem = Trim(GetWebVariable(strQueryString, "S"))
+	strTableCode = Trim(GetWebVariable(strQueryString, "T"))
+	strKey = Trim(GetWebVariable(strQueryString, "NAME"))
+	strAttachmentList = Trim(GetWebVariable(strQueryString, "Z"))
+	StartNum = Val(GetWebVariable(strQueryString, "START"))
+	strOnComplete = Trim(GetWebVariable(strQueryString, "ONCOMPLETE"))
+	strOnSubmit = Trim(GetWebVariable(strQueryString, "ONSUBMIT"))
+	strVarName = Trim(GetWebVariable(strQueryString, "VARNAME"))
+	
+	If Trim(GetWebVariable(strQueryString, "COUNT")) = "INFINITY" Then
+		maxCount = 0
+	Else
+		maxCount = Val(Trim(GetWebVariable(strQueryString, "COUNT")))
+	End If
+	If maxCount &lt; 1 Then maxCount = 10000
+	If maxCount &gt; 10000 Then maxCount = 10000
+	If startNum &lt; 1 Then startNum = 1
+	If (Right(strKey, 1) = "*") Then strKey = Left(strKey, Len(strKey)-1)
+	
+	Dim contenttype As String
+	contenttype = "Content-Type:application/json"
+	Select Case Ucase(TypeOfData)
+	Case "CONTEXT", "APPDATA", "FILES", "TTHELP", "PREVIOUSTRIALS"
+			If Len(strKey) &gt; 0 Then
+			contenttype = "Content-Type:application/javascript" 'application/x-javascript 
+		End If
+	End Select
+	Print contenttype
+	tmpJSON_Identifier = "id"
+	tmpJSON_Label = "name"
+	EntryCount = 0
+	
+	'MsgBox "TypeOfData " &amp; TypeOfData
+	
+	Select Case Ucase(TypeOfData)
+	Case "CONTEXT"
+			If Len(strKey) &gt; 0 Then Print |var | + strKey + |=|
+			Print |{ "identifier":"|+tmpJSON_Identifier+|", "label":"|+tmpJSON_Label+|", "items": [ {|
+			tmpVar = Evaluate(|@IfError(@DbLookup(""; "":@GetProfileField("System Profile Document";"ClientWebDB"); "LUClientType"; @Right(@UserName; "_"); "ClientName"; [FailSilent]);"Error")|, docContext)
+			UserData("name") = "Error"
+			UserData("name") = tmpVar(0)
+			tmpVar = Evaluate(|@Right(@UserName; "_")|, doccontext )
+			UserData("id") = tmpVar(0)
+			
+			tmpVar = Evaluate(|@tonumber(@Iferror(@Contains(@LowerCase(@DbLookup(""; "":@GetProfileField("System Profile Document";"ClientWebDB"); "LUClientType"; @Right(@UserName; "_"); 2; [FailSilent])); "agent");@false))|, doccontext)
+			tmpVarSpon = Evaluate(|@tonumber(@Iferror(@Contains(@LowerCase(@DbLookup(""; "":@GetProfileField("System Profile Document";"ClientWebDB"); "LUClientType"; @Right(@UserName; "_"); 2; [FailSilent])); "sponsor");@false))|, doccontext)	
+			UserData("issponsor") = "false"
+			UserData("isagent") = "false"
+			
+			If tmpVar(0) = 1 Then UserData("isagent") = "true"
+			If tmpVarSpon(0) = 1 Then UserData("issponsor") = "true"
+			
+			Print |"name":"| + UserData("name") +|", "id":"| + UserData("id") + |", "isagent": | + UserData("isagent") + |, "SponsorList": { "identifier":"id", "label":"name", "items": [ |;
+			If UserData("isagent") = "false" Then		'if we're not an agent, sponsor list is ME :-)
+				Print |{ "name":"| + UserData("name") +|", "id":"| + UserData("id") + |"}|
+			Else
+				tmpVar=Evaluate(|cwdb1 := @GetProfileField("System Profile Document";"ClientWebDB"); cwdb := @if(cwdb1=""; "ebs\\client\\clientweb.nsf"; cwdb1); @Iferror(@DbLookup(""; "":cwdb; "LUSponsorListByAgentID"; @Right(@UserName; "_"); 2); "-Error-")|, doccontext)
+				If UserData("issponsor") = "true" Then
+					Print |{ "name":"| + UserData("name") +|", "id":"| + UserData("id") + |"},|
+				End If
+				If Isarray(tmpVar) Then
+					For x = 0 To Ubound(tmpVar)
+						UserData("SponsorName") = Trim(Strleftback(tmpVar(x), "["))
+						UserData("SponsorID") = Trim(Strright(tmpvar(x), "|"))
+						Print |{ "name":"| + UserData("SponsorName") + |", "id":"| + UserData("SponsorID") + |"}|
+						If x &lt; Ubound(tmpVar) Then Print ","
+					Next
+				Else
+					Print |{"name":"None","id":"0"}|
+				End If
+			End If
+			
+			Print |]}}]}|;
+			If Len(strKey) &gt; 0 Then
+				Print |;|
+				If Len(strOnComplete) &gt; 0 Then Print strOnComplete + "('" + strKey + "');"
+			End If
+			
+		Case "PREVIOUSTRIALS"
+			Set dbSrc = fdbGetClientRegister
+			If Not dbSrc Is Nothing Then
+			Set view = dbSrc.GetView("AppsByApplicationId")
+			If Not view Is Nothing Then
+				Set vec = view.GetAllEntriesByKey(strSystem)
+				EntryCount = 0
+				If Len(strKey) &gt; 0 Then Print |var | + strKey + |=|
+				Print |{ "identifier":"|+tmpJSON_Identifier+|", "label":"|+tmpJSON_Label+|", "items": [|
+				Set ventry = vec.GetFirstEntry()
+				Do While (Not ventry Is Nothing)
+					Print |{"|+tmpJSON_Identifier+|":"| + ventry.ColumnValues(1) + |","|+tmpJSON_Label+|":"| + ventry.ColumnValues(2) + |"}|
+					EntryCount = EntryCount + 1
+					If EntryCount &lt; vec.count Then Print ","
+					Set ventry = vec.GetNextEntry(ventry)
+				Loop	
+				
+			Else
+				Print |{ "identifier":"0", "label": "0", "items": [ { "Error": "View AppsByApplicationId was not found"}|
+			End If
+		Else
+			Print |{ "identifier":"0", "label": "0", "items": [ { "Error": "Database Clinical Trial Register was not found"}|
+		End If
+		
+		Print |] }|
+		
+	Case "SUBDOCID"
+		Print |{"identifier":"|+tmpJSON_Identifier+|", "label":"|+tmpJSON_Label+|", "items": [ |
+		If Not dbSrc Is Nothing Then
+			Set doc = dbSrc.GetDocumentByUNID(strKey)
+			If Not doc Is Nothing Then
+				Print |{"id":"| + doc.SubmissionId(0) + |","name":"| + doc.SubmissionId(0) + |"}|
+			Else
+				Print |{"id":"0", "name":"None"}|
+			End If
+		End If
+		Print |] }|
+		
+	Case "DECLARATIONS"
+		Print |{"identifier":"|+tmpJSON_Identifier+|", "label":"|+tmpJSON_Label+|", "items": [ |
+		Set dbSrc = s.CurrentDatabase
+		If Not dbSrc Is Nothing Then
+			Set view = dbSrc.GetView("Keywords")
+			If Not view Is Nothing Then
+				Set vec = view.GetAllEntriesByKey(strKey)
+				EntryCount = 0
+				Set ventry = vec.GetFirstEntry()
+				Do While (Not ventry Is Nothing)
+					Set doc = ventry.Document
+					Print |{"|+tmpJSON_Identifier+|":"| + doc.KeywordCode(0) + |","|+tmpJSON_Label+|":"| + htmlEncode(doc.KeywordDesc(0)) + |"}|
+					EntryCount = EntryCount + 1
+					If EntryCount &lt; vec.count Then Print ","
+					Set ventry = vec.GetNextEntry(ventry)
+				Loop	
+				Print |] }|
+			Else
+				Print |{"|+tmpJSON_Identifier+|":"0", "|+tmpJSON_Label+|": "view Keywords unavailable" }|
+			End If
+		Else
+			Print |{"|+tmpJSON_Identifier+|":"0", "|+tmpJSON_Label+|": "Biologicals database unavailable" }|
+		End If
+		
+	Case "TTHELP":
+		tmpJSON_Identifier = "fieldname"
+		tmpJSON_Label = "name"
+		If Len(strKey) &gt; 0 Then
+			Print |var | + strKey + |=|
+		End If
+		Set dbSrc = fdbGetDatabase("DataDictionaryPath")
+		If Not dbSrc Is Nothing Then
+			Set view = dbSrc.GetView("vwLuTooltip")
+			If Not view Is Nothing Then
+				Set vec = view.GetAllEntriesByKey(strSystem)
+				Print |{"identifier":"|+tmpJSON_Identifier+|", "label":"|+tmpJSON_Label+|", "items": [ |
+				EntryCount = 0
+				Set ventry = vec.GetFirstEntry()
+				Do While (Not ventry Is Nothing)
+					Print |{"|+tmpJSON_Identifier+|":"| + ventry.ColumnValues(1) + |","|+tmpJSON_Label+|":"| + ventry.ColumnValues(2) + |"}|
+					EntryCount = EntryCount + 1
+					If EntryCount &lt; vec.count Then Print ","
+					Set ventry = vec.GetNextEntry(ventry)
+				Loop	
+				Print |] }|
+			Else
+				'lookup tooltip help view unavailable
+				Print |{"|+tmpJSON_Identifier+|":"0", "|+tmpJSON_Label+|": "view Lookup Tooltip Help unavailable" }|
+			End If
+		Else
+			'data dictionary unavailable
+			Print |{"|+tmpJSON_Identifier+|":"0", "|+tmpJSON_Label+|": "Data Dictionary unavailable" }|
+		End If
+		If Len(strKey) &gt; 0 Then
+			'Print |; |
+			'If Lcase(strOnComplete) = "y" Then Print |dojo.addOnLoad(function(){|
+			'Print |loadTooltipHelp();|
+			'If Lcase(strOnComplete) = "y" Then Print |});|
+		End If
+		
+	Case "APPLIST"
+		Const NODATA = "..."
+		Print |{"identifier":"|+tmpJSON_Identifier+|", "label":"|+tmpJSON_Label+|", "items": [ |
+		Set view = dbSrc.GetView("LookupByValidatedApplicationID")
+		applistCount = 0
+		If Not view Is Nothing Then		'dont take the following variable names literally, I'm just reusing variable names/types to avoid having 50 million rarely used fields of the same data type
+			Set vec = view.AllEntries
+			EntryCount = vec.Count
+			
+			If EntryCount &gt; 0 Then
+				Set ventry = vec.GetFirstEntry
+				Do While Not ventry Is Nothing
+					applistCount = applistCount + 1
+					Set doc = ventry.document
+					UserData("ValidationStatus") = ""
+					If doc.HasItem("ValidationStatus") Then
+						UserData("ValidationStatus") = doc.getfirstitem("ValidationStatus").text
+					End If
+					startNum = False
+					If strView = "" Then
+						startNum = True
+					Else
+						If doc.HasItem("ValidationStatus") Then
+							If (doc.getfirstitem("ValidationStatus").text = strView) Then
+								If doc.HasItem("ApplicationStatus") Then
+									If doc.GetFirstItem("ApplicationStatus").text = "Validated" Then
+										startNum = True
+									End If
+								Else
+									startNum = True
+								End If
+							End If
+						End If
+					End If
+					If startNum Then
+						UserData("AppID") = "Document Not Accessible"
+						UserData("ApplicationType") = NODATA
+						UserData("SponsorName") = NODATA
+						UserData("SponsorId") = NODATA
+						UserData("SponsorAddress") = NODATA
+						UserData("SponsorAddress_Label") = NODATA
+						UserData("ClinicalTrialType") = NODATA
+						UserData("TitleOfStudy") = "N/A"
+						UserData("ProductStandards") = NODATA
+						UserData("PrincipalManufacturer") = NODATA
+						UserData("IngredientName") = NODATA
+						UserData("ProductName") = NODATA
+						UserData("LabelName") = NODATA
+						UserData("ApplicationVersion") = NODATA
+						UserData("ApplicationFees") = NODATA
+						If ventry.Document.HasItem("ApplicationID") Then
+							UserData("AppID") = ventry.Document.GetFirstItem("ApplicationID").text
+						End If
+						If ventry.Document.HasItem("ApplicationID") Then
+							UserData("ApplicationType") = Left(ventry.Document.GetFirstItem("ApplicationID").text, 3)
+						End If
+						If ventry.Document.HasItem("SponsorName") Then
+							UserData("SponsorName") = ventry.Document.GetFirstItem("SponsorName").text
+						End If
+						If ventry.Document.HasItem("SponsorId") Then
+							UserData("SponsorId") = ventry.Document.GetFirstItem("SponsorId").text
+						End If
+						If ventry.Document.HasItem("SponsorAddress") Then
+							UserData("SponsorAddress") = ventry.Document.GetFirstItem("SponsorAddress").text
+						End If
+						If ventry.Document.HasItem("SponsorAddress_Label") Then
+							UserData("SponsorAddress_Label") = ventry.Document.GetFirstItem("SponsorAddress_Label").text
+						End If
+						If ventry.Document.HasItem("ClinicalTrialType") Then
+							UserData("ClinicalTrialType") = ventry.Document.GetFirstItem("ClinicalTrialType").text
+						End If
+						If ventry.Document.HasItem("TitleOfStudy") Then
+							UserData("TitleOfStudy") = ventry.Document.GetFirstItem("TitleOfStudy").text
+						End If
+						If ventry.Document.HasItem("LabelName") Then
+							UserData("LabelName") = ventry.Document.GetFirstItem("LabelName").text
+						End If
+						If ventry.Document.HasItem("ApplicationVersion") Then
+							UserData("ApplicationVersion") = ventry.Document.GetFirstItem("ApplicationVersion").text
+						End If
+						If ventry.Document.HasItem("ApplicationFees") Then
+							UserData("ApplicationFees") = ventry.Document.GetFirstItem("ApplicationFees").text
+						End If
+						Print |{"id":"| + UserData("AppID") + |", "name":"| + UserData("AppID") + |", "label":"| + UserData("AppID") + |", "ApplicationType":"| + UserData("ApplicationType") + |", "SponsorName":"| + UserData("SponsorName") + |", "ClinicalTrialType":"| + UserData("ClinicalTrialType") + |", "TitleOfStudy":"| + UserData("TitleOfStudy") + |", "ApplicationVersion":"| + UserData("ApplicationVersion") + |", "ApplicationFees":"| + UserData("ApplicationFees") + |", "SponsorAddress_Label":"| + UserData("SponsorAddress_Label") + |", "SponsorAddress":"| + UserData("SponsorAddress") + |", "SponsorId":"| + UserData("SponsorId") + |", "LabelName":"| + UserData("LabelName") + |"}|
+					End If
+					
+					Set ventry = vec.GetNextEntry(ventry)
+					If Not ventry Is Nothing Then
+						If applistCount &lt; EntryCount Then
+							Print ","
+						End If  'applistCount &lt; EntryCount
+					End If  'Not ventry Is Nothing
+				Loop
+			Else
+				Print |{}|
+			End If
+		End If
+		tmpVar = Evaluate(|@IfError(@DbLookup(""; "":@GetProfileField("System Profile Document";"ClientWebDB"); "LUClientType"; @Right(@UserName; "_"); "ClientName"; [FailSilent]);"Error")|, docContext)
+		UserData("name") = "Error"
+		UserData("name") = tmpVar(0)
+		tmpVar = Evaluate(|@Right(@UserName; "_")|, doccontext )
+		UserData("id") = tmpVar(0)
+		Print |], "count":"| + Cstr(EntryCount) + |", "clientname":"| + UserData("name") + |", "clientid":"| + UserData("id") + |", "V":"| + strView + |"}|
+		
+	Case "APPDATA"
+		' Print "Content-Type:application/octet-stream"  - for reading as stream binary
+		'18AUG2015 Bruce Langner - modified to loop through a doc collection to find the
+		'document which has the JSON.txt file
+		Dim coll As NotesDocumentCollection
+		Dim key As String
+		
+		Call InitViewObj(dbSrc)
+			id_from_url = Trim(GetWebVariable(strQueryString, "ID"))
+		If Len(id_from_url) &lt; 3 Then id_from_url = "new"
+		
+		Set view = dbSrc.GetView("LookupByApplicationID")
+		x = False
+		If Not view Is Nothing Then
+			key = id_from_url + "~" + GetWebVariable(strQueryString, "V")
+			Set coll = view.Getalldocumentsbykey(key, True)
+			
+			If (coll.count = 0  Or (Lcase(id_from_url) = "new")) Then
+				Print |var | + strKey + |=loadApplicationSkeleton({ApplicationId:'| + id_from_url + |',ApplicationVersion:'|+ GetWebVariable(strQueryString, "V") +|'})|
+				If Len(strKey) &gt; 0 Then Print |; initializeApplicationData(-1, -1);|
+			Else
+				Set doc = coll.Getfirstdocument()
+				While Not doc Is Nothing
+					If doc.form(0) = "ct" Then
+						Set stream = GetMIMETextAttachment(doc, "JSON.txt")
+						'MsgBox "Get stream from json.txt"
+						x = Not stream Is Nothing
+						If x Then
+							If Len(strKey) &gt; 0 Then Print |var | + strKey + |=|
+							Stream.Position = 0
+							While (Not stream.IsEOS)
+								buffer$ = stream.ReadText(STMREAD_LINE)
+								Print buffer$
+								'Print stream.Read(65000) - for reading as stream binary
+							Wend
+						Else
+							Print "{error:'Cannot load or access the requested record. Please contact TGA Helpdesk regarding this issue'}"
+						End If
+						
+						If Len(strKey) &gt; 0 Then Print |; initializeApplicationData(|+ Cstr(x) + |, 0);|
+						
+						If Not stream Is Nothing Then 
+							Call Stream.Close()
+							'MsgBox "Exit now found what we need"
+							Exit Sub
+						End If
+					End If
+					Set doc = coll.Getnextdocument(doc)
+				Wend
+			End If
+		End If
+
+	Case "FILES"		'get files from the file attachment sepository
+		If Len(strKey) &gt; 0 Then
+			Print |var | + strKey + |=|
+		End If
+		tmpJSON_Identifier = "AttachmentId"
+		tmpJSON_Label = "AttachmentFileName"
+		Print |{"identifier":"| + tmpJSON_Identifier + |", "label":"|+tmpJSON_Label+|", "items": [ |
+		If Len(strView) &gt; 0 And Len(strSystem) &gt; 0 Then
+			Set dbSrc = fdbGetDatabase("CTF_Path")
+			If Not dbSrc.IsOpen Then dbSrc.Open "", ""
+			Set view = dbSrc.GetView("LookupFileAttachment")
+			view.AutoUpdate = False
+			Set vec = view.GetAllEntriesByKey(Ucase(s.CurrentDatabase.FilePath + "~" + Ucase(strView) + "~" + Ucase(strSystem)), True)
+			Set ventry = vec.GetNthEntry(StartNum)
+			EntryCount = 0
+			Do While (Not ventry Is Nothing)  And (entrycount &lt; 99000)
+				Print |{"AttachmentId":"| + ventry.ColumnValues(1) + |", |
+				If Not strAttachmentList = "1" Then
+					Print |"AttachmentFileName":"| + ventry.ColumnValues(2) + |", |
+					Print |"AttachmentLocation":"| + ventry.ColumnValues(3) + |", |
+					Print |"AttachmentContext":"| + ventry.ColumnValues(4) + |",|
+					Print |"AttachmentAuthor":"| + ventry.ColumnValues(5) + |"} |
+				Else
+					Print |"AttachmentFileName":"| + ventry.ColumnValues(2) + |"}|
+				End If
+				EntryCount =EntryCount +1
+				Set ventry = vec.GetNextEntry(ventry)
+				If Not ventry Is Nothing Then Print ","
+			Loop
+		End If
+		Print |], "count":"| + Cstr(EntryCount) + |"}|
+		If Len(strKey) &gt; 0 Then
+			Print |;|
+			If Len(strOnComplete) &gt; 0 Then Print strOnComplete + "('" + strKey + "');"
+		End If
+		
+	Case "S"	'get sponsors
+		Print |{"identifier":"id", "label":"name", "items": [ |
+		Set dbSrc = s.currentdatabase
+		tmpVar = Evaluate(|@IfError(@DbLookup(""; "":@GetProfileField("System Profile Document";"ClientWebDB"); "LUClientType"; @Right(@UserName; "_"); "ClientName"; [FailSilent]);"Error")|, docContext)
+		UserData("name") = tmpVar(0)
+		tmpVar = Evaluate(|@IfError(@Text(@DbLookup( "" : "NoCache" ; "":@GetProfileField("System Profile Document";"SUM_DB"); "LULM" ; @Name( [CN] ; @UserName ) ; "ClientID" )); "User not found")|, doccontext)
+		UserData("id") = tmpVar(0)
+		
+		tmpvar = Evaluate(|@tonumber(@Iferror(@Contains(@LowerCase(@DbLookup(""; "":@GetProfileField("System Profile Document";"ClientWebDB"); "LUClientType"; @Right(@UserName; "_"); 2; [FailSilent])); "agent");@false))|, doccontext)
+		If tmpvar(0) = 0 Then		'if we're not an agent, sponsor list is ME :-)
+			Print |{"name":"| + UserData("name") +|", "id":"| + UserData("id") + |"}|
+		Else
+			tmpvar=Evaluate(|@Iferror(@DbLookup(""; "":@GetProfileField("System Profile Document";"ClientWebDB"); "LUSponsorListByAgentID"; @Right(@UserName; "_"); 2); "-Error-")|, doccontext)
+			If Isarray(tmpvar) Then
+				For x = 0 To Ubound(tmpvar)
+					UserData("SponsorName") = Trim(Strleftback(tmpvar(x), "["))
+					UserData("SponsorID") = Trim(Strright(tmpvar(x), "|"))
+					Print |{"name":"| + UserData("SponsorName") + |", "id":"| + UserData("SponsorID") + |"}|
+					If x &lt; Ubound(tmpvar) Then Print ","
+				Next
+			End If
+		End If
+		Print |]}|
+		
+		Case "AD"	'get sponsors
+			Dim sponsorName As String, sponsorID As String
+			Dim cwdb As NotesDatabase
+			Dim vCTMig As NotesView
+			Dim vc As NotesViewEntryCollection
+			Dim entry As NotesViewEntry
+			Dim entdoc As NotesDocument
+			Dim counter As Integer
+			Dim json As String
+			counter = 1
+			json = ""
+			Set cwdb = fdbGetDatabase("ClientWebPath") 'fdbGetClientWeb
+			Set vCTMig = cwdb.Getview("(LU Sponsor)")
+			Set vc = vCTMig.Allentries
+			Set entry = vc.Getfirstentry()
+			
+			While Not entry Is Nothing
+				sponsorName = entry.Columnvalues(0)
+				sponsorID = entry.Columnvalues(1)
+
+				If counter &lt; vc.Count Then
+					json = json + |{"name":"| + sponsorName + |", "id":"| + sponsorID + |"},|
+				Else
+					json = json + |{"name":"| + sponsorName + |", "id":"| + sponsorID + |"}|
+				End If
+
+				Set entry = vc.Getnextentry(entry)
+				counter = counter + 1
+			Wend
+			Print |{"identifier":"id", "label":"name", "items": [ | + json + |], "sponsorcount":"| + Cstr(vc.Count) + |"}|
+		
+	Case "SP" 'Sponsor Lookup VIA CLIENT WEB
+			Set dbSrc = fdbGetDatabase("ClientWebPath")
+			If strView="ID" Then
+				Set view = dbSrc.GetView("LUClientByID")
+			End If
+			Print |{"identifier":"id", "label":"name", "items": [|
+			view.AutoUpdate = False
+			Set vec = view.GetAllEntriesByKey(strKey, True) 'exact match
+			If Not vec Is Nothing Then
+				Set ventry = vec.GetNthEntry(StartNum)
+				strLU=""
+				buffer=False
+				Do While (Not ventry Is Nothing) And (entrycount &lt; 99000)
+					If strView="ID" Then
+						tmpVar = ventry.ColumnValues(1)
+					Else
+						tmpVar = ventry.ColumnValues(4)
+					End If 
+					If Instr(tmpVar,"|")&gt;0 Then
+						tmpVar = Trim(Strleftback(tmpvar,"|"))
+					End If
+					strKey = strLU
+					strLU = ventry.ColumnValues(1)
+					If Instr(strLU,"|")&gt;0 Then
+						strLU = Trim(Strrightback(strLU,"|"))
+					End If
+					If Not strLU = strKey Then
+						If buffer Then
+							If EntryCount &lt; vec.count Then Print ","
+						End If
+						Print |{"id":"| + strLU + |", "name":"| + tmpVar +|"}|
+						EntryCount = EntryCount + 1
+						If (EntryCount &gt;= MaxCount) Then Exit Do
+						buffer=True
+					End If
+					Set ventry = vec.GetNextEntry(ventry)
+				Loop
+			Else
+				Print |{"id":"0", "name":"No Data Available"}|
+			End If
+			Print |], "count":"| + Cstr(EntryCount) + |"}|
+			
+	Case "CW" 'CLIENT WEB
+			Set dbSrc = fdbGetDatabase("ClientWebPath")
+		If strView="P" Then
+			Set view = dbSrc.GetView("LULocationPostalB$")
+		Else
+			Set view = dbSrc.GetView("LULocationPostalRA")
+		End If
+		Print |{"identifier":"id", "label":"name", "items": [|
+		view.AutoUpdate = False
+		Set vec = view.GetAllEntriesByKey(strKey, True) 'exact match
+		If Not vec Is Nothing Then
+			Set ventry = vec.GetNthEntry(StartNum)
+			strLU=""
+			buffer=False
+			Do While (Not ventry Is Nothing) And (entrycount &lt; 99000)
+				If strView="P" Then
+					tmpVar = ventry.ColumnValues(1)
+				Else
+					tmpVar = ventry.ColumnValues(4)
+				End If 
+				If Instr(tmpVar,"|")&gt;0 Then
+					tmpVar = Trim(Strleftback(tmpvar,"|"))
+				End If
+				strKey = strLU
+				strLU = ventry.ColumnValues(1)
+				If Instr(strLU,"|")&gt;0 Then
+					strLU = Trim(Strrightback(strLU,"|"))
+				End If
+				If Not strLU = strKey Then
+					If buffer Then
+						If EntryCount &lt; vec.count Then Print ","
+					End If
+					Print |{"id":"| + strLU + |", "name":"| + tmpVar +|"}|
+					EntryCount = EntryCount + 1
+					If (EntryCount &gt;= MaxCount) Then Exit Do
+					buffer=True
+				End If
+				Set ventry = vec.GetNextEntry(ventry)
+			Loop
+		Else
+			Print |{"id":"0", "name":"No Data Available"}|
+		End If
+		Print |], "count":"| + Cstr(EntryCount) + |"}|
+		
+	Case "INGRED"		'Ingredients lookup
+		Set dbSrc = fdbGetDatabase("ING_Path")
+		
+		Set view = dbSrc.GetView("luAllIngredients")
+		strLU = strSystem+"~"+strKey+"~"+strTableCode
+		
+		Print |{"identifier":"id", "label":"name", "items": [|
+		view.AutoUpdate = False
+		Set vec = view.GetAllEntriesByKey(strLU, False) 'non-exact match
+		
+		Set ventry = vec.GetFirstEntry()
+		Do While (Not ventry Is Nothing)
+			Print |{"id":"| + Strright(ventry.ColumnValues(1), "~") + |", "name":"| + Strleft(ventry.ColumnValues(1), "~") + |"}|
+			EntryCount = EntryCount + 1
+			If EntryCount &lt; vec.count Then Print ","
+			Set ventry = vec.GetNextEntry(ventry)
+		Loop
+		Print |], "count":"| + Cstr(EntryCount) + |"}|
+		
+	End Select
+	
+ErrorResume:
+	Exit Sub
+ErrorHandler:
+	If EntryCount &gt; 0 Then Print ","
+	Print |{"iserror":true, "| + tmpJSON_Identifier + |":"| + Cstr(Err) + |", "| + tmpJSON_Label + |":"-No data available-", "error":"| + Cstr(Error(Err)) + " at line " + Cstr(Erl) + |"}|
+	Resume ErrorResume
+End Sub
+
+</lotusscript></code><code event='htmlEncode'><lotusscript>Public Function htmlEncode(s As String) As String
+	
+	If Len(s) = 0 Then Exit Function
+	
+	Dim tmp As String
+	Dim c As String
+	Dim i As Integer
+	
+	For i = 1 To Len(s)
+		c = Mid(s, i, 1)
+		If (Asc(c) &gt;= 65 And Asc(c) &lt;= 90) _
+		Or (Asc(c) &gt;= 97 And Asc(c) &lt;= 122) _
+		Or (Asc(c) &gt;= 48 And Asc(c) &lt;= 58) _
+		Or Asc(c) = 38 _
+		Or (Asc(c) &gt;= 45 And Asc(c) &lt;= 47) _
+		Or Asc(c) = 58 Or Asc(c) = 61 _
+		Or Asc(c) = 63 Or Asc(c) = 126 Then
+			tmp = tmp + c
+		Else
+			tmp = tmp + "%" + Right("0"+Hex(Asc(c)),2)
+		End If
+	Next i
+	htmlEncode = tmp
+	
+End Function
+
+</lotusscript></code><code event='GetMIMETextAttachment'><lotusscript>Function GetMIMETextAttachment(doc As NotesDocument, fileName As String) As NotesStream 
+	Dim s As New NotesSession
+	Dim mime As NotesMIMEEntity, header As NotesMimeHeader 
+	Dim child As NotesMimeEntity
+	Dim headerVal As String, expectedHeaderVal As String 
+	Dim stream As NotesStream , buffer As String 
+	
+	expectedHeaderVal = Lcase(|attachment; filename="| + fileName + |"|)
+	
+	Set GetMIMETextAttachment = Nothing 
+	s.ConvertMIME = False ' Do not convert MIME to rich text
+	
+	Set mime = doc.GetMIMEEntity("JSONMIMEFILE")
+	
+	If mime Is Nothing Then
+		s.ConvertMIME = True ' convert MIME to rich text
+		Exit Function
+	End If
+	Set child = mime.GetFirstChildEntity
+	While Not (child Is Nothing)
+		Set header = child.GetNthHeader("Content-Disposition")
+		headerVal = Lcase(header.GetHeaderValAndParams())
+		If headerVal = expectedHeaderVal Then
+			Call child.DecodeContent()
+			Set stream = s.CreateStream 
+			Call child.GetContentAsText(stream, True)
+			
+			stream.Position = 0
+			Set GetMIMETextAttachment = stream
+			s.ConvertMIME = True 'convert MIME to rich text
+			Exit Function
+		End If
+		
+		Set child = child.GetNextEntity()
+	Wend
+	
+	s.ConvertMIME = True ' convert MIME to rich text
+End Function
+
+</lotusscript></code><code event='xmlfilter'><lotusscript>Private Function xmlfilter(strText As String) As String
+	On Error Goto ErrorHandler
+	Dim lngTextPos As Long
+	Dim strIn As String
+	Dim strOut As String
+	Dim strNew As String
+	
+	If Len(strText) &lt; 1 Then Exit Function
+	
+	For lngTextPos = 1 To Len(strText)
+		strIn = Mid(strText, lngTextPos, 1)
+		Select Case strIn
+		Case "&amp;"		'what about url encoded ascii notation?
+			strOut = "&amp;amp;"
+			If Lcase(Mid(strText, lngTextPos, 5) = "&amp;amp;") Then
+				lngTextPos = lngTextPos+4
+			Elseif Lcase(Mid(strText, lngTextPos, 4) = "&amp;lt;") Then
+				lngTextPos = lngTextPos+3
+				strOut = "&amp;lt;"
+			Elseif Lcase(Mid(strText, lngTextPos, 4) = "&amp;gt;") Then
+				lngTextPos = lngTextPos+3
+				strOut = "&amp;gt;"
+			End If
+		Case "&lt;"
+			strOut = "&amp;lt;"
+		Case "&gt;"
+			strOut = "&amp;gt;"
+		Case Else
+			strOut = strIn
+		End Select
+		strNew = strNew + strOut
+	Next
+	xmlfilter = strNew
+ErrorResume:
+	Exit Function
+ErrorHandler:
+	Print "Error in " &amp; Lsi_info(2) +"/"+ Lsi_info(12) + " at line #" + Cstr(Erl) + ": (" + Cstr(Err) + ") " + Error(Err)
+	xmlfilter = "Error"
+	Resume ErrorResume
+End Function</lotusscript></code>
+<rundata processeddocs='0' exitcode='0'>
+<agentmodified><datetime dst='true'>20171019T111825,67+11</datetime></agentmodified>
+<agentrun><datetime dst='true'>20171020T120141,59+11</datetime></agentrun>
+<runlog>Started running agent '(LookupData)|LookupData' on 20/10/2017 12:01:41 PM
+Ran LotusScript code
+Done running agent '(LookupData)|LookupData' on 20/10/2017 12:01:41 PM
+</runlog></rundata>
+<item name='$POID'><datetime>20160620T120209,02+10</datetime></item></agent>
+

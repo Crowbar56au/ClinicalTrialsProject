@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(CopyDraftApplication)' alias='CopyDraftApplication' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3'
+ runaswebuser='true' publicaccess='false' designerversion='8.5.3'>
+<noteinfo noteid='466' unid='97E8F82C6357AC04CA257F7700070CD4' sequence='14'>
+<created><datetime dst='true'>20160315T121700,36+11</datetime></created>
+<modified><datetime>20160628T151506,06+10</datetime></modified>
+<revised><datetime>20160628T151506,05+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,05+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,79+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151506,12+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+Option Declare
+Use "MIMEJSONDataInterface"
+Use "IDsAndSequences"
+
+</lotusscript></code><code event='declarations'><lotusscript>Const ERR_PRIMARYARGUMENTSMISSING = 1001
+Const ERR_INVALIDDOCUMENTID = 1002
+Const ERR_EMPTYJSONSTORE = 1003
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	On Error Goto ErrorHandler
+	Dim Ses As New NotesSession
+	Dim webQueryString As Variant, webQueryStringArgs List As String
+	Dim dbThis As NotesDatabase, webDBName As Variant
+	Dim docContext As NotesDocument
+	Dim sourceDocument As NotesDocument, newDocument As NotesDocument  
+	Dim newDocWebArgs As Variant
+	Dim AppJSONEntryStore As MIMEJSONEntryStore
+	Dim newAppId As String 
+	Dim newRecordUNID As String , oldRecordUNID As String 
+	Dim JSONEntry As JSONObject 
+	Dim EmptyJSONArray As New JSONArray 
+	
+	Set dbThis = Ses.CurrentDatabase
+	Set docContext = Ses.DocumentContext
+	webDBName = Evaluate(|@WebDBName|)
+	
+	'Call docContext.ReplaceItemValue("Query_String_Decoded","unid=" + docContext.UniversalID)
+	
+	webQueryString = Split(docContext.Query_String_Decoded(0), "&amp;")
+	Forall QueryString In webQueryString
+		If Instr(QueryString, "=") &gt; 0 Then
+			webQueryStringArgs(Strleft(QueryString,"=")) = Strright(QueryString, "=")
+		End If
+	End Forall
+	
+	If Not (Iselement(webQueryStringArgs("unid"))) Then
+		Error ERR_PRIMARYARGUMENTSMISSING, "invalid arguments passed." + docContext.Query_String_Decoded(0)
+	End If
+	
+	Set sourceDocument = dbThis.GetDocumentByUNID(webQueryStringArgs("unid"))
+	
+	If sourceDocument.ApplicationStage(0) = "1" Then
+		If sourceDocument.ClinicalTrialType(0) ="CTN" Then '&gt;BW01
+			newAppId = GetID(CT_APPLICATION_SEQUENCE_KEY, CT_SEQUENCE_SYSTEMTYPE, CTN_APPTYPE)
+		Else
+			newAppId = GetID(CT_APPLICATION_SEQUENCE_KEY, CT_SEQUENCE_SYSTEMTYPE, CTX_APPTYPE)
+		End If
+		
+		Set newDocument = dbThis.CreateDocument
+		
+		Call sourceDocument.CopyAllItems(newDocument, False)
+		Call newDocument.ReplaceItemValue("ApplicationId", newAppId)
+		Call newDocument.ReplaceItemValue("ApplicationVersion", "1")
+		Call newDocument.ReplaceItemValue("ValidationStatus", "0")
+		Call newDocument.ReplaceItemValue("lookupkey", newAppId + "~" + "1")
+		
+		Set AppJSONEntryStore = New MIMEJSONEntryStore(newDocument, "JSONMIMEFILE" ,"JSON.txt")
+		If Not AppJSONEntryStore.IsEmptyStore Then
+			Set JSONEntry = AppJSONEntryStore.GetFirstJSONEntry
+			While Not (JSONEntry Is Nothing)
+				
+				oldRecordUNID =  AppJSONEntryStore.GetItemFirstValue(JSONEntry, "RecordUNID")
+				If Instr(oldRecordUNID,"~") &gt; 0 Then
+					newRecordUNID = newAppId +  Mid(oldRecordUNID, Instr(oldRecordUNID,"~") , Len(oldRecordUNID))
+				Else
+					newRecordUNID = newAppId
+				End If
+				
+				Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ApplicationId", newAppId)	
+				Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "IsActiveVersion", "1")	
+				Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ApplicationVersion", "1")	
+				Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "RecordUNID", newRecordUNID)
+				
+				If AppJSONEntryStore.GetItemFirstValue(JSONEntry, "Type") = "Application" Then
+					Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "AttachmentIds", EmptyJSONArray)
+					Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "AttachmentNames", EmptyJSONArray)
+			'Elseif AppJSONEntryStore.GetItemFirstValue(JSONEntry, "Type") = "ApplicationDetails" Then
+			'	Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ValidationStatus", "0")
+			'	Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "IsValid", "0")
+				End If
+				
+				Set JSONEntry = AppJSONEntryStore.GetNextJSONEntry
+			Wend
+			Call AppJSONEntryStore.SaveJSONToMime()
+			newDocument.save True, False
+			
+			newDocWebArgs = Evaluate(|"&amp;ACD="+@Unique + "&amp;R=" + @Text(@Second(@Now) * @Minute(@Now) * @Random+1)|)
+			'Call returnResponse(True, "Redirect", webDBName(0) + "/ct?READFORM&amp;ID=" + newAppId + "&amp;v=1"+ newDocWebArgs(0)) '&gt;BW01
+			Call returnResponse(True, "Redirect", webDBName(0) + "/ct?READFORM&amp;ID=" + newAppId + "&amp;v=1"+ newDocWebArgs(0)) '&gt;BW01
+			
+		Else
+			Error ERR_EMPTYJSONSTORE , "Empty source JSON Structure retrieved from source UNID:" + webQueryStringArgs("unid")
+		End If
+	Else
+		Call returnResponse(False, "", "This application is unable to be copied as it has progressed beyond stage 1. Only stage 1 applications can be copied. Please create a new application.")		
+	End If
+	
+ExitSub:
+	Exit Sub
+ErrorHandler:
+	Call returnResponse(False, "", "There was an error during the copy process, please contact Online Services via the contact details below. Error: " &amp; Err &amp; "(line: " &amp; Erl &amp; "), " &amp; Error)
+	Resume ExitSub
+End Sub
+
+</lotusscript></code><code event='returnResponse'><lotusscript>Function returnResponse(bSuccess As Boolean, strAction As String, strParam As String)
+	Const csCONTENT_TYPE_JSON = "Content-Type:application/json"	
+	Dim strJSON As String
+	
+	strJSON = | {"Success":"| + Cstr(bSuccess) + |", "Action":"| + strAction + |", "Message":"| + strParam + |"}|
+	
+	Print csCONTENT_TYPE_JSON
+	Print strJSON
+	
+End Function</lotusscript></code>
+<item name='$POID'><datetime>20160620T120209,83+10</datetime></item></agent>
+

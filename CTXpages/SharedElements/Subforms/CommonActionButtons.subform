@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='utf-8'?>
+<subform name='CommonActionButtons' xmlns='http://www.lotus.com/dxl' version='9.0'
+ maintenanceversion='1.0' replicaid='CA257FDB001B5780' designerversion='7'
+ comment='Maintains Form Common Action Buttons' renderpassthrough='true'>
+<noteinfo noteid='266' unid='1CF6127021ACB0AFCA257FD8000B2743' sequence='14'>
+<created><datetime>20160620T120149,47+10</datetime></created>
+<modified><datetime>20160628T151504,09+10</datetime></modified>
+<revised><datetime>20160628T151504,08+10</datetime></revised>
+<lastaccessed><datetime>20160628T151504,08+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152009,49+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='querymodechange'><lotusscript>Sub Querymodechange(Source As Notesuidocument, Continue As Variant)
+	'Continue = False
+End Sub
+</lotusscript></code><code event='querysave'><lotusscript>Sub Querysave(Source As Notesuidocument, Continue As Variant)
+	'Continue = False
+End Sub
+</lotusscript></code><code event='queryopen'><lotusscript>Sub Queryopen(Source As Notesuidocument, Mode As Integer, Isnewdoc As Variant, Continue As Variant)
+	If mode = True Then
+		'Disable edit
+		'Continue = False
+	End If
+End Sub
+</lotusscript></code>
+<actionbar bgcolor='#f0f0f0' bordercolor='black'>
+<actionbuttonstyle bgcolor='#f0f0f0'/><font size='9pt' color='system'/><border
+ style='solid' width='0px 0px 1px'/>
+<action title='Close' icon='27' showinmenu='false' hide='preview previewedit'><code
+ event='click'><formula>@Command([FileCloseWindow])</formula></code></action>
+<action title='Next' icon='94' hide='preview previewedit' align='right'><code
+ event='click'><formula>@Command([NavigateNext])</formula></code></action>
+<action title='Previous' icon='95' hide='preview previewedit' align='right'><code
+ event='click'><formula>@Command([NavigatePrev])</formula></code></action></actionbar>
+<body><richtext>
+<pardef id='1' leftmargin='0.7868in' spacebefore='1.5' hide='notes web mobile'/>
+<par def='1'><run><font style='bold italic' color='red'/>Subform: CommonActionButtons</run></par>
+<table widthtype='fitwindow' cellbordercolor='gray' leftmargin='0.7500in'
+ colorstyle='altrows' bgcolor='white' altbgcolor='#f7f7f7' rowspacing='0.0590in'
+ refwidth='11.7188in'><tablecolumn width='100%'/>
+<tablerow>
+<tablecell borderwidth='0px' bgcolor='navy'>
+<pardef id='3' leftmargin='3%' rightmargin='100%' keepwithnext='true' keeptogether='true'/>
+<par def='3'><run><font style='bold' name='Arial' pitch='variable' truetype='true'
+ familyid='20'/></run><run><font color='white' style='bold' name='Arial' pitch='variable'
+ truetype='true' familyid='20'/><sharedfieldref name='ApplicationId'/></run><run
+><font style='bold' name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='white'/> v</run><run><font color='white' style='bold' name='Arial'
+ pitch='variable' truetype='true' familyid='20'/><sharedfieldref name='ApplicationVersion'/></run><run
+><font style='bold' name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='white'/>: </run><run><font color='white' style='bold' name='Arial'
+ pitch='variable' truetype='true' familyid='20'/><field type='text' kind='computedwhencomposed'
+ name='Type'><code event='defaultvalue'><formula>"Manufacturer"</formula></code></field></run><run
+><font style='bold' name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='white'/></run></par></tablecell></tablerow></table>
+<pardef id='4' leftmargin='0.7500in' hide='notes web mobile'/>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='red'/>x</run></par></richtext></body>
+<item name='$$ScriptName' summary='false' sign='true'><text>CommonActionButtons</text></item></subform>
+

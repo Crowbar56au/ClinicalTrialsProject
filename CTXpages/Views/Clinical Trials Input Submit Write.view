@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='utf-8'?>
+<view name='Clinical Trials Input Submit Write' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' showinmenu='false'
+ publicaccess='false' designerversion='8.5.3' unreadmarks='none' onopengoto='lastopened'
+ onrefresh='displayindicator' headers='flat' opencollapsed='false' showresponsehierarchy='true'
+ showmargin='true' shrinkrows='false' extendlastcolumn='false' showhierarchies='false'
+ unreadcolor='black' rowlinecount='1' headerlinecount='2' rowspacing='1' bgcolor='white'
+ totalscolor='black' headerbgcolor='#e0e0ff' boldunreadrows='false' evaluateactions='false'
+ allownewdocuments='false' allowcustomizations='true' hidemarginborder='false'
+ marginwidth='0px' marginbgcolor='white' uniquekeys='false'>
+<noteinfo noteid='22e' unid='62677AB3112FDEBECA257F770006FCCA' sequence='14'>
+<created><datetime dst='true'>20160315T121619,30+11</datetime></created>
+<modified><datetime>20160628T151503,91+10</datetime></modified>
+<revised><datetime>20160628T151503,90+10</datetime></revised>
+<lastaccessed><datetime>20160628T151503,90+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152009,30+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='selection'><formula>SELECT Form = "Clinical Trials Input" &amp; DateSubmitted = "" &amp; DateWritten = ""</formula></code>
+<actionbar bgcolor='#e0e0ff' bordercolor='black'>
+<actionbuttonstyle bgcolor='#f0f0f0' displayborder='always' internalmargin='3px'/><font
+ size='9pt' style='bold italic' name='Verdana' pitch='variable' truetype='true'
+ familyid='20' color='system'/><border style='solid' width='0px 0px 1px'/>
+<action title='Submit To WorkMangement'><code event='click'><formula>@Command([ToolsRunMacro];"(InputWorkManagement)")</formula></code></action>
+<action title='Write to CT Repository'><code event='click'><formula>@Command([ToolsRunMacro];"(InputRepository)")</formula></code></action></actionbar>
+<column hidedetailrows='false' itemname='$5' width='14' resizable='true' separatemultiplevalues='false'
+ sortnoaccent='false' sortnocase='true' showaslinks='false' hidden='true'
+ showasicons='true'><font color='#0062e1' style='bold italic'/><columnheader
+ title='Uploaded'><font size='9pt' style='bold'/></columnheader><datetimeformat
+ show='datetime' date='yearmonthday' fourdigityearfor21stcentury='true' time='hourminutesecond'
+ zone='never' dateformat='weekdaydaymonthyear' dayformat='twodigitday' monthformat='twodigitmonth'
+ yearformat='fourdigityear' weekdayformat='shortname' dateseparator1=' ' dateseparator2='/'
+ dateseparator3='/' timeseparator=':' preference='usersetting'/><numberformat
+ format='general' punctuated='false' parens='false' percent='false' bytes='false'/><code
+ event='value'><formula>@If(LastUploaded = "" ; 81 ; 82)</formula></code></column>
+<column hidedetailrows='false' itemname='$3' width='10.2500' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='false' sortnocase='true' showaslinks='false'
+ hidden='true' showasicons='true'><font color='#0062e1' style='bold italic'/><columnheader
+ title='Submitted'><font size='9pt' style='bold'/></columnheader><datetimeformat
+ show='datetime' date='yearmonthday' fourdigityearfor21stcentury='true' time='hourminutesecond'
+ zone='never' dateformat='weekdaydaymonthyear' dayformat='twodigitday' monthformat='twodigitmonth'
+ yearformat='fourdigityear' weekdayformat='shortname' dateseparator1=' ' dateseparator2='/'
+ dateseparator3='/' timeseparator=':' preference='usersetting'/><numberformat
+ format='general' punctuated='false' parens='false' percent='false' bytes='false'/><code
+ event='value'><formula>@If(Submitted = "Y" ;  82 ; 81)</formula></code></column>
+<column hidedetailrows='false' itemname='$2' width='13.1250' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='false' sortnocase='true' showaslinks='false'
+ hidden='true' showasicons='true'><font color='#0062e1' style='bold italic'/><columnheader
+ title='Written to Repository'><font size='9pt' style='bold'/></columnheader><datetimeformat
+ show='datetime' date='yearmonthday' fourdigityearfor21stcentury='true' time='hourminutesecond'
+ zone='never' dateformat='weekdaydaymonthyear' dayformat='twodigitday' monthformat='twodigitmonth'
+ yearformat='fourdigityear' weekdayformat='shortname' dateseparator1=' ' dateseparator2='/'
+ dateseparator3='/' timeseparator=':' preference='usersetting'/><numberformat
+ format='general' punctuated='false' parens='false' percent='false' bytes='false'/><code
+ event='value'><formula>@If(ApplicationStatus = "Pending Write to Repository" ;  82 ; 81)</formula></code></column>
+<column sort='ascending' hidedetailrows='false' itemname='ApplicationID' width='19.7500'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='true' sortnocase='true'
+ showaslinks='false'><columnheader title='Application ID'><font size='9pt'
+ style='bold'/></columnheader></column>
+<column sort='ascending' hidedetailrows='false' itemname='SubmissionID' width='19.7500'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='true' sortnocase='true'
+ showaslinks='false'><columnheader title='Submission ID'><font size='9pt'
+ style='bold'/></columnheader></column>
+<column sort='ascending' hidedetailrows='false' itemname='SponsorName' width='19.7500'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='true' sortnocase='true'
+ showaslinks='false'><columnheader title='Sponsor Name'><font size='9pt' style='bold'/></columnheader></column>
+<column hidedetailrows='false' itemname='TitleOfStudy' width='12.8750' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='false' sortnocase='true' showaslinks='false'><columnheader
+ title='Title Of Study'><font size='9pt' style='bold'/></columnheader></column>
+<column sort='ascending' hidedetailrows='false' itemname='ClientReference'
+ width='14.6250' resizable='true' separatemultiplevalues='false' sortnoaccent='true'
+ sortnocase='true' showaslinks='false'><columnheader title='Client Reference'><font
+ size='9pt' style='bold'/></columnheader></column></view>
+

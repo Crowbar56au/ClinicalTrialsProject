@@ -1,0 +1,229 @@
+'++LotusScript Development Environment:2:5:(Options):0:74
+Option Public
+Option Declare
+Use "IDsAndSequences"
+'++LotusScript Development Environment:2:5:(Forward):0:1
+Declare Sub Initialize
+Declare Function GenrateInvoiceXMLDocument(docSubmission As NotesDocument, XSLTFileName As String) As Boolean
+Declare Sub CreateXMLMillItems(docSubmission As NotesDocument,Stream As NotesStream, XSLTFileName As String)
+
+'++LotusScript Development Environment:2:5:(Declarations):0:10
+Const constColumnDelimitter = "<$>"
+Const constPDFStoreDBName = "ebs\PublicHTML\pdfStore.nsf"
+
+'++LotusScript Development Environment:2:2:Initialize:1:10
+Sub Initialize
+	
+End Sub
+
+
+'++LotusScript Development Environment:2:1:GenrateInvoiceXMLDocument:1:8
+Function GenrateInvoiceXMLDocument(docSubmission As NotesDocument, XSLTFileName As String) As Boolean
+	On Error Goto ErrorHandler
+	'The Client is the Customer
+	Dim Ses As New NotesSession
+	Dim Stream As NotesStream 
+	Dim dbClient As NotesDatabase
+	Dim vwLUClientByID As NotesView
+	Dim docClient As NotesDocument 
+	Dim vwLULocations As NotesView, LocationLookupVal(1) As String 
+	Dim docLocation As NotesDocument 
+	Dim subApplicationEntries As Variant, SeqNumber As Variant 
+	Dim AppCount As Integer, Ctr As Integer, splitVal As Variant 
+	Dim XMLString As String 
+	
+'Invoice Data Variables
+	Dim InvoiceNumber As String, PaymentRefNumber As String  
+	Dim InvoiceDate As String , InvoiceCreatedDTStamp As String 
+	Dim ClientId As String , ClientName As String 
+	Dim ClientPhone As String, ClientFax As String, ClientEMail As String
+	Dim ClientAddress1 As String, ClientAddress2 As String, ClientSuburb As String, ClientState As String, ClientPostCode As String 
+	Dim InvoiceGrossAmount As String, InvoiceGSTAmount As String, InvoiceNetAmount As String 
+	Dim ApplicationId() As String, ApplicationLabel() As String, ApplicationFees() As String, ApplicationFeesGST() As String, ApplicationFeesTotal() As String
+	
+'Generate Invoice Data	- This data is generated in the submission document
+	'PaymentRefNumber =  Mid(SeqNumber(0), 4)
+	'InvoiceNumber = Mid(SeqNumber(0), 1,  Len(SeqNumber(0)) - 1)
+	'InvoiceCreatedDTStamp = Format(Now, "dd/mm/yyyy hh:nn:ss")
+	'InvoiceDate = Format(Now, "dd/mm/yyyy")
+	
+	PaymentRefNumber = docSubmission.PaymentRefNumber(0)
+	InvoiceNumber = docSubmission.InvoiceNumber(0)
+	InvoiceCreatedDTStamp = docSubmission.InvoiceCreatedDTStamp(0)
+	InvoiceDate = docSubmission.InvoiceDate(0)
+	
+'Client Details
+	ClientId = Cstr(docSubmission.ClientID(0))
+	ClientName = Cstr(docSubmission.ClientName(0))
+	Set dbClient = fdbGetDatabase("ClientWebPath")
+	'eMail Details
+	Set vwLUClientByID = dbClient.GetView("LUClientByID")
+	Set docClient =  vwLUClientByID.GetDocumentByKey(docSubmission.ClientId, True)
+	If Not (docClient Is Nothing) Then
+		ClientEMail = docClient.CLIENT_EMAIL(0)
+	End If
+	
+	'Address/Contact Details	
+	Set vwLULocations = dbClient.GetView("locations")
+	Set docLocation = vwLULocations.GetDocumentByKey(docSubmission.ClientBillingAddressID, True)
+	If Not (docLocation Is Nothing) Then
+		ClientPhone = docLocation.CLIENT_PHONE(0)
+		ClientFax = docLocation.CLIENT_FAX(0)
+		ClientAddress1 = docLocation.ADDRESS_LINE1(0)
+		ClientAddress2 = docLocation.ADDRESS_LINE2(0)
+		ClientSuburb = docLocation.TOWN(0)
+		ClientState = docLocation.STATE(0)
+		ClientPostCode = docLocation.POSTCODE(0)
+	End If
+	
+'InvoiceDetails	
+	subApplicationEntries = docSubmission.GetItemValue("ApplicationEntries")
+	AppCount = Ubound(subApplicationEntries)
+	Redim ApplicationId(AppCount)
+	Redim ApplicationLabel(AppCount)
+	Redim ApplicationFees(AppCount)
+	Redim ApplicationFeesGST(AppCount)
+	Redim ApplicationFeesTotal(AppCount)
+	
+	Ctr = 0
+	Forall ApplicationDetail In subApplicationEntries
+		splitVal = Split(ApplicationDetail, constColumnDelimitter)
+		ApplicationId(Ctr) = splitVal(0)
+		ApplicationLabel(Ctr) = splitVal(1)
+		If Isnumeric(splitVal(3)) Then
+			ApplicationFees(Ctr) = Format(Cdbl(splitVal(3)), "$###,###0.00")
+			ApplicationFeesGST(Ctr) = Format(Cdbl(0), "$###,###0.00")
+			ApplicationFeesTotal(Ctr) = Format(Cdbl(splitVal(3)), "$###,###0.00")
+		End If
+		
+		Ctr = Ctr + 1
+	End Forall
+	
+'Invoice Value
+	If Isnumeric(docSubmission.InvoiceAmount(0)) Then
+		InvoiceGrossAmount = Format(Cdbl(docSubmission.InvoiceAmount(0)), "$###,###0.00")
+		InvoiceGSTAmount = "$0.00"
+		InvoiceNetAmount = Format(Cdbl(docSubmission.InvoiceAmount(0)), "$###,###0.00")
+	End If
+	
+'Generate XML
+	'The If True structure is just used for indentation purpose for ease of readability
+	Set stream = ses.CreateStream
+	XMLString = |<?xml version="1.0" encoding="windows-1252" standalone="no"?>|
+	Call Stream.WriteText(XMLString, EOL_CRLF)
+	XMLString = |<BiologicalInvoice>|
+	Call Stream.WriteText(XMLString, EOL_CRLF)
+	If True Then
+		
+		XMLString = |<InvoiceNumber>| + InvoiceNumber + |</InvoiceNumber>|
+		Call Stream.WriteText(XMLString, EOL_CRLF)
+		XMLString = |<InvoiceDate>| + InvoiceDate + |</InvoiceDate>|
+		Call Stream.WriteText(XMLString, EOL_CRLF)
+		XMLString = |<InvoiceCreatedDTStamp>| + InvoiceCreatedDTStamp + |</InvoiceCreatedDTStamp>|
+		Call Stream.WriteText(XMLString, EOL_CRLF)
+		XMLString = |<PaymentRefNumber>| + PaymentRefNumber + |</PaymentRefNumber>|
+		Call Stream.WriteText(XMLString, EOL_CRLF)
+		
+		XMLString = |<ClientDetails>|
+		Call Stream.WriteText(XMLString, EOL_CRLF)
+		If True Then
+			XMLString = |<ClientId>| + ClientId + |</ClientId>|
+			Call Stream.WriteText(XMLString, EOL_CRLF)
+			XMLString = |<ClientName>| + ClientName + |</ClientName>|
+			Call Stream.WriteText(XMLString, EOL_CRLF)
+			
+			XMLString = |<ClientBillingAddress>|
+			Call Stream.WriteText(XMLString, EOL_CRLF)
+			If True Then
+				XMLString = |<Address1>| + ClientAddress1 + |</Address1>|
+				Call Stream.WriteText(XMLString, EOL_CRLF)
+				XMLString = |<Address2>| + ClientAddress2 + |</Address2>|
+				Call Stream.WriteText(XMLString, EOL_CRLF)
+				XMLString = |<Suburb>| + ClientSuburb + |</Suburb>|
+				Call Stream.WriteText(XMLString, EOL_CRLF)
+				XMLString = |<State>| + ClientState + |</State>|
+				Call Stream.WriteText(XMLString, EOL_CRLF)
+				XMLString = |<PostCode>| + ClientPostCode + |</PostCode>|
+				Call Stream.WriteText(XMLString, EOL_CRLF)
+			End If
+			XMLString = |</ClientBillingAddress>|
+			Call Stream.WriteText(XMLString, EOL_CRLF)
+			
+			XMLString = |<ClientContactDetails>|
+			Call Stream.WriteText(XMLString, EOL_CRLF)
+			If True Then
+				XMLString = |<Phone>| + ClientPhone + |</Phone>|
+				Call Stream.WriteText(XMLString, EOL_CRLF)
+				XMLString = |<Fax>| + ClientFax + |</Fax>|
+				Call Stream.WriteText(XMLString, EOL_CRLF)
+				XMLString = |<eMail>| + ClientEMail + |</eMail>|
+				Call Stream.WriteText(XMLString, EOL_CRLF)
+			End If
+			XMLString = |</ClientContactDetails>|
+			Call Stream.WriteText(XMLString, EOL_CRLF)
+			
+		End If
+		XMLString = |</ClientDetails>|
+		Call Stream.WriteText(XMLString, EOL_CRLF)
+		XMLString = |<InvoiceEntries>|
+		Call Stream.WriteText(XMLString, EOL_CRLF)
+		For ctr = 0 To AppCount
+			XMLString = |<InvoiceEntry>|
+			Call Stream.WriteText(XMLString, EOL_CRLF)
+			If True Then
+				XMLString = |<ApplicationId>| + ApplicationId(ctr) + |</ApplicationId>|
+				Call Stream.WriteText(XMLString, EOL_CRLF)
+				XMLString = |<ApplicationLabel>| + ApplicationLabel(ctr) + |</ApplicationLabel>|
+				Call Stream.WriteText(XMLString, EOL_CRLF)
+				XMLString = |<ApplicationFees>| + ApplicationFees(ctr) + |</ApplicationFees>|
+				Call Stream.WriteText(XMLString, EOL_CRLF)
+				XMLString = |<ApplicationFeesGST>| + ApplicationFeesGST(ctr) + |</ApplicationFeesGST>|
+				Call Stream.WriteText(XMLString, EOL_CRLF)
+				XMLString = |<ApplicationFeesTotal>| + ApplicationFeesTotal(ctr) + |</ApplicationFeesTotal>|
+				Call Stream.WriteText(XMLString, EOL_CRLF)
+			End If
+			XMLString = |</InvoiceEntry>|
+			Call Stream.WriteText(XMLString, EOL_CRLF)
+		Next Ctr
+		XMLString = |</InvoiceEntries>|
+		Call Stream.WriteText(XMLString, EOL_CRLF)
+		XMLString = |<InvoiceGrossAmount>| + InvoiceGrossAmount + |</InvoiceGrossAmount>|
+		Call Stream.WriteText(XMLString, EOL_CRLF)
+		XMLString = |<InvoiceGSTAmount>| + InvoiceGSTAmount + |</InvoiceGSTAmount>|
+		Call Stream.WriteText(XMLString, EOL_CRLF)
+		XMLString = |<InvoiceNetAmount>| + InvoiceNetAmount + |</InvoiceNetAmount>|
+		Call Stream.WriteText(XMLString, EOL_CRLF)
+	End If
+	XMLString = |</BiologicalInvoice>|
+	Call Stream.WriteText(XMLString, EOL_CRLF)
+	
+	Call CreateXMLMillItems(docSubmission, Stream, XSLTFileName) 
+	
+	GenrateInvoiceXMLDocument = True
+Done:
+	Exit Function
+ErrorHandler:
+	Msgbox "ERROR: Script Library - GenrateInvoiceXMLDocument Function GenrateInvoiceXMLDocument - Message (" + Cstr(Err) + ") " +  Error() + " line: " + Erl()
+	GenrateInvoiceXMLDocument = False
+	Resume Done
+End Function
+'++LotusScript Development Environment:2:2:CreateXMLMillItems:1:8
+Sub CreateXMLMillItems(docSubmission As NotesDocument,Stream As NotesStream, XSLTFileName As String)
+	Dim Ses As New NotesSession
+	Dim XMLRtf As NotesRichTextItem, buffer As String 
+	
+	If docSubmission.HasItem("XML") Then
+		docSubmission.RemoveItem("XML")
+		docSubmission.Save True, False
+	End If
+	Set XMLRtf = New NotesRichTextItem(docSubmission, "XML")
+	
+	Stream.Position = 0
+	While (Not stream.IsEOS)
+		buffer$ = stream.ReadText(STMREAD_LINE, EOL_CRLF)
+		Call XMLRtf.AppendText(buffer$)
+		'Call XMLRtf.AddNewline(1)
+	Wend
+	
+	Call docSubmission.ReplaceItemValue("XSL", XSLTFileName)
+End Sub

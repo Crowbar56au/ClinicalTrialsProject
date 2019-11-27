@@ -1,0 +1,181 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(LookupCT)' alias='LookupCT' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3'
+ runaswebuser='true' publicaccess='false' designerversion='8.5.3' comment='Lookup data from code tables'>
+<noteinfo noteid='502' unid='2A3629B0E5811FF7CA257F7700070C80' sequence='14'>
+<created><datetime dst='true'>20160315T121659,52+11</datetime></created>
+<modified><datetime>20160628T151506,45+10</datetime></modified>
+<revised><datetime>20160628T151506,44+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,44+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,10+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151506,51+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+Option Declare
+Use "GetDatabases"
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	On Error Goto ErrorHandler
+	Dim s As New NotesSession
+	Dim dbSrc As NotesDatabase		'code tables database
+	Dim docContext As NotesDocument	'current web session
+	Dim view As NotesView	'the view used to get the code tables we need
+	Dim EntryCount As Long	'how many entries/documents have been printed
+	Dim tmpVar As Variant	'usual temporary variable
+	Dim x As Long			'usual counter
+	Dim searchstring As String	'the search criteria to find the code table we want
+	Dim vec As NotesViewEntryCollection	'the list of code table entries to print
+	Dim ventry As NotesViewEntry	'the current view entry being output/tested
+	Dim QSpairs List As String	'list of QueryString pairs we will use
+	Dim newQS As Variant		'list of pairs to filter from URL
+	Dim currentCT As String		'the name of the current code table
+	Dim previousCT As String		'the name of the previous code table to determine if closing of group needs to happen
+	Dim itemfunction As String	'populated if Z=1 is specified in URL
+	Set docContext = s.DocumentContext
+	newQS = Split(docContext.Query_String_Decoded(0), "&amp;")
+	QSpairs("Z")=""
+	QSpairs("S")=""
+	QSpairs("T")=""
+	QSpairs("NAME")=""
+	QSpairs("VARNAME")=""
+	QSpairs("ONCOMPLETE")=""
+	QSpairs("JOIN")=""
+	
+	For x = 0 To Ubound(newQS)
+		If Instr(newqs(x), "=") &gt; 0 Then
+			QSpairs(Ucase(Strleft(newqs(x),"="))) = Strright(newqs(x), "=")
+		End If
+	Next
+	
+	If Len(QSpairs("VARNAME")) &gt; 0 Then
+		Print "Content-Type:application/javascript"
+		Print |var | + QSpairs("VARNAME") + |=|
+	Else
+		Print "Content-Type:application/json"
+	End If
+	
+	EntryCount = 0
+	Set dbSrc = fdbGetDatabase("DCT_Path")
+	If Not dbsrc Is Nothing Then
+		searchstring = QSpairs("S")+"~"
+		If QSpairs("T") = "*" Then
+			Print |{"identifier":"codetable","label":"codetable","items":[|
+			Set view = dbSrc.GetView("DCTDojoLookup")
+		Else
+			Print |{"identifier":"abbreviation","label":"name","items":[|
+			Set view = dbSrc.GetView("DCTListByCat")
+			If Len(QSpairs("NAME"))&gt;0 Then QSpairs("NAME") = "~"+QSpairs("NAME")
+			searchstring = searchstring + QSpairs("T")+QSpairs("NAME")
+		End If
+		view.AutoUpdate = False
+		
+		Set vec = view.GetAllEntriesByKey(searchstring, False)
+		Set ventry = vec.GetFirstEntry
+		Do While Not ventry Is Nothing
+			If QSpairs("T") = "*" Then
+				tmpVar = ventry.columnvalues(0)
+				If Isarray(tmpvar) Then tmpvar=tmpvar(0)
+				currentCT = Strleft(Strright(tmpVar, "~"), "~")
+				tmpVar = ""
+				If previousCT &lt;&gt; currentCT Then
+					If previousCT &lt;&gt; "" Then Print |]},|
+					previousCT = currentCT
+					Print |{"codetable":"|+currentCT + |","identifier":"abbreviation","label":"name","items":[|
+				Else
+					If EntryCount &lt; vec.count Then Print ","
+				End If
+			End If
+			itemfunction = ""
+			If QSpairs("Z")="1" Then 
+				If ventry.Document.hasitem("FunctionMask") Then
+					itemfunction = |,"mask":"| + Join(Fulltrim(ventry.Document.GetFirstItem("FunctionMask").values),",") + |"|
+				End If
+				On Error Goto errorhandler
+			End If
+			If QSpairs("JOIN") = "Y" Then
+				tmpvar = |{"name":"| + xmlfilter(ventry.ColumnValues(1)) + | (| + xmlfilter(ventry.ColumnValues(2)) + |)|  + |","abbreviation":"| + xmlfilter(ventry.ColumnValues(2)) + |"| + itemfunction + |}|
+			Else
+				tmpvar = |{"name":"| + xmlfilter(ventry.ColumnValues(1)) + |","abbreviation":"| + xmlfilter(ventry.ColumnValues(2)) + |"| + itemfunction + |}|
+			End If
+			EntryCount = EntryCount + 1
+			If QSPairs("T")&lt;&gt; "*" Then If EntryCount &lt; vec.count Then tmpvar = tmpvar + ","
+			Print tmpvar
+			Set ventry = vec.GetNextEntry(ventry)
+		Loop
+		If QSpairs("T") = "*" Then
+			If entrycount &gt; 0 Then Print |]}|
+		End If
+		
+		Print |],"count":"| + Cstr(EntryCount) + |","searchstring":"| + searchstring + |"}|
+		If Len(QSpairs("VARNAME")) &gt; 0 Then
+			If QSpairs("T") = "R" Then Print ";"
+			Print |var loadcount=|+ Cstr(EntryCount) + |; var searchstring="| + searchstring + |";|
+		End If
+	Else
+		Print |{"identifier":"abbreviation","label":"name","items":"abbreviation":"0","label":"database access error..."}]}|
+	End If
+	
+ErrorResume:
+	If Len(QSpairs("VARNAME")) &gt; 0 And Len(QSpairs("ONCOMPLETE")) &gt; 0 Then Print QSpairs("ONCOMPLETE") + "();"
+	Exit Sub
+ErrorHandler:
+	If EntryCount &gt; 0 Then Print ","
+	Print Cstr(Error) + " at line " + Cstr(Erl)
+	Resume ErrorResume
+End Sub
+
+</lotusscript></code><code event='xmlfilter'><lotusscript>Private Function xmlfilter(thing) As String
+	On Error Goto ErrorHandler
+	Dim lngTextPos As Long
+	Dim strIn As String
+	Dim strOut As String
+	Dim strNew As String
+	Dim strText As String
+	
+	strText = Cstr(thing)
+	
+	If Len(strText) &lt; 1 Then Exit Function
+	
+	For lngTextPos = 1 To Len(strText)
+		strIn = Mid(strText, lngTextPos, 1)
+		Select Case strIn
+		Case "&amp;"		'what about url encoded ascii notation?
+			strOut = "&amp;amp;"
+			If Lcase(Mid(strText, lngTextPos, 5) = "&amp;amp;") Then
+				lngTextPos = lngTextPos+4
+			Elseif Lcase(Mid(strText, lngTextPos, 4) = "&amp;lt;") Then
+				lngTextPos = lngTextPos+3
+				strOut = "&amp;lt;"
+			Elseif Lcase(Mid(strText, lngTextPos, 4) = "&amp;gt;") Then
+				lngTextPos = lngTextPos+3
+				strOut = "&amp;gt;"
+			End If
+		'Case "&lt;"
+			'strOut = "&amp;lt;"
+		'Case "&gt;"
+			'strOut = "&amp;gt;"
+		Case """"  'INC61834 UAT - replace double quote with 2 x single quote, BL.
+			strOut = "''"
+		Case ","
+			strOut = "."
+		Case "{", "["
+			strOut = "("
+		Case "}", "]"
+			strOut = ")"
+		Case Else
+			strOut = strIn
+		End Select
+		strNew = strNew + strOut
+	Next
+	xmlfilter = strNew
+ErrorResume:
+	Exit Function
+ErrorHandler:
+	Print "Error in " &amp; Lsi_info(2) +"/"+ Lsi_info(12) + " at line #" + Cstr(Erl) + ": (" + Cstr(Err) + ") " + Error(Err)
+	xmlfilter = "Error"
+	Resume ErrorResume
+End Function</lotusscript></code>
+<item name='$POID'><datetime>20160620T120209,25+10</datetime></item></agent>
+

@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(updateapplicationid)' alias='UpdateApplicationID' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3'
+ publicaccess='false' designerversion='7' restrictions='unrestricted'>
+<noteinfo noteid='5c6' unid='618B7ABDDD50C065CA257F7700070A51' sequence='14'>
+<created><datetime dst='true'>20160315T121653,93+11</datetime></created>
+<modified><datetime>20160628T151507,00+10</datetime></modified>
+<revised><datetime>20160628T151506,99+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,99+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,45+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151507,05+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+Option Declare
+Use "PrintErrorReport"
+Use "IDsAndSequences"
+
+</lotusscript></code><code event='declarations'><lotusscript>
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	On Error Goto ErrHandle
+	Dim s As New NotesSession, db As NotesDatabase, docContext As NotesDocument, specifiedID As Variant, newQS As Variant, QSpairs List As String, x As Long
+	Dim newdoc As notesdocument, appid As String, trialtype As String
+	Dim idview As notesview, idVEC As notesviewentrycollection, idVEntry As NotesViewEntry
+	Set db = s.currentdatabase
+	Set docContext = s.DocumentContext
+	
+	newQS = Split(docContext.Query_String_Decoded(0), "&amp;")
+	QSpairs("TESTMODE") = ""
+	QSpairs("ID") = ""
+	QSpairs("V") = ""
+	QSpairs("TYPE") = "X"
+	For x = 0 To Ubound(newQS)
+		If Instr(newqs(x), "=") &gt; 0 Then
+			QSpairs(Ucase(Strleft(newqs(x),"="))) = Trim(Strright(newqs(x), "="))
+		End If
+	Next
+	
+	If Ucase(QSpairs("ID")) = "NEW" Or QSpairs("ID") = "" Then
+		If docContext.ApplicationId(0) = "" Then
+			Set idview = db.getview("AppIDTracker")
+			'If idview Is Nothing Then
+			'	Print "Cannot verify the new Application ID. Contact TGA Support regarding this issue"
+			'Else
+			'	Set idVEC = idview.GetAllEntriesByKey(QSPairs("ID")+"~"+QSPairs("V"), True)
+			'	If idVEC.Count &lt; 1 Then
+'			trialtype = "N"
+			
+			trialtype="NA"
+			appid="-1"
+			If Ucase(QSpairs("TYPE")) = "X" Or Ucase(QSpairs("TYPE")) = "Y" Or Ucase(QSpairs("TYPE")) = "CTX" Then
+				appid=GetID(CT_APPLICATION_SEQUENCE_KEY, CT_SEQUENCE_SYSTEMTYPE, CTX_APPTYPE)
+				trialtype = "CTX"
+			Else
+				appid = GetID(CT_APPLICATION_SEQUENCE_KEY, CT_SEQUENCE_SYSTEMTYPE, CTN_APPTYPE)
+				trialtype="CTN"		
+			End If
+			
+			docContext.ReplaceItemValue "ClinicalTrialType", trialtype
+			docContext.ReplaceItemValue "ApplicationId", appid
+			docContext.ReplaceItemValue "ApplicationVersion", "1"
+			If Instr(s.CommonUserName, "_")&gt;0 Then
+				docContext.ReplaceItemValue "UserID", Strright(s.CommonUserName, "_")
+			Else
+				docContext.ReplaceItemValue "UserID", s.CommonUserName
+			End If
+			Set newdoc = db.createdocument
+			newdoc.replaceitemvalue "form", "AppIDplaceholder"
+			newdoc.replaceitemvalue "type", "AppIDplaceholder"
+			newdoc.replaceitemvalue "id", docContext.ApplicationId(0)
+			newdoc.replaceitemvalue "version", docContext.ApplicationVersion(0)
+			newdoc.replaceItemValue "ClinicalTrialType", trialtype
+			newdoc.save True, False, True
+			docContext.ExplicitKey = docContext.ApplicationId(0)
+			'	End If
+			'End If
+		End If
+	Else
+		docContext.ReplaceItemValue "ApplicationId", QSpairs("ID")
+		docContext.ReplaceItemValue "ApplicationVersion", QSpairs("V")
+	End If
+	
+	If Ucase(QSpairs("ID")) = "NEW" Or QSpairs("ID") = "" Then
+		If docContext.ApplicationID(0) = "" Then
+			docContext.ExplicitKey = docContext.ApplicationID(0)
+		End If
+	Else
+		docContext.ReplaceItemValue "ApplicationID", QSpairs("ID")
+	End If
+	
+	Exit Sub
+ErrHandle:
+	Call sPrintErrorReport(db)
+	Exit Sub
+End Sub</lotusscript></code>
+<rundata processeddocs='0' exitcode='0' agentdata='69B466DF518DCE74CA257FE0001CF82C'>
+<agentmodified><datetime>20160628T151507,00+10</datetime></agentmodified>
+<agentrun><datetime>20190801T152947,16+10</datetime></agentrun>
+<runlog>Started running agent '(updateapplicationid)|UpdateApplicationID' on 01/08/2019 03:29:47 PM
+Ran LotusScript code
+Done running agent '(updateapplicationid)|UpdateApplicationID' on 01/08/2019 03:29:47 PM
+</runlog></rundata>
+<item name='$POID'><datetime>20160620T120206,42+10</datetime></item></agent>
+

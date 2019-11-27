@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xp:view
+	xmlns:xp="http://www.ibm.com/xsp/core">
+	
+	<xp:panel id="onRowDblClickEOS"> 
+		<xp:eventHandler event="onclick" submit="true"
+			refreshMode="partial" refreshId="refreshPanelEOS"
+			disableValidators="true">
+			<xp:this.action><![CDATA[#{javascript:try {
+	if(@Length(getComponent("dialogEOS").getValue()) > 0) {
+		if(@Length(getComponent("unidstoreL4EOS").getValue()) > 0) { 
+			viewScope.put(getComponent("unidnameEOS").getValue(),getComponent("unidstoreL4EOS").getValue());  		
+			getComponent("unidstoreEOS").setValue(getComponent("unidstoreL4EOS").getValue());   
+		} else if(@Length(getComponent("unidstoreL3EOS").getValue()) > 0) { 
+			viewScope.put(getComponent("unidnameEOS").getValue(),getComponent("unidstoreL3EOS").getValue());  		
+			getComponent("unidstoreEOS").setValue(getComponent("unidstoreL3EOS").getValue());   
+		} else if(@Length(getComponent("unidstoreL2EOS").getValue()) > 0) { 
+			viewScope.put(getComponent("unidnameEOS").getValue(),getComponent("unidstoreL2EOS").getValue()); 
+			getComponent("unidstoreEOS").setValue(getComponent("unidstoreL2EOS").getValue()); 
+		} else if(@Length(getComponent("unidstoreL1EOS").getValue()) > 0) {
+			viewScope.put(getComponent("unidnameEOS").getValue(),getComponent("unidstoreL1EOS").getValue()); 
+			getComponent("unidstoreEOS").setValue(getComponent("unidstoreL1EOS").getValue());  
+		}
+		
+		// Reset page scope variables
+		viewScope.put("SSJS_Return", "");
+		
+		var dialogName = getComponent("dialogEOS").getValue();
+		
+/*
+	For future use if we want to load Container information from parent application and Shelf document
+	inherits the same data as the product. (Alex Elliott 1st October 2015)
+		
+		// If the componentDetailsDialog is being opened save the underlying parent (if it's a Composite Pack)
+		if (dialogName == "componentDetailsDialog") {
+			if (typeof(composite) != "undefined") {
+				if (composite != null) {
+					saveCompApp(composite, null);
+				}
+			}
+		}
+*/
+		
+		getComponent(dialogName).show(); 
+		getComponent("unidstoreL2EOS").setValue(""); 
+		getComponent("unidstoreL3EOS").setValue(""); 
+		getComponent("unidstoreL4EOS").setValue("");
+		getComponent("dialogEOS").setValue("");
+	}	 
+} catch (e) {
+	print("executeOnServer custom control onRowDblClickEOS onClientLoad() error: " + e);
+}}]]></xp:this.action>
+		</xp:eventHandler>
+	</xp:panel>   
+	
+	<xp:panel
+		id="refreshPanelEOS">
+		<xp:table>
+			<xp:tr>
+				<xp:td>
+					<xp:inputText
+						id="unidstoreEOS" styleClass="hiddenField">
+					</xp:inputText>
+				</xp:td>				
+				<xp:td>
+					<xp:inputText
+						id="unidstoreL1EOS" styleClass="hiddenField">
+					</xp:inputText>
+				</xp:td>
+				<xp:td>
+					<xp:inputText
+						id="unidstoreL2EOS"
+						styleClass="hiddenField">
+					</xp:inputText>
+				</xp:td>
+				<xp:td>
+					<xp:inputText
+						id="unidstoreL3EOS"
+						styleClass="hiddenField">
+					</xp:inputText>
+				</xp:td>
+				<xp:td>
+					<xp:inputText
+						id="unidstoreL4EOS"
+						styleClass="hiddenField">
+					</xp:inputText>
+				</xp:td>			 
+				<xp:td>
+					<xp:inputText
+						id="unidnameEOS"
+						styleClass="hiddenField">
+					</xp:inputText>
+				</xp:td>
+				<xp:td>
+					<xp:inputText
+						id="dialogEOS"
+						styleClass="hiddenField">
+					</xp:inputText>
+				</xp:td>						
+			</xp:tr>
+		</xp:table>
+		
+		<xp:scriptBlock id="eosScriptBlock"
+			type="text/javascript">
+			<xp:this.value>
+				<![CDATA[function onGridDoubleClickEOS() {
+	try {		
+		var a = dojo.byId("#{id:onRowDblClickEOS}");
+		if (a)
+			a.click();
+	} catch (e) {
+		consoleLog("onGridDoubleClickEOS error: " + e);
+	}
+}]]>
+			</xp:this.value>
+		</xp:scriptBlock>
+	</xp:panel>
+		
+</xp:view>

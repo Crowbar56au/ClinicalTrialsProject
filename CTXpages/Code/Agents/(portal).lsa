@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(portal)' alias='portal' xmlns='http://www.lotus.com/dxl' version='9.0'
+ maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3' publicaccess='false'
+ designerversion='8.5.3' comment='this agent redirects portal links to where the user should be'>
+<noteinfo noteid='56e' unid='15B3010BEFB396DECA257F7700070A93' sequence='22'>
+<created><datetime dst='true'>20160315T121654,59+11</datetime></created>
+<modified><datetime>20190917T121740,33+10</datetime></modified>
+<revised><datetime>20190917T121740,31+10</datetime></revised>
+<lastaccessed><datetime>20190917T121740,31+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,31+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20190917T121741,18+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	On Error Resume Next
+	Dim s As New notessession
+	Dim doc As notesdocument
+	Dim appdoc As notesdocument
+	Dim APPID As String
+	Dim appver As String
+	Dim formname As String
+	Dim partonekey As String
+	Dim partoneunid As String
+	Dim partonedoc As NotesDocument
+	Set doc = s.DocumentContext
+	
+	If doc Is Nothing Then
+		Print "No Document Context"
+		Exit Sub
+	End If
+	
+	unid = Left(Strright(Lcase(doc.GetFirstItem("query_string").text),"&amp;unid="),32)
+	If Len(unid) &lt;&gt; 32 Then
+		Print "[/?&amp;INVALID_UNIVERSALID="+unid +"]"
+	End If
+	Set appdoc = s.CurrentDatabase.GetDocumentByUNID(unid)
+	If appdoc Is Nothing Then
+		Print "[/?&amp;APPLICATION_NOT_FOUND="+unid +"]"
+	Else
+		If appdoc.HasItem("form") Then
+			xpagename = appdoc.getfirstitem("form").text + ".xsp"
+		Else
+			Print "[/?&amp;APPLICATION_MISSING_XPAGENAME_FIELD="+unid +"]"
+		End If
+		partonekey = appdoc.getfirstitem("applicationid").text + "~" + appdoc.getfirstitem("applicationversion").text + "~Part1"
+		Set partonedoc = s.Currentdatabase.Getview("xPart1").Getdocumentbykey(partonekey, True)
+		If Not partonedoc Is Nothing Then
+			partoneunid = partonedoc.Universalid
+		End If 
+		Print "["+Strleft(doc.GetFirstItem("path_translated").text,".nsf") + ".nsf/" +xpagename + "?appdocumentId=" +unid+ "&amp;partonedocumentId=" + partoneunid +"&amp;action=editDocument]"
+	End If
+End Sub</lotusscript></code>
+<rundata processeddocs='0' exitcode='0' agentdata='267D447F67FC640CCA258478000CA6F3'>
+<agentmodified><datetime>20190917T121740,33+10</datetime></agentmodified>
+<agentrun><datetime dst='true'>20191127T084741,30+11</datetime></agentrun>
+<runlog>Started running agent '(portal)|portal' on 27/11/2019 08:47:41 AM
+Ran LotusScript code
+Done running agent '(portal)|portal' on 27/11/2019 08:47:41 AM
+</runlog></rundata>
+<item name='$POID'><datetime>20160620T120206,72+10</datetime></item></agent>
+

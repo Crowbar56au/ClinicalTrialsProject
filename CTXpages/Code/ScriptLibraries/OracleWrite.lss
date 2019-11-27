@@ -1,0 +1,549 @@
+'++LotusScript Development Environment:2:5:(Options):0:74
+Option Public
+Option Declare
+Use "Common"
+Use "GetDatabases"
+'++LotusScript Development Environment:2:5:(Forward):0:1
+Declare Sub Initialize
+Declare Sub sWritetoOracle(ndApplication As NotesDocument)
+Declare Function fintInitProcessReport(ndApplication As notesdocument) As Integer
+Declare Function fintFinProcessReport(strStatus As String) As Integer
+Declare Function fInitiateOracleWrite(PDoc As NotesDocument, strAppType As String) As Integer
+Declare Function  fPreOracleProcessing(ndoc As NotesDocument) As Integer
+Declare Function flngGetLocationFunctionID(ndoc As NotesDocument, intClientID As Long, strClientType As String) As Long
+Declare Function fintSendClientEmail(ndApplication As notesdocument, lngARTGID As Long) As Integer
+Declare Function flngGetFirstAvailableLocFunctionID(intClientID As Long, strFunctionCode  As String) As Long
+Declare Function fgetCurrentProductIDFromRegister(LicenceID As String) As String
+
+'++LotusScript Development Environment:2:5:(Declarations):0:10
+
+'Notes Objects
+Dim nsApplications As notessession
+Dim ndbApplications As notesdatabase
+Dim ndProcessReport As notesdocument
+Dim nrReportDetails As notesrichtextitem
+Dim ndProcessingProfile As notesdocument
+Dim nvClient As notesview
+Dim ndClient As notesdocument
+Const csUNCLASSIFIED = " [SEC=UNCLASSIFIED]"
+
+Const CS_ORACLE_FULL_WRITE = "BioApp New"
+Const CS_ORACLE_PRODUCT_VARIATION_WRITE = "BioApp Variation"
+Const CS_EMAIL_FAILED = "Email notification failed"
+Const CS_Write_FAILED = "Oracle write failure"
+Const CS_WRITE_COMPLETE = "Completed"
+'++LotusScript Development Environment:2:2:Initialize:1:10
+Sub Initialize
+	
+End Sub
+'++LotusScript Development Environment:2:2:sWritetoOracle:1:8
+Sub sWritetoOracle(ndApplication As NotesDocument)
+	
+	On Error Goto errorhandler
+	
+	  'Declare objects and variables
+	
+	
+	
+	
+	Dim strMessage As String,strAppUnid  As String,strAppId As String
+	Dim lngARTGID As Long
+	Dim lngPRODUCTID As Long	
+	Dim strText As String
+	Dim intReceiptNoFlag As Integer
+	Dim intTGAINFlag As Integer
+	Dim strApplicationStatus As String
+	Dim flagProcessingInProgress As Integer
+	Dim strNdDocUNID As String, strAppType As String
+	Dim ndcColl As NotesDocumentCollection	
+	Set nsApplications = New notessession
+	Set ndbApplications = nsApplications.CurrentDatabase	
+	
+	If Not ndApplication Is Nothing 	Then	
+		strAppId = ndApplication.ApplicationID(0)
+		Call fintInitProcessReport(ndApplication)
+		If Not(ndApplication.WriteStatus(0) =CS_EMAIL_FAILED)Then	
+			Call fintWriteReportMessage(ndProcessReport," Processing Application - "+strAppID)	
+			
+     'Check that the Receipt Number  have been entered. 			
+			If (Trim$(Cstr(ndApplication.ReceiptNumber(0))) = "") Then 
+				Call fintWriteReportMessage(ndProcessReport,"Application " + strAppID + " (Product Name: " + ndApplication.ProductName(0) + ") does not contain a Receipt Number" )				
+				ndApplication.WriteStatus =CS_WRITE_FAILED				
+				Call fintFinProcessReport(CS_WRITE_FAILED)  
+				Goto SaveDoc    
+			End If
+			
+			'Performing Pre Oracle processing
+			If Not( fPreOracleProcessing(ndApplication))Then
+				Call fintWriteReportMessage(ndProcessReport,"Error in Processing Application ("+strAppID+") Payment Agent\ function fPreOracleProcessing")
+				ndApplication.WriteStatus =CS_WRITE_FAILED
+				Call fintFinProcessReport(CS_WRITE_FAILED)
+				Goto SaveDoc   
+			End If			
+			
+			
+			'ndApplication.WriteStatus =CS_WRITE_FAILED	
+			'Call ndApplication.Save(True, True)
+			strAppUnid = ndApplication.UniversalID
+			
+			
+			If (ndApplication.ReplaceExisting(0)="N")Then 
+				strAppType = CS_ORACLE_FULL_WRITE
+			Else
+				strAppType = CS_ORACLE_PRODUCT_VARIATION_WRITE 				
+			End If		
+			Call fintDisplayStatus("Initiating Oracle write process for "+strAppType )
+			If Not (fInitiateOracleWrite(ndApplication,strAppType)) Then  
+          'Application failed to write to Oracle
+				ndApplication.WriteStatus =CS_WRITE_FAILED
+				Call fintFinProcessReport(CS_WRITE_FAILED)
+				Goto SaveDoc
+			Else
+				flagProcessingInProgress = False	
+				Delete ndApplication 'deleting in memory document 
+				Set ndApplication = ndbApplications.GetDocumentByUNID(strAppUnid)
+				ndApplication.ApplicationStatus= CS_WRITE_COMPLETE
+				ndApplication.WriteStatus =CS_WRITE_COMPLETE	
+			End If
+		End If
+		
+		'Getting ARTG number
+		If(ndApplication.WriteStatus(0) = CS_WRITE_COMPLETE	 Or ndApplication.WriteStatus(0) = CS_EMAIL_FAILED	)Then
+			If (ndApplication.ReplaceExisting(0)="N")Then
+				If(ndApplication.hasItem("ARTGID"))Then
+					lngARTGID = Clng(ndApplication.GetItemValue("ARTGID")(0))	
+				End If				
+			Else
+				lngARTGID = Clng(ndApplication.GetItemValue("CloneSource")(0))
+			End If
+			
+					' Email Notification
+			If( fintSendClientEmail(ndApplication,lngARTGID))Then
+				ndApplication.WriteStatus = CS_WRITE_COMPLETE	
+				Call fintDisplayStatus("Client Email Notification Sent.")
+				Call fintWriteReportMessage(ndProcessReport,"Client Email NotificationSent.")
+			Else
+				ndApplication.WriteStatus =CS_EMAIL_FAILED
+				Call fintDisplayStatus(CS_EMAIL_FAILED)
+				Call fintWriteReportMessage(ndProcessReport,CS_EMAIL_FAILED)
+			End If			
+		End If		
+		
+		Call fintFinProcessReport(ndApplication.WriteStatus(0))		
+		Call fintDisplayStatus("Application Processing completed.")
+		Call fintWriteReportMessage(ndProcessReport," Application Processing completed.")
+		
+SaveDoc:
+		Call ndApplication.Save(True, True)		
+		
+	End If
+	
+	Exit Sub
+	
+errorhandler:
+	
+	
+	Exit Sub
+End Sub
+
+
+'++LotusScript Development Environment:2:1:fintInitProcessReport:1:8
+Function fintInitProcessReport(ndApplication As notesdocument) As Integer
+     'Processing Report
+	Set ndProcessReport = ndbApplications.CreateDocument
+	ndProcessReport.Form = "fmProcessReport"
+	ndProcessReport.SubmissionID = ndApplication.SubmissionID(0)	
+	ndProcessReport.ApplicationID = ndApplication.ApplicationID(0)
+	ndProcessReport.ProductName = ndApplication.ProductName(0)
+	ndProcessReport.SponsorName = ndApplication.SponsorName(0)
+	ndProcessReport.AgentName = ndApplication.ApplicantName(0)
+	ndProcessReport.ReportStart = Cstr(Now)
+	Set nrReportDetails = ndProcessReport.CreateRichTextItem("ReportDetails")
+	Call ndProcessReport.Save(True, True)
+	
+	
+End Function
+'++LotusScript Development Environment:2:1:fintFinProcessReport:1:8
+Function fintFinProcessReport(strStatus As String) As Integer
+     'Finalise Process report	
+	ndProcessReport.ReportEnd = Cstr(Now)
+	ndProcessReport.ReportStatus = strStatus
+	Call ndProcessReport.Save(True, True)
+End Function
+'++LotusScript Development Environment:2:1:fInitiateOracleWrite:1:8
+Function fInitiateOracleWrite(PDoc As NotesDocument, strAppType As String) As Integer
+	Dim dbConfig As NotesDatabase, dbInterim As NotesDatabase
+	Dim Agent As NotesAgent
+	Dim ndRef As NotesDocument, ndLSXLog As notesdocument
+	
+	Dim strRefId As String,strStatus As String, strProcessunid As String
+	
+	Set dbConfig= fdbGetCFG
+	Set dbInterim = fdbgetInt()    ' lsx interim database
+	Set ndRef = dbconfig.CreateDocument
+	ndRef.form = "Reference"
+	ndRef.srcDatabase = ndbApplications.FilePath
+	ndRef.DocUNID = PDoc.UniversalID
+	ndRef.ApplicationType=strAppType
+	Call ndRef.ComputeWithForm(False,False)
+	Call ndRef.Save(True,False)
+	strRefId = ndRef.NoteID
+	Set Agent = dbConfig.GetAgent("WriteToOracle")
+	Call Agent.Run(strRefId) 
+	Delete ndRef
+	Set ndRef = dbConfig.GetDocumentByID(strRefId)
+	strStatus = ndRef.GetItemValue("ProcessStatus")(0)
+	strProcessunid= ndRef.GetItemValue("ProcessReportUNID")(0) ' getting Process report unid from Ref. doc
+	Set ndLSXLog  = dbInterim.GetDocumentByUNID(strProcessunid)  ' getting handle on process doc from interim database
+	If(strStatus = "Success")Then
+		Call fintWriteReportMessage(ndProcessReport,"Successfully Written To Oracle...")
+		If Not(ndLSXLog Is Nothing)Then			
+			Call nrReportDetails.AppendDocLink(ndLSXLog,"Click here to see further detail","Click here to see further detail")
+			Call nrReportDetails.AddNewline(1)
+		End If
+		fInitiateOracleWrite = True
+	Else
+		Call fintWriteReportMessage(ndProcessReport,"Write To Oracle Failed...")
+		If Not(ndLSXLog Is Nothing)Then
+			Call nrReportDetails.AppendDocLink(ndLSXLog,"Click here to see further detail","Click here to see further detail")
+			Call nrReportDetails.AddNewline(1)
+		End If
+		Print "Write To Oracle Failed...("+PDoc.SubmissionID(0)+")"
+		fInitiateOracleWrite = False
+	End If
+End Function
+'++LotusScript Development Environment:2:1:fPreOracleProcessing:1:8
+Function  fPreOracleProcessing(ndoc As NotesDocument) As Integer
+	
+	On Error Goto ErrHandler
+		'All constants are decribed in "Common" script library
+	Dim  ndbDeviceMan As notesdatabase
+	Dim nvDeviceMan As notesview
+	Dim ndClient As NotesDocument,ndSub As NotesDocument
+	Dim collLocation As NotesDocumentCollection
+	Dim strKey(1 To 3) As String
+	Dim i As Integer
+	Dim strPK_ProductID As String
+	Set ndbClient = fdbGetClient	
+	
+	'Populating Sponser Location Function Id
+	If (ndoc.SponsorID(0) <> "") Then
+		ndoc.SPONSORLOCATIONFUNCTIONID = flngGetLocationFunctionID(ndoc, Clng(ndoc.SponsorID(0)), "Sponsor")
+	End If          
+          'Populating Agent location function id.
+	If ndoc.ClientID(0) <> "" And ndoc.ClientID(0) <> ndoc.SponsorID(0) Then
+		ndoc.AgentId = ndoc.ClientId(0) 
+		ndoc.AGENTLOCATIONFUNCTIONID = flngGetLocationFunctionID(ndoc, Clng(ndoc.ClientId(0)), "Agent")
+               ' LBP added for sponsor address
+		ndoc.SPONSORLOCATIONFUNCTIONID  = flngGetLocationFunctionID(ndoc, Clng(ndoc.SponsorID(0)), "Sponsor")                 
+	End If
+	
+	ndoc.BMUBILLINGLOCFUNCTIONID= flngGetLocationFunctionID(ndoc, Clng(ndoc.SponsorID(0)), "Billing") 'SMS 03/08/07 AOS
+	
+      'Collect the number of formulations associated with the application.
+	If(ndoc.form(0)="CodeStockApp")Then		
+		Set nvApplicationSubs =  ndbApplications.GetView(AV_APPLICATIONSUBS) ' from common script library
+		Set ncSubFormulations = nvApplicationSubs.GetAllDocumentsByKey(ndoc.ApplicationID(0) & DF_FORMULATION, True)
+		
+		Select Case ncSubFormulations.Count
+		Case 1
+			ndoc.PRODUCTTYPE ="SM"      
+		Case Else
+			ndoc.PRODUCTTYPE ="CP"      
+		End Select
+	End If
+		' SB 25 July 2008 Jira: ACC-369 (looking for product id in the register to deactivate)
+	If Not(ndoc.GetItemValue("ReplaceExisting")(0) = "N")Then		
+		If(ndoc.HasItem("pk_ProductID"))Then
+			strPK_ProductID = fgetCurrentProductIDFromRegister(ndoc.cloneSource(0))
+			If Not(strPK_ProductID = Cstr(ndoc.pk_ProductID(0)))Then
+				Call ndoc.ReplaceItemValue("pk_ProductID_whencloned", ndoc.pk_ProductID(0)) ' backing up orignal "pk_product" field value just in case
+				Call ndoc.ReplaceItemValue("pk_ProductID", strPK_ProductID) 
+			End If		
+		End If	
+	End If
+	'End ' SB 25 July 2008 
+	
+	'Processing for Manufacturers
+	Set nvApplicationSubs =  ndbApplications.GetView(AV_APPLICATIONSUBS)
+	Set nvManufacturerLocationFunction = ndbClient.GetView(AV_MANUFACTURERLOCATIONFUNCTION)
+	Set ncSubManufacturers = nvApplicationSubs.GetAllDocumentsByKey(ndoc.ApplicationID(0) & DF_MANUFACTURER, True)     
+	Set ndSub = ncSubManufacturers.GetFirstDocument
+	Set ndbDeviceMan = fdbGetDevices
+	Set nvDeviceMan = ndbDeviceMan.GetView("LULocationActiveStreetRA")
+	While Not (ndSub Is Nothing)		
+' getting manufacturer location from Devices\manfact.nsf database
+		
+		If Cstr(ndSub.AusManufacturerID(0)) = "" Then			
+			Set collLocation = nvDeviceMan.GetAllDocumentsByKey( Clng(ndSub.OSManufacturerID(0)), True)
+		Else
+			Set collLocation = nvDeviceMan.GetAllDocumentsByKey( Clng(ndSub.AusManufacturerID(0)), True)
+		End If
+		
+		For i = 1 To collLocation.Count 
+			Set ndClient = collLocation.GetNthDocument(i)
+			If Not (ndClient Is Nothing) Then
+				If Cstr(ndSub.ManufacturerLocation(0)) = Cstr(ndClient.Location_ID(0)) Then
+					ndSub.LOCATIONFUNCTIONID = Clng(ndClient.Location_Function_Id(0))
+					Exit For
+				End If
+			End If
+		Next		
+		' set Manufacturer_id field
+		If(ndSub.GetItemValue("AusManufacturer")(0) = "OS")Then
+			Call ndSub.replaceItemValue("Manufacturer_Id",ndSub.GetItemValue("OSManufacturerID")(0))
+		Else
+			Call ndSub.replaceItemValue("Manufacturer_Id",ndSub.GetItemValue("AUSManufacturerID")(0))		
+		End If
+		
+		Call ndSub.Save(False,False)
+		Set ndSub = ncSubManufacturers.GetNextDocument(ndSub)
+	Wend
+	fPreOracleProcessing = True
+	Exit Function
+ErrHandler:
+	fPreOracleProcessing = False
+	Print("Pre Oracle processing failed. Please contact the system administrator."+ Error +" at line "+Erl)      
+	Exit Function
+End Function	
+
+'++LotusScript Development Environment:2:1:flngGetLocationFunctionID:1:8
+Function flngGetLocationFunctionID(ndoc As NotesDocument, intClientID As Long, strClientType As String) As Long
+     'Purpose:
+     'Get the location function ids for a client id.
+	
+     'Declare objects and variables	
+	Dim nCollClient As NotesDocumentCollection	
+	Dim strKey(1 To 3) As String
+	On Error Goto errorhandler
+	
+	'SMS 29/06/07 AOS: modified function
+	
+	Set ndbClient = fdbGetClient
+	
+	If (Lcase((strClientType)) = "sponsor") Or (Lcase(strClientType) = "billing") Then  	'check if client type is Sponsor, get regulatory address and find corresponding function code
+		Dim strRegAdd As String
+		Dim strFunctionCode As String
+		
+		If (Lcase((strClientType)) = "sponsor") Then   'SMS 1/08/07 
+			strRegAdd = ndoc.SponsorRegAdd(0)
+			strFunctionCode = "RA"                                 'SMS 23/01/08
+		Else
+			strRegAdd = ndoc.SponsorBillAdd(0)
+			strFunctionCode="B$"                                    'SMS 23/01/08
+		End If
+		If Not(strRegAdd  = "") Then 'Sb 30 May 2008 For existing application not having "SponsorRegAdd" and  "SponsorBillAdd"  fields
+			
+			Set nvClient = ndbClient.GetView("LUManufacturerLocationFunction") 
+			Set ncollClient = nvClient.GetAllDocumentsByKey(strRegAdd, True)
+		'SMS 23/01/08 changes made to pick the relevant location function based location document
+			If ncollClient.Count >0 Then
+				Set ndClient = nCollClient.GetFirstDocument
+				Do While Not ndClient Is Nothing
+					If Left$(ndClient.FUNCTION_CONCAT(0),2) = strFunctionCode Then
+						flngGetLocationFunctionID = ndClient.Location_Function_ID(0)
+						Exit Function	
+					End If
+					Set ndClient=nCollClient.GetNextDocument(ndClient)
+				Loop			
+				flngGetLocationFunctionID = False 
+				
+			Else
+				flngGetLocationFunctionID = False                'no locations were found
+			End If
+		Else 'Sb 30 May 2008 For existing application not having "SponsorRegAdd" and  "SponsorBillAdd"  fields
+			
+			flngGetLocationFunctionID  = flngGetFirstAvailableLocFunctionID(intClientID , strFunctionCode )
+			Exit Function	
+		End If
+		
+	End If
+	If (Lcase((strClientType)) = "agent") Then		   'if client type is agent loop through available function codes for address and pick the lowest
+		Dim ctr As Integer
+		ctr = 1
+		Set nvClient = ndbClient.GetView("LULocationFunctionActivePostalRA")
+		Set nCollClient = nvClient.GetAllDocumentsByKey(intClientID, True)
+		
+		If nCollClient.Count > 0 Then  ''e.g 4 location function documents found			
+			Do Until ctr = 12                     'TGA does not xpect RA's greater than 10/11
+				Set ndClient = nCollClient.GetFirstDocument				
+				Do While Not ndClient Is Nothing
+					If Clng(Mid(ndClient.Function_Concat(0),3,2 )) = ctr Then						
+						flngGetLocationFunctionID = ndClient.Location_Function_ID(0)
+						Exit Function
+					End If					
+					Set ndClient = nCollClient.GetNextDocument(ndClient)
+				Loop
+				ctr=ctr+1
+			Loop
+		End If		
+	End If
+	
+     'If script gets to here then the script has been unable to determine the location function id.
+	flngGetLocationFunctionID = False
+	Exit Function
+	
+errorhandler:
+	flngGetLocationFunctionID = False
+	Print("OTC Medicines Processing: flngGetLocationFunctionID failed. Please contact the system administrator." & Error & Erl)    
+End Function
+'++LotusScript Development Environment:2:1:fintSendClientEmail:1:8
+Function fintSendClientEmail(ndApplication As notesdocument, lngARTGID As Long) As Integer
+	
+     'Purpose:
+     'Send the client an email advising of the listing.
+     'Declare objects and variables
+	Dim ndbUserManagement As notesdatabase
+	Dim nvUserManagement As notesview
+	Dim nvKeywords As NotesView
+	Dim ndUserManagement As notesdocument
+	Dim ARTGNotificationEMail As NotesDocument
+	Dim Body As Variant
+	Dim strBody As String
+	Dim strLabelName As String
+	Dim strSponsorName As String
+	Dim strAUSTL As String
+	Dim strBioClass As String
+	Dim strDateOfListing As String
+	Dim strPaymentExemptionNUmber As String
+	Dim strEmailAddress As String ,strCCAddress As String
+	Const SENDER = "noreply@tga.gov.au"
+	
+	On Error Goto errorhandler
+	
+	Call fintDisplayStatus("Sending Client E-Mail...")
+	Call fintWriteReportMessage(ndProcessReport,"Sending Client E-Mail...")
+	Set nvKeywords = ndbApplications.GetView("Keywords")
+	Set ARTGNotificationEMail = nvKeywords.GetDocumentByKey("EMAIL_NOTIFICATION_CONTENT", True)
+	Set Body = ARTGNotificationEMail.GetFirstItem("Body")
+     'Set up variables
+	strLabelName = Cstr(ndApplication.LabelName(0))
+	strSponsorName = ndApplication.SponsorName(0)
+	strAUSTL = Cstr(lngARTGID)
+	strBioClass = Cstr(ndApplication.BiologicalClass(0))
+	strDateOfListing = Cstr(Today)
+	strCCAddress = ndApplication.ContactEmail(0)
+	
+	strBody = Body.GetUnFormattedText()
+	strBody = Replace(strBody,{<APPLICATIONIDENTIFIER>},ndApplication.ApplicationId(0),1,,5)
+	strBody = Replace(strBody, {<ARTGNUMBER>}, strAUSTL)
+	strBody = Replace(strBody, {<LABELNAME>}, strLabelName)
+	strBody = Replace(strBody, {<SPONSORNAME>}, strSponsorName)
+	strBody = Replace(strBody, {<BIOLOGICALCLASS>}, strBioClass)
+	strBody = Replace(strBody, {<ENTRYDATE>}, strDateOfListing)
+	
+     'Get the client email address.
+	Set ndbUserManagement = fdbGetUserMgt
+	Set nvUserManagement = ndbUserManagement.GetView("LUALLByFullName")
+	Set ndUserManagement = nvUserManagement.GetDocumentByKey(Cstr(ndApplication.SubmitterName(0)))
+	
+	If (ndUserManagement Is Nothing) Then
+		Messagebox "Unable to locate the client document in the User Management database"
+		Call fintWriteReportMessage(ndProcessReport,"Unable to locate the client document in the User Management database")
+		Exit Function
+	End If
+	strEmailAddress = Cstr(ndUserManagement.AccountEmail(0))
+	
+     'Create and send email to client
+	Dim ndEmail As notesdocument
+	Set ndEmail = ndbApplications.CreateDocument
+	ndEmail.Form = "Memo"
+	ndEmail.SendTo = strEmailAddress
+	If Not (strCCAddress ="")Then
+		ndEmail.CopyTo = strEmailAddress
+	End If
+	
+	ndEmail.Subject = "Registration Advice from Therapeutic Goods Administration for Product '" + strLabelName + "'" + csUNCLASSIFIED
+	ndEmail.Body = strBody
+	ndEmail.Principal = SENDER
+	ndEmail.From = SENDER
+	ndEmail.AltFrom = SENDER
+	ndEmail.SendFrom = SENDER
+	ndEmail.INetFrom = SENDER
+	ndEmail.tmpDisplaySentBy = SENDER
+	ndEmail.tmpDisplayFrom_Preview = SENDER
+	ndEmail.DisplaySent = SENDER
+	
+      ' LBP 07/02/2003 Changed to Not Save document and not send form with memo
+	ndEmail.SaveOptions = "0"
+	Call ndEmail.Send( False)
+	
+	fintSendClientEmail = True
+	Call fintWriteReportMessage(ndProcessReport,"Client E-Mail has been sent.")
+	
+	Exit Function
+	
+errorhandler:
+	
+	fintSendClientEmail = False
+	Msgbox Cstr(Err()) +" ErrorMsg: " + Error() + " on line #:" + Cstr(Erl())
+	Exit Function
+End Function
+'++LotusScript Development Environment:2:1:flngGetFirstAvailableLocFunctionID:1:8
+Function flngGetFirstAvailableLocFunctionID(intClientID As Long, strFunctionCode  As String) As Long
+	On Error Goto errHandler
+	Dim nCollLoc As NotesDocumentCollection	
+	Dim ndLoc As NotesDocument
+	Dim strLookupkey As String, vwName As String
+	Dim ctr As Integer
+	
+	Select Case 	strFunctionCode 
+	Case "RA"
+		vwName = "LULocationFunctionActivePostalRA"
+	Case"B$"
+		vwName = "LULocationFunctionActivePostalB$"		
+	Case Else		
+		flngGetFirstAvailableLocFunctionID = False
+		Exit Function		
+	End Select
+	
+	Set nvClient = ndbClient.GetView(vwName) 
+	'strLookupkey = Cstr(intClientID)
+	Set ncollLoc = nvClient.GetAllDocumentsByKey(intClientID,True)
+	
+	ctr = 1	
+	If ncollLoc .Count > 0 Then  
+		Do Until ctr = 12                     
+			Set ndLoc = nCollLoc.GetFirstDocument				
+			Do While Not ndLoc Is Nothing
+				If Clng(Mid(ndLoc.Function_Concat(0),3,2 )) = ctr Then					
+					flngGetFirstAvailableLocFunctionID= ndLoc.Location_Function_ID(0)
+					Exit Function
+				End If					
+				Set ndLoc= nCollLoc.GetNextDocument(ndLoc)
+			Loop
+			ctr=ctr+1
+		Loop
+	End If	
+	
+	flngGetFirstAvailableLocFunctionID = False
+	
+errHandler:
+	Msgbox "Error in flngGetFirstAvailableLocFunctionID function of OTC Medicine Processing Agent"+ Error +" at line "+Erl
+	Exit Function
+End Function
+'++LotusScript Development Environment:2:1:fgetCurrentProductIDFromRegister:1:8
+Function fgetCurrentProductIDFromRegister(LicenceID As String) As String
+	Dim dbARTG As NotesDatabase
+	Dim dcARTG As NotesDocumentCollection
+	Dim docARTG As NotesDocument
+	Dim vwARTG As NotesView
+	Dim LatestProductID As Long
+	Set dbARTG = fdbGetRegister
+	Set vwARTG = dbARTG.GetView("tblProducts")
+	Set dcARTG = vwARTG.GetAllDocumentsByKey(LicenceId+"~CU",True)	
+	If(dcARTG.Count >0)Then		
+		Set docARTG = dcARTG.GetFirstDocument
+		LatestProductID = Clng(docARTG.productID(0))
+		While Not(docARTG Is Nothing)
+			If(Clng(docARTG.productID(0) )> LatestProductID )Then
+				LatestProductID = Clng(docARTG.productID(0))
+			End If			
+			Set docARTG = dcARTG.GetNextDocument(docARTG)
+		Wend		
+		fgetCurrentProductIDFromRegister = Cstr(LatestProductID )
+		Exit Function
+	End If
+	fgetCurrentProductIDFromRegister = ""
+	Exit Function
+End Function

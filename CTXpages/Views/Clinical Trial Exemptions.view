@@ -1,0 +1,88 @@
+<?xml version='1.0' encoding='utf-8'?>
+<view name='Clinical Trial Exemptions' alias='ctx' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='web mobile'
+ showinmenu='true' publicaccess='false' designerversion='8.5.3' comment='View for Notes'
+ unreadmarks='none' onopengoto='top' onrefresh='displayindicator' headers='beveled'
+ opencollapsed='false' showresponsehierarchy='false' showmargin='false' shrinkrows='false'
+ extendlastcolumn='false' showhierarchies='false' unreadcolor='black' rowlinecount='1'
+ headerlinecount='1' rowspacing='1' bgcolor='white' altrowcolor='#efefef'
+ totalscolor='gray' headerbgcolor='white' boldunreadrows='false' evaluateactions='false'
+ allownewdocuments='false' allowcustomizations='false' hidemarginborder='false'
+ marginwidth='0px' marginbgcolor='white' uniquekeys='false' indexrefresh='automatic'
+ indexdiscard='inactivebyinterval' indexdiscardinterval='24' initialbuildrestricted='false'
+ noemptycategories='false'>
+<noteinfo noteid='1f6' unid='12C28ACAECFCA6A7CA257F770006FCFB' sequence='14'>
+<created><datetime dst='true'>20160315T121619,79+11</datetime></created>
+<modified><datetime>20160628T151503,72+10</datetime></modified>
+<revised><datetime>20160628T151503,71+10</datetime></revised>
+<lastaccessed><datetime dst='true'>20191127T020254,77+11</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152009,02+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='selection'><formula>SELECT Type = "Application" &amp; !@IsAvailable($Conflict) &amp; ClinicalTrialType = "CTX"</formula></code><code
+ event='form'><formula>@If(@ClientType="Notes";"CTXApplicationControlData";"ctx")</formula></code>
+<actionbar bgcolor='navy' bordercolor='black'>
+<actionbuttonstyle showdropdown='true' bgcolor='#6260a1'/><font size='9pt'
+ color='white'/><border width='0px 0px 1px'/>
+<action title='Categori_ze' showinbar='false' systemcommand='categorize'/>
+<action title='_Edit Document' showinbar='false' systemcommand='edit'/>
+<action title='Send Docu_ment' showinbar='false' systemcommand='send'/>
+<action title='_Forward' showinbar='false' systemcommand='forward'/>
+<action title='_Move To Folder...' showinbar='false' systemcommand='movetofolder'/>
+<action title='_Remove From Folder' showinbar='false' systemcommand='removefromfolder'/></actionbar>
+<column sort='descending' hidedetailrows='false' itemname='$8' width='16.2500'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='false' sortnocase='true'
+ showaslinks='false' hidden='true'><font size='8pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20'/><columnheader title='Hidden Sort Column'><font
+ size='9pt'/></columnheader><datetimeformat show='datetime' date='yearmonthday'
+ fourdigityearfor21stcentury='true' time='hourminutesecond' zone='never' dateformat='weekdaydaymonthyear'
+ dayformat='twodigitday' monthformat='twodigitmonth' yearformat='fourdigityear'
+ weekdayformat='shortname' dateseparator1=' ' dateseparator2='/' dateseparator3='/'
+ timeseparator=':' preference='usersetting'/><numberformat legacy='true' format='general'
+ varying='true' punctuated='false' parens='false' percent='false' bytes='false'/><code
+ event='value'><formula>@Modified</formula></code></column>
+<column hidedetailrows='false' itemname='Date' width='10' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='false' sortnocase='true' showaslinks='false'><font
+ size='8pt' name='Arial' pitch='variable' truetype='true' familyid='20'/><columnheader
+ title='Date'><font size='9pt'/></columnheader><datetimeformat show='date'
+ date='yearmonthday' fourdigityear='true' time='hourminutesecond' zone='never'
+ dateformat='weekdaydaymonthyear' dayformat='twodigitday' monthformat='twodigitmonth'
+ yearformat='fourdigityear' weekdayformat='shortname' dateseparator1=' ' dateseparator2='/'
+ dateseparator3='/' timeseparator=':' preference='usersetting'/><numberformat
+ format='general' punctuated='false' parens='false' percent='false' bytes='false'/><code
+ event='value'><formula>strDay := @Text(@Day(@Modified));
+strDay := @Repeat("0"; 1; 2-@Length(strDay)) + strDay;
+strMonth := @Text(@Month(@Modified));
+strMonth := @Repeat("0"; 1; 2-@Length(strMonth)) + strMonth;
+@Text(@Year(@Modified)) + "-" + strMonth + "-" + strDay</formula></code></column>
+<column hidedetailrows='false' itemname='Identifier' width='19.5000' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='true' sortnocase='true' showaslinks='false'><font
+ size='8pt' name='Arial' pitch='variable' truetype='true' familyid='20'/><columnheader
+ title='Identifier'><font size='9pt'/></columnheader><numberformat legacy='true'
+ format='general' varying='true' punctuated='false' parens='false' percent='false'
+ bytes='false'/><code event='value'><formula>ApplicationID</formula></code></column>
+<column hidedetailrows='false' itemname='Client Reference' width='28' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='true' sortnocase='true' showaslinks='false'><font
+ size='8pt' name='Arial' pitch='variable' truetype='true' familyid='20'/><columnheader
+ title='Client Reference'><font size='9pt'/></columnheader><numberformat legacy='true'
+ format='general' varying='true' punctuated='false' parens='false' percent='false'
+ bytes='false'/><code event='value'><formula>@If(ApplicantName="";"None";ApplicantName)</formula></code></column>
+<column hidedetailrows='false' itemname='Information' width='17.1250' resizable='false'
+ separatemultiplevalues='false' sortnoaccent='true' sortnocase='true' showaslinks='false'><font
+ size='8pt' name='Arial' pitch='variable' truetype='true' familyid='20'/><columnheader
+ title='Information'><font size='9pt'/></columnheader><numberformat legacy='true'
+ format='general' varying='true' punctuated='false' parens='false' percent='false'
+ bytes='false'/><code event='value'><formula>@If(@Length(ClientReference) &gt; 100;
+	@Left(ClientReference; 100)+"...";
+	ClientReference
+)</formula></code></column>
+<column hidedetailrows='false' itemname='Sponsor' width='23.8750' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='false' sortnocase='true' showaslinks='false'><font
+ size='8pt' name='Arial' pitch='variable' truetype='true' familyid='20'/><columnheader
+ title='Sponsor'><font size='9pt'/></columnheader><numberformat legacy='true'
+ format='general' varying='true' punctuated='false' parens='false' percent='false'
+ bytes='false'/><code event='value'><formula>@If(@Length(SponsorName) &gt; 100;
+	@Left(SponsorName; 100)+"...";
+	SponsorName
+)</formula></code></column></view>
+

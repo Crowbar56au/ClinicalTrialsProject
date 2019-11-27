@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(PrintApplicationWeb)' xmlns='http://www.lotus.com/dxl' version='9.0'
+ maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3' publicaccess='false'
+ designerversion='7' restrictions='unrestricted'>
+<noteinfo noteid='57e' unid='2604D32C3967F919CA257F7700070C0F' sequence='14'>
+<created><datetime dst='true'>20160315T121658,39+11</datetime></created>
+<modified><datetime>20160628T151506,88+10</datetime></modified>
+<revised><datetime>20160628T151506,87+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,87+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,33+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151506,93+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+Option Declare
+Use "PrintApplication"
+
+
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	On Error Goto errHandler
+	On Error 4091 Goto errInvalidUniversalID
+	
+	'PWB 08Oct07 - AOS Portal compatible update
+	
+	Dim strQueryString As String
+	Dim strUNID As String
+	
+	Set session = New NotesSession
+	Set dbCurrent = session.CurrentDatabase
+	Set cdoc = session.DocumentContext
+	
+	strQueryString = cdoc.Query_String(0)
+	strUNID = GetWebVariable(strQueryString, "unid")
+	
+	Call PrintApplicationFromWeb(strUNID)
+	Exit Sub
+	
+errInvalidUniversalID:
+	Call returnResponse(False, "Refresh", "The document you wish to print could not be found.")
+	Exit Sub
+errHandler:
+	Call returnResponse(False, "", "There was an unexpected error while attempting to print the document requested: Error " &amp; Err &amp; " at line " &amp; Erl &amp; " - " &amp; Error)
+	Exit Sub
+End Sub
+</lotusscript></code><code event='GetWebVariable'><lotusscript>Function GetWebVariable (querystring As String, argname As String) As String
+	Dim tmpstr As String	
+	GetWebVariable = ""
+	tmpstr = Strright(querystring, argname + "=")
+	
+	If (Instr(tmpstr, "&amp;") &lt;&gt; 0) Then
+		GetWebVariable = Strleft(tmpstr, "&amp;")
+	Else
+		GetWebVariable = tmpstr
+	End If
+End Function</lotusscript></code>
+<item name='$POID'><datetime>20160620T120208,42+10</datetime></item></agent>
+

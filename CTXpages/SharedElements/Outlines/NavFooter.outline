@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='utf-8'?>
+<outline name='NavFooter' alias='nFoot' xmlns='http://www.lotus.com/dxl' version='9.0'
+ maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='web' publicaccess='false'
+ designerversion='7'>
+<noteinfo noteid='36a' unid='B367A48A41AA9B61CA257F7700070118' sequence='13'>
+<created><datetime dst='true'>20160315T121630,32+11</datetime></created>
+<modified><datetime>20160628T151505,10+10</datetime></modified>
+<revised><datetime>20160628T151505,09+10</datetime></revised>
+<lastaccessed><datetime>20160628T151505,09+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,14+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<outlineentry label='User Actions' type='none' displayimage='false'/>
+<outlineentry label='Report an Issue' level='1' type='action' displayimage='false'><code
+ event='value'><formula>ResourceDB:=@GetProfileField("System Profile Document";"RES_Db");
+ResourceDBServer := @Subset(@DbName;1);
+
+lkup:=@DbLookup("":"";ResourceDBServer:ResourceDB;"ResourceConfig";"ReportIssue";5);
+
+emailAdd:=@Word(lkup;"~";1);
+emailSub:=@Word(lkup;"~";2);
+emailBody:=@Word(lkup;"~";3);
+
+@If(@IsError(lkup);@Prompt([Ok];"Report an Issue";"There was an error looking up the Resource database");
+
+@Command( [MailComposeMemo] ):
+@Command([EditGotoField]; "EnterSendTo"):
+@Command([EditInsertText]; emailAdd):
+@Command([EditGotoField] ; "Subject"):
+@Command([EditInsertText]; emailSub + " " +@DbTitle):
+@Command([EditGotoField] ; "Body"):
+@Command([EditInsertText]; emailBody)+@NewLine);""</formula></code></outlineentry>
+<outlineentry label='Help' level='1' type='action' displayimage='false'><code
+ event='value'><formula>HelpDB:=@GetProfileField("System Profile Document";"SHL_Db");
+CurrentServer := @Subset(@DbName;1);
+GetView := "ARTG";
+@Command([FileOpenDatabase];CurrentServer:HelpDB;GetView;0;1)</formula></code></outlineentry>
+<outlineentry label='Close' level='1' type='action' displayimage='false'><code
+ event='value'><formula>@Command([FileCloseWindow])</formula></code></outlineentry></outline>
+

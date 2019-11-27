@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<subform name='HTMLEnd' xmlns='http://www.lotus.com/dxl' version='9.0' maintenanceversion='1.0'
+ replicaid='CA257FDB001B5780' designerversion='7' renderpassthrough='true'>
+<noteinfo noteid='2de' unid='BE5EE9CFB4FD0439CA257FD8000B26F2' sequence='14'>
+<created><datetime>20160620T120148,66+10</datetime></created>
+<modified><datetime>20160628T151503,38+10</datetime></modified>
+<revised><datetime>20160628T151503,37+10</datetime></revised>
+<lastaccessed><datetime>20160628T151503,37+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152009,79+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1' leftmargin='1in' tabs='L1in'/>
+<par def='1'><run><font color='#00c200'/>&lt;script type="text/javascript"&gt;&lt;!-- </run></par>
+<pardef id='2' leftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='2'><run><font color='#00c200'/> --&gt;&lt;/script&gt;</run></par>
+<par def='1'><run><font color='#00c200'/>&lt;/body&gt;&lt;/html&gt;</run></par></richtext></body>
+<item name='$$ScriptName' summary='false' sign='true'><text>HTMLEnd</text></item></subform>
+

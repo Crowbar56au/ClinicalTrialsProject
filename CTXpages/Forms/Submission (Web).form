@@ -1,0 +1,1239 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form name='Submission (Web)' alias='submission' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='notes mobile'
+ nocompose='true' noquery='true' treatashtml='true' publicaccess='false' designerversion='8.5.3'
+ comment='the readform web version'>
+<noteinfo noteid='3b6' unid='F39E131AF3AB91BBCA257FD8000B28D0' sequence='14'>
+<created><datetime>20160620T120153,44+10</datetime></created>
+<modified><datetime>20160628T151505,62+10</datetime></modified>
+<revised><datetime>20160628T151505,61+10</datetime></revised>
+<lastaccessed><datetime>20160628T151505,61+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,31+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1' leftmargin='0.7500in' rightmargin='76%' hide='notes web'/>
+<section expanded='true'><sectiontitle pardef='1' color='teal'><font color='red'/><text
+>hidden notes fields</text></sectiontitle>
+<pardef id='2' leftmargin='1in' rightmargin='76%' hide='notes web'/>
+<par def='2'><run><font color='red'/>Client: </run><field type='text' kind='computedfordisplay'
+ name='ClientDB'><code event='defaultvalue'><formula>REM {Returns db file path};
+DBPath := @GetProfileField("System Profile Document";"SCL_Path");
+@ReplaceSubstring(@Word(DBPath;"!!";2); "\\"; "/")</formula></code></field><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='10' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font color='red'/>-</run><field
+ type='text' kind='computedfordisplay' name='ClientServer'><code event='defaultvalue'><formula
+>REM {Returns db server};
+@GetProfileField("System Profile Document";"SCL_Server")</formula></code></field><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='19' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font color='red'/>-</run><field
+ type='text' kind='computedwhencomposed' name='ClientId' htmlid='ClientId'><code
+ event='defaultvalue'><formula>@IfError(@Text(@DbLookup( "" : "NoCache" ; "":@GetProfileField("System Profile Document";"SUM_DB"); "LULM" ; @Name( [CN] ;
+@UserName ) ; "ClientID" )); "User not found")</formula></code></field><compositedata
+ type='98' prevtype='65402' nexttype='222' afterparcount='29' containertype='65418'
+ aftercontainercount='2' afterbegincount='4'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font color='red'/>-</run><field
+ type='text' kind='computed' name='LUClientType'><code event='defaultvalue'><formula
+>REM {Get the Client ID using the Username};
+cID := @If( @Contains( ClientID ; "ERROR" ) ; "Error" ; "" );
+
+REM {Check if ID is an agent};
+agentResult := @DbLookup( "" : "NoCache" ; "" : ClientWDB ; "LUClientType" ; ClientID ; 2 );
+
+REM {If username was not found produce error message, if agent was not found in lookup user is sponsor, if was found user is agent};
+@If( cID = "Error" ; "ERROR: Could not find User Name \"" + @Name( [CN] ; @UserName ) + "\" in User Manager database" ;
+         @IsError( agentResult ) ; "Sponsor" ; agentResult )</formula></code></field><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='38' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font color='red'/>-</run><field
+ type='text' kind='computedwhencomposed' name='ClientName' htmlid='AgentName'
+ htmlclass='L98P'><code event='defaultvalue'><formula>@IfError(@DbLookup(""; "":@GetProfileField("System Profile Document";"ClientWebDB"); "LUClientType"; @Right(@UserName; "_"); "ClientName"; [FailSilent]);"Error")</formula></code></field><compositedata
+ type='98' prevtype='65402' nexttype='222' afterparcount='48' containertype='65418'
+ aftercontainercount='2' afterbegincount='4'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font color='red'/></run><field
+ type='number' kind='editable' name='InvoiceAmount'><numberformat format='general'
+ varying='true' digits='2' punctuated='false' parens='false' percent='false'
+ bytes='false'/></field><run><font color='red'/></run><field type='text' allowmultivalues='true'
+ kind='editable' name='ApplicationEntries' listinputseparators='comma semicolon'
+ listdisplayseparator='semicolon'/><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='65' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font color='red'/></run></par>
+<pardef id='3' leftmargin='1in' hide='web' tabs='L1.1438in L1.5375in L1.9313in L2.3250in L2.7188in L3.1125in L3.5063in L3.9000in L4.2938in L4.6875in L5.0813in L5.4750in L5.8688in L6.2625in L6.6563in L7.0500in L7.4438in L7.8375in L8.2313in L8.6250in'/>
+<par def='3'><run><font color='green'/>readers: </run><field type='readers'
+ allowmultivalues='true' kind='computed' name='readers' listinputseparators='comma'
+ listdisplayseparator='comma'><code event='defaultvalue'><formula>@Unique(@Author:"[TGA]":"[System Profile]":"LocalDomainServers":"LocalDomainAdmins":"Sime Administrator":"$Notes Support")</formula></code></field><run
+><font color='green'/>, authors: </run><field type='authors' allowmultivalues='true'
+ kind='computed' name='authors' listinputseparators='comma' listdisplayseparator='comma'><code
+ event='defaultvalue'><formula>@Unique(@Author:"[TGA]":"[System Profile]":"LocalDomainServers":"LocalDomainAdmins":"Sime Administrator":"$Notes Support")</formula></code></field><run
+><font color='green'/>, Query_String: </run><field type='text' kind='computedfordisplay'
+ name='query_string' htmlid='query_string'><code event='defaultvalue'><formula
+>query_string</formula></code></field><compositedata type='98' prevtype='65402'
+ nexttype='222' afterparcount='27' containertype='65418' aftercontainercount='2'
+ afterbegincount='4'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font color='green'/>, Used for Validation DB: </run><field
+ type='text' kind='computedfordisplay' name='Server_Protocol_Name'><code event='defaultvalue'><formula
+>@If(@Contains(HTTP_Referer;"/"); @Left(HTTP_Referer;"/"); HTTP_Referer)</formula></code></field><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='36' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font color='green'/>, query_string_decoded:</run><field
+ type='text' kind='computedfordisplay' name='query_string_decoded'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='45' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font color='green'/></run></par></section>
+<pardef id='4' leftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='4'><run><font color='green'/>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"&gt;</run></par>
+<par def='4'><run><font style='bold'/>&lt;html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"&gt;</run></par>
+<par def='4'><run><font style='bold'/>&lt;head&gt;</run></par>
+<par def='4'><run><font color='green'/>&lt;title&gt;TGA eBS :: Clinical Trials Submissions&lt;/title&gt;</run></par>
+<pardef id='5' leftmargin='1in' tabs='L1in'/>
+<par def='5'><run><font color='green'/>&lt;!-- (an attempt) to prevent caching of grid data (from Microsoft Support) --&gt;</run></par>
+<par def='5'><run><font color='green'/>&lt;!-- support.microsoft.com/kb/234067 and support.microsoft.com/kb/222064 --&gt;</run></par>
+<par def='4'><run><font color='green'/>&lt;META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE"&gt;</run></par>
+<par def='4'><run><font color='green'/>&lt;META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE"&gt;</run></par>
+<par def='4'><run><font color='green'/>&lt;META HTTP-EQUIV="Expires" CONTENT="-1"&gt;</run></par>
+<pardef id='6' leftmargin='1.1806in' firstlineleftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='6'>&lt;meta http-equiv="X-UA-Compatible" content="IE=8"&gt;&lt;/meta&gt;</par>
+<par def='4'><run><font color='green'/>&lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8" /&gt;</run></par>
+<pardef id='7' leftmargin='0.7500in' tabs='L1in'/><subformref name='HTMLHeadSubmission'/>
+<par def='5'><run><font color='green'/>&lt;script type="text/javascript" src="</run><run
+><font color='green'/>/domjs/dojo-1.5.0</run><run><font color='green'/>/dojo/dojo.js" djConfig="parseOnLoad:true, isDebug:true"&gt;&lt;/script&gt;</run></par>
+<par def='4'><run><font color='green'/>&lt;script type="text/javascript" src="standard.js"&gt;&lt;/script&gt;</run></par>
+<pardef id='8' leftmargin='1.2500in' firstlineleftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='8'><run><font color='green'/>&lt;script type="text/javascript" SRC="/</run><run
+><font color='green'/><computedtext><code event='value'><formula>@WebDbName</formula></code></computedtext></run><run
+><font color='green'/>/LookupCT?openagent&amp;VARNAME=storeApplicationTypes&amp;F=CT&amp;S=W&amp;T=PRODTYPE&amp;R=</run><run
+><font color='green'/><computedtext><code event='value'><formula>@Text(@Second(@Now) * @Minute(@Now) * @Random+1)</formula></code></computedtext></run><run
+><font color='green'/>"&gt;&lt;/script&gt;</run></par>
+<pardef id='9' leftmargin='1.7500in' firstlineleftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='9'><run><font color='green'/>&lt;script type="text/javascript"&gt;</run></par>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='8' borderstyle='single' hidewhenexpanded='true' color='black'><text
+>Globals</text></sectiontitle>
+<pardef id='10' leftmargin='3.4521in' firstlineleftmargin='1.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='10'>var gValidationDB = '<computedtext><code event='value'><formula
+>server_protocol_name+"/"+@ReplaceSubstring(@GetProfileField("System Profile Document"; "CTV_Db"); "\\"; "/")</formula></code></computedtext>';</par>
+<par def='10'>var submitterName = '<computedtext><code event='value'><formula
+>@Name([CN]; @UserName)</formula></code></computedtext>'</par>
+<pardef id='11' leftmargin='1.5000in' firstlineleftmargin='1.2500in' tabs='L1in'/>
+<par def='11'>var baselookup = 'LookupData?OpenAgent';</par>
+<pardef id='12' leftmargin='2.7500in' firstlineleftmargin='1.2500in' tabs='L1in'/>
+<par def='12'>var tmpIDs = new Array();  //to hold the unique IDs of the selected applications</par>
+<pardef id='13' leftmargin='5in' firstlineleftmargin='1.2500in' tabs='L1in'/>
+<par def='13'>var tmpAppVersion = new Array();  //to hold data - Application Version</par>
+<pardef id='14' leftmargin='3in' firstlineleftmargin='1.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='14'>var tmpStoreValidation;</par>
+<par def='13'>var djstore_SubmissionInfo;</par>
+<par def='13'>var printInvoiceURL = '';</par>
+<par def='13'>var submissionURL = '';</par>
+<pardef id='15' leftmargin='4.6257in' firstlineleftmargin='1.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='15'>var strMultiApp;</par>
+<par def='10'>var JSON2;</par>
+<par def='10'>function consoleLog(e) { try { if(console) console.log(e); }catch(e){} }</par></section>
+<pardef id='16' leftmargin='3.4521in' firstlineleftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='16' borderstyle='single' hidewhenexpanded='true' color='black'><text
+>JSON.stringify and JSON.parse</text></sectiontitle>
+<par def='10'><run><font style='bold'/>if (!JSON2) { JSON2 = {};}</run></par>
+<par def='10'><run><font style='bold underline'/>(function () { "use strict"; function f(n) {</run></par>
+<pardef id='17' leftmargin='3.4521in' firstlineleftmargin='1.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='17'><run><font style='bold'/>// Format integers to have at least two digits.</run></par>
+<par def='17'>return n &lt; 10 ? '0' + n : n;</par>
+<pardef id='18' leftmargin='3.4521in' firstlineleftmargin='1.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='18'>}</par>
+<par def='18'>if (typeof Date.prototype.toJSON !== 'function') {</par>
+<par def='17'>Date.prototype.toJSON = function (key) {</par>
+<pardef id='19' leftmargin='3.4521in' firstlineleftmargin='2in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='19'>return isFinite(this.valueOf()) ? this.getUTCFullYear() + '-' + f(this.getUTCMonth() + 1) + '-' + f(this.getUTCDate()) + 'T' + f(this.getUTCHours()) + ':' + f(this.getUTCMinutes()) + ':' + f(this.getUTCSeconds()) + 'Z' : null;</par>
+<par def='17'>};</par>
+<par def='17'>String.prototype.toJSON =</par>
+<par def='17'>Number.prototype.toJSON =</par>
+<par def='17'>Boolean.prototype.toJSON = function (key) {</par>
+<par def='19'>return this.valueOf();</par>
+<par def='17'>};</par>
+<par def='18'>}</par>
+<par def='18'>var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,</par>
+<par def='18'>escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,</par>
+<par def='18'>gap, indent, </par>
+<par def='18'>meta = {'\b': '\\b', '\t': '\\t', '\n': '\\n', '\f': '\\f', '\r': '\\r', '"': '\\"', '\\': '\\\\' }, rep;	<run
+><font style='bold'/>// table of character substitutions</run></par>
+<par def='18'/>
+<par def='18'><run><font style='bold underline'/>function quote(string) {</run></par>
+<par def='17'><run><font style='bold' color='green'/>// If the string contains no control characters, no quote characters, and no backslash characters, then we can safely slap some quotes around it. Otherwise we must also replace the offending characters with safe escape sequences.</run></par>
+<par def='17'/>
+<par def='17'>escapable.lastIndex = 0;</par>
+<par def='17'>return escapable.test(string) ? '"' + string.replace(escapable, function (a) {</par>
+<par def='19'>var c = meta[a];</par>
+<par def='19'>return typeof c === 'string' ? c : '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);</par>
+<par def='17'>}) + '"' : '"' + string + '"';</par>
+<par def='18'>}</par>
+<par def='18'/>
+<par def='18'><run><font size='12pt' style='bold underline'/>function str(key, holder) {</run></par>
+<par def='17'>// Produce a string from holder[key].</par>
+<par def='17'>var i, // The loop counter.</par>
+<par def='17'>k, // The member key.</par>
+<par def='17'>v, // The member value.</par>
+<par def='17'>length, mind = gap, partial, value = holder[key];</par>
+<par def='17'/>
+<par def='17'>if (k) { var ts1 = k+'';</par>
+<par def='19'>if (ts1.charAt(0) == "_") return '';</par>
+<par def='17'>};</par>
+<par def='17'/>
+<par def='17'>// If the value has a toJSON method, call it to obtain a replacement value.</par>
+<par def='17'>if (value &amp;&amp; typeof value === 'object' &amp;&amp; typeof value.toJSON === 'function') {</par>
+<par def='19'>value = value.toJSON(key);</par>
+<par def='17'>};</par>
+<par def='17'/>
+<par def='17'>// If we were called with a replacer function, then call the replacer to obtain a replacement value.</par>
+<par def='17'>if (typeof rep === 'function') {</par>
+<par def='19'>value = rep.call(holder, key, value);</par>
+<par def='17'>};</par>
+<par def='17'>// What happens next depends on the value's type.</par>
+<par def='17'>switch (typeof value) {</par>
+<par def='17'>case 'string':</par>
+<par def='19'>return quote(value);</par>
+<par def='17'>case 'number':</par>
+<par def='19'>// JSON numbers must be finite. Encode non-finite numbers as null.</par>
+<par def='19'>return isFinite(value) ? String(value) : 'null';</par>
+<par def='17'>case 'boolean':</par>
+<par def='17'>case 'null':</par>
+<par def='19'>// If the value is a boolean or null, convert it to a string. Note: typeof null does not produce 'null'. The case is included here in the remote chance that this gets fixed someday.</par>
+<par def='19'>return String(value);</par>
+<par def='19'>// If the type is 'object', we might be dealing with an object or an array or null.</par>
+<par def='17'>case 'object':</par>
+<par def='19'>// Due to a specification blunder in ECMAScript, typeof null is 'object', so watch out for that case.</par>
+<par def='19'>if (!value) {</par>
+<pardef id='20' leftmargin='3.4521in' firstlineleftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='20'>return 'null';</par>
+<par def='19'>}</par>
+<par def='19'>// Make an array to hold the partial results of stringifying this object value.</par>
+<par def='19'>gap += indent;</par>
+<par def='19'>partial = [];</par>
+<par def='19'>// Is the value an array?</par>
+<par def='19'>if (Object.prototype.toString.apply(value) === '[object Array]') {</par>
+<par def='20'><run><font color='green'/>// The value is an array. Stringify every element. Use null as a placeholder</run></par>
+<par def='20'><run><font color='green'/>// for non-JSON values.</run></par>
+<par def='20'>length = value.length;</par>
+<par def='20'>for (i = 0; i &lt; length; i += 1) {</par>
+<pardef id='21' leftmargin='4.7021in' firstlineleftmargin='2.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='21'>partial[i] = str(i, value) || '';</par>
+<pardef id='22' leftmargin='4.7021in' firstlineleftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='22'>}</par>
+<pardef id='23' leftmargin='4.4521in' firstlineleftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='23'><run><font color='green'/>// Join all of the elements together, separated with commas, and wrap them in</run></par>
+<par def='23'><run><font color='green'/>// brackets.</run></par>
+<par def='23'>v = partial.length === 0 ? '[]' : gap ? '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']' : '[' + partial.join(',') + ']';</par>
+<par def='23'>gap = mind;</par>
+<par def='23'>return v;</par>
+<pardef id='24' leftmargin='4.4521in' firstlineleftmargin='2in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='24'>}</par>
+<pardef id='25' leftmargin='4.2021in' firstlineleftmargin='2in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='25'><run><font color='green'/>// If the replacer is an array, use it to select the members to be stringified.</run></par>
+<par def='24'>if (rep &amp;&amp; typeof rep === 'object') {</par>
+<par def='23'>length = rep.length;</par>
+<par def='22'>for (i = 0; i &lt; length; i += 1) {</par>
+<par def='21'>k = rep[i];</par>
+<par def='21'>if (k) { var ts1 = k+'';</par>
+<pardef id='26' leftmargin='4.9521in' firstlineleftmargin='2.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='26'>if (ts1.charAt(0) != "_"){</par>
+<pardef id='27' leftmargin='5.2021in' firstlineleftmargin='3in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='27'>if (typeof k === 'string') {</par>
+<pardef id='28' leftmargin='5.4521in' firstlineleftmargin='3.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='28'>v = str(k, value);</par>
+<par def='28'>if (v) {</par>
+<pardef id='29' leftmargin='5.7021in' firstlineleftmargin='3.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='29'>partial.push(quote(k) + (gap ? ': ' : ':') + v);</par>
+<par def='28'>}</par>
+<par def='27'>}</par>
+<par def='26'>}</par>
+<par def='21'>}</par>
+<par def='23'>}<run><font color='green'/>//end for</run></par>
+<par def='25'>} else {</par>
+<par def='23'><run><font color='green'/>//Otherwise, iterate through all of the keys in the object.</run></par>
+<par def='23'>for (k in value) {</par>
+<par def='21'>if (k) { var ts1 = k+'';</par>
+<par def='26'>if (ts1.charAt(0) != "_"){</par>
+<par def='27'>if (Object.hasOwnProperty.call(value, k)) {</par>
+<par def='28'>v = str(k, value);</par>
+<par def='28'>if (v) {</par>
+<par def='29'>partial.push(quote(k) + (gap ? ': ' : ':') + v);</par>
+<par def='28'>}</par>
+<par def='27'>}</par>
+<par def='26'>}</par>
+<par def='21'>}</par>
+<par def='23'>}<run><font color='green'/>//end for</run></par>
+<par def='24'>}</par>
+<par def='25'>// Join all of the member texts together, separated with commas,</par>
+<par def='24'>// and wrap them in braces.</par>
+<par def='25'>v = partial.length === 0 ? '{}' : gap ? '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}' : '{' + partial.join(',') + '}';</par>
+<par def='25'>gap = mind;</par>
+<par def='25'>return v;</par>
+<pardef id='30' leftmargin='3.9521in' firstlineleftmargin='1.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='30'>}</par>
+<par def='10'>}</par>
+<par def='10'>	// If the JSON object does not yet have a stringify method, give it one.</par>
+<par def='10'>	if (typeof JSON2.stringify !== 'function') {</par>
+<par def='10'>		JSON2.stringify = function (value, replacer, space) {</par>
+<par def='10'>			// The stringify method takes a value and an optional replacer, and an optional</par>
+<par def='10'>			// space parameter, and returns a JSON text. The replacer can be a function</par>
+<par def='10'>			// that can replace values, or an array of strings that will select the keys.</par>
+<par def='10'>			// A default replacer method can be provided. Use of the space parameter can</par>
+<par def='10'>			// produce text that is more easily readable.</par>
+<par def='10'>			var i;</par>
+<par def='10'>			gap = '';</par>
+<par def='10'>			indent = '';</par>
+<par def='10'>			// If the space parameter is a number, make an indent string containing that many spaces.</par>
+<par def='10'>			if (typeof space === 'number') {</par>
+<par def='10'>				for (i = 0; i &lt; space; i += 1) {</par>
+<par def='10'>					indent += ' ';</par>
+<par def='10'>				}</par>
+<par def='10'>				// If the space parameter is a string, it will be used as the indent string.</par>
+<par def='10'>			} else if (typeof space === 'string') {</par>
+<par def='10'>				indent = space;</par>
+<par def='10'>			}</par>
+<par def='10'>			// If there is a replacer, it must be a function or an array.</par>
+<par def='10'>			// Otherwise, throw an error.</par>
+<par def='10'>			rep = replacer;</par>
+<par def='10'>			if (replacer &amp;&amp; typeof replacer !== 'function' &amp;&amp; (typeof replacer !== 'object' || typeof replacer.length !== 'number')) {</par>
+<par def='10'>				throw new Error('JSON2.stringify');</par>
+<par def='10'>			}</par>
+<par def='10'>			// Make a fake root object containing our value under the key of ''. Return the result of stringifying the value.</par>
+<par def='10'>			return str('', {</par>
+<par def='10'>				'': value</par>
+<par def='10'>			});</par>
+<par def='10'>		};</par>
+<par def='10'>	}</par>
+<par def='10'>	// If the JSON object does not yet have a parse method, give it one.</par>
+<par def='10'>	if (typeof JSON2.parse !== 'function') {</par>
+<par def='10'>		JSON2.parse = function (text, reviver) {</par>
+<par def='10'>			// The parse method takes a text and an optional reviver function, and returns</par>
+<par def='10'>			// a JavaScript value if the text is a valid JSON text.</par>
+<par def='10'>			var j;</par>
+<par def='10'/>
+<par def='10'>			function walk(holder, key) {</par>
+<par def='10'>				// The walk method is used to recursively walk the resulting structure so</par>
+<par def='10'>				// that modifications can be made.</par>
+<par def='10'>				var k, v, value = holder[key];</par>
+<par def='10'>				if (value &amp;&amp; typeof value === 'object') {</par>
+<par def='10'>					for (k in value) {</par>
+<par def='10'>						if (Object.hasOwnProperty.call(value, k)) {</par>
+<par def='10'>							v = walk(value, k);</par>
+<par def='10'>							if (v !== undefined) {</par>
+<par def='10'>								value[k] = v;</par>
+<par def='10'>							} else {</par>
+<par def='10'>								delete value[k];</par>
+<par def='10'>							}</par>
+<par def='10'>						}</par>
+<par def='10'>					}</par>
+<par def='10'>				}</par>
+<par def='10'>				return reviver.call(holder, key, value);</par>
+<par def='10'>			}</par>
+<par def='10'>			// Parsing happens in four stages. In the first stage, we replace certain</par>
+<par def='10'>			// Unicode characters with escape sequences. JavaScript handles many characters</par>
+<par def='10'>			// incorrectly, either silently deleting them, or treating them as line endings.</par>
+<par def='10'>			text = String(text);</par>
+<par def='10'>			cx.lastIndex = 0;</par>
+<par def='10'>			if (cx.test(text)) {</par>
+<par def='10'>				text = text.replace(cx, function (a) {</par>
+<par def='10'>					return '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);</par>
+<par def='10'>				});</par>
+<par def='10'>			}</par>
+<par def='10'>			// In the second stage, we run the text against regular expressions that look</par>
+<par def='10'>			// for non-JSON patterns. We are especially concerned with '()' and 'new'</par>
+<par def='10'>			// because they can cause invocation, and '=' because it can cause mutation.</par>
+<par def='10'>			// But just to be safe, we want to reject all unexpected forms.</par>
+<par def='10'>			// We split the second stage into 4 regexp operations in order to work around</par>
+<par def='10'>			// crippling inefficiencies in IE's and Safari's regexp engines. First we</par>
+<par def='10'>			// replace the JSON backslash pairs with '@' (a non-JSON character). Second, we</par>
+<par def='10'>			// replace all simple value tokens with ']' characters. Third, we delete all</par>
+<par def='10'>			// open brackets that follow a colon or comma or that begin the text. Finally,</par>
+<par def='10'>			// we look to see that the remaining characters are only whitespace or ']' or</par>
+<par def='10'>			// ',' or ':' or '{' or '}'. If that is so, then the text is safe for eval.</par>
+<par def='10'>			if (/^[\],:{}\s]*$/.test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@').replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {</par>
+<par def='10'>				// In the third stage we use the eval function to compile the text into a</par>
+<par def='10'>				// JavaScript structure. The '{' operator is subject to a syntactic ambiguity</par>
+<par def='10'>				// in JavaScript: it can begin a block or an object literal. We wrap the text</par>
+<par def='10'>				// in parens to eliminate the ambiguity.</par>
+<par def='10'>				j = eval('(' + text + ')');</par>
+<par def='10'>				// In the optional fourth stage, we recursively walk the new structure, passing</par>
+<par def='10'>				// each name/value pair to a reviver function for possible transformation.</par>
+<par def='10'>				return typeof reviver === 'function' ? walk({</par>
+<par def='10'>					'': j</par>
+<par def='10'>				}, '') : j;</par>
+<par def='10'>			}</par>
+<par def='10'>			// If the text is not JSON parseable, then a SyntaxError is thrown.</par>
+<par def='10'>			throw new SyntaxError('JSON2.parse');</par>
+<par def='10'>		};</par>
+<par def='10'>	}</par>
+<par def='10'>}());</par>
+<pardef id='31' leftmargin='3.2021in' firstlineleftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='31'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='8' borderstyle='double' hidewhenexpanded='true' color='black'><text
+>dojo.require</text></sectiontitle>
+<pardef id='32' leftmargin='1.5000in' firstlineleftmargin='1.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='32'>dojo.require("dijit.dijit");</par>
+<par def='32'>dojo.require("dijit.Dialog");</par>
+<par def='32'>dojo.require("dijit.form.Button");</par>
+<par def='32'>dojo.require("dijit.form.TextBox");</par>
+<par def='32'>dojo.require("dijit.form.DateTextBox");</par>
+<par def='32'>dojo.require("dijit.form.Select");</par>
+<par def='32'>dojo.require("dijit.form.ComboBox");</par>
+<par def='32'>dojo.require("dijit.form.FilteringSelect");</par>
+<par def='32'>dojo.require("dijit.form.MultiSelect");</par>
+<par def='32'>dojo.require("dijit.form.CheckBox");</par>
+<par def='11'>dojo.require("dijit.layout.TabContainer");</par>
+<par def='11'>dojo.require("dijit.layout.BorderContainer");</par>
+<par def='11'>dojo.require("dijit.layout.LayoutContainer");</par>
+<par def='11'>dojo.require("dijit.layout.StackContainer");</par>
+<par def='11'>dojo.require("dijit.layout.ContentPane");</par>
+<par def='32'>dojo.require("dojox.grid.DataGrid");</par>
+<par def='32'>dojo.require("dojox.grid.EnhancedGrid");</par>
+<par def='32'>dojo.require("dojox.grid.cells.dijit");</par>
+<par def='32'>dojo.require("dojo.data.api.Write");</par>
+<par def='32'>dojo.require("dojo.data.api.Read");</par>
+<par def='32'>dojo.require("dojo.data.util.sorter");</par>
+<par def='32'>dojo.require("dojox.grid.enhanced.plugins.DnD");</par>
+<par def='32'>dojo.require("dojox.grid.enhanced.plugins.Menu");</par>
+<par def='32'>dojo.require("dojox.grid.enhanced.plugins.NestedSorting");</par>
+<par def='32'>dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");</par>
+<par def='32'>dojo.require("dojo.data.ItemFileWriteStore");</par>
+<par def='32'>dojo.require("dojo.data.ItemFileReadStore");</par>
+<par def='32'>dojo.require("dojox.data.QueryReadStore");</par>
+<par def='32'>dojo.require("dojox.data.CsvStore");</par>
+<par def='32'>dojo.require("dojox.math.random.Secure");</par>
+<par def='32'>dojo.require("dojo.number");</par>
+<par def='32'>dojo.require("dojo.parser");</par>
+<pardef id='33' leftmargin='1.7500in' firstlineleftmargin='1.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='33'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='9' borderstyle='double' hidewhenexpanded='true' color='black'><text
+>djLayouts</text></sectiontitle>
+<par def='32'>var SponsorName_Formatter = function(rowIndex, item){ if (item != null) return item.SponsorName + ' (' + item.SponsorId + ')'; };</par>
+<par def='32'>var ClinicalType_Formatter = function(rowIndex, item){ if (item != null) return (item.ClinicalTrialType == 'CTX' ? 'Exemption' : 'Notification'); };</par>
+<par def='32'>var ApplicationFees_Formatter = function(rowIndex, item){ if (item != null) return ((item.ApplicationFees[0].charAt(0) != '$' ? '$':'') + item.ApplicationFees[0]); };</par>
+<par def='32'>var ApplicationVersion_Formatter = function(rowIndex, item){ if (item != null) return  'v' + item.ApplicationVersion; };</par>
+<par def='32'>var djlayout_EligibleApplications = [</par>
+<pardef id='34' leftmargin='1.7500in' firstlineleftmargin='1.5000in' tabs='L1in'/>
+<par def='34'>{field: 'id', name: 'Application ID', width:'142px' },</par>
+<par def='34'>{get:ApplicationVersion_Formatter, name: 'Version', width:'60px' },</par>
+<par def='34'>{field: 'TitleOfStudy', name: 'Title Of Study', width: '160px'},</par>
+<par def='34'>{get:ClinicalType_Formatter, name: 'Type', width: '63px' },</par>
+<par def='33'>{get:SponsorName_Formatter, name: 'Sponsor Name', width: 'auto' },</par>
+<par def='33'>{field: 'SponsorAddress_Label', name: 'Sponsor Address', width: 'auto' },</par>
+<par def='33'>{get:ApplicationFees_Formatter,  name: 'Fee', width: '50px' }</par>
+<par def='11'>];</par>
+<par def='11'/>
+<par def='32'>var djlayout_SelectedApplications = [</par>
+<par def='34'>{field: 'id', name: 'Application ID', width:'200px' },</par>
+<par def='33'>{field: 'SponsorName', name: 'Sponsor Name', width: 'auto' },</par>
+<par def='33'>{field: 'SponsorAddress_Label', name: 'Sponsor Address', width: 'auto' },</par>
+<par def='33'>{get:ApplicationFees_Formatter,  name: 'Fee', width: '50px' }</par>
+<par def='11'>];</par>
+<par def='11'/>
+<par def='32'>var djlayout_Validation = [</par>
+<par def='33'>{ field: 'ApplicationId', name: 'Application ID', width: '169px' },</par>
+<par def='33'>{ field: 'ErrorMessage', name: 'Error Message', width: '70%' },</par>
+<par def='33'>{ field: 'EntryName', name: 'Entry Name', width: '20%' },</par>
+<par def='33'>{ field: 'ElementRef', name: 'Reference', width: '169px' }</par>
+<par def='32'>];</par>
+<pardef id='35' leftmargin='2in' firstlineleftmargin='1.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='35'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='9' borderstyle='double' hidewhenexpanded='true' color='black'><text
+>Data Stores</text></sectiontitle>
+<par def='11'>//empty store for intializing djgrid_Validation</par>
+<par def='11'>var store_Validation = {"identifier": "id", "label": "name", "items": []};</par>
+<par def='11'>var store_SelectedApplications = {'identifier': 'id', 'label': 'name', 'items': []};</par>
+<par def='35'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='9' borderstyle='single' hidewhenexpanded='true' color='black'><text
+>Form Actions</text></sectiontitle>
+<pardef id='36' leftmargin='2in' firstlineleftmargin='1.2500in' tabs='L1in'/>
+<par def='36'>var tmpInvoiceAmt = 0;</par>
+<pardef id='37' leftmargin='2.2500in' firstlineleftmargin='1.2500in'/>
+<par def='37'><run><font style='bold'/>function submitApplications(theObject) {</run></par>
+<pardef id='38' leftmargin='5in' firstlineleftmargin='1.5000in' tabs='L1in'/>
+<par def='38'>tmpIDs = [];</par>
+<pardef id='39' leftmargin='5.7500in' firstlineleftmargin='1.5000in' tabs='L1in'/>
+<par def='39'>tmpAppVersion = [];</par>
+<pardef id='40' leftmargin='2.7500in' firstlineleftmargin='1.5000in' tabs='L1in'/>
+<par def='40'>clientName = dijit.byId('Submission_ClientName').getValue();</par>
+<par def='40'>clientAddress = dijit.byId('Submission_ClientAddress').value;</par>
+<par def='40'>sponsorName = dijit.byId("Submission_SponsorName").value;</par>
+<par def='40'>applicationType = dijit.byId('Submission_ApplicationType').value;</par>
+<par def='40'>var tmpSponsorBillingAddress = new Array(); //to hold individual application sponsor billiing addresses</par>
+<par def='40'>var tmpSponsorId = new Array();</par>
+<par def='40'>var tmpAppFees = new Array();</par>
+<par def='40'>var tmpTitleOfStudy = new Array();</par>
+<par def='40'>var tmpInvoiceAmt = 0;</par>
+<par def='40'>var tmpApplicationType = new Array();</par>
+<par def='40'>var tmpClientBillingID = dijit.byId("Submission_ClientAddress").getValue();</par>
+<par def='40'>var passUIValidation = false;</par>
+<par def='40'>var validationErrorMsg = '';</par>
+<par def='40'/>
+<par def='40'>if(clientAddress == ''){dialogText('Guidance','Please select an Applicant Billing Address&lt;br /&gt;&lt;br /&gt;', '', '', '','Close');return;};</par>
+<par def='40'>if(sponsorName == ''){dialogText('Guidance','Please select a Sponsor Name&lt;br /&gt;&lt;br /&gt;', '', '', '','Close');return;};</par>
+<par def='40'>if(applicationType == ''){dialogText('Guidance','Please select an application type&lt;br /&gt;&lt;br /&gt;', '', '', '','Close');return;};</par>
+<pardef id='41' leftmargin='2.2500in' firstlineleftmargin='1.5000in' tabs='L1in'/>
+<par def='41'/>
+<par def='40'><run><font color='green'/>//get all Selected Items</run></par>
+<pardef id='42' leftmargin='2.5000in' firstlineleftmargin='1.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='42'>var selected_eligible_items = djgrid_EligibleApplications.selection.getSelected();</par>
+<pardef id='43' leftmargin='2.7500in' firstlineleftmargin='1.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='43'>if (selected_eligible_items.length) {</par>
+<pardef id='44' leftmargin='2.7500in' firstlineleftmargin='1.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='44'>dojo.forEach(selected_eligible_items, function(selectedItem) {</par>
+<pardef id='45' leftmargin='3in' firstlineleftmargin='2in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='45'>if (selectedItem !== null) {</par>
+<pardef id='46' leftmargin='3in' firstlineleftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='46'>dojo.forEach(djgrid_EligibleApplications.store.getAttributes(selectedItem), function(attribute) {</par>
+<pardef id='47' leftmargin='3.2500in' firstlineleftmargin='2.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='47'>if(attribute == 'ApplicationType'){</par>
+<pardef id='48' leftmargin='4in' firstlineleftmargin='3in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='48'>var value = djgrid_EligibleApplications.store.getValues(selectedItem, attribute);</par>
+<pardef id='49' leftmargin='4.2500in' firstlineleftmargin='3in' tabs='L1in'/>
+<par def='49'>tmpApplicationType.push(value.toString());</par>
+<par def='47'>};</par>
+<par def='47'>if(attribute == 'TitleOfStudy'){</par>
+<par def='48'>var value = djgrid_EligibleApplications.store.getValues(selectedItem, attribute);</par>
+<par def='49'>tmpTitleOfStudy.push(value.toString());</par>
+<par def='47'>};</par>
+<par def='47'/>
+<par def='47'>if(attribute == 'SponsorAddress_Label'){</par>
+<par def='48'>var value = djgrid_EligibleApplications.store.getValues(selectedItem, attribute);</par>
+<par def='49'>tmpSponsorBillingAddress.push(value.toString());</par>
+<par def='47'>}</par>
+<par def='47'>if(attribute == 'id'){</par>
+<par def='48'>var value = djgrid_EligibleApplications.store.getValues(selectedItem, attribute);</par>
+<par def='49'>tmpIDs.push(value.toString());</par>
+<par def='47'>};</par>
+<par def='47'>if(attribute == 'ApplicationVersion'){</par>
+<par def='48'>var value = djgrid_EligibleApplications.store.getValues(selectedItem, attribute);</par>
+<par def='49'>tmpAppVersion.push(value.toString());</par>
+<par def='47'>};</par>
+<par def='47'>if(attribute == 'ApplicationFees'){</par>
+<par def='48'>var value = djgrid_EligibleApplications.store.getValues(selectedItem, attribute);</par>
+<par def='49'>tmpAppFees.push(value.toString());</par>
+<par def='47'>};</par>
+<par def='46'>}); <run><font color='green'/> //end dojo.forEach</run></par>
+<par def='45'>};  <run><font color='green'/>//end if (selectedItem !== null)</run></par>
+<par def='44'>}); <run><font color='green'/>//end dojo.forEach</run></par>
+<par def='44'/>
+<par def='44'/>
+<par def='44'><run><font color='green'/>//compare the tmpSponsorBillingAddress to ensure they are the same</run></par>
+<pardef id='50' leftmargin='3in' firstlineleftmargin='1.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='50'>if (tmpSponsorBillingAddress.length &gt; 1){</par>
+<par def='45'>for (i=0; i &lt; tmpSponsorBillingAddress.length; i++) {</par>
+<pardef id='51' leftmargin='3.5000in' firstlineleftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='51'>if(tmpSponsorBillingAddress[i].toLowerCase() != tmpSponsorBillingAddress[0].toLowerCase()){</par>
+<par def='47'>dialogText('Guidance','The Sponsors Billing Address must be the same for all applications in the Submission:&lt;br /&gt;&lt;br /&gt;' + tmpSponsorBillingAddress[0] + '&lt;br /&gt;&lt;br /&gt;' + tmpSponsorBillingAddress[i] + '&lt;br /&gt;&lt;br /&gt;', '', '', '','Close');</par>
+<pardef id='52' leftmargin='3.7500in' firstlineleftmargin='2.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='52'>return;</par>
+<par def='51'>};</par>
+<par def='45'>};  <run><font color='green'/>//end for loop</run></par>
+<pardef id='53' leftmargin='3.5000in' firstlineleftmargin='2in' tabs='L1in'/>
+<par def='53'>passUIValidation = true;</par>
+<par def='50'>}else if(tmpSponsorBillingAddress.length = 1){</par>
+<pardef id='54' leftmargin='3.2500in' firstlineleftmargin='2in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='54'><run><font color='green'/>//only one value, nothing to check</run></par>
+<par def='53'>passUIValidation = true;</par>
+<par def='50'>};</par>
+<par def='45'/>
+<pardef id='55' leftmargin='5in' firstlineleftmargin='1.7500in' tabs='L1in'/>
+<par def='55'>if (passUIValidation) {</par>
+<par def='25'>try {</par>
+<par def='46'>cursor_wait();</par>
+<pardef id='56' leftmargin='5.1257in' firstlineleftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='56'>strMultiApp = '';</par>
+<pardef id='57' leftmargin='4.6257in' firstlineleftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='57'>for (i=0; i &lt; tmpIDs.length; i++){</par>
+<pardef id='58' leftmargin='4.3757in' firstlineleftmargin='2.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='58'>strMultiApp = (i&gt;0 ? strMultiApp + '**' : '') + tmpIDs[i] + '~' + tmpAppVersion[i];</par>
+<par def='57'>}</par>
+<par def='56'>for (i=0; i &lt; tmpAppFees.length; i++){</par>
+<pardef id='59' leftmargin='5.1257in' firstlineleftmargin='2.5000in' tabs='L1in'/>
+<par def='59'>tmpInvoiceAmt = tmpInvoiceAmt + parseFloat(tmpAppFees[i]);</par>
+<par def='56'>};</par>
+<pardef id='60' leftmargin='4.8757in' firstlineleftmargin='2.2500in' tabs='L1in'/>
+<par def='60'>try { jsiframe_submitdoc.getElementById('submit1_invoiceamount').value = tmpInvoiceAmt; }catch(e){consoleLog(e);}</par>
+<pardef id='61' leftmargin='5.1257in' firstlineleftmargin='2.2500in' tabs='L1in'/>
+<par def='61'/>
+<par def='56'>var script = document.getElementById('vd1');</par>
+<pardef id='62' leftmargin='5.4521in' firstlineleftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='62'>if (script) { script.outerHTML = ''; }</par>
+<par def='62'>var head= document.getElementsByTagName('head')[0];</par>
+<par def='51'>var script= document.createElement('script');</par>
+<par def='51'>script.type= 'text/javascript';</par>
+<par def='51'>script.id = 'vd1';</par>
+<pardef id='63' leftmargin='4.5132in' firstlineleftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='63'>script.src= '<computedtext><code event='value'><formula>server_protocol_name+"/"+@ReplaceSubstring(@GetProfileField("System Profile Document"; "CTV_Db"); "\\"; "/")</formula></code></computedtext>/agtValidateCTMulti?openagent&amp;VARNAME=subValidationData&amp;ONCOMPLETE=returnedValidationResults&amp;Z=N&amp;ID=' + strMultiApp + '&amp;R=' + Math.random();</par>
+<par def='51'>head.appendChild(script);</par>
+<pardef id='64' leftmargin='4.4979in' firstlineleftmargin='2in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='64'>} catch (e) {</par>
+<pardef id='65' leftmargin='3.7500in' firstlineleftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='65'>dialogText('Program Error', e + '&lt;br /&gt;&lt;br /&gt;', '', '', '','Close');</par>
+<pardef id='66' leftmargin='4.2479in' firstlineleftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='66'>consoleLog('Error in submitApplications somwhere in if(passUIValidation) : ' + e.message);</par>
+<par def='64'>};</par>
+<par def='55'>};</par>
+<par def='43'>}else {</par>
+<pardef id='67' leftmargin='3.2500in' firstlineleftmargin='1.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='67'>dialogText('Guidance','Please select at least one of the eligible Application(s) for Submission&lt;br /&gt;&lt;br /&gt;', '', '', '','Close');</par>
+<par def='43'>}; <run><font color='green'/> //end if (selected_eligible_items.length)</run></par>
+<pardef id='68' leftmargin='2.5000in' firstlineleftmargin='1.2500in' tabs='L1in'/>
+<par def='68'>}</par>
+<pardef id='69' leftmargin='2.2500in' firstlineleftmargin='1.2500in' tabs='L1in'/>
+<par def='69'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='31' borderstyle='single' hidewhenexpanded='true' color='black'><text
+>function returnedValidationResults(fieldname)</text></sectiontitle>
+<par def='10'><run><font style='bold'/>function returnedValidationResults(fieldname){</run></par>
+<pardef id='70' leftmargin='3.7021in' firstlineleftmargin='1.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='70'><run><font style='bold'/></run></par>
+<par def='70'>if (fieldname == '') fieldname = 'subValidationData';</par>
+<par def='70'>try{</par>
+<par def='30'>var returnedData = eval(fieldname);</par>
+<par def='70'>}catch(e){return;};</par>
+<par def='70'/>
+<par def='70'>try {</par>
+<pardef id='71' leftmargin='2in' firstlineleftmargin='1.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='71'>if (subValidationData.items[0].success) {</par>
+<pardef id='72' leftmargin='2.2500in' firstlineleftmargin='2in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='72'>assignDeclarationText(djgrid_EligibleApplications._by_idx[djgrid_EligibleApplications.selection.selectedIndex].item.ClinicalTrialType[0]);</par>
+<par def='72'>declarationResponse(null, true);</par>
+<par def='71'>} else {</par>
+<par def='72'>showValidationErrors(subValidationData);</par>
+<pardef id='73' leftmargin='2.5000in' firstlineleftmargin='2in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='73'>cursor_clear();</par>
+<par def='71'>}  <run><font color='green'/>//end if (returnedData.items[0].items[0].success</run></par>
+<par def='70'>}catch(e){ consoleLog('error: ' + e); };</par>
+<par def='10'>}</par>
+<par def='10'/></section>
+<pardef id='74' leftmargin='2.2500in' firstlineleftmargin='1in' tabs='L1in'/>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='74' borderstyle='single' hidewhenexpanded='true' color='black'><text
+>function printInvoice(theObject)</text></sectiontitle>
+<par def='68'><run><font style='bold'/>function printInvoice(theObject) {	//print the invoice for the submission</run></par>
+<par def='42'>dijit.byId("djform_Action3").domNode.style.color = 'green';</par>
+<par def='40'>window.open(printInvoiceURL,'_blank', 'menubar=no,location=no,toolbar=no');</par>
+<par def='40'>window.location.href="/";</par>
+<par def='68'>}</par></section>
+<pardef id='75' leftmargin='2in' firstlineleftmargin='1in' tabs='L1in'/>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='75' borderstyle='single' hidewhenexpanded='true' color='black'><text
+>function declarationResponse(theObject, ShowHide)</text></sectiontitle>
+<par def='69'><run><font style='bold'/>function declarationResponse(theObject, ShowHide) {</run></par>
+<par def='33'>if (ShowHide) {	<run><font color='green'/>//show the declaration first</run></par>
+<par def='71'>dojo.byId("declarationText").style.display = '';</par>
+<pardef id='76' leftmargin='2.2500in' firstlineleftmargin='1.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='76'>dojo.byId("submissionContent").style.display = 'none';</par>
+<par def='76'>dijit.byId("djform_Action2").domNode.style.display = 'none';</par>
+<par def='76'>dijit.byId("djform_Action7").domNode.style.display = '';</par>
+<par def='76'>dijit.byId("djform_Action8").domNode.style.display = '';</par>
+<pardef id='77' leftmargin='2in' firstlineleftmargin='1.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='77'>} else {		<run><font color='green'/>//declaration declined</run></par>
+<pardef id='78' leftmargin='3in' firstlineleftmargin='1.7500in' tabs='L1in'/>
+<par def='78'>window.location.reload(location.href);</par>
+<par def='77'>};</par>
+<pardef id='79' leftmargin='2.2500in' firstlineleftmargin='1.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='79'>cursor_clear();</par>
+<pardef id='80' leftmargin='1.7500in' firstlineleftmargin='1.2500in'/>
+<par def='80'>};</par>
+<par def='80'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'
+ expanded='true'><sectiontitle pardef='75' borderstyle='single' hidewhenexpanded='true'
+ color='black'><text>function createSubmission()</text></sectiontitle>
+<par def='69'><run><font style='bold'/>function createSubmission() {	</run><run
+><font color='green'/>//SUBMIT</run></par>
+<par def='33'><run><font color='green'/>//INC71804 prevent double click of the Accept button. BL 16JUN2016</run></par>
+<pardef id='81' leftmargin='1.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='81'>var elem = dijit.byId("djform_Action7");</par>
+<par def='81'>elem.setAttribute('disabled', true);</par>
+<par def='81'>elem.setAttribute('label', 'Processing ...');</par>
+<par def='33'><run><font color='green'/></run></par>
+<par def='33'>try {</par>
+<par def='71'>var result = submit1.document.forms[0].submit();</par>
+<par def='33'>}catch(e){consoleLog(e);}</par>
+<par def='33'/>
+<par def='32'>};</par>
+<par def='32'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='31' borderstyle='single' hidewhenexpanded='true' color='black'><text
+>function submissionCreated(fieldname)</text></sectiontitle>
+<par def='10'><run><font style='bold'/>function submissionCreated(fieldname, framename){</run></par>
+<par def='18'>if (fieldname == undefined) fieldname = 'submissionData';</par>
+<par def='18'>if (fieldname == '') fieldname = 'submissionData';</par>
+<par def='18'>if (framename == undefined) framename = 'submit1';</par>
+<par def='18'>if (framename == '') framename = 'submit1';</par>
+<pardef id='82' leftmargin='3.9521in' firstlineleftmargin='1.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='82'>try {</par>
+<par def='70'>var localData = eval(framename + '.' + fieldname);</par>
+<pardef id='83' leftmargin='4.2021in' firstlineleftmargin='1.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='83'>if (localData !== 'undefined') {</par>
+<par def='24'>if (localData.items[0].success) {</par>
+<pardef id='84' leftmargin='2.7500in' firstlineleftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='84'>//printInvoiceURL = '/<computedtext><code event='value'><formula
+>@WebDbName</formula></code></computedtext>/printinvoice?openagent&amp;docid=' + localData.items[0].recordunid;	<run
+><font color='green'/>// JV - 11 Nov 2013 replaced with URL to new invoicing agent</run></par>
+<pardef id='85' leftmargin='2in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='85'>        printInvoiceURL = '<computedtext><code event='value'><formula
+>"/servlet/xmlmillr6?dbid=ebs/PublicHTML/pdfStore.nsf&amp;docid="</formula></code></computedtext>'  + localData.items[0].recordunid + '<computedtext
+><code event='value'><formula>"&amp;agid=(PrintEBS_StandardInvoice)&amp;SourceDbid=ClinicalTrialsPath"</formula></code></computedtext>'</par>
+<par def='84'>dijit.byId("djform_Action2").domNode.style.display = 'none';</par>
+<par def='84'>dojo.byId("successMsg").style.display = '';</par>
+<par def='84'>dojo.byId("declarationText").style.display = 'none';</par>
+<par def='84'>dojo.byId("submissionContent").style.display = 'none';</par>
+<par def='46'>dijit.byId("djform_Action7").domNode.style.display = 'none';</par>
+<par def='46'>dijit.byId("djform_Action8").domNode.style.display = 'none';</par>
+<par def='46'>var storeURL = 'LookupData?openagent&amp;F=SUBDOCID&amp;NAME=' + localData.items[0].recordunid</par>
+<par def='46'>djstore_SubmissionID = new dojo.data.ItemFileReadStore({url:storeURL});</par>
+<par def='46'>djstore_SubmissionID.fetch();</par>
+<par def='51'>djgrid_SelectedApplications.update();</par>
+<par def='51'><run><font color='green'/>//only display Print Invoice button if there is an application in the submission that actaully requires payment.</run></par>
+<par def='51'>if(djstore_SelectedApplications._arrayOfAllItems){</par>
+<par def='52'>for(i=0; i&lt;djstore_SelectedApplications._arrayOfAllItems.length; i++){</par>
+<pardef id='86' leftmargin='4in' firstlineleftmargin='2.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='86'>if(parseInt(djstore_SelectedApplications._arrayOfAllItems[i].ApplicationFees[0]) &gt; 0){</par>
+<pardef id='87' leftmargin='3.5000in' firstlineleftmargin='3in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='87'>dijit.byId("djform_Action3").domNode.style.display = '';</par>
+<pardef id='88' leftmargin='4.2500in' firstlineleftmargin='3in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='88'>break;</par>
+<par def='86'>}</par>
+<par def='52'>}</par>
+<par def='51'>}</par>
+<par def='51'>if(localData.items[0].error != ""){</par>
+<pardef id='89' leftmargin='2.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='89'>alert('Application(s) have been submitted in the past; refer successful submission below for: \n\n' + localData.items[0].error + '\n\nContact TGA to report the problem');</par>
+<par def='51'>}</par>
+<par def='24'>} else {</par>
+<pardef id='90' leftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='90'>declarationResponse(null, false);</par>
+<par def='90'>if (!localData.items[0].success){</par>
+<par def='89'>alert(localData.items[0].error);</par>
+<par def='90'>} else {</par>
+<pardef id='91' leftmargin='4.9521in' firstlineleftmargin='2.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='91'>alert('Submission document creation has failed, try submitting each application separately to continue. Contact TGA to report the problem.');</par>
+<par def='22'>}</par>
+<par def='24'>};</par>
+<par def='83'>};</par>
+<par def='77'>}catch(e) {</par>
+<par def='76'>consoleLog('Submission creation error: ' + e);</par>
+<par def='76'>alert('Submission creation error: ' + e + '\n\n');</par>
+<par def='77'>};</par>
+<par def='79'>cursor_clear();</par>
+<par def='10'>};</par>
+<par def='10'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='31' borderstyle='single' hidewhenexpanded='true' color='black'><text
+>function printSubmissionDocument()</text></sectiontitle>
+<par def='10'><run><font style='bold'/>function printSubmissionDocument(){</run></par>
+<par def='33'>if (djgrid_SelectedApplications.focus.rowIndex &gt;= 0) {</par>
+<par def='71'>mywindow = window.open('/<computedtext><code event='value'><formula
+>@WebDbName</formula></code></computedtext>/printpreview?openpage', 'printpreview', 'location=0,status=0,scrollbars=1,menubar=0,directories=0,resizable=1');</par>
+<par def='33'>}</par>
+<par def='32'>};</par></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='31' borderstyle='single' hidewhenexpanded='true' color='black'><text
+>function getPrintPreviewData()</text></sectiontitle>
+<par def='10'><run><font style='bold'/>function getPrintPreviewData(){</run></par>
+<par def='33'>if (djgrid_SelectedApplications.focus.rowIndex &gt;= 0) {</par>
+<par def='71'>var x={};</par>
+<par def='71'>x.rowIndex = djgrid_SelectedApplications.focus.rowIndex</par>
+<par def='71'>var theselection = djgrid_SelectedApplications.getItem(x.rowIndex);</par>
+<pardef id='92' leftmargin='2.3694in' firstlineleftmargin='1.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='92'>x.id = theselection.id;</par>
+<par def='71'>x.submissionID = djstore_SubmissionID._arrayOfAllItems[0].id;</par>
+<par def='71'>x.sponsorName = theselection.SponsorName;</par>
+<par def='71'>x.sponsorAddress = theselection.SponsorAddress_Label;</par>
+<par def='71'>return x;</par>
+<par def='33'>}</par>
+<par def='10'>};</par></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='31' borderstyle='single' hidewhenexpanded='true' color='black'><text
+>function showValidationErrors(returnedResults)</text></sectiontitle>
+<par def='10'><run><font style='bold'/>function showValidationErrors(returnedResults){  </run><run
+><font style='bold' color='green'/>//BL 01APR2011</run></par>
+<pardef id='93' leftmargin='4.2479in' firstlineleftmargin='1.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='93'><run><font color='green'/>//creates a table of validation errors when needed</run></par>
+<par def='70'>var displayObj = dojo.byId("validationErrors");</par>
+<par def='93'>displayObj.innerHTML = 'Loading validation results ... please wait';</par>
+<pardef id='94' leftmargin='2.2181in' firstlineleftmargin='1.5000in'/>
+<par def='94'>var initTable = '&lt;table width="95%" cellspacing="0" cellpadding="5"  style="border: 1px solid #E8E8E8;"&gt;&lt;tr&gt;&lt;th width="200px" style="background: #6CF;"&gt;Application Id&lt;/th&gt;&lt;th style="background: #6CF;"&gt;Error Message&lt;/th&gt;&lt;th style="background: #6CF;"&gt;Entry Name&lt;/th&gt;&lt;th style="background: #6CF;"&gt;Reference&lt;/th&gt;&lt;/tr&gt;';</par>
+<par def='70'>var endTable = '&lt;/table&gt;';</par>
+<par def='70'>var appLink = '';</par>
+<par def='70'>var bodyTable = '';</par>
+<par def='70'>var rowClass = '';</par>
+<par def='70'>var appId = '';</par>
+<par def='70'>var errMsg = '';</par>
+<par def='70'>var appType = '';</par>
+<par def='70'>var appRef = '';</par>
+<par def='93'>for (var j=0; j &lt; returnedResults.items.length; j++){</par>
+<pardef id='95' leftmargin='4.4979in' firstlineleftmargin='1.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='95'>for(var k = 0; k &lt; returnedResults.items[j].items.length; k++){</par>
+<pardef id='96' leftmargin='4.7479in' firstlineleftmargin='2in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='96'><run><font color='green'/>//apply odd row background colour</run></par>
+<par def='96'>var oddEven = (j+ k +1) % 2;</par>
+<par def='96'>if (oddEven != 0) {</par>
+<pardef id='97' leftmargin='4.9979in' firstlineleftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='97'>rowClass = '&lt;tr style="background: #E8E8E8;"&gt;';</par>
+<par def='96'>}else{</par>
+<par def='97'>rowClass = '&lt;tr&gt;';</par>
+<par def='96'>};</par>
+<par def='96'><run><font color='green'/>//assign the data to variables</run></par>
+<pardef id='98' leftmargin='4.9979in' firstlineleftmargin='2in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='98'>appId = returnedResults.items[j].items[k].ApplicationId</par>
+<par def='98'>errMsg = returnedResults.items[j].items[k].ErrorMessage;</par>
+<par def='98'>appType = returnedResults.items[j].items[k].Type;</par>
+<par def='98'>appRef = returnedResults.items[j].items[k].ElementRef;</par>
+<par def='98'><run><font color='green'/>//create a link to application - not used yet as we don't have version number returned</run></par>
+<pardef id='99' leftmargin='2.6118in' firstlineleftmargin='2.0111in'/>
+<par def='99'>appLink = '&lt;a href="/<computedtext><code event='value'><formula
+>@WebDbName</formula></code></computedtext>/ct?readform&amp;ID=' + appId + '&amp;V=1" target="_blank"&gt;' + appId + '&lt;/a&gt;';</par>
+<par def='99'><run><font color='green'/>//create the table rows</run></par>
+<par def='99'>bodyTable = bodyTable + rowClass + '&lt;td valign="top"&gt;' + appId + '&lt;/td&gt;&lt;td valign="top"&gt;' + errMsg + '&lt;/td&gt;&lt;td valign="top"&gt;' + appType + '&lt;/td&gt;&lt;td valign="top"&gt;' + appRef + '&lt;/td&gt;&lt;/tr&gt;';</par>
+<par def='95'>};</par>
+<par def='93'>};</par>
+<par def='93'/>
+<par def='93'>displayObj.innerHTML = initTable + bodyTable + endTable;</par>
+<par def='70'/>
+<par def='10'>}; <run><font color='green'/>//end function showValidationErrors</run></par></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='31' borderstyle='single' hidewhenexpanded='true' color='black'><text
+>cursor functions</text></sectiontitle>
+<par def='32'><run><font color='green'/>// Changes the cursor to an hourglass</run></par>
+<par def='32'><run><font style='bold'/>function cursor_wait() {</run></par>
+<par def='33'>document.body.style.cursor = 'wait';</par>
+<par def='32'>};</par>
+<par def='32'/>
+<par def='32'><run><font color='green'/>// Returns the cursor to the default pointer</run></par>
+<par def='32'><run><font style='bold'/>function cursor_clear() {</run></par>
+<par def='33'>document.body.style.cursor = 'default';</par>
+<par def='32'>};</par></section>
+<pardef id='100' leftmargin='1.5000in' firstlineleftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='100' borderstyle='single' hidewhenexpanded='true' color='black'><text
+>addOnload</text></sectiontitle>
+<pardef id='101' leftmargin='1.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='101'>var newiframe = '';</par>
+<par def='11'>dojo.addOnLoad(function() {</par>
+<par def='34'/>
+<par def='33'>setTimeout(function(){</par>
+<par def='71'>var loader = dojo.byId("loader");</par>
+<par def='71'>dojo.fadeOut({ node: loader, duration: 500, onEnd: function(){ loader.style.display = "none"; }}).play();</par>
+<par def='33'>}, 500);</par>
+<par def='33'/>
+<par def='33'>new dijit.form.FilteringSelect({</par>
+<par def='71'>store: new dojox.data.QueryReadStore({ </par>
+<par def='72'>fetch: function(request) {</par>
+<pardef id='102' leftmargin='2.5000in' firstlineleftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='102'>var tmpClientID = dojo.byId('Submission_ClientID').value;</par>
+<par def='102'>request.serverQuery = {name:tmpClientID, f:"CW", v:"P" };</par>
+<par def='102'>return this.inherited("fetch", arguments);</par>
+<par def='72'>},</par>
+<par def='72'>url: "LookupData?OpenAgent"</par>
+<par def='71'>}),</par>
+<pardef id='103' leftmargin='2in' firstlineleftmargin='1.7500in' tabs='L1in'/>
+<par def='103'>pageSize: 100,</par>
+<par def='103'>hasDownArrow: true,</par>
+<par def='103'>highlightMatch: 'first',</par>
+<par def='103'>searchDelay: 5,</par>
+<par def='103'>style: 'width:300px;',</par>
+<pardef id='104' leftmargin='1.7500in' tabs='L1in'/>
+<par def='104'>onChange: function() { try { jsiframe_submitdoc.getElementById('submit1_clientaddressid').value = this.item.i.id;  }catch(e){consoleLog(e);} },</par>
+<par def='103'>fetchProperties: '{sort:{attribute:"id", descending:false}}',</par>
+<par def='103'>placeHolder: 'Select an address...',</par>
+<par def='103'>id: 'Submission_ClientAddress'</par>
+<par def='33'>}, "Submission_ClientAddress");</par>
+<par def='43'/>
+<par def='81'>dojo.connect(djgrid_EligibleApplications, 'onSelectionChanged', getSelectedApplications);</par>
+<par def='50'/>
+<pardef id='105' leftmargin='2.8007in' firstlineleftmargin='1.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='105'>var tmpURL = constant.DBURL + 'submissionUpload?readform';</par>
+<par def='105'>newiframe = createFrame('submit1', true, tmpURL, 0, 0, false);</par>
+<par def='81'>setTimeout('getHandleToSubmissionIframeDoc();', 90);</par>
+<par def='43'/>
+<pardef id='106' leftmargin='1.7500in' firstlineleftmargin='1.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='106'>}); <run><font color='green'/> //end dojo.addOnLoad</run></par>
+<par def='106'/>
+<par def='106'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='100' borderstyle='single' hidewhenexpanded='true' color='black'><text
+>sponsorListLoaded</text></sectiontitle>
+<par def='106'><run><font style='bold'/>function sponsorListLoaded(variableName) {</run></par>
+<par def='18'/>
+<par def='18'/>
+<par def='4'>	if (!dijit) {</par>
+<par def='4'>		setTimeout('sponsorListLoaded("' + variableName + '")', 250);</par>
+<par def='4'>		consoleLog('waiting for sponsor list to load');</par>
+<par def='4'>		return;</par>
+<par def='4'>	}</par>
+<par def='4'>	if (!dijit.byId('Submission_SponsorName')) {</par>
+<par def='4'>		setTimeout('sponsorListLoaded("' + variableName + '")', 150);</par>
+<par def='4'>		consoleLog('waiting for sponsor name to be available');</par>
+<par def='4'>		return;</par>
+<par def='4'>	}</par>
+<par def='4'>	</par>
+<par def='18'/>
+<par def='18'>sponsorList = eval(variableName);</par>
+<par def='18'>if (sponsorList.items[0].SponsorList) {</par>
+<pardef id='107' leftmargin='3.7021in' firstlineleftmargin='1.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='107'>try {</par>
+<pardef id='108' leftmargin='3.9521in' firstlineleftmargin='2in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='108'>djstore_SponsorList = new dojo.data.ItemFileWriteStore({data: storeSponsorList.items[0].SponsorList });</par>
+<pardef id='109' leftmargin='3.7021in' firstlineleftmargin='2in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='109'>dijit.byId('Submission_SponsorName').store = djstore_SponsorList;</par>
+<par def='108'>djstore_TrialsApplicationTypes = new dojo.data.ItemFileWriteStore({data: {"identifier": "abbreviation", "label": "name", "items": []}});</par>
+<par def='108'>for(i=0; i &lt; storeApplicationTypes.count; i++){</par>
+<pardef id='110' leftmargin='4.2021in' firstlineleftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='110'>var tmpStr = new String(storeApplicationTypes.items[i].abbreviation);</par>
+<par def='110'>if(tmpStr == "CTX" || tmpStr == "CTN"){<run><font color='green'/>//search for 'ct' in the item abbreviation and add it to the new store</run></par>
+<pardef id='111' leftmargin='4.4521in' firstlineleftmargin='2.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='111'>djstore_TrialsApplicationTypes.newItem(storeApplicationTypes.items[i]);</par>
+<par def='110'>};</par>
+<par def='108'>};</par>
+<par def='108'>dijit.byId('Submission_ApplicationType').setStore(djstore_TrialsApplicationTypes);</par>
+<par def='19'>djstore_Declaration = new dojo.data.ItemFileReadStore({url:'LookupData?openagent&amp;F=DECLARATIONS&amp;NAME=CT&amp;R=<run
+><font color='fuchsia'/><computedtext><code event='value'><formula>@Text(@Second(@Now) * @Minute(@Now) * @Random+1)</formula></code></computedtext></run>'});</par>
+<par def='108'>djstore_Declaration.fetch();</par>
+<par def='73'/>
+<pardef id='112' leftmargin='2.7500in' firstlineleftmargin='2in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='112'>var gridObj = dijit.byId("djgrid_EligibleApplications");</par>
+<par def='73'>var sponsorNameObj = dijit.byId("Submission_SponsorName");</par>
+<par def='73'>var sponsorIdObj = dijit.byId("Submission_SponsorId");</par>
+<pardef id='113' leftmargin='3in' firstlineleftmargin='2in' tabs='L1in'/>
+<par def='113'>var appTypeObj = dijit.byId("Submission_ApplicationType");</par>
+<pardef id='114' leftmargin='2.5000in' firstlineleftmargin='2in' tabs='L1in'/>
+<par def='114'>var submissionDeclarationObj = dijit.byId("declarationTxt");</par>
+<pardef id='115' leftmargin='2.5000in' firstlineleftmargin='2.2500in' tabs='L1in'/>
+<par def='115'/>
+<par def='73'>sponsorNameObj.set('value', storeSponsorList.items[0].SponsorList.items[0].name);</par>
+<par def='45'>sponsorIdObj.set('value', storeSponsorList.items[0].SponsorList.items[0].id);</par>
+<par def='114'><run><font color='green'/></run></par>
+<par def='112'>dojo.connect(sponsorNameObj, 'onChange', function() {</par>
+<par def='90'>if (dijit.byId("Submission_SponsorName").value != '') {</par>
+<pardef id='116' leftmargin='3.5000in' firstlineleftmargin='2.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='116'>sponsorIdObj.set('value', sponsorNameObj.get('value'));</par>
+<pardef id='117' leftmargin='2.7500in' firstlineleftmargin='2.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='117'>try{ jsiframe_submitdoc.getElementById('submit1_sponsorid').value = sponsorIdObj.value; }catch(e){consoleLog(e);}</par>
+<par def='52'>gridObj.filter({ClinicalTrialType: appTypeObj.get('value'), SponsorId: sponsorIdObj.get('value')}, true);</par>
+<par def='116'>gridObj.rowSelectCell.toggleAllSelection(false);</par>
+<par def='90'>}</par>
+<par def='112'>});</par>
+<par def='112'/>
+<par def='112'>dojo.connect(appTypeObj, 'onChange', function () {</par>
+<pardef id='118' leftmargin='5.2479in' firstlineleftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='118'>var applicationtypecode =  appTypeObj.getValue() + 'DEC';  <run
+><font color='green'/>//eg.: CTNDEC</run></par>
+<par def='51'>gridObj.filter({SponsorId: sponsorIdObj.getValue(), ClinicalTrialType: appTypeObj.getValue()}, true);</par>
+<pardef id='119' leftmargin='3.2500in' firstlineleftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='119'>gridObj.rowSelectCell.toggleAllSelection(false);</par>
+<par def='45'>});  <run><font color='green'/>//end dojo.connect(appTypeObj, 'onChange'</run></par>
+<par def='46'><run><font color='green'/></run></par>
+<par def='73'>var submitBtn = dijit.byId("djform_Action2");</par>
+<par def='73'>dojo.connect(submitBtn, 'onClick', function() {</par>
+<par def='46'>try{</par>
+<par def='47'>var items = djgrid_EligibleApplications.selection.getSelected();</par>
+<par def='47'>for (var i = 0; i &lt; items.length; i++) {</par>
+<pardef id='120' leftmargin='3.5000in' firstlineleftmargin='2.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='120'>var item = items[i];</par>
+<pardef id='121' leftmargin='3.5000in' firstlineleftmargin='2.7500in'/>
+<par def='121'>djstore_SelectedApplications.newItem({'id': djstore_EligibleApplications.getValue(item, 'id'), 'name':djstore_EligibleApplications.getValue(item, 'id'), 'SponsorName': djstore_EligibleApplications.getValue(item, 'SponsorName'), 'SponsorAddress_Label': djstore_EligibleApplications.getValue(item, 'SponsorAddress_Label'),'ApplicationFees':djstore_EligibleApplications.getValue(item, 'ApplicationFees')});</par>
+<pardef id='122' leftmargin='3.2500in' firstlineleftmargin='2.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='122'>djstore_SelectedApplications.fetch();</par>
+<par def='122'>djgrid_SelectedApplications.store = djstore_SelectedApplications;  //this was the key</par>
+<par def='122'>djgrid_SelectedApplications.update();</par>
+<par def='122'>djgrid_SelectedApplications.render();</par>
+<par def='47'>};</par>
+<par def='46'>}catch(e){}</par>
+<par def='73'>});  <run><font color='green'/>//end dojo.connect(submitBtn, 'onClick' ....</run></par>
+<par def='108'><run><font color='green'/></run></par>
+<par def='107'>}catch(e) { consoleLog('problem processing sponsor details...'); }</par>
+<par def='18'>} else {</par>
+<par def='107'>sponsorList.items[0].SponsorList.items[0] = {name:'no sponsors to load!',id:'0'};</par>
+<par def='18'>}</par>
+<pardef id='123' leftmargin='3.2021in' firstlineleftmargin='1.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='123'>}</par>
+<pardef id='124' leftmargin='2.5000in' firstlineleftmargin='1.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='124'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='100' borderstyle='single' hidewhenexpanded='true' color='black'><text
+>function getHandleToSubmissionIframeDoc(){</text></sectiontitle>
+<pardef id='125' leftmargin='2.7021in' firstlineleftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='125'><run><font style='bold'/>function getHandleToSubmissionIframeDoc(){</run></par>
+<par def='32'>try {</par>
+<par def='33'>jsiframe_submitdoc = getIframeDocument(newiframe);</par>
+<par def='33'>if (jsiframe_submitdoc.URL.indexOf('about') &gt;= 0 &amp;&amp; jsiframe_submitdoc.URL.indexOf('blank') &gt;= 0) {</par>
+<par def='71'>setTimeout('getHandleToSubmissionIframeDoc();', 50);</par>
+<par def='33'>} else {</par>
+<par def='71'>consoleLog(jsiframe_submitdoc);</par>
+<par def='33'>}</par>
+<par def='32'>} catch(e) {</par>
+<par def='33'>consoleLog('cant get the submitdoc form(0) yet');</par>
+<par def='32'>}</par>
+<par def='125'>}</par>
+<par def='125'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='100' borderstyle='single' hidewhenexpanded='true' color='black'><text
+>function getSelectedApplications(e) {</text></sectiontitle>
+<par def='32'><run><font style='bold'/>function getSelectedApplications(e) {</run></par>
+<par def='33'>var vsa = '';</par>
+<par def='33'>if (this.focus.rowIndex &gt;= 0) {</par>
+<par def='71'/>
+<par def='71'>var selectionCount = this.selection.getSelectedCount();</par>
+<par def='71'>if (selectionCount &gt; 0) {</par>
+<par def='72'>var theselections = this.selection.getSelected();</par>
+<par def='72'>for (i = 0; i &lt;= (selectionCount - 1); i++) {</par>
+<par def='102'>var xx = theselections[i];</par>
+<par def='102'>var xx_id = '';</par>
+<par def='102'>try { xx_id = xx.id[0]; } catch(e) {consoleLog('old data:'); consoleLog(e);}</par>
+<par def='102'>var xx_ver = '';</par>
+<par def='102'>try { xx_ver = xx.ApplicationVersion[0]; } catch(e) {consoleLog('old data:'); consoleLog(e);}</par>
+<par def='102'>if (xx_id != '' &amp;&amp; xx_ver != '') {</par>
+<par def='117'>vsa += xx_id+'~'+xx_ver;</par>
+<par def='117'>if (i&lt;selectionCount-1) vsa += ';';</par>
+<par def='102'>}</par>
+<par def='72'>}</par>
+<par def='71'>}</par>
+<par def='33'>}</par>
+<par def='33'>try { jsiframe_submitdoc.getElementById('submit1_applicationUNIDs').value = vsa;  }catch(e){consoleLog(e);}</par>
+<par def='32'>}</par>
+<par def='8'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='100' borderstyle='single' hidewhenexpanded='true' color='black'><text
+>Select Declaration Text</text></sectiontitle>
+<par def='106'><run><font style='bold'/>function assignDeclarationText(clinicaltrialtype){</run></par>
+<pardef id='126' leftmargin='4.7479in' firstlineleftmargin='1.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='126'>try{</par>
+<par def='44'>if(djstore_Declaration._arrayOfAllItems){</par>
+<par def='45'>for(i=0; i &lt; djstore_Declaration._arrayOfAllItems.length; i++){</par>
+<par def='119'>if (djstore_Declaration._arrayOfAllItems[i].id[0].indexOf(clinicaltrialtype) &gt;= 0){</par>
+<par def='116'>dojo.byId("declarationTxt").innerHTML = unescape(djstore_Declaration._arrayOfAllItems[i].name[0]);</par>
+<par def='119'>}</par>
+<par def='45'>}</par>
+<par def='44'>}</par>
+<par def='42'>}catch(e){consoleLog('error: function assignDeclarationText: ' + e.message)};</par>
+<par def='106'>};</par>
+<par def='106'/></section>
+<par def='100'>&lt;/script&gt;</par>
+<pardef id='127' leftmargin='1in'/>
+<par def='127'><run><font style='bold'/>&lt;/head&gt;</run></par>
+<par def='127'><run><font style='bold'/>&lt;body class="claro"&gt;</run></par>
+<pardef id='128' leftmargin='0.7500in' firstlineleftmargin='0.5000in'/>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='128' hidewhenexpanded='true' color='#f1f1b4' borderstyle='tabdiag'><text
+>//Data Stores</text></sectiontitle>
+<par def='4'>&lt;div dojoType="dojo.data.ItemFileReadStore" id="djstore_EligibleApplications" jsId="djstore_EligibleApplications" url="/<computedtext
+><code event='value'><formula>@WebDbName</formula></code></computedtext>/xAgentLookupEligibleApplications.xsp?&amp;user=<computedtext
+><code event='value'><formula>@Name([CN]; @UserName)</formula></code></computedtext>&amp;v=1&amp;R=<computedtext
+><code event='value'><formula>@Text(@Second(@Now) * @Minute(@Now) * @Random+1)</formula></code></computedtext>""&gt;&lt;/div&gt;</par>
+<par def='4'>&lt;div dojoType="dojo.data.ItemFileWriteStore" jsId="djstore_SelectedApplications" data="store_SelectedApplications"&gt;&lt;/div&gt;</par>
+<par def='4'>&lt;div dojoType="dojo.data.ItemFileReadStore" jsId="djstore_Validation" data="store_Validation"&gt;&lt;/div&gt;</par>
+<pardef id='129' leftmargin='1.2500in' firstlineleftmargin='1in'/>
+<par def='129'/></section>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='7' hidewhenexpanded='true' color='teal'><text>&lt;div id="loader"&gt;</text></sectiontitle>
+<pardef id='130'/>
+<par def='130'>&lt;div id="loader"&gt;</par>
+<pardef id='131' leftmargin='1.2500in'/>
+<par def='131'>&lt;div id="loaderInner"&gt;</par>
+<pardef id='132' leftmargin='1.5000in'/>
+<par def='132'>&lt;table&gt;</par>
+<pardef id='133' leftmargin='1.7500in'/>
+<par def='133'>&lt;tr&gt;</par>
+<pardef id='134' leftmargin='2in'/>
+<par def='134'>&lt;td&gt;&lt;img src='/domjs/dojo-1.5.0/ebs/resources/loader_lg.gif'/&gt;&lt;/td&gt;</par>
+<par def='134'>&lt;td nowrap style="padding:8px 15px 8px 15px;"&gt;Please wait, loading ...&lt;/td&gt;</par>
+<par def='133'>&lt;/tr&gt;</par>
+<par def='132'>&lt;/table&gt;</par>
+<par def='131'>&lt;/div&gt;</par>
+<par def='130'>&lt;/div&gt;</par></section>
+<pardef id='135' leftmargin='1in' firstlineleftmargin='0.7500in'/>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='135' hidewhenexpanded='true' color='teal'><text>&lt;div dojoType="dijit.layout.BorderContainer" jsId="djborder_Main" style="width:100%;height:100%"&gt;</text></sectiontitle>
+<par def='129'>&lt;div dojoType="dijit.layout.BorderContainer" jsId="djborder_Main" style="width:100%;height:100%"&gt;</par>
+<pardef id='136' leftmargin='1.5000in' firstlineleftmargin='1.2500in'/>
+<par def='136'>&lt;div dojoType="dijit.layout.ContentPane" id="djborder_Top" region="top" style="overflow:hidden; height: auto;"&gt;</par>
+<par def='34'>&lt;div style="width:100%"&gt;</par>
+<pardef id='137' leftmargin='2in' firstlineleftmargin='1.7500in'/>
+<par def='137'>&lt;img src="<run><font style='bold' color='red'/><computedtext
+><code event='value'><formula>server_protocol_name+"/"+@ReplaceSubstring(@GetProfileField("System Profile Document"; "GRA_Db"); "\\"; "/")</formula></code></computedtext></run>/smLogo.gif?openimageresource" alt="logo" /&gt;</par>
+<par def='137'>&lt;span style="margin:0 0 0 25px; vertical-align:top; font-weight:bold; font-size:18pt;"&gt;Clinical Trials Submissions&lt;/span&gt;</par>
+<pardef id='138' leftmargin='1.7500in' firstlineleftmargin='1.5000in'/>
+<par def='138'>&lt;/div&gt;</par>
+<par def='138'/>
+<par def='103'>&lt;div style="width:100%" id="djform_Actions"&gt;</par>
+<pardef id='139' leftmargin='2.2500in' firstlineleftmargin='2in'/>
+<par def='139'>&lt;input type="button" dojoType="dijit.form.Button" onClick="window.location.href='/';" id="djform_Action1" name="djFormData_action1" label="Close" /&gt;</par>
+<par def='139'>&lt;input type="button" dojoType="dijit.form.Button" onClick="submitApplications(this)" id="djform_Action2" name="djFormData_action2" label="Submit" /&gt;</par>
+<par def='139'>&lt;input type="button" dojoType="dijit.form.Button" onClick="printInvoice(this);" id="djform_Action3" name="djFormData_action3" label="Print Invoice" style="display:none;" /&gt;</par>
+<par def='139'>&lt;input type="button" dojoType="dijit.form.Button" onClick="declarationResponse(this, false)" id="djform_Action8" name="djFormData_action8" label="Decline" /&gt;</par>
+<par def='139'>&lt;input type="button" dojoType="dijit.form.Button" onClick="createSubmission()" id="djform_Action7" name="djFormData_action7" label="Accept" /&gt;</par>
+<par def='137'>&lt;/div&gt;</par>
+<par def='136'>&lt;/div&gt;</par>
+<par def='136'>&lt;div dojoType="dijit.layout.ContentPane" id="djborder_Content" region="center"&gt;</par>
+<par def='138'>&lt;div id="declarationText" style="display: none; padding: 10px;"&gt;Before submitting your application(s) please read the declaration below and click the &lt;span style="color:red"&gt;Accept&lt;/span&gt; button to proceed with this submission; or click on the Decline button to return to the Submission form.&lt;p&gt;</par>
+<par def='137'>&lt;div id="declarationTxt"&gt;&lt;/div&gt;</par>
+<par def='138'>&lt;/div&gt;</par>
+<par def='138'>&lt;div id="successMsg" style="display: none; padding: 10px;"&gt;</par>
+<par def='137'>&lt;div id="successContent"&gt;Thank You.  The Submission of your application(s) has been successful.&lt;/div&gt;</par>
+<par def='137'>&lt;br /&gt;&lt;br /&gt;</par>
+<par def='137'>&lt;span&gt;Submitted Application(s):&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;</par>
+<par def='137'>&lt;span&gt;Please double click on a row to preview and print  a Submission document for the data package.  This action may also be performed from the Portal in the lodged submissions view.&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;</par>
+<pardef id='140' leftmargin='1.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='140'>&lt;div style="border:1px solid #8BA0BD; width:100%; height:100%;"&gt;</par>
+<par def='140'>&lt;div dojoType="dojox.grid.EnhancedGrid" jsId="djgrid_SelectedApplications" id="djgrid_SelectedApplications" name="djgrid_SelectedApplications" structure="djlayout_SelectedApplications"  store="djstore_SelectedApplications" onDblClick="printSubmissionDocument()" plugins="{indirectSelection:false, loadingMessage: 'Loading ...', nestedSorting: false, dnd: false, errorMessage: 'No applications to display'}" canSort="noSort" style="height: 220px; width:100%;display:block;"&gt; &lt;/div&gt;</par>
+<par def='140'>&lt;/div&gt;</par>
+<par def='138'>&lt;/div&gt;</par>
+<par def='138'>&lt;div id="submissionContent"&gt;</par>
+<pardef id='141' leftmargin='2.2500in' firstlineleftmargin='1.7500in'/>
+<par def='141'>&lt;table width="100%" height="100%"&gt;</par>
+<pardef id='142' leftmargin='2.5000in' firstlineleftmargin='2in'/>
+<par def='142'>&lt;tr&gt;&lt;td class="c1"&gt;Client Name:&lt;/td&gt;</par>
+<par def='142'>&lt;td&gt;</par>
+<par def='102'>&lt;input type="text" dojoType="dijit.form.TextBox" style="width:300px;" readOnly="true" id="Submission_ClientName" jsId="Submission_ClientName" name="Submission_ClientName" value="<computedtext
+><code event='value'><formula>ClientName</formula></code></computedtext>" /&gt;</par>
+<par def='115'>&lt;input type="hidden" id="Submission_ClientID" value="<computedtext
+><code event='value'><formula>ClientID</formula></code></computedtext>" /&gt;</par>
+<par def='142'>&lt;/td&gt;</par>
+<par def='142'>&lt;/tr&gt;</par>
+<par def='142'>&lt;tr&gt;&lt;td class="m1"&gt;Applicant Billing Address:&lt;/td&gt;</par>
+<par def='142'>&lt;td&gt;</par>
+<par def='115'>&lt;input type="text" field="Submission_ClientAddress" id="Submission_ClientAddress" jsId="Submission_ClientAddress"/&gt;</par>
+<par def='142'>&lt;/td&gt;</par>
+<par def='142'>&lt;/tr&gt;&lt;tr&gt;</par>
+<par def='142'>&lt;td class="m1"&gt;Sponsor Name:&lt;/td&gt;</par>
+<pardef id='143' leftmargin='2.7500in' firstlineleftmargin='2.2500in'><code
+ event='hidewhen' enabled='false'><formula>!@Contains(LUClientType;"Agent")</formula></code></pardef>
+<par def='143'>&lt;td&gt;</par>
+<pardef id='144' leftmargin='2.5000in'><code event='hidewhen' enabled='false'><formula
+>!@Contains(LUClientType;"Agent")</formula></code></pardef>
+<par def='144'>&lt;div dojoType="dijit.form.FilteringSelect" style="width:300px;" id="Submission_SponsorName" name="Submission_SponsorName" jsId="Submission_SponsorName" placeHolder="Select a Sponsor ..." store= "storeSponsorList"&gt;&lt;/div&gt;</par>
+<par def='144'>&lt;div dojoType="dijit.form.TextBox" readOnly="true" id="Submission_SponsorId" name="Submission_SponsorId" jsId="Submission_SponsorId" placeHolder="9999999" style="width:50px; display:none;" &gt;&lt;/div&gt;</par>
+<par def='143'>&lt;/td&gt;</par>
+<pardef id='145' leftmargin='2.7500in' firstlineleftmargin='2in'><code event='hidewhen'
+ enabled='false'><formula>!@Contains(LUClientType;"Agent")</formula></code></pardef>
+<par def='145'>&lt;/tr&gt;&lt;tr&gt;</par>
+<pardef id='146' leftmargin='3in' firstlineleftmargin='2.2500in'><code event='hidewhen'
+ enabled='false'><formula>!@Contains(LUClientType;"Agent")</formula></code></pardef>
+<par def='146'>&lt;td class="m1"&gt;Application Type:&lt;/td&gt;</par>
+<par def='146'>&lt;td&gt;</par>
+<par def='89'>&lt;input type="text" dojoType="dijit.form.Select" id="Submission_ApplicationType" name="Submission_ApplicationType" jsId="Submission_ApplicationType" placeHolder="Select the type of application ..." style="width:305px;" /&gt;</par>
+<par def='146'>&lt;/td&gt;</par>
+<par def='72'>&lt;/tr&gt;</par>
+<par def='72'>&lt;tr&gt;</par>
+<par def='90'>&lt;td&gt;&amp;nbsp;&lt;/td&gt;&lt;td&gt;&amp;nbsp;&lt;/td&gt;</par>
+<par def='134'>&lt;/tr&gt;</par>
+<par def='72'>&lt;tr&gt;</par>
+<par def='72'>	&lt;td class="c1"&gt;Invoice Selected Sponsor?&lt;/td&gt;&lt;td&gt;</par>
+<pardef id='147' leftmargin='2.9521in' rightmargin='100%' firstlineleftmargin='2.5000in'/>
+<par def='147'>&lt;input type="radio" name="InvoiceQuery" value=Y  onClick=" jsiframe_submitdoc.getElementById('submit1_invoicesponsor').value='Y'" id="InvoiceQuery_1" /&gt;&lt;label for="InvoiceQuery_1"&gt;Yes&lt;/label&gt;</par>
+<par def='147'>&lt;input type="radio" name="InvoiceQuery" value=N  onClick=" jsiframe_submitdoc.getElementById('submit1_invoicesponsor').value='N'" id="InvoiceQuery_0"  checked="true" /&gt;&lt;label for="InvoiceQuery_0"&gt;No&lt;/label&gt;</par>
+<par def='142'>      &lt;/td&gt;</par>
+<par def='72'>&lt;/tr&gt;</par>
+<par def='72'>&lt;tr&gt;</par>
+<par def='90'>&lt;td&gt;&amp;nbsp;&lt;/td&gt;&lt;td&gt;&amp;nbsp;&lt;/td&gt;</par>
+<par def='134'>&lt;/tr&gt;</par>
+<par def='72'>&lt;tr&gt;</par>
+<par def='90'>&lt;td class="m1" style="vertical-align: top;"&gt;Eligible Applications:&lt;/td&gt;</par>
+<par def='90'>&lt;td colspan="2"&gt;</par>
+<par def='89'>&lt;div style="border:1px solid #8BA0BD"&gt;</par>
+<pardef id='148' leftmargin='2.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='148'>&lt;div dojoType="dojox.grid.EnhancedGrid" jsId="djgrid_EligibleApplications" id="djgrid_EligibleApplications" name="djgrid_EligibleApplications" structure="djlayout_EligibleApplications" store="djstore_EligibleApplications" plugins="{indirectSelection:true, loadingMessage: 'Loading ...', nestedSorting: false, dnd: false, errorMessage: 'No applications to display'}" canSort="noSort" style="height:220px; width:100%;"&gt; &lt;/div&gt;</par>
+<par def='89'>&lt;/div&gt;</par>
+<par def='90'>&lt;/td&gt;</par>
+<par def='72'>&lt;/tr&gt;</par>
+<par def='72'>&lt;tr&gt;</par>
+<par def='90'>&lt;td&gt;&amp;nbsp;&lt;/td&gt;&lt;td&gt;&amp;nbsp;&lt;/td&gt;</par>
+<par def='134'>&lt;/tr&gt;</par>
+<par def='72'>&lt;tr&gt;</par>
+<pardef id='149' leftmargin='2.2500in'/>
+<par def='149'>&lt;td class="c1" style="vertical-align: top;"&gt;Application Re-Validation Errors:&lt;/td&gt;</par>
+<par def='149'>&lt;td colspan="2"&gt;</par>
+<pardef id='150' leftmargin='2.5000in'/>
+<par def='150'>&lt;span id="validationErrors"&gt;&lt;/span&gt;</par>
+<par def='149'>&lt;/td&gt;</par>
+<par def='134'>&lt;/tr&gt;</par>
+<par def='133'>&lt;/table&gt;</par>
+<par def='132'>&lt;/div&gt;</par>
+<par def='131'>&lt;/div&gt;</par>
+<par def='129'>&lt;/div&gt;</par></section>
+<pardef id='151' leftmargin='2.7021in' firstlineleftmargin='0.5000in' tabs='L1in'/>
+<section onread='expand' onpreview='expand' onedit='collapse' onprint='expand'><sectiontitle
+ pardef='151' hidewhenexpanded='true' color='#e1e1e1' borderstyle='tabdiag'><text
+>this is a fancy dialog confirmation</text></sectiontitle>
+<par def='129'><run><font color='#009900'/>&lt;</run><run><font style='bold'/>div</run><run
+><font color='#009900'/> </run><run><font color='#000066'/>id</run><run><font
+ color='#66cc66'/>=</run><run><font color='red'/>"id_dialog"</run><run><font
+ color='#009900'/> dojoType</run><run><font color='#66cc66'/>=</run><run><font
+ color='red'/>"dijit.Dialog"</run><run><font color='#009900'/> </run><run
+><font color='#000066'/>title</run><run><font color='#66cc66'/>=</run><run
+><font color='red'/>"Confirmation Dialog"</run><run><font color='#009900'/>&gt;</run></par>
+<par def='136'><run><font color='#009900'/>&lt;</run><run><font style='bold'/>div</run><run
+><font color='#009900'/> </run><run><font color='#000066'/>id</run><run><font
+ color='#66cc66'/>=</run><run><font color='red'/>"id_dialog_text"</run><run
+><font color='#009900'/>&gt;&lt;</run><run><font color='#66cc66'/>/</run><run
+><font style='bold'/>div</run><run><font color='#009900'/>&gt;</run></par>
+<par def='138'><run><font color='#009900'/>&lt;</run><run><font style='bold'/>div</run><run
+><font color='#009900'/> </run><run><font color='#000066'/>class</run><run
+><font color='#66cc66'/>=</run><run><font color='red'/>"dijitDialogPaneActionBar"</run><run
+><font color='#009900'/>&gt;</run></par>
+<par def='137'><run><font color='#009900'/>&lt;</run><run><font style='bold'/>button</run><run
+><font color='#009900'/> </run><break/><run><font color='#009900'/>dojoType</run><run
+><font color='#66cc66'/>=</run><run><font color='red'/>"dijit.form.Button"</run><run
+><font color='#009900'/> </run><break/><run><font color='#000066'/>type</run><run
+><font color='#66cc66'/>=</run><run><font color='red'/>"submit"</run><run
+><font color='#009900'/> </run><break/><run><font color='#000066'/>id</run><run
+><font color='#66cc66'/>=</run><run><font color='red'/>"id_dialog_button_1"</run><run
+><font color='#009900'/>&gt;</run></par>
+<par def='137'>affirmative</par>
+<par def='137'><run><font color='#009900'/>&lt;</run><run><font color='#66cc66'/>/</run><run
+><font style='bold'/>button</run><run><font color='#009900'/>&gt;</run><break
+/><run><font color='#009900'/>&lt;</run><run><font style='bold'/>button</run><run
+><font color='#009900'/> </run><break/><run><font color='#009900'/>dojoType</run><run
+><font color='#66cc66'/>=</run><run><font color='red'/>"dijit.form.Button"</run><run
+><font color='#009900'/> </run><break/><run><font color='#000066'/>type</run><run
+><font color='#66cc66'/>=</run><run><font color='red'/>"button"</run><run
+><font color='#009900'/> </run><break/><run><font color='#000066'/>onClick</run><run
+><font color='#66cc66'/>=</run><run><font color='red'/>"dijit.byId('id_dialog').onCancel();"</run><run
+><font color='#009900'/> </run><break/><run><font color='#000066'/>id</run><run
+><font color='#66cc66'/>=</run><run><font color='red'/>"id_dialog_button_2"</run><run
+><font color='#009900'/>&gt;</run></par>
+<par def='137'>negative</par>
+<par def='137'><run><font color='#009900'/>&lt;</run><run><font color='#66cc66'/>/</run><run
+><font style='bold'/>button</run><run><font color='#009900'/>&gt;</run></par>
+<par def='138'><run><font color='#009900'/>&lt;</run><run><font color='#66cc66'/>/</run><run
+><font style='bold'/>div</run><run><font color='#009900'/>&gt;</run></par>
+<par def='129'><run><font color='#009900'/>&lt;</run><run><font color='#66cc66'/>/</run><run
+><font style='bold'/>div</run><run><font color='#009900'/>&gt;</run></par>
+<pardef id='152' leftmargin='2.9521in' firstlineleftmargin='1in' tabs='L1in'/>
+<par def='152'/></section>
+<pardef id='153' leftmargin='2.9521in' firstlineleftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='153'>&lt;script type="text/javascript" SRC="LookupData?openagent&amp;F=CONTEXT&amp;NAME=storeSponsorList&amp;ONCOMPLETE=sponsorListLoaded&amp;R=<computedtext
+><code event='value'><formula>@Text(@Second(@Now) * @Minute(@Now) * @Random+1)</formula></code></computedtext>"&gt;&lt;/script&gt;</par>
+<par def='5'><run><font style='bold'/>&lt;/body&gt;</run></par>
+<par def='5'><run><font color='green'/>&lt;!-- (an attempt) to prevent caching of grid data (from Microsoft Support) --&gt;</run></par>
+<par def='5'><run><font color='green'/>&lt;!-- support.microsoft.com/kb/234067 and support.microsoft.com/kb/222064 --&gt;</run></par>
+<par def='5'><run><font style='bold' color='green'/>&lt;head&gt;</run></par>
+<par def='4'><run><font color='green'/>&lt;META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE"&gt;</run></par>
+<par def='4'><run><font color='green'/>&lt;META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE"&gt;</run></par>
+<par def='4'><run><font color='green'/>&lt;META HTTP-EQUIV="Expires" CONTENT="-1"&gt;</run></par>
+<par def='5'><run><font style='bold' color='green'/>&lt;/head&gt;</run></par>
+<par def='5'><run><font style='bold'/>&lt;/html&gt;</run></par>
+<par def='5'/></richtext></body>
+<item name='$SubForm_RepIDs' sign='true'><text>0000000000000000</text></item>
+<item name='$$ScriptName' summary='false' sign='true'><text>submission</text></item>
+<item name='InvoiceAmount' summary='false'><number>0</number></item></form>
+

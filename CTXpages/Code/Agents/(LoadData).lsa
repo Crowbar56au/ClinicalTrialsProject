@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(LoadData)' alias='LoadData' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3'
+ runaswebuser='true' publicaccess='false' designerversion='7'>
+<noteinfo noteid='4ea' unid='DE93093A666E948DCA257F7700070C91' sequence='14'>
+<created><datetime dst='true'>20160315T121659,69+11</datetime></created>
+<modified><datetime>20160628T151506,39+10</datetime></modified>
+<revised><datetime>20160628T151506,38+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,38+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,05+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151506,45+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+Option Declare
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	'Loads a Tilda (~) delimited file, The first row of the data file maintains the field name
+	Dim Ses As New NotesSession
+	Dim dbThis As NotesDatabase
+	Dim Doc As NotesDocument
+	Dim DataLine As String, fileNum As Integer
+	Dim FileName As String
+	Dim FieldName As Variant, FieldValues As Variant , DataValue As Variant 
+	Dim Ctr As Integer, Max As Integer 
+	Set dbThis = Ses.CurrentDatabase
+	
+	FileName  = "d:\Formulations.txt"
+	
+	fileNum% = Freefile()
+	Open FileName For Input As fileNum%
+	
+	If Not Eof(fileNum%) Then
+		'Read first line to get the Field Names
+		Line Input #fileNum%, DataLine
+		FieldName = Split(DataLine,"~")
+	End If
+	
+	Do While Not Eof(fileNum%)
+		Line Input #fileNum%, DataLine
+		FieldValues  = Split(DataLine,"~")
+		
+		Set doc = dbThis.CreateDocument()
+		
+		Max = Ubound(FieldValues)
+		
+		For ctr = 0 To Max
+			DataValue = Split(FieldValues(ctr), ";")
+			Call doc.ReplaceItemValue(FieldName(ctr), DataValue)
+		Next
+		doc.Save True, False
+	Loop
+	Close fileNum%
+End Sub</lotusscript></code>
+<item name='$POID'><datetime>20160620T120209,33+10</datetime></item></agent>
+

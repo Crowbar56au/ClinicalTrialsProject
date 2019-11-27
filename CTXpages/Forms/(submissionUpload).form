@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form name='(submissionUpload)' alias='submissionUpload' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' nocompose='true'
+ noquery='true' treatashtml='true' publicaccess='false' designerversion='8.5.3'
+ renderpassthrough='true' conflictaction='mergenoconflicts'>
+<noteinfo noteid='5ae' unid='ACEF4DC0BFA4DC7ACA257FD8000B2A0B' sequence='14'>
+<created><datetime>20160620T120156,59+10</datetime></created>
+<modified><datetime>20160628T151506,95+10</datetime></modified>
+<revised><datetime>20160628T151506,94+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,94+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,40+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1' leftmargin='2.7021in' firstlineleftmargin='1in' tabs='L1in'/>
+<par def='1'>&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;</par>
+<pardef id='2' leftmargin='1.5000in' firstlineleftmargin='1.2500in'/>
+<par def='2'>&lt;form id="submit1" name="submit1" style="display:none;" method="post" action="createSubmission?openagent&amp;VARNAME=submissionData&amp;ONCOMPLETE=submissionCreated&amp;R=<computedtext
+><code event='value'><formula>@Text(@Random(1)*@Second(@Now)/@Minute(@Now))</formula></code></computedtext>" target="_self" &gt;</par>
+<pardef id='3' leftmargin='1.7500in' firstlineleftmargin='1.5000in'/>
+<par def='3'>&lt;input type="text" value="<computedtext><code event='value'><formula
+>@IfError(@Text(@DbLookup( "" : "NoCache" ; "":@GetProfileField("System Profile Document";"SUM_DB"); "LULM" ; @Name( [CN] ;
+@UserName ) ; "ClientID" )); "User not found")</formula></code></computedtext>" id="submit1_clientid" name="submit1_clientid" multivalue="false" /&gt;</par>
+<par def='3'>&lt;input type="text" value="" id="submit1_sponsorid" name="submit1_sponsorid" multivalue="false" /&gt;</par>
+<par def='3'>&lt;input type="text" value="" id="submit1_clientaddressid" name="submit1_clientaddressid" multivalue="false" /&gt;</par>
+<par def='3'>&lt;input type="text" value="" id="submit1_invoiceamount" name="submit1_invoiceamount" multivalue="false" /&gt;</par>
+<par def='3'>&lt;input type="text" value="" id="submit1_applicationUNIDs" name="submit1_applicationUNIDs" multivalue="true" separator=";" /&gt;</par>
+<par def='3'>&lt;input type="text" value="" id="submit1_invoicesponsor" name="submit1_invoicesponsor" multivalue="false" /&gt;</par>
+<par def='2'>&lt;/form&gt;</par>
+<par def='1'>&lt;/body&gt;&lt;/html&gt;</par></richtext></body>
+<item name='$HFFlags'><text>1</text></item>
+<item name='$$ScriptName' summary='false' sign='true'><text>submissionUpload</text></item></form>
+

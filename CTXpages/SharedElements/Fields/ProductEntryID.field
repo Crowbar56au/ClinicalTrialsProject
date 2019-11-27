@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<sharedfield name='ProductEntryID' xmlns='http://www.lotus.com/dxl' version='9.0'
+ maintenanceversion='1.0' replicaid='CA257FDB001B5780' designerversion='7'>
+<noteinfo noteid='396' unid='38EE1F2B3E9EDF91CA257F7700070134' sequence='13'>
+<created><datetime dst='true'>20160315T121630,60+11</datetime></created>
+<modified><datetime>20160628T151505,37+10</datetime></modified>
+<revised><datetime>20160628T151505,36+10</datetime></revised>
+<lastaccessed><datetime>20160628T151505,36+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,23+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><field
+ type='text' kind='computedwhencomposed' name='ProductEntryID' htmlid='ProductEntryID'><code
+ event='defaultvalue'><formula>ProductEntryID</formula></code></field>
+<item name='$HTMLCode' sign='true'>
+<rawitemdata type='1'>
+</rawitemdata></item></sharedfield>
+

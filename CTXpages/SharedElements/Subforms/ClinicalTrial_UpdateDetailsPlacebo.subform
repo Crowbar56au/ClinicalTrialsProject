@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='utf-8'?>
+<subform name='ClinicalTrial_UpdateDetailsPlacebo' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' designerversion='8.5.3'
+ renderpassthrough='true'>
+<noteinfo noteid='256' unid='0243C93D0F98DFF4CA257FD8000B2761' sequence='14'>
+<created><datetime>20160620T120149,77+10</datetime></created>
+<modified><datetime>20160628T151504,05+10</datetime></modified>
+<revised><datetime>20160628T151504,04+10</datetime></revised>
+<lastaccessed><datetime>20160628T151504,04+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152009,44+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1' leftmargin='1.7500in' tabs='L1in'/>
+<par def='1'>&lt;tr id="updatedetails_placebo_row3" style="display:none"&gt;</par>
+<pardef id='2' leftmargin='2in' tabs='L1in'/>
+<par def='2'>&lt;td colspan="2"&gt;&amp;nbsp;&lt;/td&gt;</par>
+<par def='1'>&lt;/tr&gt;</par>
+<par def='1'>&lt;tr id="updatedetails_placebo_row1" style="display:none"&gt;</par>
+<par def='2'>&lt;td class="n1"&gt;Placebo Details&lt;/td&gt;</par>
+<par def='2'>&lt;td&gt;</par>
+<pardef id='3' leftmargin='2.2500in' tabs='L1in'/>
+<par def='3'>&lt;div dojoType="dijit.form.Button" label="Add Placebo" id="UpdateDetails_Button_AddPlacebo"&gt;</par>
+<pardef id='4' leftmargin='2.5000in' tabs='L1in'/>
+<par def='4'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<pardef id='5' leftmargin='2.7500in' tabs='L1in'/>
+<par def='5'>UpdateDetails_Button_AddPlacebo_onClick();</par>
+<par def='4'>&lt;/script&gt;</par>
+<par def='3'>&lt;/div&gt;</par>
+<par def='3'>&lt;div dojoType="dijit.form.Button" label="Remove Selected Placebo(s)" id="UpdateDetails_Button_RemovePlacebo"&gt;</par>
+<par def='4'>&lt;script type="dojo/method"  event="onClick"&gt;</par>
+<par def='5'>UpdateDetails_Button_RemovePlacebo_onClick();</par>
+<pardef id='6' leftmargin='2.7500in' firstlineleftmargin='2.5000in' tabs='L1in'/>
+<par def='6'>&lt;/script&gt;</par>
+<par def='3'>&lt;/div&gt;</par>
+<par def='2'>&lt;/td&gt;</par>
+<par def='1'>&lt;/tr&gt;</par>
+<par def='1'>&lt;tr id="updatedetails_placebo_row2" style="display:none"&gt;</par>
+<par def='2'>&lt;td colspan="2"&gt;</par>
+<pardef id='7' leftmargin='2.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='7'>&lt;div style="border:1px solid #8BA0BD"&gt;</par>
+<pardef id='8' leftmargin='2.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='8'>&lt;div dojoType="dojox.grid.EnhancedGrid" id="UpdateDetails_Placebos" structure="[{name: 'Product Name', field: 'ProductName', width: 'auto' },{name: 'Route of Administration', field: 'RouteOfAdmin_Label', width: 'auto' },{name: 'Description', field: 'PlaceboDescription', width: 'auto' },{name:'Open',get:formatterButtonEdit}]" plugins="{indirectSelection:true}" style="height:140px; width:100%;" noDataMessage="Placebo Details"&gt;</par>
+<pardef id='9' leftmargin='2.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='9'>&lt;script type="dojo/method"  event="onDblClick"&gt;</par>
+<pardef id='10' leftmargin='3in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='10'>UpdateDetails_Placebos_onDblClick(this);</par>
+<par def='5'>&lt;/script&gt;</par>
+<par def='8'>&lt;/div&gt;</par>
+<par def='7'>&lt;/div&gt;</par>
+<pardef id='11' leftmargin='2in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='11'>&lt;/td&gt;</par>
+<pardef id='12' leftmargin='1.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='12'>&lt;/tr&gt;</par></richtext></body>
+<item name='$HFFlags'><text>1</text></item>
+<item name='$$ScriptName' summary='false' sign='true'><text>ClinicalTrial_Part1PlaceboComparator</text></item></subform>
+

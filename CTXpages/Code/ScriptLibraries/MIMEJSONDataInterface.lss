@@ -1,0 +1,973 @@
+'++LotusScript Development Environment:2:5:(Options):0:74
+Option Public
+Option Declare
+'IMPORTANT
+'Make sure in the "ls.snapps.JSONReader" library only the Use "ls.snapps.JSONWrapperConverters" is used
+Use "ls.snapps.JSONReader"
+
+'++LotusScript Development Environment:2:5:(Forward):0:1
+Declare Class EntryIdentity
+Declare Class EntryIdentityByType
+Declare Class MIMEJSONEntryStore
+
+'++LotusScript Development Environment:2:5:(Declarations):0:10
+Class EntryIdentity
+	Public Item As Variant 
+End Class
+
+Class EntryIdentityByType
+	Public Items List As EntryIdentity
+	Public Count As Integer
+End Class
+
+Class MIMEJSONEntryStore
+'Public Decerations
+Declare Public Sub New(doc As NotesDocument, MIMEFieldName As String, MIMEFileName As String)
+Declare Public Function JSONToNotesDocuments(CommitDocuments As Boolean) As Boolean
+Declare Public Function GetEntryByIdentity(RecordUNID As String) As JSONObject
+Declare Public Function GetEntriesByType(EntryType As String) As Variant
+Declare Public Function HasItem(EntryByIdentity As JSONObject, ItemName As String) As Boolean 
+Declare Public Function AddItem(EntryByIdentity As JSONObject, ItemName As String, Value As Variant) As Boolean
+Declare Public Function RemoveItem(EntryByIdentity As JSONObject, ItemName As String) As Boolean
+Declare Public Function GetItemValue(EntryByIdentity As JSONObject, ItemName As String) As Variant
+Declare Public Function GetItemFirstValue(EntryByIdentity As Variant, ItemName As String) As Variant
+Declare Public Function ReplaceItemValue(EntryByIdentity As JSONObject, ItemName As String, Value As Variant) As Boolean
+Declare Public Function RenameItem(EntryByIdentity As JSONObject, oldName As String, newName As String, overwriteNewItemIfExists As Boolean) As Boolean
+Declare Public Function MoveItemToAnotherEntry(SourceEntryByIdentity As JSONObject, ItemName As String, TargetEntryByIdentity As JSONObject,  overWriteTargetEntryItemIfExists As Boolean, removeOld As Boolean) As Boolean
+Declare Public Function GetEntryByKey(ItemKeyName As String, SingleSearchValue As Variant) As JSONObject 
+Declare Public Function GetAllEntriesByKey(ItemKeyName As String, SingleSearchValue As Variant) As Variant 
+Declare Public Function GetEntryofTypeByKey(EntryType As String, ItemKeyName As String, SingleSearchValue As Variant) As JSONObject 
+Declare Public Function GetAllEntriesofTypeByKey(EntryType As String,ItemKeyName As String, SingleSearchValue As Variant) As Variant 
+Declare Public Function ToJSON() As String 
+Declare Public Function EntryToJSON(EntryByIdentity As JSONObject) As String 
+Declare Public Function SaveJSONToMime()  As Boolean
+Declare Public Function SaveJSONToMimeToAnotherDocument(doc As Notesdocument)  As Boolean
+'Properties	
+Declare Public Property Get Count As Integer
+Declare Public Property Get GetFirstJSONEntry As JSONObject
+Declare Public Property Get GetLastJSONEntry As JSONObject	
+Declare Public Property Get GetNextJSONEntry As JSONObject	
+Declare Public Property Get GetPrevJSONEntry As JSONObject	
+Declare Public Property Get GetNthJSONEntry(idx As Integer) As JSONObject '- 1st entry has a idx equal to 1
+Declare Public Property Get NotesDocuments As Variant 
+	
+	Public EntriesByIdentity List As EntryIdentity
+	Public EntriesByType List As EntryIdentityByType
+	Public IsEmptyStore As Boolean
+	
+'Private Declerations	
+Declare Private Function LoadItems(JSONObj As JSONObject, Parent As JSONObject) As JSONObject 
+Declare Private Function CreateNPopulateNotesDocument(JSONObj As Variant, SaveDocumentToDB As Boolean)
+Declare Private Function GetMIMETextAttachment() As NotesStream 
+Declare Private Sub CreateMIMETextAttachment(OtherDocument As NotesDocument)	
+	Private jsonReader As JSONReader
+	Private jsonRootObject As JSONObject 
+	Private JSONEntryCollection() As Variant 
+	Private JSONEntriesCount As Integer
+	Private JSONEntryIndexPointer As Integer
+	Private SourceDocument As NotesDocument 
+	Private MIMEFieldName As String 
+	Private MIMEFileName As String 
+	Private DocumentArray() As NotesDocument 
+	Private NumberOfDocs As Integer
+	
+'Sub New
+	Public Sub New(doc As NotesDocument, MIMEFieldName As String, MIMEFileName As String)
+		'Dim s As New NotesSession
+		Dim stream As NotesStream , buffer As String 
+		Dim dt As New NotesDateTime("Today")
+		Call dt.SetNow
+		
+		If (Not doc Is Nothing) And  Trim(MIMEFieldName) <> "" And Trim(MIMEFileName) <> "" Then
+			Set Me.SourceDocument = doc
+			Me.MIMEFieldName = MIMEFieldName
+			Me.MIMEFileName = MIMEFileName
+			
+			If Me.SourceDocument.HasItem(Me.MIMEFieldName) Then
+				Set stream = GetMIMETextAttachment()
+				If Not (stream Is Nothing) Then
+					stream.Position = 0
+					While (Not stream.IsEOS)
+						buffer$ = buffer$ + stream.ReadText(STMREAD_LINE)
+					Wend
+					Call Stream.Close()
+					
+					If Trim(buffer$) = "" Then
+						Me.IsEmptyStore = True
+					Else
+						Set Me.jsonReader = New JSONReader
+						Set Me.jsonRootObject = jsonReader.Parse(buffer$)	'this is a JSONObject
+						Call Me.LoadItems(jsonRootObject)
+						Me.JSONEntryIndexPointer = 0
+						Me.IsEmptyStore = False
+						Me.NumberOfDocs = 0
+						Redim Me.DocumentArray(Me.NumberOfDocs)
+					End If
+				Else
+					Me.IsEmptyStore = True
+				End If
+			Else
+				Me.IsEmptyStore = True
+			End If
+		Else
+			Me.IsEmptyStore = True
+		End If
+	End Sub
+	
+'Property Get Count
+	Public Property Get Count As Integer
+		Count = Me.JSONEntriesCount
+	End Property
+	
+'Property Get GetFirstJSONEntry	
+	Public Property Get GetFirstJSONEntry As JSONObject
+		If Me.JSONEntriesCount > 0 Then
+			Me.JSONEntryIndexPointer = 0
+			Set GetFirstJSONEntry = Me.JSONEntryCollection(Me.JSONEntryIndexPointer)
+		Else
+			Set GetFirstJSONEntry = Nothing
+		End If
+	End Property
+	
+'Property Get GetLastJSONEntry	
+	Public Property Get GetLastJSONEntry As JSONObject
+		If Me.JSONEntriesCount > 0 Then
+			Me.JSONEntryIndexPointer = Me.JSONEntriesCount - 1
+			Set GetLastJSONEntry = Me.JSONEntryCollection(Me.JSONEntryIndexPointer)
+		Else
+			Set GetLastJSONEntry = Nothing
+		End If
+	End Property
+	
+'Property Get GetNextJSONEntry	
+	Public Property Get GetNextJSONEntry As JSONObject
+		If Me.JSONEntriesCount > 0 Then
+			Me.JSONEntryIndexPointer = Me.JSONEntryIndexPointer + 1
+			If Me.JSONEntryIndexPointer < Me.JSONEntriesCount Then
+				Set GetNextJSONEntry = Me.JSONEntryCollection(Me.JSONEntryIndexPointer)
+			Else
+				Set GetNextJSONEntry = Nothing
+			End If
+		Else
+			Set GetNextJSONEntry = Nothing
+		End If
+	End Property
+	
+'Property Get GetPrevJSONEntry	
+	Public Property Get GetPrevJSONEntry As JSONObject
+		If Me.JSONEntriesCount > 0 Then
+			Me.JSONEntryIndexPointer = Me.JSONEntryIndexPointer -1 
+			If Me.JSONEntryIndexPointer >= 0 Then
+				Set GetPrevJSONEntry = Me.JSONEntryCollection(Me.JSONEntryIndexPointer)
+			Else
+				Me.JSONEntryIndexPointer = 0
+				Set GetPrevJSONEntry = Nothing
+			End If
+		Else
+			Set GetPrevJSONEntry = Nothing
+		End If
+	End Property
+	
+'Property Get GetNthJSONEntry	
+	Public Property Get GetNthJSONEntry(idx As Integer) As JSONObject '- 1st entry has a idx equal to 1
+		If Me.JSONEntriesCount > 0 Then
+			If idx > 0 And idx < Me.JSONEntryIndexPointer Then
+				Set GetNthJSONEntry = Me.JSONEntryCollection(idx -1)
+			Else
+				Set GetNthJSONEntry = Nothing
+			End If	
+		Else
+			Set GetNthJSONEntry = Nothing
+		End If
+	End Property
+	
+	Public Property Get NotesDocuments As Variant 
+		NotesDocuments = Me.DocumentArray
+	End Property
+	
+'Function LoadItems	
+	Private Function LoadItems(JSONObj As JSONObject) As JSONObject 
+		Dim RecordUNID As String, EntryType As String 
+		Dim JSONEntry As JSONObject, subJSONEntry As JSONObject
+		Dim JSONEntries As Variant, subJSONEntries As Variant
+		Dim ObjType As String , subObjType As String 
+		Dim ItemType As String 
+		
+		JSONEntries = JSONObj.Items
+		
+		'The RecordUNID is the Primary Key value for ant Entry/Item, and in NO case can be duplicated
+		'Duplicating it may cause loss of data. Hence treat it always as a Primary Key which Never ever can be duplicated
+		If Iselement(JSONEntries("RecordUNID")) Then
+			ItemType =  Typename(JSONEntries("RecordUNID"))
+			If ItemType = "STRING" Then
+				RecordUNID = JSONEntries("RecordUNID")
+			Elseif ItemType = "JSONARRAY" Then
+				RecordUNID = JSONEntries("RecordUNID").items(0)
+			End If
+			
+			Set Me.EntriesByIdentity(RecordUNID) = New EntryIdentity
+			Set Me.EntriesByIdentity(RecordUNID).Item = JSONObj
+			
+			If Iselement(JSONEntries("Type")) Then
+				ItemType =  Typename(JSONEntries("Type"))
+				If ItemType = "STRING" Then
+					EntryType = JSONEntries("Type")
+				Elseif ItemType = "JSONARRAY" Then
+					EntryType = JSONEntries("Type").items(0)
+				End If
+				
+				If Not (Iselement( Me.EntriesByType(EntryType))) Then
+					Set Me.EntriesByType(EntryType) = New EntryIdentityByType	
+				End If
+				Set Me.EntriesByType(EntryType).Items(RecordUNID) = Me.EntriesByIdentity(RecordUNID)
+				Me.EntriesByType(EntryType).Count = Me.EntriesByType(EntryType).Count + 1
+			End If
+			Redim Preserve JSONEntryCollection(JSONEntriesCount)
+			Set JSONEntryCollection(JSONEntriesCount) = JSONObj
+			JSONEntriesCount = JSONEntriesCount + 1
+		End If
+		
+		Forall Entry In JSONEntries
+			ObjType = Typename(Entry)
+			If  objType = "JSONOBJECT" Then
+				'If this is an Object, its a Document/Document Collection entry 
+				'call LoadItems to process the nested document
+				Set JSONEntry = Entry
+				Call LoadItems(JSONEntry)
+			Elseif objType = "JSONARRAY" Then
+				'JSONEntry.Items would be of type EMPTY in cases where Empty objects exists
+				If Typename(Entry.Items) <> "EMPTY" Then
+					subObjType = Typename(Entry.Items(0))					
+					If subObjType = "JSONOBJECT" Then
+						'This is a Collection of other Documents
+						Forall SubEntry In Entry.Items
+							Set subJSONEntry = subEntry
+							Call LoadItems(subJSONEntry)								
+						End Forall
+					End If						
+				End If	
+			End If
+		End Forall
+	End Function
+	
+'Function GetMIMETextAttachment()
+	Private Function GetMIMETextAttachment() As NotesStream 
+		Dim s As New NotesSession
+		Dim mime As NotesMIMEEntity, header As NotesMimeHeader 
+		Dim child As NotesMimeEntity
+		Dim headerVal As String, expectedHeaderVal As String 
+		Dim stream As NotesStream , buffer As String 
+		
+		Set stream = s.CreateStream
+		Set GetMIMETextAttachment = stream
+		s.ConvertMIME = False ' Do not convert MIME to rich text
+		
+		expectedHeaderVal = Lcase(|attachment; filename="| + Me.MIMEFileName + |"|)
+		
+		Set mime = Me.SourceDocument.GetMIMEEntity(Me.MIMEFieldName)
+		If mime Is Nothing Then
+			s.ConvertMIME = True ' convert MIME to rich text
+			Exit Function
+		End If
+		
+		Set child = mime.GetFirstChildEntity
+		While Not (child Is Nothing)
+			Set header = child.GetNthHeader("Content-Disposition")
+			headerVal = Lcase(header.GetHeaderValAndParams())
+			If headerVal = expectedHeaderVal Then
+				Call child.DecodeContent()
+				Call child.GetContentAsText(stream, True)
+				
+				stream.Position = 0
+				s.ConvertMIME = True 'convert MIME to rich text
+				Exit Function
+			End If
+			
+			Set child = child.GetNextEntity()
+		Wend
+		
+		s.ConvertMIME = True ' convert MIME to rich text
+	End Function
+	
+'Sub CreateMIMETextAttachment()
+	Private Sub CreateMIMETextAttachment(OtherDocument As NotesDocument)
+		Dim s As New NotesSession
+		Dim TargetNotesDocument As NotesDocument
+		Dim mime As NotesMIMEEntity, header As NotesMimeHeader 
+		Dim child As NotesMimeEntity
+		Dim blankStream As NotesStream
+		Dim expectedHeaderVal As String, headerVal As String 
+		Dim stream As NotesStream
+		Dim strJSON As String 
+		
+		strJSON = Me.ToJSON()
+		Set stream = s.CreateStream
+		Call stream.WriteText(strJSON,EOL_NONE)	
+		
+		If OtherDocument Is Nothing Then
+			Set TargetNotesDocument = Me.SourceDocument
+		Else
+			Set TargetNotesDocument = OtherDocument
+		End If
+		
+		s.ConvertMIME = False ' Do not convert MIME to rich text
+		expectedHeaderVal = Lcase(|attachment; filename="| + Me.MIMEFileName + |"|)
+		
+		Set mime = TargetNotesDocument.GetMIMEEntity(Me.MIMEFieldName)
+		If mime Is Nothing Then
+			Set mime = TargetNotesDocument.CreateMIMEEntity(Me.MIMEFieldName)
+		Else
+		'For Existing Documents
+			Set child = mime.GetFirstChildEntity
+			Do While Not (child Is Nothing)
+				Set header = child.GetNthHeader("Content-Disposition")
+				headerVal = Lcase(header.GetHeaderValAndParams())
+				If headerVal = expectedHeaderVal Then
+					Exit Do
+				End If
+				
+				Set child = child.GetNextEntity()
+			Loop
+		End If
+		
+		Set header = mime.GetNthHeader("Content-Type")    
+		If header Is Nothing Then
+			Set header = mime.CreateHeader("Content-Type")
+			Call header.SetHeaderVal("multipart/mixed")
+		End If
+		
+		If child Is Nothing Then
+			Set child = mime.CreateChildEntity
+			Set header = child.CreateHeader("Content-Type")
+			Call header.SetHeaderValAndParams("text/plain; charset=UTF-8")
+			
+			Set header = child.CreateHeader("Content-Description")
+			Call header.SetHeaderVal(|"| + Me.MIMEFileName + |"|)
+			
+			Set header = child.CreateHeader("Content-Disposition")
+			Call header.SetHeaderValAndParams(|attachment; filename="| + Me.MIMEFileName + |"|)	
+		End If
+		
+		Call child.SetContentFromText(stream, "text/plain; charset=UTF-8; name=" + Me.MIMEFileName, ENC_IDENTITY_8BIT)
+		Call TargetNotesDocument.CloseMIMEEntities(True, Me.MIMEFieldName)
+		
+		s.ConvertMIME = True ' Do not convert MIME to rich text
+    		'The Calling Routine should take the resposibility to close/flush the stream
+	End Sub
+	
+'Function JSONToNotesDocuments	
+	Public Function JSONToNotesDocuments(CommitDocuments As Boolean) As Boolean
+		On Error Goto ErrorHandler
+		
+		JSONToNotesDocuments = False
+		
+		Me.NumberOfDocs = 0
+		Redim Me.DocumentArray(Me.NumberOfDocs)
+		Call CreateNPopulateNotesDocument(Me.jsonRootObject, CommitDocuments) 'Recursivly called
+		JSONToNotesDocuments = True
+ExitFunction:
+		Exit Function
+ErrorHandler:
+		Resume ExitFunction
+	End Function
+	
+'Function ReadJSONObject	
+	Private Function CreateNPopulateNotesDocument(JSONObj As Variant, SaveDocumentToDB As Boolean)
+		Dim s As New NotesSession
+		Dim JSONEntries As Variant, subJSONEntries As Variant
+		Dim ObjType As String , subObjType As String 
+		Dim doc As NotesDocument, isDocumentEntry As Boolean
+		
+		JSONEntries = JSONObj.Items
+		
+		isDocumentEntry=False
+		If Iselement(JSONEntries("RecordUNID")) And Iselement(JSONEntries("id"))  Then
+		'Create a Notes Document only in the case where the entry has UNID and ID JSON Elements, as according to the JSON every document Entry has to have a UNID, Id aswell as a TYPE element
+			Set doc = New NotesDocument(s.currentdatabase)
+			isDocumentEntry=True
+		End If
+		
+		Forall JSONEntry In JSONEntries
+			ObjType = Typename(JSONEntry)
+			If  objType = "JSONOBJECT" Then
+				'If this is an Object, its a Document/Document Collection entry call ReadJSONObject to process the nested document
+				Call CreateNPopulateNotesDocument(JSONEntry, SaveDocumentToDB)
+			Elseif objType = "JSONARRAY" Then
+				'JSONEntry.Items would be of type EMPTY in cases where the Object has no entries in the ITEMS array of JSON where the Dummy EMPTY JSON objects have been created
+				If Typename(JSONEntry.Items) <> "EMPTY" Then
+					subObjType = Typename(JSONEntry.Items(0))
+					If subObjType <> "JSONOBJECT" Then	'THE REAL DATA ELEMENT / ENTRY Type MULTIVALUE
+						If isDocumentEntry Then
+							doc.ReplaceItemValue Listtag(JSONEntry), JSONEntry.Items
+						End If
+					Else	'Else This is a Collection of other Documents
+						Forall JSONSubEntry In JSONEntry.Items
+							Call CreateNPopulateNotesDocument(JSONSubEntry, SaveDocumentToDB)
+						End Forall
+					End If
+				Else
+					If isDocumentEntry Then
+						doc.ReplaceItemValue Listtag(JSONEntry), ""
+					End If
+				End If	
+			Else
+				If isDocumentEntry Then	'THE REAL DATA ELEMENT / ENTRY
+					doc.ReplaceItemValue Listtag(JSONEntry), JSONEntry
+				End If
+			End If
+		End Forall
+		
+		If isDocumentEntry Then
+			If SaveDocumentToDB Then
+				doc.Save True, False
+			End If
+			Redim Preserve DocumentArray(Me.NumberOfDocs)
+			Set DocumentArray(Me.NumberOfDocs) = doc
+			Me.NumberOfDocs = Me.NumberOfDocs + 1
+		End If
+		
+	End Function
+	
+'Function GetEntryByIdentity	
+	Public Function GetEntryByIdentity(RecordUNID As String) As JSONObject
+		If Iselement(Me.EntriesByIdentity(RecordUNID)) Then
+			Set GetEntryByIdentity = Me.EntriesByIdentity(RecordUNID).item
+		Else
+			Set GetEntryByIdentity = Nothing
+		End If
+		Exit Function
+	End Function
+	
+'Function GetEntriesByType
+	Public Function GetEntriesByType(EntryType As String) As Variant 
+		Dim returnArray() As JSONObject 
+		Dim ctr As Integer, isIntialised As Boolean
+		If Iselement(Me.EntriesByType(EntryType)) Then
+			ctr = 0
+			Forall JSONEntry In Me.EntriesByType(EntryType).Items
+				isIntialised = True
+				Redim Preserve returnArray(ctr)
+				Set returnArray(ctr) = Me.GetEntryByIdentity(Listtag(JSONEntry))
+				ctr = ctr + 1
+			End Forall
+			If isIntialised = True Then
+				GetEntriesByType = returnArray
+			Else
+				GetEntriesByType = Null
+			End If
+		Else
+			GetEntriesByType = Null
+		End If
+	End Function
+	
+'Function AddItem
+	Public Function AddItem(EntryByIdentity As Variant, ItemName As String, Value As Variant) As Boolean
+		On Error Goto ErrorHandler
+		AddItem =  Me.ReplaceItemValue(EntryByIdentity, ItemName, Value) 
+Done:	
+		Exit Function
+ErrorHandler:
+		AddItem = False
+		Resume Done
+	End Function
+	
+'Function RemoveItem
+	Public Function RemoveItem(EntryByIdentity As Variant, ItemName As String) As Boolean
+		On Error Goto ErrorHandler
+		RemoveItem = False
+		If Typename(EntryByIdentity) = "JSONOBJECT"  Then
+			Call EntryByIdentity.RemoveItem(ItemName)
+		End If
+Done:	
+		Exit Function
+ErrorHandler:
+		RemoveItem = False
+		Resume Done
+	End Function
+	
+'Function GetItemValue
+	Public Function GetItemValue(EntryByIdentity As Variant, ItemName As String) As Variant
+		On Error Goto ErrorHandler
+		Dim ItemValue As Variant 
+		Dim ctr As Integer
+		If Typename(EntryByIdentity) = "JSONOBJECT" Then
+			If Isobject(EntryByIdentity.GetItemValue(ItemName)) Then
+				Set ItemValue = EntryByIdentity.GetItemValue(ItemName)	
+				If Typename(ItemValue) = "JSONARRAY" Then
+					GetItemValue = ItemValue.items
+				Else
+					Set GetItemValue = ItemValue
+				End If
+			Else
+				GetItemValue = EntryByIdentity.GetItemValue(ItemName)
+			End If
+		Else
+			GetItemValue = Null
+		End If
+Done:	
+		Exit Function
+ErrorHandler:
+		GetItemValue = Null
+		Resume Done
+	End Function
+	
+'Function GetItemValue
+	Public Function GetItemFirstValue(EntryByIdentity As Variant, ItemName As String) As Variant
+		On Error Goto ErrorHandler
+		GetItemFirstValue = Null
+		
+		Dim ItemValue As Variant 
+		ItemValue = GetItemValue(EntryByIdentity, ItemName)
+		If Isobject(ItemValue) Then
+			GetItemFirstValue = Null
+		Elseif Isarray(ItemValue) Then
+			GetItemFirstValue = ItemValue(0)
+		Else
+			GetItemFirstValue = ItemValue
+		End If
+Done:	
+		Exit Function
+ErrorHandler:
+		GetItemFirstValue = Null
+		Resume Done
+	End Function
+	
+'Function ReplaceItemValue
+	Public Function ReplaceItemValue(EntryByIdentity As Variant, ItemName As String, Value As Variant) As Boolean
+		On Error Goto ErrorHandler
+		ReplaceItemValue = False
+		
+		Dim jsonArr As JSONArray
+		Dim UNIDValue As String, oldUNIDValue As String 
+		Dim TypeValue As String, oldTypeValue As String 
+		Dim tmpValue As Variant 
+		Dim ItemType As String , EntryType As String 
+		
+		If Typename(EntryByIdentity) = "JSONOBJECT" Then
+			If Ucase(ItemName) = "RECORDUNID" Or Ucase(ItemName) = "TYPE" Then
+				'Check that an entry with the new RECORDUNID value does not exists
+				If Isarray(Value) Then
+					If Ubound(Value) >= 1 Then
+						Msgbox "A " + ItemName + " value can never ever be a multi value field"
+						Exit Function
+					Else
+						If Ucase(ItemName) = "RECORDUNID" Then UNIDValue = Value(0)
+						If Ucase(ItemName) = "TYPE" Then TypeValue = Value(0)
+					End If
+				Else
+					If Ucase(ItemName) = "RECORDUNID" Then UNIDValue = Value
+					If Ucase(ItemName) = "TYPE" Then TypeValue = Value
+				End If
+				
+				If Trim(UNIDValue) = "" And Trim(TypeValue) = "" Then
+					Msgbox "A " + ItemName + " value can never be blank"
+					Exit Function
+				End If
+				
+				If Ucase(ItemName) = "RECORDUNID" Then
+					If Not (GetEntryByIdentity(UNIDValue) Is Nothing) Then
+						Msgbox "A Entry with the same RecordUNID already exist."
+						Exit Function
+					Else
+						tmpValue = GetItemValue(EntryByIdentity, "RecordUNID")
+						If Isarray(tmpValue) Then
+							oldUNIDValue = tmpValue(0)
+						Else
+							oldUNIDValue = tmpValue
+						End If
+					End If
+				Else
+					tmpValue = GetItemValue(EntryByIdentity, "Type")
+					If Isarray(tmpValue) Then
+						oldTypeValue = tmpValue(0)
+					Else
+						oldTypeValue = tmpValue
+					End If
+				End If
+			End If
+			
+			If Isnull(Value) Then
+				Call EntryByIdentity.ReplaceItemValue(ItemName, "")	
+			Elseif Isarray(Value) Then
+				Set jsonArr = New JSONArray
+				Forall entryValue In Value
+					jsonArr.AddItem(entryValue)
+				End Forall
+				Call EntryByIdentity.ReplaceItemValue(ItemName, jsonArr)	
+			Else
+				Call EntryByIdentity.ReplaceItemValue(ItemName, Value)	
+			End If
+			
+			If Ucase(ItemName) = "RECORDUNID" Then
+				'Reshuffle the Object stack, Remove old Item , and add new Item
+				Set Me.EntriesByIdentity(UNIDValue) = New EntryIdentity
+				Set Me.EntriesByIdentity(UNIDValue).Item = EntryByIdentity
+				If Iselement(EntryByIdentity.Items("Type")) Then
+					ItemType =  Typename(EntryByIdentity.Items("Type"))
+					If ItemType = "STRING" Then
+						EntryType = EntryByIdentity.Items("Type")
+					Elseif ItemType = "JSONARRAY" Then
+						EntryType = EntryByIdentity.Items("Type").items(0)
+					End If
+					
+					Set Me.EntriesByType(EntryType).Items(UNIDValue) = Me.EntriesByIdentity(UNIDValue)
+					
+					Delete Me.EntriesByType(EntryType).Items(oldUNIDValue)
+					Erase Me.EntriesByType(EntryType).Items(oldUNIDValue)
+				End If
+				
+				Delete Me.EntriesByIdentity(oldUNIDValue) 
+				Erase Me.EntriesByIdentity(oldUNIDValue) 
+				ReplaceItemValue = True
+			Elseif Ucase(ItemName) = "TYPE" Then
+				tmpValue = GetItemValue(EntryByIdentity, "RecordUNID")
+				If Isarray(tmpValue) Then
+					UNIDValue = tmpValue(0)
+				Else
+					UNIDValue = tmpValue
+				End If
+				
+				If Not (Iselement( Me.EntriesByType(TypeValue))) Then
+					Set Me.EntriesByType(TypeValue) = New EntryIdentityByType	
+				End If
+				Set Me.EntriesByType(TypeValue).Items(UNIDValue) = Me.EntriesByIdentity(UNIDValue)
+				Me.EntriesByType(TypeValue).Count = Me.EntriesByType(TypeValue).Count + 1
+				
+				'Update/Delete old TYPE references
+				Me.EntriesByType(oldTypeValue).Count = Me.EntriesByType(oldTypeValue).Count - 1
+				Delete Me.EntriesByType(oldTypeValue).Items(UNIDValue)
+				Erase Me.EntriesByType(oldTypeValue).Items(UNIDValue)
+				
+				If Me.EntriesByType(oldTypeValue).Count = 0 Then
+					Delete Me.EntriesByType(oldTypeValue)
+					Erase Me.EntriesByType(oldTypeValue)		
+				End If
+			Else
+				ReplaceItemValue = True
+			End If
+		End If		
+Done:	
+		Exit Function
+ErrorHandler:
+		ReplaceItemValue = False
+		Resume Done
+	End Function
+	
+'Function HasItem
+	Public Function HasItem(EntryByIdentity As JSONObject, ItemName As String) As Boolean
+		Dim JSONItems As Variant
+		JSONItems = EntryByIdentity.Items 
+		If Iselement(JSONItems(ItemName)) Then
+			HasItem = True
+		Else
+			HasItem = False
+		End If
+	End Function
+	
+'Function RenameItem
+	Public Function RenameItem(EntryByIdentity As JSONObject, oldName As String, newName As String, overWriteNewItemIfExists As Boolean) As Boolean
+		On Error Goto ErrorHandler
+		RenameItem = False
+		If Ucase(newName) = "RECORDUNID" Or Ucase(oldName) = "RECORDUNID" Or Ucase(newName) = "TYPE" Or Ucase(oldName) = "TYPE" Then
+			'NOT Allowed
+			Exit Function
+		End If
+		If Typename(EntryByIdentity) = "JSONOBJECT" Then
+			If HasItem(EntryByIdentity, oldName) Then
+				If (Not HasItem(EntryByIdentity, newName)) Or overWriteNewItemIfExists Then
+					Call AddItem(EntryByIdentity, newName, GetItemValue(EntryByIdentity,oldName))
+					Call RemoveItem(EntryByIdentity, oldName)
+					RenameItem = True
+				End If
+			End If
+		End If
+Done:	
+		Exit Function
+ErrorHandler:
+		RenameItem = False
+		Resume Done
+	End Function	
+	
+'Function MoveEntry
+	Public Function MoveItemToAnotherEntry(SourceEntryByIdentity As JSONObject, ItemName As String, TargetEntryByIdentity As JSONObject,  overWriteTargetEntryItemIfExists As Boolean, removeOld As Boolean) As Boolean 
+		On Error Goto ErrorHandler
+		MoveItemToAnotherEntry = False
+		
+		Dim tmpValue As Variant, UNIDValue As Variant 
+		If Typename(SourceEntryByIdentity) = "JSONOBJECT" And Typename(TargetEntryByIdentity) = "JSONOBJECT" Then
+			If HasItem(SourceEntryByIdentity, ItemName) Then
+				If (Not HasItem(TargetEntryByIdentity, ItemName)) Or overWriteTargetEntryItemIfExists Then
+					Call AddItem(TargetEntryByIdentity, ItemName, SourceEntryByIdentity.GetItemValue(ItemName))
+					If removeOld Then					
+						'Call RemoveItem(SourceEntryByIdentity, ItemName)
+						Call ReplaceItemValue(SourceEntryByIdentity, ItemName, "")
+						
+					End If
+					
+					MoveItemToAnotherEntry = True
+				End If	
+			End If
+		End If
+Done:	
+		Exit Function
+ErrorHandler:
+		MoveItemToAnotherEntry = False
+		Resume Done
+	End Function
+	
+'Function GetEntryByKey
+	Public Function GetEntryByKey(ItemKeyName As String, SingleSearchValue As Variant) As JSONObject 
+		On Error Goto ErrorHandler
+		Set GetEntryByKey = Nothing
+		
+		Dim JSONObj As JSONObject	
+		Dim ItemValue As Variant
+		Dim searchValue As Variant 
+		
+		If Isobject(SingleSearchValue) Then
+			Exit Function
+		Elseif Isarray(SingleSearchValue) Then
+			searchValue = SingleSearchValue(0)
+		Else
+			searchValue = SingleSearchValue
+		End If
+		Dim Items As Variant
+		Forall Entry In Me.EntriesByIdentity
+			Set JSONObj = Entry.Item
+			Items = JSONObj.Items
+			If Iselement(Items(ItemKeyName)) Then
+				If Not Isobject(GetItemValue(Entry, ItemKeyName)) Then
+					ItemValue = GetItemValue(Entry, ItemKeyName)
+					If Isarray(ItemValue) Then
+						Forall arrValue In ItemValue
+							If arrValue = searchValue Then
+								Set GetEntryByKey = JSONObj
+							End If
+						End Forall
+					Else
+						If ItemValue =  searchValue Then
+							Set GetEntryByKey = JSONObj
+						End If
+					End If
+				End If
+			End If
+		End Forall
+Done:	
+		Exit Function
+ErrorHandler:
+		Set GetEntryByKey = Nothing
+		Resume Done
+	End Function
+	
+'Function GetAllEntriesByKey
+	Public Function GetAllEntriesByKey(ItemKeyName As String, SingleSearchValue As Variant) As Variant 
+		On Error Goto ErrorHandler
+		GetAllEntriesByKey = Null
+		
+		Dim JSONObj As JSONObject	
+		Dim ItemValue As Variant
+		Dim returnArray() As Variant, arrCount As Integer
+		Dim isInitialised As Boolean
+		Dim searchValue As Variant 
+		
+		If Isobject(SingleSearchValue) Then
+			Exit Function
+		Elseif Isarray(SingleSearchValue) Then
+			searchValue = SingleSearchValue(0)
+		Else
+			searchValue = SingleSearchValue
+		End If
+		Redim returnArray(arrCount)
+		
+		Dim Items As Variant
+		Forall Entry In Me.EntriesByIdentity
+			Set JSONObj = Entry.Item
+			Items = JSONObj.Items
+			If Iselement(Items(ItemKeyName)) Then
+				If Not Isobject(GetItemValue(Entry, ItemKeyName)) Then
+					ItemValue = GetItemValue(Entry, ItemKeyName)
+					If Isarray(ItemValue) Then
+						Forall arrValue In ItemValue
+							If arrValue = searchValue Then
+								isInitialised = True
+								Redim Preserve returnArray(arrCount)
+								Set returnArray(arrCount) = JSONObj
+								arrCount = arrCount + 1
+								Exit Forall
+							End If
+						End Forall
+					Else
+						If ItemValue =  searchValue Then
+							isInitialised = True
+							Redim Preserve returnArray(arrCount)
+							Set returnArray(arrCount) = JSONObj
+							arrCount = arrCount + 1
+							Exit Forall
+						End If
+					End If
+				End If
+			End If
+		End Forall
+		
+		If isInitialised  Then
+			GetAllEntriesByKey = returnArray
+		Else
+			GetAllEntriesByKey = Null
+		End If
+Done:	
+		Exit Function
+ErrorHandler:
+		GetAllEntriesByKey = Null
+		Resume Done
+	End Function
+	
+'Function GetEntryofTypeByKey
+	Public Function GetEntryofTypeByKey(EntryType As String, ItemKeyName As String, SingleSearchValue As Variant) As JSONObject 
+		'On Error Goto ErrorHandler
+		Set GetEntryofTypeByKey = Nothing
+		
+		Dim JSONObj As JSONObject	
+		Dim ItemValue As Variant
+		Dim searchValue As Variant 
+		
+		If Isobject(SingleSearchValue) Then
+			Exit Function
+		Elseif Isarray(SingleSearchValue) Then
+			searchValue = SingleSearchValue(0)
+		Else
+			searchValue = SingleSearchValue
+		End If
+		Dim Items As Variant
+		Forall Entry In Me.GetEntriesByType(EntryType)
+			Set JSONObj = Entry
+			Items = JSONObj.Items
+			If Iselement(Items(ItemKeyName)) Then
+				If Not Isobject(GetItemValue(Entry, ItemKeyName)) Then
+					ItemValue = GetItemValue(Entry, ItemKeyName)
+					If Isarray(ItemValue) Then
+						Forall arrValue In ItemValue
+							If arrValue = searchValue Then
+								Set GetEntryofTypeByKey = JSONObj
+							End If
+						End Forall
+					Else
+						If ItemValue = searchValue  Then
+							Set GetEntryofTypeByKey = JSONObj
+						End If
+					End If
+				End If
+			End If
+		End Forall
+Done:	
+		Exit Function
+ErrorHandler:
+		Set GetEntryofTypeByKey = Nothing
+		Resume Done
+	End Function
+	
+'Function GetAllEntriesOfTypeByKey
+	Public Function GetAllEntriesofTypeByKey(EntryType As String,ItemKeyName As String, SingleSearchValue As Variant) As Variant 
+		On Error Goto ErrorHandler
+		GetAllEntriesofTypeByKey = Null
+		
+		Dim JSONObj As JSONObject	
+		Dim ItemValue As Variant
+		Dim returnArray() As Variant, arrCount As Integer
+		Dim isInitialised As Boolean
+		Dim searchValue As Variant 
+		
+		If Isobject(SingleSearchValue) Then
+			Exit Function
+		Elseif Isarray(SingleSearchValue) Then
+			searchValue = SingleSearchValue(0)
+		Else
+			searchValue = SingleSearchValue
+		End If
+		
+		Dim Items As Variant
+		Forall Entry In Me.GetEntriesByType(EntryType)
+			Set JSONObj = Entry
+			Items = JSONObj.Items
+			If Iselement(Items(ItemKeyName)) Then
+				If Not Isobject(GetItemValue(Entry, ItemKeyName)) Then
+					ItemValue = GetItemValue(Entry, ItemKeyName)
+					If Isarray(ItemValue) Then
+						Forall arrValue In ItemValue
+							If arrValue = searchValue Then
+								isInitialised = True
+								Redim Preserve returnArray(arrCount)
+								Set returnArray(arrCount) = JSONObj
+								arrCount = arrCount + 1
+								Exit Forall
+							End If
+						End Forall
+					Else
+						If ItemValue = searchValue Then
+							isInitialised = True
+							Redim Preserve returnArray(arrCount)
+							Set returnArray(arrCount) = JSONObj
+							arrCount = arrCount + 1
+							Exit Forall
+						End If
+					End If
+				End If
+			End If
+		End Forall
+		If isInitialised  Then
+			GetAllEntriesofTypeByKey = returnArray
+		Else
+			GetAllEntriesofTypeByKey = Null
+		End If
+Done:	
+		Exit Function
+ErrorHandler:
+		GetAllEntriesofTypeByKey = Null
+		Resume Done
+	End Function	
+	
+'Function ToJSON()
+	Public Function ToJSON() As String 
+		On Error Goto ErrorHandler
+		ToJSON = Me.jsonRootObject.ToJSON()
+Done:	
+		Exit Function
+ErrorHandler:
+		Resume Done
+	End Function
+	
+'Function EntryToJSON
+	Public Function EntryToJSON(EntryByIdentity As JSONObject) As String 
+		On Error Goto ErrorHandler
+		EntryToJSON = EntryByIdentity.ToJSON()
+Done:	
+		Exit Function
+ErrorHandler:
+		Resume Done
+	End Function
+	
+'Function SaveJSONToMime
+	Public Function SaveJSONToMime()  As Boolean
+		On Error Goto ErrorHandler
+		SaveJSONToMime = False
+		Call Me.CreateMIMETextAttachment(Nothing)
+		Me.SourceDocument.Save True, False
+		SaveJSONToMime = True
+Done:	
+		Exit Function
+ErrorHandler:
+		Resume Done
+	End Function
+	
+'Function SaveJSONToMimeNewDocument
+	Public Function SaveJSONToMimeToAnotherDocument(doc As Notesdocument)  As Boolean
+		On Error Goto ErrorHandler
+		SaveJSONToMimeToAnotherDocument = False
+		Call Me.CreateMIMETextAttachment(doc)
+		Me.SourceDocument.Save True, False
+		SaveJSONToMimeToAnotherDocument = True
+Done:	
+		Exit Function
+ErrorHandler:
+		Resume Done
+	End Function
+End Class

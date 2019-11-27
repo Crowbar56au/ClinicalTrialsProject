@@ -1,0 +1,151 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(Backfill Missing App Data)' alias='agBackfillData' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3'
+ publicaccess='false' designerversion='8.5.3' comment='Write data from Part1/Part2 to Main app doc'
+ activatable='false' enabled='false'>
+<noteinfo noteid='43a' unid='065863886A265A59CA257F7700070D1F' sequence='14'>
+<created><datetime dst='true'>20160315T121701,11+11</datetime></created>
+<modified><datetime>20160628T151505,97+10</datetime></modified>
+<revised><datetime>20160628T151505,96+10</datetime></revised>
+<lastaccessed><datetime>20160628T151505,96+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,71+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151506,02+10</datetime></designchange>
+<trigger type='scheduled'>
+<schedule type='never' runlocation='specific' runserver='CN=EWCBRDOMI01/OU=SVR/O=TTRADEV'/></trigger>
+<documentset type='modified'/><code event='options'><lotusscript>%REM
+	Agent (Backfill Missing App Data) | agBackfillData
+	Created Apr 30, 2013 by Derek Schillings/DEVELOPER/TGADEV (DFS)
+	Description: Write Trial dates and Title of Study to main app doc. 
+	Scheduled to run daily at 6am - TGA-INC-29052
+	WP Disabled this agent , since we don't need this agent anymore.
+%END REM
+Option Public
+Option Explicit
+
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	
+	'Constants
+
+	Const sAPP_VIEW_NAME = "AppsByApplicationId"
+	Const sALL_APPS_VIEW_NAME = "LookupAllByApplicationID"	
+	
+	'Declarations
+
+	Dim Nsession As NotesSession 
+	Dim Ncurrdb As NotesDatabase
+	Dim Nappview As NotesView
+	Dim Nallview As NotesView
+	Dim Nappdoc As NotesDocument
+	
+	Dim Npartdoc As NotesDocument
+	Dim Ncompdoc As NotesDocument
+	
+	Dim sKey As String
+	Dim bUpdateRequired As Boolean
+	
+	'Get session and current database	
+	
+	Set Nsession = New NotesSession
+	Set Ncurrdb = Nsession.currentdatabase
+	
+	'Get Applications views
+
+	Set Nappview = Ncurrdb.Getview(sAPP_VIEW_NAME)
+	Set Nallview = Ncurrdb.Getview(sALL_APPS_VIEW_NAME)
+	
+	'Get first application
+	
+	Set Nappdoc = Nappview.getfirstdocument
+	
+	'Process all applications
+	
+	While Not (Nappdoc Is Nothing )
+		
+		'Set start of key
+		sKey = Nappdoc.ApplicationID(0) + "~" + Cstr(Nappdoc.ApplicationVersion(0)) 
+		
+		'If CTN get Part1 doc (Notification)
+		
+		If( Nappdoc.ClinicalTrialType(0) = "CTN" ) Then
+			sKey = sKey + "~Part1"
+			Set Npartdoc = Nallview.getdocumentbykey( sKey, True )
+		End If
+		
+		'If CTX get Part2 doc (Exemption)
+		
+		If( Nappdoc.ClinicalTrialType(0) = "CTX" ) Then
+			sKey = sKey + "~Part2"
+			Set Npartdoc = Nallview.getdocumentbykey( sKey, True )
+		End If
+		
+		'Get completion doc
+		
+		sKey = Strleftback(sKey, "~") + "~Completion"
+		Set Ncompdoc = Nallview.getdocumentbykey( sKey, True )
+		
+		'Update main application doc
+
+		bUpdateRequired = False
+		
+		If Not( Npartdoc Is Nothing ) Then
+			
+			'Trial Start Date
+			If Trim(Nappdoc.StartDate(0)) = "" Then 
+				If Trim(Npartdoc.StartDate(0)) &lt;&gt; "" Then
+					Nappdoc.StartDate = Npartdoc.StartDate(0)
+					bUpdateRequired = True
+				End If
+			End If
+			
+			'Expected Completion Date
+			If Trim(Nappdoc.ExpectedCompletionDate(0)) = "" Then 
+				If Trim(Npartdoc.ExpectedCompletionDate(0)) &lt;&gt; "" Then
+					Nappdoc.ExpectedCompletionDate = Npartdoc.ExpectedCompletionDate(0)
+					bUpdateRequired = True
+				End If
+			End If
+
+			'Finish Date
+			If Trim(Nappdoc.FinishDate(0)) = "" Then 
+				If Trim(Npartdoc.FinishDate(0)) &lt;&gt; "" Then
+					Nappdoc.FinishDate = Npartdoc.FinishDate(0)
+					bUpdateRequired = True
+				End If
+			End If
+			
+			'Title of Study
+			If Trim(Nappdoc.TitleOfStudy(0)) = "" Then 
+				If Trim(Npartdoc.TitleOfStudy(0)) &lt;&gt; "" Then
+					Nappdoc.TitleOfStudy = Npartdoc.TitleOfStudy(0)
+					bUpdateRequired = True			
+				End If
+			End If
+			
+		End If
+
+		'Update main application doc with completion date
+		
+		If Not( Ncompdoc Is Nothing ) Then
+			If Trim(Nappdoc.TrialCompletionDate(0)) = "" Then 
+				If Trim(Ncompdoc.TrialCompletionDate(0)) &lt;&gt; "" Then
+					Nappdoc.TrialCompletionDate = Ncompdoc.TrialCompletionDate(0)
+					bUpdateRequired = True
+				End If
+			End If
+		End If		
+		
+		'Save application if required
+		If bUpdateRequired Then Call Nappdoc.save(True, False)		
+		
+		'Get next application
+		
+		Set Nappdoc = Nappview.getnextdocument(Nappdoc)
+		
+	Wend
+	
+End Sub</lotusscript></code>
+<item name='$POID'><datetime>20160620T120210,28+10</datetime></item></agent>
+

@@ -1,0 +1,215 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(LookupDataRepository)' alias='LookupDataRepository' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3'
+ publicaccess='false' designerversion='8.5.3'>
+<noteinfo noteid='50a' unid='127F61C041EA6712CA257F7700070C55' sequence='14'>
+<created><datetime dst='true'>20160315T121659,09+11</datetime></created>
+<modified><datetime>20160628T151506,46+10</datetime></modified>
+<revised><datetime>20160628T151506,45+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,45+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,11+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151506,52+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+Option Declare
+Use "GetDatabases"
+Use "DraftToJSON"
+
+'/ ************************************************************
+'/ 		INC 65021 - Print Preview for Repository doesn work at all
+'/ 		WP - 05 May 2015
+'/ 		Copy this agent from LookupRepository agent and modified to get the JSONDocument from CT Repository 
+'/		
+'/ 		The current design causing the problem that the Client did not have the access to JSONDocument in CT Repository even as a Reader
+'/ 		Only the Application document they have access as a Reader.
+'/ 		This agent running as server security, so we need to make sure that the SIME ClientID is member of Readers field in Application Document before
+'/ 		we access the JSON File, we do this by passing the effectiveusername from agent printCTAppPortal in CT Repository
+'/ 		We also make sure that the userid is valid and active, to prevent hijacking the data in Repository		
+'/ ************************************************************
+
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	Dim s As New NotesSession, dbSrc As NotesDatabase
+	Dim dbUserMgmt As notesdatabase
+	Dim view As NotesView, vUsersById As notesview
+	Dim strQueryString As String, strKey As String
+	Dim strUserName As String
+	Dim id_from_url As String, appVer As String
+	Dim doc As NotesDocument, appDoc As NotesDocument
+	Dim tmpdoc As NotesDocument, docUserid As notesdocument
+	Dim dc As notesdocumentcollection
+	Dim stream As NotesStream
+	Dim nitem As notesitem
+	Dim buffer As String,  x As Long, SIMEClientID As String
+	
+	On Error Resume Next
+	strQueryString = s.DocumentContext.Query_String_Decoded(0)
+	strUserName = Trim(GetWebVariable(strQueryString, "U"))
+	id_from_url = Trim(GetWebVariable(strQueryString, "ID"))
+	appVer = GetWebVariable(strQueryString, "V")
+	
+	On Error Goto ErrorHandler
+	
+	Print "Content-Type:application/json"
+	
+	Set stream = S.CreateStream
+	strKey = id_from_url
+
+	If Len(strKey) &gt; 0 Then
+		
+		Set dbSrc = fdbGetDatabase("CTR_Path")
+		Set dbUserMgmt = fdbGetDatabase("UserManagementPath")
+		
+		If dbSrc Is Nothing Then
+			Msgbox "Error in LookupDataRepository Agent, can not open CT Repository Database." 
+			Exit Sub
+		End If
+		If dbUserMgmt Is Nothing Then
+			Msgbox "Error in LookupDataRepository Agent, can not open SIME User Management Database."
+			Exit Sub
+		End If
+		
+		Set vUsersById = dbUserMgmt.Getview("LUActiveUserByUserId")
+		Set view = dbSrc.GetView("LookupByApplicationID")
+		
+		If vUsersById Is Nothing Then
+			Msgbox "Error in LookupDataRepository Agent, cannot get 'LUActiveUserByUserId' View in User Management Database."
+			Exit Sub
+		End If
+		
+		If view Is Nothing Then
+			Msgbox "Error in LookupDataRepository Agent, cannot get 'LookupByApplicationID' View in CT Repository Database."
+			Exit Sub
+		End If				
+						
+		If (Not view Is Nothing) And (Not vUsersById Is Nothing) Then
+			
+			Set dc = view.GetAllDocumentsByKey(id_from_url + "~" + appVer , True)
+			Set tmpdoc = dc.Getfirstdocument()
+			Do While Not (tmpdoc Is Nothing)
+				If Lcase(tmpdoc.Form(0)) = "ct" Then
+					Set doc = tmpdoc
+				Else 
+					Set appdoc = tmpdoc
+				End If
+				Set tmpdoc = dc.Getnextdocument(tmpdoc)
+			Loop
+			
+			If appdoc Is Nothing Then
+				Msgbox "Error in LookupDataRepository Agent, cannot get Application Document for this ID: " &amp; strKey
+				Exit Sub
+			End If
+			
+			Set nitem = appdoc.Getfirstitem("WebReaders")
+			If nitem Is Nothing Then
+				Msgbox "Error in LookupDataRepository Agent, cannot get WebReaders item in Application Document for this ID: " &amp; strKey
+				Exit Sub
+			End If
+			
+			'/ Check the Username passed by url
+			If strUserName = "" Then
+				Msgbox "Error in LookupDataRepository Agent, Username is not passed in the URL."
+				Exit Sub
+			End If
+			
+			'/ Check if the user is in the SIME Client and Active
+			Set docUserid = vUsersById.Getdocumentbykey(strUserName, True)
+			If docUserid Is Nothing Then
+				Msgbox "Error in LookupDataRepository Agent, cannot get User Account document in SIME User Management Database for this user: " &amp; strUserName
+				Exit Sub
+			End If
+			
+			If Lcase(docUserid.Status(0)) &lt;&gt; "active" Then
+				Msgbox "Error in LookupDataRepository Agent, User Account in SIME User Management Database for this user: " &amp; strUserName &amp; " is not Active."
+				Exit Sub
+			End If
+			
+			Dim flag As Boolean			
+			'/ If Yes then 
+			SIMEClientID = "SIME" &amp; Strright(strUserName,"_")
+			flag = False
+			Forall v In nitem.Values
+				If Ucase(v) = SIMEClientID Then
+					flag = True
+				End If
+			End Forall
+			
+			If Not flag Then
+				'/ Don't have access to AppDoc as well as JSONDoc implied, then out
+				Msgbox "Error in LookupDataRepository Agent, User Account for this user: " &amp; strUserName &amp; " is not a member of WebReaders field."
+				Exit Sub
+			End If
+			
+			'Set doc = view.GetDocumentByKey(id_from_url + "~" + appVer , True)
+			If (doc Is Nothing) Or (Lcase(id_from_url) = "new") Then
+				Msgbox "Error in LookupDataRepository Agent, JSON Document not found for this ID: " &amp; strKey  &amp; " or this is New Application."
+			Else
+				
+				Set stream = GetMIMETextAttachment(doc, "JSON.txt")
+				x = Not stream Is Nothing
+				If x Then
+					Stream.Position = 0
+					While (Not stream.IsEOS)
+						buffer$ = stream.ReadText(STMREAD_LINE)
+						Print buffer$
+					Wend
+				End If
+				If Not stream Is Nothing Then Call Stream.Close()
+			End If
+			
+		End If
+	End If
+
+	
+ErrorResume:
+	Exit Sub
+ErrorHandler:
+	Print |;|
+	Msgbox "Error in " &amp; Lsi_info(2) +"/"+ Lsi_info(12) + " at line #" + Cstr(Erl) + ": (" + Cstr(Err) + ") " + Error(Err)
+	Resume ErrorResume
+	
+End Sub
+
+</lotusscript></code><code event='GetMIMETextAttachment'><lotusscript>Function GetMIMETextAttachment(doc As NotesDocument, fileName As String) As NotesStream 
+	Dim s As New NotesSession
+	Dim mime As NotesMIMEEntity, header As NotesMIMEHeader 
+	Dim child As NotesMIMEEntity
+	Dim headerVal As String, expectedHeaderVal As String 
+	Dim stream As NotesStream , buffer As String 
+	
+	expectedHeaderVal = Lcase(|attachment; filename="| + fileName + |"|)
+	
+	Set GetMIMETextAttachment = Nothing 
+	s.ConvertMIME = False ' Do not convert MIME to rich text
+	
+	Set mime = doc.GetMIMEEntity("JSONMIMEFILE")
+	
+	If mime Is Nothing Then
+		s.ConvertMIME = True ' convert MIME to rich text
+		Exit Function
+	End If
+	
+	Set child = mime.GetFirstChildEntity
+	While Not (child Is Nothing)
+		Set header = child.GetNthHeader("Content-Disposition")
+		headerVal = Lcase(header.GetHeaderValAndParams())
+		If headerVal = expectedHeaderVal Then
+			Call child.DecodeContent()
+			Set stream = s.CreateStream 
+			Call child.GetContentAsText(stream, True)
+			
+			stream.Position = 0
+			Set GetMIMETextAttachment = stream
+			s.ConvertMIME = True 'convert MIME to rich text
+			Exit Function
+		End If
+		
+		Set child = child.GetNextEntity()
+	Wend
+	
+	s.ConvertMIME = True ' convert MIME to rich text
+End Function</lotusscript></code>
+<item name='$POID'><datetime>20160620T120208,89+10</datetime></item></agent>
+

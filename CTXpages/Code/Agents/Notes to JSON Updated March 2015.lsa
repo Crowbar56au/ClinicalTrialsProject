@@ -1,0 +1,2380 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='Notes to JSON Updated March 2015' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3'
+ publicaccess='false' designerversion='8.5.3'>
+<noteinfo noteid='376' unid='CA92766860F8FC88CA257F7700070994' sequence='14'>
+<created><datetime dst='true'>20160315T121652,04+11</datetime></created>
+<modified><datetime>20160628T151505,21+10</datetime></modified>
+<revised><datetime>20160628T151505,20+10</datetime></revised>
+<lastaccessed><datetime>20160628T151505,20+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,16+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151505,26+10</datetime></designchange>
+<trigger type='actionsmenu'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+Option Declare
+
+%INCLUDE "lsconst.lss"
+
+
+</lotusscript></code><code event='declarations'><lotusscript>
+Dim outputJS As Long
+Dim db As NotesDatabase
+	
+Dim Trials()
+
+
+
+
+</lotusscript></code><code event='initialize'><lotusscript>
+Sub Initialize
+	On Error Goto errorHandler
+	Const scriptElement = "Initialize"
+	
+	Dim vVal As Variant
+	vVal = Evaluate({@IsMember("[Admin]";@UserRoles)})
+	If vVal(0) = 0 Then
+		Msgbox "You are not authorised to run this agent..."
+		Exit Sub
+	End If
+	
+	Dim boxType As Long, answer As Integer
+	boxType&amp; = MB_YESNO + MB_ICONQUESTION
+	answer% = Messagebox("Are you sure that you want to generate JSON Documents from all Applications in this database?", boxType&amp;, "Continue?")
+	If answer% = 7 Then 
+		Exit Sub
+	End If
+	
+	Dim vSponsor As NotesView
+	Dim vDoc As NotesDocument
+	
+	Dim session As New NotesSession
+	Set db = session.Currentdatabase
+	Set vSponsor = db.Getview("AppsByApplicationId")
+	Dim count As Integer
+
+
+	count = 0
+	Set vDoc = vSponsor.Getfirstdocument()
+	Do While Not (vDoc Is Nothing)
+		Redim Preserve Trials(count)
+		Trials(count) = vDoc.ApplicationId(0)
+		count = count + 1
+		Set vDoc = vSponsor.GetNextdocument(vDoc)
+	Loop
+		
+	%REM
+	'/ ---- No Used these lines of codes anymore ----
+	Dim file2 As Integer
+	file2% = FreeFile()
+	Open "D:\Lotus Notes\Migration\Dataset\SponsorAddress.txt" For Input As file2%
+	While Not EOF(file2%)
+		ReDim Preserve Trials(count)
+		Input #file2%, Trials(count)
+		count = count + 1
+		
+		If count Mod 50 = 0 Then
+			Print count
+		End If
+	Wend
+	
+	Close file2%
+				
+	%END REM
+
+	'ReDim Trials(0)
+	'Trials(0) = "CT-2014-CTN-00130-1"
+	Call createJSONDoc(session)
+	
+exitGracefully:
+	Exit Sub
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	Resume exitGracefully
+End Sub
+
+</lotusscript></code><code event='CreateMIMETextAttachment'><lotusscript>
+Function CreateMIMETextAttachment(doc As NotesDocument, stream As NotesStream, fileName As String)
+
+	Dim s As New NotesSession
+	Dim mime As NotesMIMEEntity, header As NotesMIMEHeader 
+	Dim child As NotesMIMEEntity
+	Dim blankStream As NotesStream
+	Dim expectedHeaderVal As String, headerVal As String 
+
+	s.ConvertMIME = False ' Do not convert MIME to rich text
+	expectedHeaderVal = Lcase(|attachment; filename="| + fileName + |"|)
+	
+	Set mime = doc.GetMIMEEntity("JSONMIMEFILE")
+	If mime Is Nothing Then
+		Set mime = doc.CreateMIMEEntity("JSONMIMEFILE")
+	Else
+		'For Existing Documents
+		Set child = mime.GetFirstChildEntity
+		Do While Not (child Is Nothing)
+			Set header = child.GetNthHeader("Content-Disposition")
+			headerVal = Lcase(header.GetHeaderValAndParams())
+			If headerVal = expectedHeaderVal Then
+				Exit Do
+			End If
+			
+			Set child = child.GetNextEntity()
+		Loop
+	End If
+	
+	Set header = mime.GetNthHeader("Content-Type")    
+	If header Is Nothing Then
+		Set header = mime.CreateHeader("Content-Type")
+		Call header.SetHeaderVal("multipart/mixed")
+	End If
+	
+	If child Is Nothing Then
+		Set child = mime.CreateChildEntity
+		Set header = child.CreateHeader("Content-Type")
+		Call header.SetHeaderValAndParams("text/plain; charset=UTF-8")
+		
+		Set header = child.CreateHeader("Content-Description")
+		Call header.SetHeaderVal(|"| + fileName + |"|)
+		
+		Set header = child.CreateHeader("Content-Disposition")
+		Call header.SetHeaderValAndParams(|attachment; filename="| + fileName + |"|)	
+	End If
+	
+	Call child.SetContentFromText(stream, "text/plain; charset=UTF-8; name=" + fileName, ENC_IDENTITY_8BIT)
+	Call doc.CloseMIMEEntities(True, "JSONMIMEFILE")
+	
+	s.ConvertMIME = True ' Do not convert MIME to rich text
+    'The Calling Routine should take the resposibility to close/flush the stream
+End Function
+
+</lotusscript></code><code event='ProcessPOSTRequest'><lotusscript>
+Function ProcessPOSTRequest(docContext As NotesDocument, getJSONString As String)
+	On Error Goto errorhandler
+	Dim Session As New NotesSession
+	Dim dbThis As NotesDatabase
+	Dim docJSON As NotesDocument 
+	Dim dc As NotesDocumentCollection, doc As NotesDocument, success As Boolean
+	Dim JSONDataFieldName As String , JSONSupportDataFieldName As String 
+	Dim dataBuffer As String, dataTemp As Variant 
+	Dim JSONSupportDataBuffer As String 
+	Dim stream As NotesStream
+	Dim ItemValuePairs As Variant 
+	Dim DataValuePair As Variant
+	Dim ctr As Integer 
+	Dim fieldStr As String , fieldName As String , fieldlistULimit As Integer
+	Dim temp As Variant, totalbytes As Long, nextampersand As Long, querystring As String
+	Dim JSONstring As String, qsCMD As String, strReason As String
+	
+	Set stream = session.CreateStream
+		
+	JSONDataFieldName = "MultiPart32KJSONData_"
+	JSONSupportDataFieldName  = "SupportingFieldDataSet"
+	
+	JSONstring = getJSONString
+		
+	Set dbThis = session.CurrentDatabase
+	
+	Set docJSON = docContext
+
+	Call stream.WriteText(JSONstring,EOL_NONE)	
+	Call CreateMIMETextAttachment(docJSON, stream, "JSON.txt") 'used to be docJSON
+	Call stream.Truncate
+	Call stream.Close
+	'Call SetDocumentAuditNSecurity(docJSON) 'Causing error at present
+	'Call docJson.Replaceitemvalue("ApplicationStatus", "Draft") ' remove later if and when have real data
+	'Call docJson.Replaceitemvalue("ApplicationVersion", "1") ' remove later if and when have real data
+	'Call docJson.Replaceitemvalue("ApplicationStage", "1") ' remove later if and when have real data
+
+	success = docJSON.Save(True, False)
+	
+	
+	If success Then
+		strReason = "success"
+	Else
+		strReason = "failed to save document"
+	End If
+	
+errorresume:
+	On Error Resume Next
+	temp=""
+	If outputJS Then temp = |var result='|
+	temp=temp + |{"key":|
+	If success Then
+		temp=temp + "1"
+	Else
+		temp=temp + "0"
+	End If
+	temp=temp + |, "reason":"| + strReason + |"}|
+	If outputJS Then
+		temp=temp+|';|
+		querystring = docContext.GetFirstItem("query_string").text
+		qsCMD = Strright(querystring, "&amp; ONCOMPLETE=")
+		If Len(qsCMD) &gt; 0 Then	
+			If Instr(qsCMD, "&amp; ") &gt; 0 Then qsCMD = Strleft(qsCMD, "&amp; ")
+			querystring = Join(Split(querystring, "'"), "`")
+			strReason = Join(Split(strReason, "'"), "`")
+			Print |&amp;lt;html &gt; &amp;lt;head &gt; &amp;lt;script type="text/javascript" &gt; |
+			Print |//try {|
+			'Print temp
+			Print |parent.| + qsCMD + |(| + Cstr(Val(success)) + |, '| + strReason + |', '| + querystring + |');|
+			Print |//} catch (e) {console.log('error processing `post submit` functions');}|
+			Print |&amp;lt;/script &gt; &amp;lt;/head &gt; &amp;lt;body &gt; &amp;lt;/body &gt; &amp;lt;/html &gt; |
+		End If
+	Else
+		'Print temp
+	End If
+	Exit Function
+errorhandler:
+	success = 0
+	strReason = Cstr(Err) + "=" + Cstr(Error) + | at line | + Cstr(Erl)
+	Msgbox strReason
+	Resume ErrorResume
+End Function
+
+</lotusscript></code><code event='ADRString'><lotusscript>
+
+%REM
+	Function ADRString
+	Description: Comments for Function
+%END REM
+Function ADRString(doc As NotesDocument, applicationID As String, applicationVersion As String)
+	
+End Function
+
+</lotusscript></code><code event='placeboString'><lotusscript>
+%REM
+	Function placeboString
+	Description: Comments for Function
+%END REM
+Function placeboString(ctdoc As NotesDocument, doc As NotesDocument, applicationID As String, applicationVersion As String)
+	
+	Dim pString As String, uniqueID As String, placeholder As String, codePlaceholder As String, valuePlaceholder As String
+	Dim dosePlaceholder As String, strength As String
+	
+	Forall f In ctdoc.Items
+		If f.Name = "id" Then
+			uniqueID = f.Text
+		End If
+		
+		If f.Name = "Strength" Then
+			strength = f.Text
+		End If
+	End Forall
+	
+	placeholder = "Not Provided"
+	codePlaceholder = "NA"
+	valuePlaceholder = "Placebo"
+	
+	%REM
+	pString = "{""id"":[""" &amp; uniqueID &amp;_
+	"""],""identifier"":[""RecordUNID""],""label"":[""ProductName""],""Type"":[""Placebo""],""Form"":[""Placebo""],""ApplicationId"":[""" &amp; _
+	applicationID &amp; """],""ApplicationVersion"":[""" &amp; applicationVersion &amp; _
+	"""],""DataSection"":[""1""],""RecordUNID"":[""" &amp; uniqueID &amp; """],""ActiveName"":[""" &amp; placeholder &amp; _
+	"""],""DosageForm"":[""" &amp; codePlaceholder &amp; """],""DosageForm_Label"":[""" &amp; placeholder &amp; """],""Dose"":[""" &amp; codePlaceholder &amp; _
+	"""],""ProductName"":[""" &amp; valuePlaceholder &amp; """],""RouteOfAdmin"":[""" &amp; codePlaceholder &amp; """],""RouteOfAdmin_Label"":[""" &amp; _
+	placeholder &amp; """],""Strength"":[""" &amp; strength &amp; """],""DoseFrequency"":[""" &amp; valuePlaceholder &amp; """]}"
+	%END REM
+		
+	pString = "{""id"":[""" &amp; uniqueID &amp;_
+	"""],""identifier"":[""RecordUNID""],""label"":[""ProductName""],""Type"":[""Placebo""],""Form"":[""Placebo""],""ApplicationId"":[""" &amp; _
+	applicationID &amp; """],""ApplicationVersion"":[""" &amp; applicationVersion &amp; _
+	"""],""DataSection"":[""1""],""RecordUNID"":[""" &amp; uniqueID &amp; """]," &amp; _
+	"""ProductName"":[""" &amp; valuePlaceholder &amp; """],""RouteOfAdmin"":[""" &amp; codePlaceholder &amp; """],""RouteOfAdmin_Label"":[""" &amp; _
+	placeholder &amp; """],""PlaceboDescription"":[""Not Provided""]}"
+	
+	placeboString = pString
+	
+End Function
+
+</lotusscript></code><code event='deviceString'><lotusscript>
+%REM
+	Function deviceString
+	Description: Comments for Function
+%END REM
+Function deviceString(ctdoc As NotesDocument, doc As NotesDocument, applicationID As String, applicationVersion As String)
+	
+	Dim dString As String, uniqueID As String, valuePlaceholder As String, codePlaceholder As String, placeholder As String
+	
+	Forall f In ctdoc.Items
+		If f.Name = "id" Then
+			uniqueID = f.Text
+		End If
+	End Forall
+	
+	placeholder = "Not Provided"
+	codePlaceholder = "NA"
+	valuePlaceholder = "Device"
+	
+	dString = "{""id"":[""" &amp; uniqueID &amp; _
+	"""],""identifier"":[""RecordUNID""],""label"":[""ProductName""],""Type"":[""Device""],""Form"":[""Device""],""ApplicationId"":[""" &amp; _
+	applicationID &amp; """],""ApplicationVersion"":[""" &amp; applicationVersion &amp; """],""DataSection"":[""1""],""IsAKit"":[""" &amp; _
+	"""],""GMDNS"":[""""],""IntendedUse"":[""1""],""IntendedUseOtherDescription"":[""Not Provided""],""RecordUNID"":[""" &amp; uniqueID &amp; """],""ProductName"":[""" &amp; valuePlaceholder &amp; _
+	"""],""Manufacturer"":[""" &amp; codePlaceholder &amp; """],""Manufacturer_Label"":[""" &amp; placeholder &amp; """],""Description"":[""" &amp; _
+	placeholder &amp; """]}"
+	
+	deviceString = dString
+End Function
+
+</lotusscript></code><code event='countryString'><lotusscript>
+%REM
+	Function countryString
+	Description: Comments for Function
+%END REM
+Function countryString(ctdoc As NotesDocument, doc As NotesDocument, applicationID As String, applicationVersion As String)
+	
+	Dim trialConductedInCountryString As String, uniqueID As String, trialCountryCode As String, trialCountryLabel As String
+	
+	Forall f In ctdoc.Items
+		If f.Name = "id" Then
+			uniqueID = f.Text
+		End If
+		
+		If f.Name = "TrialConductedinCountry" Then
+			trialCountryCode = f.Text
+		End If
+		
+		If f.Name = "TrialConductedInCountry_Label" Then
+			trialCountryLabel = f.Text
+		End If
+		
+	End Forall
+	
+	trialConductedInCountryString = "{""id"":[""" &amp; uniqueID &amp; _
+	"""],""identifier"":[""RecordUNID""],""label"":[""TrialConductedInCountry_Label""],""Type"":[""TrialConductedInCountry""],""Form"":[""TrialConductedInCountry""],""ApplicationId"":[""" &amp; _
+	applicationID &amp; """],""ApplicationVersion"":[""" &amp; applicationVersion &amp; _
+	"""],""DataSection"":[""1""],""RecordUNID"":[""" &amp; uniqueID &amp; """],""TrialConductedInCountry"":[""" &amp; _
+	trialCountryCode &amp; """],""TrialConductedInCountry_Label"":[""" &amp;  trialCountryLabel &amp; """]}"
+	
+	countryString = trialConductedInCountryString
+	
+End Function
+
+</lotusscript></code><code event='IBPString'><lotusscript>
+%REM
+	Function IBPString
+	Description: Comments for Function
+%END REM
+Function IBPString(doc As NotesDocument, applicationID As String, applicationVersion As String)
+	
+End Function
+
+</lotusscript></code><code event='createJSONDoc'><lotusscript>
+%REM
+	Function createJSONString
+	Description: Comments for Function
+%END REM
+Function createJSONDoc(session As NotesSession)
+	
+	On Error Goto errorHandler
+	Const scriptElement = "createJSONDoc"
+	
+	Dim doc As NotesDocument
+
+	Dim formname As String
+	formname = "ct"
+	
+	'Create new doc
+
+	
+	Dim item As Variant
+	
+	Dim ctfdb As NotesDatabase
+	Dim ctformview As NotesView
+	Dim ctdoc As NotesDocument
+	Dim ctdocs As NotesDocumentCollection
+	Dim searchString As String
+	Dim ritem As NotesItem
+	Dim aitem As NotesItem
+	
+	Set ctfdb = session.Currentdatabase
+	Set ctformview = ctfdb.GetView("FindApplicationID")
+
+	Dim file As Integer
+	file% = Freefile()
+	Open "D:\Lotus Notes\Migration\Dataset\checkJSON.txt" For Append As file%
+	
+	Dim medCounter As Integer, bioCounter As Integer, siteCounter As Integer, deviceCounter As Integer, placeboCounter As Integer
+	Dim countryCounter As Integer, completionCounter As Integer, i As Integer, flag As Integer
+	Dim ctAppID As String, ctAppVer As String
+	
+	Dim JSONString As String
+	
+	Dim applicationID As String, applicationVersion As String, identifier As String, isActiveVersion As String
+	Dim applicantName As String, applicationStage As String, applicationStageCode As String, biologicalProductDescription As String
+	Dim completionRecordUNID As String, completionDetails As String, completionReason As String
+	Dim contactEmailCompletion As String, contactFaxCompletion As String, contactNameCompletion As String, contactPhoneCompletion As String
+	Dim contactEmail As String, contactFax As String, contactName As String, contactPhone As String, contactPosition As String
+	Dim trialCompletionDate As String, createdBy As String, createdOn As String, expectedCompletionDate As String
+	Dim isSubmitted As String, isValidated As String, lastEditor As String, clientReference As String, cleanTrial As String
+	
+	Dim part1RecordUNID As String, part1ID As String, protocolNumber As String, totalPatients As String, titleOfStudy As String
+	Dim trialTherapeuticArea As String, trialStartDate As String, trialTypeDescription As String, trialClassArray As Variant
+	Dim trialClassification As String, trialTypeArray As Variant, trialType As String, dataDetails As String
+	Dim isPotentialRestrictedGoodUsed As String, potentialRestrictedGoodUsed As String
+	
+	Dim sponsorAddress As String, sponsorAddress_Id As String, sponsorID As String, sponsorName As String, sponsorAddressLabel As String
+	Dim submissionDate As String, submissionID As String
+	Dim clientName As String, clientID As String
+	
+	Dim biologicalRecordUNID As String, Biologicals As String, getBiologicals As String
+	Dim medicineRecordUNID As String, Medicines As String, getMedicines As String
+	Dim deviceRecordUNID As String, Devices As String
+	Dim placeboRecordUNID As String, Placebos As String
+	Dim siteRecordUNID As String, Sites As String, getSites As String
+	Dim trialConductedInCountriesRecordUNID As String, TrialConductedInCountries As String
+	
+	Dim medCounter2 As Integer, bioCounter2 As Integer, siteCounter2 As Integer, trialCount As Integer, counter As Long
+	Dim newString As String, isCleanTrial As String
+	
+	counter = 0
+	
+	For trialCount = 0 To Ubound(Trials)
+	
+		Set doc = db.Createdocument
+		doc.Form = formname	
+	
+		medCounter2 = 0
+		bioCounter2 = 0
+		siteCounter2 = 0
+		'------------------
+		medCounter = 0
+		bioCounter = 0
+		siteCounter = 0
+		deviceCounter = 0
+		placeboCounter = 0
+		countryCounter = 0
+		completionCounter = 0
+		
+		Sites = ""
+		Medicines = ""
+		Biologicals = ""
+		Devices = ""
+		Placebos = ""
+		TrialConductedInCountries = ""
+		
+		' Initialise all string variables
+		applicationID = ""
+		applicationVersion = ""
+		isActiveVersion = ""
+		applicationStage = ""
+		clientID = ""
+		clientName = ""
+		clientReference = ""
+		identifier = ""
+		sponsorID = ""
+		sponsorName = ""
+		applicantName = ""
+		sponsorAddress = ""
+		sponsorAddress_Id = ""
+		sponsorAddressLabel = ""
+		contactEmailCompletion = ""
+		contactFaxCompletion = ""
+		contactNameCompletion = ""
+		contactPosition = ""
+		contactPhoneCompletion = ""
+		completionReason = ""
+		trialCompletionDate = ""
+		completionRecordUNID = ""
+		contactEmail = ""
+		contactFax = ""
+		contactName = ""
+		contactPhone = ""
+		expectedCompletionDate = ""
+		part1RecordUNID = ""
+		isPotentialRestrictedGoodUsed = ""
+		potentialRestrictedGoodUsed = ""
+		protocolNumber = ""
+		trialStartDate = ""
+		titleOfStudy = ""
+		totalPatients = ""
+		trialTherapeuticArea = ""
+		trialTypeDescription = ""
+		cleanTrial = ""
+		newString = ""
+	
+		'searchString = StrLeft(Trials(trialCount),"|",0,1)
+		searchString = Trials(trialCount)
+		Set ctdocs = ctformview.Getalldocumentsbykey(searchString, True)	
+		Set ctdoc = ctdocs.Getfirstdocument()
+		
+	
+	flag = 0
+	While Not ctdoc Is Nothing
+		Forall f In ctdoc.Items
+			If f.Name = "Form" And f.Text = "Application" Then
+				flag = 1
+				isCleanTrial = ctdoc.isCleanTrial(0)
+			End If
+			
+			If f.Name= "ApplicationID" And flag = 1 Then
+				applicationID = f.Text
+			End If
+			
+			If f.Name= "ApplicationVersion" And flag = 1 Then
+				applicationVersion = f.Text
+			End If
+			
+			If f.Name = "Form" And f.text = "Medicine" Then
+				medCounter = medCounter + 1
+				flag = 0
+			End If
+			If f.Name = "Form" And f.text = "Site" Then
+				siteCounter = siteCounter + 1
+				flag = 0
+			End If 
+			If f.Name = "Form" And f.text = "Biological" Then
+				bioCounter = bioCounter + 1
+				flag = 0
+			End If
+			If f.Name = "Form" And f.text = "Device" Then
+				deviceCounter = deviceCounter + 1
+				flag = 0
+			End If
+			If f.Name = "Form" And f.text = "Placebo" Then
+				placeboCounter = placeboCounter + 1
+				flag = 0
+			End If
+			If f.Name = "Form" And f.text = "TrialConductedInCountry" Then
+				countryCounter = countryCounter + 1
+				flag = 0
+			End If 
+			If f.Name = "Form" And f.text = "Completion" Then
+				completionCounter = completionCounter + 1
+				flag = 0
+			End If 
+		End Forall
+		flag = 0
+		Set ctdoc = ctdocs.Getnextdocument(ctdoc)
+	Wend
+	
+	Write #file%, medCounter &amp; " Count of meds"
+	Write #file%, siteCounter &amp; " Count of sites"
+	Write #file%, bioCounter &amp; " Count of biologicals"
+	Write #file%, deviceCounter &amp; " Count of device"
+	Write #file%, placeboCounter &amp; " Count of placebo"
+	Write #file%, countryCounter &amp; " Count of country"
+	Write #file%, completionCounter &amp; " Count of completion"
+	
+	Set ctdoc = ctdocs.Getfirstdocument()
+
+	flag = 0
+	
+	Set item = doc.Replaceitemvalue("Form", "ct")
+	Set item = doc.Replaceitemvalue("Type", "Application")
+	Set item = doc.Replaceitemvalue("LastEditor", "Admin")
+	dataDetails = "Not Provided"
+	biologicalProductDescription = "Not Provided"
+	lastEditor = "Admin"
+	
+	'While Not counter  &gt;  1
+ 	While Not ctdoc Is Nothing
+		Forall f In ctdoc.Items
+			'Application
+			If f.Name = "Form" And f.Text = "Application" Then
+				flag = 1
+			End If
+			
+			If f.Name= "ApplicationID" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("ApplicationID", f.Text)
+			End If
+			
+			If f.Name= "ApplicationVersion" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("ApplicationVersion", f.Text)
+			End If
+			
+			If f.Name= "IsActiveVersion" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("IsActiveVersion", f.Text)
+				isActiveVersion = f.Text
+			End If
+			
+			If f.Name= "ApplicationStage" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("ApplicationStage", f.Text)
+				applicationStage = f.Text
+			End If
+			
+			If f.Name= "ApplicationStatus" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("ApplicationStatus", f.Text)
+			End If
+			
+			If f.Name= "ApplicationStatusCode" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("ApplicationStatusCode", f.Text)
+			End If
+			
+			If f.Name= "ClientID" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("ClientID", f.Text)
+				clientID = f.Text
+			End If
+			
+			If f.Name= "ClientName" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("ClientName", f.Text)
+				clientName = JSONEncode( f.Text )
+			End If
+			
+			If f.Name= "clientreference" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("clientreference", f.Text)
+				clientReference = JSONEncode( f.Text )
+			End If
+			
+			If f.Name= "ClinicalTrialNo" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("ClinicalTrialNo", f.Text)
+			End If
+			
+			If f.Name= "ClinicalTrialType" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("ClinicalTrialType", f.Text)
+			End If
+			
+			If f.Name= "id" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("id", f.Text)
+				Set item = doc.Replaceitemvalue("RecordUNID", f.Text)
+				identifier = f.text
+			End If
+			
+			If f.Name= "sponsorid" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("sponsorid", f.Text)
+				sponsorID = f.text
+			End If
+			
+			If f.Name= "sponsorname" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("sponsorname", f.Text)
+				sponsorName = JSONEncode( f.text )
+				Set item = doc.Replaceitemvalue("ApplicantName", f.Text)
+				applicantName = JSONEncode( f.text )
+			End If
+			
+			If f.Name= "SponsorAddress" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("SponsorAddress", f.Text)
+				sponsorAddress = JSONEncode( f.text )
+			End If
+			
+			If f.Name= "SponsorAddress_Id" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("SponsorAddress_Id", f.Text)
+				sponsorAddress_Id = f.text
+			End If
+			
+			If f.Name= "SponsorAddress_Label" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("SponsorAddress_Label", f.Text)
+				sponsorAddressLabel = JSONEncode( f.text )
+			End If
+			
+			If f.Name= "Stream" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("Stream", f.Text)
+			End If
+			
+			If f.Name= "SubmissionId" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("SubmissionId", f.Text)
+			End If
+			
+			If f.Name= "titleofstudy" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("titleofstudy", f.Text)
+			End If
+			
+			If Lcase(f.Name) = "iscleantrial" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("isCleanTrial", f.Text)
+				cleanTrial = f.Text
+			End If
+			
+			If f.Name= "WebAuthors" And flag = 1 Then
+				Dim webAuthorArray As Variant
+				webAuthorArray = ctdoc.Getitemvalue("WebAuthors")
+				Set item = doc.Replaceitemvalue("WebAuthors", webAuthorArray)
+				item.IsAuthors = True
+			End If
+			
+			If f.Name= "WebReaders" And flag = 1 Then
+				Dim webReaderArray As Variant
+				webReaderArray = ctdoc.Getitemvalue("WebReaders")
+				Set item = doc.Replaceitemvalue("WebReaders", webReaderArray)
+				item.IsReaders = True
+			End If
+			
+			'Completion
+			If completionCounter  &gt;  0 And f.Name = "Form" And f.Text = "Completion" Then
+				Write #file%, "Complete"
+				flag = 3
+			End If
+			
+			If f.Name= "ContactEmail" And flag = 3 Then
+				contactEmailCompletion = f.Text
+			End If
+			
+			If f.Name= "ContactFax" And flag = 3 Then
+				contactFaxCompletion = f.Text
+			End If
+			
+			If f.Name= "ContactName" And flag = 3 Then
+				contactNameCompletion = f.Text
+			End If
+			
+			If f.Name= "ContactPerson" And flag = 3 Then
+				contactPosition = f.Text
+			End If
+			
+			If f.Name= "ContactPhone" And flag = 3 Then
+				contactPhoneCompletion = f.Text
+			End If
+			
+			If f.Name= "CompletedFile" And flag = 3 Then
+				Set item = doc.Replaceitemvalue("CompletedFile", f.Text)
+			End If
+			
+			If f.Name= "CompletedFolio" And flag = 3 Then
+				Set item = doc.Replaceitemvalue("CompletedFolio", f.Text)
+			End If
+			
+			If f.Name= "CompletionDetails" And flag = 3 Then
+				completionDetails = JSONEncode( f.Text )
+			End If
+			
+			If f.Name= "CompletionReason" And flag = 3 Then
+				If f.Text = "" Then
+					completionReason = "Not Provided"
+				Else
+					completionReason = JSONEncode( f.Text )
+				End If
+			End If
+			
+			If f.Name= "FinishDate" And flag = 3 Then
+				trialCompletionDate = Format(f.Text, "yyyy-mm-dd")
+			End If
+			
+			If f.Name= "id" And flag = 3 Then
+				completionRecordUNID = f.Text
+			End If
+			
+			isValidated = ""
+			isSubmitted = ""
+			
+			'Medicine
+			If medCounter  &gt;  0 And f.Name = "Form" And f.Text = "Medicine" Then
+				medCounter2 = medCounter2 + 1	
+				Write #file%, "Medicine"
+				Write #file%, "medCounter2 value: " &amp; medCounter2
+				getMedicines = medString (ctdoc, doc, applicationID, applicationVersion)
+				If medCounter2 = 1 Then
+					Medicines = Medicines + getMedicines
+				Else
+					Medicines = Medicines + "," + getMedicines
+				End If
+			End If
+		
+			'Site
+			If siteCounter  &gt;  0 And f.Name = "Form" And f.Text = "Site" Then
+				siteCounter2 = siteCounter2 + 1	
+				Write #file%, "Site"
+				getSites = siteString(ctdoc, doc, applicationID, applicationVersion)
+				If siteCounter2 = 1 Then
+					Sites = Sites + getSites
+				Else
+					Sites = Sites + "," + getSites
+				End If
+			End If
+		
+			'Biological
+			If bioCounter  &gt;  0 And f.Name = "Form" And f.Text = "Biological" Then
+				bioCounter2 = bioCounter2 + 1	
+				Write #file%, "Biological"
+				getBiologicals = biolString(ctdoc, doc, applicationID, applicationVersion)
+				If bioCounter2 = 1 Then
+					Biologicals = Biologicals + getBiologicals
+				Else
+					Biologicals = Biologicals + "," + getBiologicals
+				End If
+			End If
+		
+			'IBP - do not process, just copy Lotus form
+		'	Call IBPString(doc, applicationID, applicationVersion)
+			'ADR - do not process, just copy Lotus form
+		'	Call ADRString(doc, applicationID, applicationVersion)
+			
+			'Device
+			If deviceCounter  &gt;  0 And f.Name = "Form" And f.Text = "Device" Then
+				Write #file%, "Device"
+				Devices = deviceString(ctdoc, doc, applicationID, applicationVersion)
+			End If
+		
+			'Placebo
+			If placeboCounter  &gt;  0 And f.Name = "Form" And f.Text = "Placebo" Then
+				Write #file%, "Placebo"
+				Placebos = placeboString(ctdoc, doc, applicationID, applicationVersion)
+			End If
+		
+			'Part1
+			If f.Name = "Form" And f.Text = "Part1" Then
+				flag = 2
+			End If
+			
+			If f.Name= "ContactEmail" And flag = 2 Then
+				contactEmail = f.Text
+			End If
+			
+			If f.Name= "ContactFax" And flag = 2 Then
+				contactFax = f.Text
+			End If
+			
+			If f.Name= "ContactName" And flag = 2 Then
+				contactName = f.Text
+			End If
+			
+			If f.Name= "ContactPhone" And flag = 2 Then
+				contactPhone = f.Text
+			End If
+			
+			If f.Name= "ExpectedCompletionDate" And flag = 2 Then
+				expectedCompletionDate = Format(f.Text, "yyyy-mm-dd")
+			End If
+			
+			If f.Name= "id" And flag = 2 Then
+				part1RecordUNID = f.Text
+			End If
+			
+			If f.Name= "IsPotentialRestrictedGoodUsed" And flag = 2 Then
+				isPotentialRestrictedGoodUsed = f.Text
+			End If
+			
+			If f.Name= "PotentialRestrictedGood" And flag = 2 Then
+				potentialRestrictedGoodUsed = f.Text
+			End If
+			
+			If f.Name= "ProtocolNumber" And flag = 2 Then
+				protocolNumber = JSONEncode( f.Text )
+				'newString = Findreplace(protocolNumber, """", "'")
+				'protocolNumber = newString
+			End If
+			
+			If f.Name= "StartDate" And flag = 2 Then
+				trialStartDate = Format(f.Text, "yyyy-mm-dd")
+			End If
+			
+			If f.Name= "titleofstudy" And flag = 2 Then
+				titleOfStudy = JSONEncode( f.Text )
+			End If
+			
+			If f.Name= "TotalPatients" And flag = 2 Then
+				totalPatients = f.Text
+			End If
+			
+			If f.Name= "TrialTherapeuticArea" And flag = 2 Then
+				trialTherapeuticArea = JSONEncode( f.Text )
+			End If
+			
+			If f.Name= "TrialTypeDescription" And flag = 2 Then
+				trialTypeDescription = JSONEncode( f.Text )
+			End If
+			
+			If f.Name= "TrialClassification" And flag = 2 Then
+				trialClassArray = ctdoc.Getitemvalue("TrialClassification")
+				
+				For i=0 To Ubound(trialClassArray)
+					If i=0 Then
+						trialClassification = """" + trialClassArray(i) + """"
+					Else
+						trialClassification = "" + trialClassification +",""" + trialClassArray(i) + """"
+					End If
+				Next
+			End If
+			
+			If f.Name= "TrialType" And flag = 2 Then
+				trialTypeArray = ctdoc.Getitemvalue("TrialType")
+				
+				For i=0 To Ubound(trialTypeArray)
+					If i=0 Then
+						trialType = """" + trialTypeArray(i) + """"
+					Else
+						trialType = "" + trialType +",""" + trialTypeArray(i) + """"
+					End If
+				Next
+			End If
+			
+			'TrialConductedInCountry
+			If countryCounter  &gt;  0 And f.Name = "Form" And f.Text = "TrialConductedInCountry" Then
+				For i=1 To countryCounter
+					Write #file%, "Which country?"
+					TrialConductedInCountries = countryString(ctdoc, doc, applicationID, applicationVersion)
+				Next
+			End If
+		End Forall
+		flag = 0
+		
+		If counter Mod 50 = 0 Then
+			Print ApplicationID "@ " counter
+		End If
+		counter = counter + 1
+		Set ctdoc = ctdocs.Getnextdocument(ctdoc)
+	Wend
+	
+	If Not doc.Hasitem("id") Then
+		ctAppID = ApplicationID &amp;  "~" &amp;  ApplicationVersion
+		Set item = doc.Replaceitemvalue("id", ctAppID)
+		Set item = doc.Replaceitemvalue("RecordUNID", ctAppID)
+		identifier = ctAppID
+	End If
+	
+		JSONString = |{"label":"id","identifier":"id","items":{"Type":"Application","Form":"Application","Key":{"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion": "| &amp;  applicationVersion &amp;  |","id":"| &amp;  identifier &amp;  |"},"ApplicationId":"| &amp;  applicationID &amp;_
+|","ApplicationVersion":"| &amp;  applicationVersion &amp;  |","id":"| &amp;  identifier &amp;  |","RecordUNID":"| &amp;  identifier &amp;  |","ClinicalTrialType": "CTN","IsActiveVersion":"| &amp;  isActiveVersion &amp;  |","ApplicantName":"| &amp;  applicantName &amp;  |","ApplicationStage":"| &amp; applicationStage &amp;_
+|","ApplicationStageCode":"| &amp;  applicationStageCode &amp;  |","ApplicationStatus": "Draft", "ApplicationStatusCode": "DRAFT","AuditLog":{"label":"AuditMessage","items":[],"id":"| &amp;  identifier &amp;  |","Key": {"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"| &amp;  applicationVersion &amp;_
+|","id":"| &amp;  identifier &amp;  |"},"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"| &amp;  applicationVersion &amp;  |"},"BiologicalProductDescription":"| &amp;  biologicalProductDescription &amp;  |","ChangeReport":"", "Completion":{"Type":"Completion","Form":"Completion","id":"| &amp;  completionRecordUNID &amp;_
+|","Key":{"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"| &amp;  applicationVersion &amp;  |","id":"| &amp;  applicationID &amp;  |"},"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"| &amp;  applicationVersion &amp;_
+|","RecordUNID":"| &amp;  completionRecordUNID &amp;  |","DataSection":4,"CompletionDetails":"| &amp;  completionDetails &amp;  |","CompletionReason":"| &amp;  completionReason &amp;  |","ContactEmail":"| &amp;  contactEmailCompletion &amp;  |","ContactFax":"| &amp;  contactFaxCompletion &amp;  |","ContactName":"| &amp;  contactNameCompletion &amp;_
+|","ContactPhone":"| &amp;  contactPhoneCompletion &amp;  |","ContactPosition":"| &amp;  contactPosition &amp;  |","TrialCompletionDate":"| &amp;  trialCompletionDate &amp;  |"}, "CreatedBy":"| &amp;  createdBy &amp;  |","CreatedOn":"| &amp;  createdOn &amp;  |","ErrorReport":"", "ExpectedCompletionDate":"| &amp;  expectedCompletionDate &amp;_
+|","InvoiceDate":"", "InvoiceNumber":"", "IsExportedToGP":"", "IsPaymentReceived":"", "IsReceiptImportedFromGP":"", "IsSubmitted":"| &amp;  isSubmitted &amp;  |","IsValidated":"| &amp;  isValidated &amp;  |","IsWorkMgmtEntryCreatedCompletion":"","LastEdited":"| &amp;  Now &amp;  |","LastEditor":"| &amp;  lastEditor &amp;_
+|","SponsorAddress":"| &amp;  sponsorAddress &amp;  |","SponsorAddress_Id":"| &amp;  sponsorAddress_Id &amp;  |","SponsorID":"| &amp;  sponsorID &amp;  |","SponsorName":"| &amp;  sponsorName &amp;  |","SubmissionDate":"| &amp;  submissionDate &amp;  |","SubmissionId":"| &amp;  submissionID &amp;  |","TitleOfStudy":"| &amp;  titleOfStudy &amp;_
+|","Part1":{"Type":"Part1","Form":"Part1","id":"| &amp;  part1RecordUNID &amp;  |","Key":{"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"| &amp;  applicationVersion &amp;  |","id":"| &amp;  part1ID &amp;  |","DataSection":1},"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"| &amp;  applicationVersion &amp;_
+|","RecordUNID":"| &amp;  part1RecordUNID &amp;  |","DataSection":1,"SponsorAttachment":"","SponsorAttachment_Label":"","BiologicalProductDescription":"| &amp;  biologicalProductDescription &amp;  |","CertificationFileAttachmentFileNames":"","CertificationFileAttachmentIds":"","ContactEmail":"| &amp;  contactEmail &amp;_
+|","ContactName":"| &amp;  contactName &amp;  |","ContactPhone":"| &amp;  contactPhone &amp;  |","ExpectedCompletionDate":"| &amp;  expectedCompletionDate &amp;  |","IsPotentialRestrictedGoodUsed":"| &amp;  isPotentialRestrictedGoodUsed &amp;  |","DataDetails":"| &amp;  dataDetails &amp;  |","PotentialRestrictedGoodDesc":"| &amp;  potentialRestrictedGoodUsed &amp;_
+|","ProtocolNumber":"| &amp;  protocolNumber &amp;  |","TotalPatients":"| &amp;  totalPatients &amp;  |","TitleOfStudy":"| &amp;  titleOfStudy &amp;  |","TrialTherapeuticArea":"| &amp;  trialTherapeuticArea &amp;  |","TrialStartDate":"| &amp;  trialStartDate &amp;  |","TrialTypeDescription":"| &amp;  trialTypeDescription &amp;_
+|","IsWorkMgmtEntryCreated":"","WorkMgmtEntryCreateDate":"","WorkMgmtProcessId":"","TrialClassification":[| &amp;  trialClassification &amp;  |],"PrecedingTrials":[],"TrialType":[| &amp;  trialType &amp;  |],"AnimalExcipients":{"identifier":"id","id":"| &amp;  applicationID &amp;_
+|~1~Part1~AnimalExcipients","Key":{"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"| &amp;  applicationVersion &amp;  |","id":"| &amp;  applicationID &amp;  |~1~Part1~AnimalExcipients","DataSection":"1"},"items":[]},"Biologicals":{"identifier":"id","id":"| &amp;  biologicalRecordUNID &amp;_
+|","Key":{"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"| &amp;  applicationVersion &amp;  |","id":"| &amp;  biologicalRecordUNID &amp;  |","DataSection":"1"},"items":[| &amp;  Biologicals &amp;  |]},"Medicines":{"identifier":"id","id":"| &amp;  medicineRecordUNID &amp;  |","Key":{"ApplicationId":"| &amp;  applicationID &amp;_
+|","ApplicationVersion":"| &amp;  applicationVersion &amp;  |","id":"| &amp;  medicineRecordUNID &amp;  |","DataSection":"1"},"items":[| &amp;  Medicines &amp;  |]},"Devices":{"identifier":"id","id":"| &amp;  deviceRecordUNID &amp;  |","Key":{"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"| &amp;  applicationVersion &amp;_
+|","id":"| &amp;  deviceRecordUNID &amp;  |","DataSection":"1"},"items":[| &amp;  Devices &amp;  |]},"Placebos":{"identifier":"id","id":"| &amp;  placeboRecordUNID &amp;  |","Key":{"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"| &amp;  applicationVersion &amp;  |","id":"| &amp;  placeboRecordUNID &amp;_
+|","DataSection":"1"},"items":[| &amp;  Placebos &amp;  |]},"Comparators":{"identifier":"id","id":"| &amp;  applicationID &amp;  |~1~Part1~Comparators","Key":{"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"1","id":"| &amp;  applicationID &amp;_
+|~1~Part1~Comparators","DataSection":"1"},"items":[]},"Sites":{"identifier":"id","label":"TrialSite","id":"| &amp;  applicationID &amp;  |~1~Part1~Sites","Key":{"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"| &amp;  applicationVersion &amp;  |","id":"| &amp;  siteRecordUNID &amp;_
+|","DataSection":"1"},"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"| &amp;  applicationVersion &amp;  |","DataSection":"1","items":[| &amp;  Sites &amp;  |]}, "TrialConductedInCountries":{"identifier":"id","id":"| &amp;  trialConductedInCountriesRecordUNID &amp;  |","Key":{"ApplicationId":"| &amp;  applicationID &amp;_
+|","ApplicationVersion":"| &amp;  applicationVersion &amp;  |","id":"| &amp;  trialConductedInCountriesRecordUNID &amp;  |","DataSection":"1"},"items":[| &amp;  TrialConductedInCountries &amp;_
+|]},"GMO":"Not Provided","Nanoparticles":"Not Provided","GeneTherapyDetails":"Not Provided","BiologicalNotInPhaseOne":"","BiologicalManufacturerDetails":"Not Provided","BiologicalProductDescription":"Not Provided","StartDate":"| &amp;  trialStartDate &amp;_
+|","IsPotentialRestrictedGoodUsed":"No","IsActiveVersion":"| &amp;  isActiveVersion &amp;  |"},"Part2":{"identifier":"","Type":"Part2","Form":"Part2","id":"","Key":{"ApplicationId":"","ApplicationVersion":"","id":"","DataSection":2},"ApplicationId":"","ApplicationVersion":"",| &amp;_
+|"RecordUNID":"","DataSection":2,"ContactName":"","ContactPhone":"","ContactFax":"","ContactEmail":"","StartDate":"","FinishDate":"","NotificationType":"","NotificationType_Label":"","TrialType":[],"TrialTypeDescription":"","TitleOfStudy":"","TrialClassification":[],"ProtocolNumber":"","GMO":"","Nanoparticles":"",| &amp;_
+|"Placebos":{"identifier":"id","id":"","Key":{"ApplicationId":"","ApplicationVersion":"","id":"","DataSection":"2"},"items":[]},"Comparators":{"identifier":"id","id":"","Key": {"ApplicationId":"","ApplicationVersion":"1","id":"","DataSection":"2"}}},| &amp;_
+|"UpdateDetails":{"identifier":"RecordUNID","Type":"UpdateDetails","Form":"UpdateDetails","id":"| &amp;  applicationID &amp;  |~1~UpdateDetails| &amp;  |","Key":{ "ApplicationId":"CT-2015-CTN-02002-1","ApplicationVersion":"1","id":"| &amp;  applicationID &amp;  |~1~UpdateDetails| &amp; |","DataSection":"3"},"RecordUNID":"| &amp;  applicationID &amp;_
+|~1~UpdateDetails| &amp;  |","DataSection":"3","ChangeApprovalStatus":"","ChangeDateTime":"","ChangeId":"","ChangeInitiatedBy":"","Comments":"","ContactEmail":"","ContactName":"","ContactPhone":"","ApplicationId":"| &amp;  applicationID &amp;_
+|","ApplicationVersion":"1","TrialStartDate":"","TrialFinishDate":"","BiologicalProductDescription":"","BiologicalNotInPhaseOne":"","BiologicalManufacturerDetails":"","GeneTherapyDetails":"","Nanoparticles":"","GMO":"","IsPotentialRestrictedGoodUsed":"","ProtocolNumber":"",| &amp;_
+|"TotalPatients":"","TitleOfStudy":"","IsDistinctGood":"","TrialClassification":[],"PrecedingTrials":[],"TrialType":[],"TrialType_Label":"","Sites":{"identifier":"id","label":"TrialSite","id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~Sites","Key":{"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"1","id":"| &amp;  applicationID &amp;_
+|~1~UpdateDetails~Sites","DataSection":"3"},"items":[],"LastEntryKey":"0","ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"1","DataSection":"3","ApplicationStage":"1"},"AnimalExcipients":{"identifier":"id","id":"| &amp;  applicationID &amp;_
+|~1~UpdateDetails~AnimalExcipients","Key":{"ApplicationId":"CT-2015-CTN-02002-1","ApplicationVersion":"1","id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~AnimalExcipients","DataSection":"3"},"items":[],"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"1","ApplicationStage":"1"},"Biologicals":{"identifier":"id","id":"| &amp;  applicationID &amp;_
+|~1~UpdateDetails~Biologicals","Key":{"ApplicationId":"CT-2015-CTN-02002-1","ApplicationVersion":"1","id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~Biologicals","DataSection":"3"},"items":[],"LastEntryKey":"0","ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"1","ApplicationStage":"1"},"Medicines":{"identifier":"id","id":"| &amp;  applicationID &amp;_
+|~1~UpdateDetails~Medicines","Key":{"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"1","id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~Medicines","DataSection":"3"},"items":[],"LastEntryKey":"0","ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"1","ApplicationStage":"1"},"Devices":{"identifier":"id","id":"| &amp;  applicationID &amp;_
+|~1~UpdateDetails~Devices","Key":{"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"1","id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~Devices","DataSection":"3"},"items":[],"LastEntryKey":"0","ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"1","ApplicationStage":"1"},"MedicineIngredients":{"identifier":"id","id":"| &amp;  applicationID &amp;_
+|~1~UpdateDetails~MedicineIngredients","Key":{"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"1","id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~MedicineIngredients","DataSection":"3"},"items":[],"LastEntryKey":"0","ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"1","ApplicationStage":"1"},"BiologicalIngredients":{"identifier":"id","id":"| &amp;_
+ applicationID &amp;  |~1~UpdateDetails~BiologicalIngredients","Key":{"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"1","id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~BiologicalIngredients","DataSection":"3"},"items":[],"LastEntryKey":"0","ApplicationId":"| &amp;  applicationID &amp;_
+|","ApplicationVersion":"1","ApplicationStage":"1"},"TrialConductedInCountries":{"identifier":"id","id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~TrialConductedInCountries","Key":{"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"1","id":"| &amp;  applicationID &amp;_
+|~1~UpdateDetails~TrialConductedInCountries","DataSection":"3"},"items":[]},"ApplicationStage":"1"},"ValidationLog":{"identifier":"RecordUNID","label":"Message","items":[],"id":"| &amp;  identifier &amp;  |","Key":{"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"| &amp;  applicationVersion &amp;_
+|","id":"| &amp;  identifier &amp;  |"},"ApplicationId":"| &amp;  applicationID &amp;  |","ApplicationVersion":"| &amp;  applicationVersion &amp;  |"},"ValidationStatus":"0","WorkMgmtEntryCreateDateCompletion":"","WorkMgmtProcessIdCompletion":"","WMID_Review":"","WMID_Application":"","IsPushBackTriggered":"0","IsPushBackSubmittedBack":"0","PushBackTriggerDates":[],| &amp;_
+|"PushBackSubmittedBackDates":[],"VariationNonFeeList":[],"ClientName":"| &amp;  clientName &amp;  |","ClientId":"| &amp;  clientID &amp;  |","LabelName":"","SponsorAddress_Label":"| &amp;  sponsorAddressLabel &amp;  |","ClientReference":"| &amp;  clientReference &amp;  |","isClean":"| &amp;  cleanTrial &amp;  |"}}|
+		
+
+	Write #file%, "---------------------------------------------------------------"
+	
+	Set item = doc.Replaceitemvalue("$UpdatedBy", "Admin")
+	
+	Set aitem = doc.Getfirstitem("WebAuthors")
+	If Not (aitem Is Nothing) Then
+		aitem.IsAuthors = True
+	End If
+		
+	Set aitem = doc.Getfirstitem("WebReaders")
+	If Not (aitem Is Nothing) Then
+		aitem.IsReaders = True
+	End If
+	
+	doc.isCleanTrial = isCleanTrial
+	Call doc.Save(True, True)
+	Call ProcessPOSTRequest(doc, JSONString)
+	Next
+	Close #file%
+exitGracefully:
+	Exit Function
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	Resume exitGracefully
+End Function
+
+</lotusscript></code><code event='biolString'><lotusscript>
+%REM
+	Function biolString
+	Description: Comments for Function
+%END REM
+Function biolString(ctdoc As NotesDocument, doc As NotesDocument, applicationID As String, applicationVersion As String)
+	Dim bioString As String, uniqueID As String, codePlaceholder As String, placeholder As String, tradeCodeName As String
+	Dim activeName As String, item As Variant, productNameText As String, newString As String
+	Dim dosageFormLabel As String, dosageFormCode As String
+	
+	Forall f In ctdoc.Items
+		If f.Name = "id" Then
+			uniqueID = f.Text
+		End If
+		
+		If f.Name = "LabelName" Then
+			newString = ""
+			tradeCodeName = JSONEncode( f.Text )
+			'newString = Findreplace(tradeCodeName, """", "'")
+			'tradeCodeName = newString
+		End If
+		
+		If f.Name = "ProductName" Then
+			newString = ""
+			activeName = JSONEncode( f.text )
+			'newString = Findreplace(activeName, """", "'")
+			'activeName = newString
+		End If
+		
+		If f.Name = "ProductNameText" Then
+			newString = ""
+			Set item = doc.Replaceitemvalue("ProductNameText", f.Text)
+			productNameText = JSONEncode( f.Text )
+			'newString = Findreplace(productNameText, """", "'")
+			'productNameText = newString
+		End If
+		
+		If f.Name = "DosageForm_Label" Then
+			dosageFormLabel = JSONEncode( f.text )
+		End If
+		
+		If f.Name = "DosageForm" Then
+			If f.text = "" Then
+				dosageFormCode = "NP"
+			Else
+				dosageFormCode = JSONEncode( f.text )
+			End If
+		End If
+		
+	End Forall
+	
+	codePlaceholder = "NA"
+	placeholder = "Not Provided"
+	
+	%REM
+	bioString = "{""id"":[""" &amp; uniqueID &amp; _
+	"""],""identifier"":[""RecordUNID""],""label"":[""ProductName""],""Type"":[""Biological""],""Form"":[""Biological""],""ApplicationId"":[""" &amp; _
+	applicationID &amp; """],""ApplicationVersion"":[""" &amp; applicationVersion &amp; _
+	"""],""DataSection"":[""1""],""RecordUNID"":[""" &amp; uniqueID &amp; """],""AnimalOrigin"":[""" &amp; codePlaceholder &amp; _
+	"""],""AnimalOrigin_Label"":[""" &amp; placeholder &amp; """],""DosageForm_Label"":[""" &amp; dosageFormLabel &amp; """],""DosageForm"":[""" &amp; _
+	dosageFormCode &amp; """],""LabelName"":[""" &amp; tradeCodeName &amp; """],""ProductName"":[""" &amp; activeName &amp; _
+	"""],""ProductNameText"":[""" &amp; productNameText &amp; _
+	"""],""RouteOfAdmin"":[""" &amp; codePlaceholder &amp; """],""RouteOfAdmin_Label"":[""" &amp; placeholder &amp; _
+	"""],""CountryList"":[""" &amp; codePlaceholder &amp; """],""CountryList_Label"":[""" &amp; placeholder &amp; """]}"	
+	%END REM
+	
+	bioString = "{""id"":[""" &amp; uniqueID &amp; _
+	"""],""identifier"":[""RecordUNID""],""label"":[""ProductName""],""Type"":[""Biological""],""Form"":[""Biological""],""ApplicationId"":[""" &amp; _
+	applicationID &amp; """],""ApplicationVersion"":[""" &amp; applicationVersion &amp; _
+	"""],""DataSection"":[""1""],""RecordUNID"":[""" &amp; uniqueID &amp; """],""AnimalOrigin"":[""" &amp; codePlaceholder &amp; _
+	"""],""AnimalOrigin_Label"":[""" &amp; placeholder &amp; """],""DosageForm_Label"":[""" &amp; dosageFormLabel &amp; """],""DosageForm"":[""" &amp; _
+	dosageFormCode &amp; """],""LabelName"":[""" &amp; tradeCodeName &amp; """],""ProductName"":[""" &amp; activeName &amp; _
+	"""],""ProductNameText"":[""" &amp; productNameText &amp; _
+	"""],""RouteOfAdmin"":[""" &amp; codePlaceholder &amp; """],""RouteOfAdmin_Label"":[""" &amp; placeholder &amp; _
+	"""],""CountryList"":[""" &amp; codePlaceholder &amp; """],""CountryList_Label"":[""" &amp; placeholder &amp; """]}"	
+	biolString = bioString
+	
+End Function
+
+</lotusscript></code><code event='Findreplace1'><lotusscript>
+Function Findreplace1(Byval wholestring As Variant, find As String, ireplace As String) As String
+	
+	Dim checkstring As Variant, saveleft As String, n As String, leftString As String, rightString As String
+	
+	checkstring=wholestring
+	saveleft=""
+	
+	While Instr(1, checkstring, find)  &lt;&gt; 0 
+		n=Instr(1, checkstring, find)
+		leftstring = Left(checkstring, n-1)
+		rightstring=Right(checkstring, Len(checkstring)-n-Len(find)+1)
+		saveleft=saveleft+leftstring+ireplace
+		checkstring=rightstring
+	Wend
+	FindReplace1= saveleft+checkstring
+End Function
+
+</lotusscript></code><code event='siteString'><lotusscript>
+%REM
+	Function siteString
+	Description: Comments for Function
+%END REM
+Function siteString(ctdoc As NotesDocument, doc As NotesDocument, applicationID As String, applicationVersion As String)
+	Dim Sites As String, item As Variant
+	Dim sponsorAttachment As String, uniqueID As String, sponsorAttachment_Label As String, expStartDate As String
+	Dim appAuthorityName As String, appAuthorityState As String, approvingAuthorityAttachment As String
+	Dim appAuthorityStateLabel As String, HREC_Code As String, HREC_Name As String, HREC_State As String
+	Dim HREC_Attachment As String, HRECAttachLabel As String, PrInvestigatorName As String, PrInvestigatorState As String
+	Dim PrInvestigatorAttachment As String, PrInvestigatorAttachLabel As String, trialSiteAddress As String
+	Dim trialSiteState As String, trialSite As String, copyEdited As String, trialSiteStateLabel As String
+	Dim sponsorDecl As String, PrInvestigatorDecl As String, HREC_StateLabel As String, HREC_Decl As String
+	Dim ApprovingAuthStateLabel As String, ApprovingAuthDecl As String, newString As String 
+	
+	Forall f In ctdoc.Items
+		If f.Name = "id" Then
+			uniqueID = f.text
+		End If
+		
+		If f.Name = "ApprovingCertAssigned" Then
+			Set item = doc.Replaceitemvalue("ApprovingCertAssigned", f.Text)
+		End If
+		
+		If f.Name = "ExpectedSiteStartDate" Then
+			expStartDate = Format(f.Text, "yyyy-mm-dd") 'Check format
+		End If
+		
+		If f.Name = "HRECCode" Then
+			HREC_Code = f.Text
+		End If
+		
+		If f.Name = "HRECName" Then
+			HREC_Name = JSONEncode( f.Text )
+		End If
+		
+		If f.Name = "HRECState" Then
+			HREC_State = f.Text
+		End If
+		
+		If f.Name = "HRECState_Label" Then
+			HREC_StateLabel = f.Text
+		End If
+		
+		If f.Name = "PrincipalInvestigatorName" Then
+			newString = ""
+			PrInvestigatorName = JSONEncode( f.Text )
+			'newString = Findreplace(PrInvestigatorName, """", "'")
+			'PrInvestigatorName = newString
+		End If
+		
+		If f.Name = "TrialSite" Then
+			newString = ""
+			trialSite = JSONEncode( f.Text )
+			'newString = Findreplace(trialSite, """", "'")
+			'trialSite = newString
+		End If
+		
+		If f.Name = "TrialSiteAddress" Then
+			newString = ""
+			trialSiteAddress = JSONEncode( f.Text )
+			'newString = Findreplace(trialSiteAddress, """", "'")
+			'trialSiteAddress = newString
+			
+		End If
+		
+		If f.Name = "TrialSiteState" Then
+			trialSiteState = f.Text
+		End If
+		
+		If f.Name = "TrialSiteState_Label" Then
+			trialSiteStateLabel = f.Text
+		End If
+		
+	End Forall
+	
+	ApprovingAuthDecl = """Not Provided"""
+	appAuthorityName = """Not Provided"""
+	appAuthorityState = """NA"""
+	appAuthorityStateLabel = """Not Provided"""
+	HREC_Decl = """Not Provided"""
+	PrInvestigatorAttachment = """Not Provided"""
+	PrInvestigatorAttachLabel = """Not Provided"""
+	PrInvestigatorDecl = "Not Provided"
+	PrInvestigatorState = """A"""
+	sponsorAttachment = """Not Provided"""
+	sponsorAttachment_Label = """Not Provided"""
+	sponsorDecl = """Not Provided"""
+	copyEdited = ""
+	
+	%REM
+	Sites = "{""id"":[""" &amp; uniqueID &amp; _
+	"""],""identifier"":[""id""],""label"":[""TrialSite""],""Type"":[""Site""],""Form"":[""Site""],""ApplicationId"":[""" &amp; _
+	applicationID &amp; """],""ApplicationVersion"":[" &amp; applicationVersion &amp; _
+	"],""DataSection"":[""1""],""RecordUNID"":[""" &amp; uniqueID &amp; """],""SponsorAttachment"":[" &amp; _
+	sponsorAttachment &amp; "],""SponsorAttachment_Label"":[" &amp; sponsorAttachment_Label &amp; _
+	"],""ExpectedSiteStartDate"":[""" &amp; expStartDate &amp; """],""ApprovingAuthorityName"":[" &amp; appAuthorityName &amp; _
+	"],""ApprovingAuthorityState"":[" &amp; appAuthorityState &amp; "],""ApprovingAuthorityAttachment"":[" &amp; approvingAuthorityAttachment &amp; _
+	"],""ApprovingAuthorityAttachment_Label"":[" &amp; appAuthorityStateLabel &amp; "],""HRECCode"":[""" &amp;  HREC_Code &amp; _
+	"""],""HRECName"":[""" &amp;  HREC_Name &amp; """],""HRECState"":[""" &amp;  HREC_State &amp; """],""HRECAttachment"":[" &amp;  HREC_Attachment &amp; _
+	"],""HRECAttachment_Label"":[" &amp;  HRECAttachLabel &amp; "],""PrincipalInvestigatorName"":[""" &amp;  PrInvestigatorName &amp; _
+	"""],""PrincipalInvestigatorState"":[" &amp;  PrInvestigatorState &amp; "],""PrincipalInvestigatorAttachment"":[" &amp; _
+	PrInvestigatorAttachment &amp; "],""PrincipalInvestigatorAttachment_Label"":[" &amp;  PrInvestigatorAttachLabel &amp; _
+	"],""TrialSiteAddress"":[""" &amp;  trialSiteAddress &amp; """],""TrialSiteState"":[""" &amp;  trialSiteState &amp; _
+	"""],""TrialSite"":[""" &amp;  trialSite &amp; """],""copyHasBeenEdited"":[" &amp; copyEdited &amp; "],""TrialSiteState_Label"":[""" &amp; _
+	trialSiteStateLabel &amp; """],""SponsorDeclaration"":[" &amp; sponsorDecl &amp; "],""PrincipalInvestigatorDeclaration"":[""" &amp; _
+	PrInvestigatorDecl &amp; """],""HRECState_Label"":[""" &amp;  HREC_StateLabel &amp; """],""HRECDeclaration"":[" &amp;  HREC_Decl &amp; _
+	"],""ApprovingAuthorityState_Label"":[" &amp; ApprovingAuthStateLabel &amp; "],""ApprovingAuthorityDeclaration"":[" &amp; _
+	ApprovingAuthDecl &amp; "]}"	
+	%END REM
+
+	Sites = "{""id"":[""" &amp; uniqueID &amp; _
+	"""],""identifier"":[""id""],""label"":[""TrialSite""],""Type"":[""Site""],""Form"":[""Site""],""ApplicationId"":[""" &amp; _
+	applicationID &amp; """],""ApplicationVersion"":[" &amp; applicationVersion &amp; _
+	"],""DataSection"":[""1""],""RecordUNID"":[""" &amp; uniqueID &amp; """]," &amp; _
+	"""ExpectedSiteStartDate"":[""" &amp; expStartDate &amp; """]," &amp; _
+	"""ApprovingAuthorityName"":[" &amp; appAuthorityName &amp; "]," &amp; _
+	"""ApprovingAuthorityContactEmail"":[""notprovided@byorg.com""]," &amp; _
+	"""ApprovingAuthorityContactPhone"":[""0212345678""]," &amp; _
+	"""ApprovingAuthorityOfficer"":[""Not Provided""]," &amp; _
+	"""ApprovingAuthorityPosition"":[""Not Provided""]," &amp; _
+	"""HRECCode"":[""" &amp;  HREC_Code &amp; _
+	"""],""HRECName"":[""" &amp;  HREC_Name &amp; _
+	"""],""HRECContactEmail"":[""notprovided@byorg.com""]," &amp; _
+	"""HRECContactOfficer"":[""Not Provided""]," &amp; _
+	"""HRECContactPhone"":[""0212345678""]," &amp; _
+	"""HRECPosition"":[""Not Provided""]," &amp; _
+	"""PrincipalInvestigatorName"":[""" &amp;  PrInvestigatorName &amp; 	"""]," &amp; _
+	"""PrincipalInvestigatorContactEmail"":[""notprovided@byorg.com""]," &amp; _
+	"""PrincipalInvestigatorContactPhone"":[""0212345678""]," &amp; _
+	"""TrialSiteAddress"":[""" &amp;  trialSiteAddress &amp; """]," &amp; _
+	"""TrialSiteState"":[""" &amp;  trialSiteState &amp; _
+	"""],""TrialSite"":[""" &amp;  trialSite &amp; """]," &amp; _
+	"""copyHasBeenEdited"":[" &amp; copyEdited &amp; "]," &amp; _
+	"""TrialSiteState_Label"":[""" &amp; _
+	trialSiteStateLabel &amp; """]," &amp; _
+	"""SponsorDeclaration"":[" &amp; sponsorDecl &amp; "]," &amp; _
+	"""PrincipalInvestigatorDeclaration"":[""" &amp; _
+	PrInvestigatorDecl &amp; """]}"
+			
+	siteString = Sites
+End Function
+
+</lotusscript></code><code event='createJSONDoc_OLD'><lotusscript>
+Function createJSONDoc_OLD(session As NotesSession)
+	
+	On Error Goto errorHandler
+	Const scriptElement = "createJSONDoc_OLD"
+	
+	Dim doc As NotesDocument
+
+	Dim formname As String
+	formname = "ct"
+	
+	'Create new doc
+
+	
+	Dim item As Variant
+	
+	Dim ctfdb As NotesDatabase
+	Dim ctformview As NotesView
+	Dim ctdoc As NotesDocument
+	Dim ctdocs As NotesDocumentCollection
+	Dim searchString As String
+	Dim ritem As NotesItem
+	Dim aitem As NotesItem
+	
+	Set ctfdb = session.Currentdatabase
+	Set ctformview = ctfdb.GetView("FindApplicationID")
+
+	Dim file As Integer
+	file% = Freefile()
+	Open "D:\Lotus Notes\Migration\Dataset\checkJSON.txt" For Append As file%
+	
+	Dim medCounter As Integer, bioCounter As Integer, siteCounter As Integer, deviceCounter As Integer, placeboCounter As Integer
+	Dim countryCounter As Integer, completionCounter As Integer, i As Integer, flag As Integer
+	Dim ctAppID As String, ctAppVer As String
+	
+	Dim JSONString As String
+	
+	Dim applicationID As String, applicationVersion As String, identifier As String, isActiveVersion As String
+	Dim applicantName As String, applicationStage As String, applicationStageCode As String, biologicalProductDescription As String
+	Dim completionRecordUNID As String, completionDetails As String, completionReason As String
+	Dim contactEmailCompletion As String, contactFaxCompletion As String, contactNameCompletion As String, contactPhoneCompletion As String
+	Dim contactEmail As String, contactFax As String, contactName As String, contactPhone As String, contactPosition As String
+	Dim trialCompletionDate As String, createdBy As String, createdOn As String, expectedCompletionDate As String
+	Dim isSubmitted As String, isValidated As String, lastEditor As String, clientReference As String, cleanTrial As String
+	
+	Dim part1RecordUNID As String, part1ID As String, protocolNumber As String, totalPatients As String, titleOfStudy As String
+	Dim trialTherapeuticArea As String, trialStartDate As String, trialTypeDescription As String, trialClassArray As Variant
+	Dim trialClassification As String, trialTypeArray As Variant, trialType As String, dataDetails As String
+	Dim isPotentialRestrictedGoodUsed As String, potentialRestrictedGoodUsed As String
+	
+	Dim sponsorAddress As String, sponsorAddress_Id As String, sponsorID As String, sponsorName As String, sponsorAddressLabel As String
+	Dim submissionDate As String, submissionID As String
+	Dim clientName As String, clientID As String
+	
+	Dim biologicalRecordUNID As String, Biologicals As String, getBiologicals As String
+	Dim medicineRecordUNID As String, Medicines As String, getMedicines As String
+	Dim deviceRecordUNID As String, Devices As String
+	Dim placeboRecordUNID As String, Placebos As String
+	Dim siteRecordUNID As String, Sites As String, getSites As String
+	Dim trialConductedInCountriesRecordUNID As String, TrialConductedInCountries As String
+	
+	Dim medCounter2 As Integer, bioCounter2 As Integer, siteCounter2 As Integer, trialCount As Integer, counter As Long
+	Dim newString As String
+	
+	counter = 0
+	
+	For trialCount = 0 To Ubound(Trials)
+	
+		Set doc = db.Createdocument
+		doc.Form = formname	
+	
+		medCounter2 = 0
+		bioCounter2 = 0
+		siteCounter2 = 0
+		'------------------
+		medCounter = 0
+		bioCounter = 0
+		siteCounter = 0
+		deviceCounter = 0
+		placeboCounter = 0
+		countryCounter = 0
+		completionCounter = 0
+		
+		Sites = ""
+		Medicines = ""
+		Biologicals = ""
+		Devices = ""
+		Placebos = ""
+		TrialConductedInCountries = ""
+		
+		' Initialise all string variables
+		applicationID = ""
+		applicationVersion = ""
+		isActiveVersion = ""
+		applicationStage = ""
+		clientID = ""
+		clientName = ""
+		clientReference = ""
+		identifier = ""
+		sponsorID = ""
+		sponsorName = ""
+		applicantName = ""
+		sponsorAddress = ""
+		sponsorAddress_Id = ""
+		sponsorAddressLabel = ""
+		contactEmailCompletion = ""
+		contactFaxCompletion = ""
+		contactNameCompletion = ""
+		contactPosition = ""
+		contactPhoneCompletion = ""
+		completionReason = ""
+		trialCompletionDate = ""
+		completionRecordUNID = ""
+		contactEmail = ""
+		contactFax = ""
+		contactName = ""
+		contactPhone = ""
+		expectedCompletionDate = ""
+		part1RecordUNID = ""
+		isPotentialRestrictedGoodUsed = ""
+		potentialRestrictedGoodUsed = ""
+		protocolNumber = ""
+		trialStartDate = ""
+		titleOfStudy = ""
+		totalPatients = ""
+		trialTherapeuticArea = ""
+		trialTypeDescription = ""
+		cleanTrial = ""
+		newString = ""
+	
+		'searchString = StrLeft(Trials(trialCount),"|",0,1)
+		searchString = Trials(trialCount)
+		Set ctdocs = ctformview.Getalldocumentsbykey(searchString, True)	
+		Set ctdoc = ctdocs.Getfirstdocument()
+		
+	
+	flag = 0
+	While Not ctdoc Is Nothing
+		Forall f In ctdoc.Items
+			If f.Name = "Form" And f.Text = "Application" Then
+				flag = 1
+			End If
+			
+			If f.Name= "ApplicationID" And flag = 1 Then
+				applicationID = f.Text
+			End If
+			
+			If f.Name= "ApplicationVersion" And flag = 1 Then
+				applicationVersion = f.Text
+			End If
+			
+			If f.Name = "Form" And f.text = "Medicine" Then
+				medCounter = medCounter + 1
+				flag = 0
+			End If
+			If f.Name = "Form" And f.text = "Site" Then
+				siteCounter = siteCounter + 1
+				flag = 0
+			End If 
+			If f.Name = "Form" And f.text = "Biological" Then
+				bioCounter = bioCounter + 1
+				flag = 0
+			End If
+			If f.Name = "Form" And f.text = "Device" Then
+				deviceCounter = deviceCounter + 1
+				flag = 0
+			End If
+			If f.Name = "Form" And f.text = "Placebo" Then
+				placeboCounter = placeboCounter + 1
+				flag = 0
+			End If
+			If f.Name = "Form" And f.text = "TrialConductedInCountry" Then
+				countryCounter = countryCounter + 1
+				flag = 0
+			End If 
+			If f.Name = "Form" And f.text = "Completion" Then
+				completionCounter = completionCounter + 1
+				flag = 0
+			End If 
+		End Forall
+		flag = 0
+		Set ctdoc = ctdocs.Getnextdocument(ctdoc)
+	Wend
+	
+	Write #file%, medCounter &amp; " Count of meds"
+	Write #file%, siteCounter &amp; " Count of sites"
+	Write #file%, bioCounter &amp; " Count of biologicals"
+	Write #file%, deviceCounter &amp; " Count of device"
+	Write #file%, placeboCounter &amp; " Count of placebo"
+	Write #file%, countryCounter &amp; " Count of country"
+	Write #file%, completionCounter &amp; " Count of completion"
+	
+	Set ctdoc = ctdocs.Getfirstdocument()
+
+	flag = 0
+	
+	Set item = doc.Replaceitemvalue("Form", "ct")
+	Set item = doc.Replaceitemvalue("Type", "Application")
+	Set item = doc.Replaceitemvalue("LastEditor", "Admin")
+	dataDetails = "Not Provided"
+	biologicalProductDescription = "Not Provided"
+	lastEditor = "Admin"
+	
+	'While Not counter  &gt;  1
+ 	While Not ctdoc Is Nothing
+		Forall f In ctdoc.Items
+			'Application
+			If f.Name = "Form" And f.Text = "Application" Then
+				flag = 1
+			End If
+			
+			If f.Name= "ApplicationID" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("ApplicationID", f.Text)
+			End If
+			
+			If f.Name= "ApplicationVersion" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("ApplicationVersion", f.Text)
+			End If
+			
+			If f.Name= "IsActiveVersion" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("IsActiveVersion", f.Text)
+				isActiveVersion = f.Text
+			End If
+			
+			If f.Name= "ApplicationStage" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("ApplicationStage", f.Text)
+				applicationStage = f.Text
+			End If
+			
+			If f.Name= "ApplicationStatus" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("ApplicationStatus", f.Text)
+			End If
+			
+			If f.Name= "ApplicationStatusCode" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("ApplicationStatusCode", f.Text)
+			End If
+			
+			If f.Name= "ClientID" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("ClientID", f.Text)
+				clientID = f.Text
+			End If
+			
+			If f.Name= "ClientName" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("ClientName", f.Text)
+				clientName = JSONEncode( f.Text )
+			End If
+			
+			If f.Name= "clientreference" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("clientreference", f.Text)
+				clientReference = JSONEncode( f.Text )
+			End If
+			
+			If f.Name= "ClinicalTrialNo" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("ClinicalTrialNo", f.Text)
+			End If
+			
+			If f.Name= "ClinicalTrialType" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("ClinicalTrialType", f.Text)
+			End If
+			
+			If f.Name= "id" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("id", f.Text)
+				Set item = doc.Replaceitemvalue("RecordUNID", f.Text)
+				identifier = f.text
+			End If
+			
+			If f.Name= "sponsorid" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("sponsorid", f.Text)
+				sponsorID = f.text
+			End If
+			
+			If f.Name= "sponsorname" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("sponsorname", f.Text)
+				sponsorName = JSONEncode( f.text )
+				Set item = doc.Replaceitemvalue("ApplicantName", f.Text)
+				applicantName = JSONEncode( f.text )
+			End If
+			
+			If f.Name= "SponsorAddress" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("SponsorAddress", f.Text)
+				sponsorAddress = JSONEncode( f.text )
+			End If
+			
+			If f.Name= "SponsorAddress_Id" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("SponsorAddress_Id", f.Text)
+				sponsorAddress_Id = f.text
+			End If
+			
+			If f.Name= "SponsorAddress_Label" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("SponsorAddress_Label", f.Text)
+				sponsorAddressLabel = JSONEncode( f.text )
+			End If
+			
+			If f.Name= "Stream" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("Stream", f.Text)
+			End If
+			
+			If f.Name= "SubmissionId" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("SubmissionId", f.Text)
+			End If
+			
+			If f.Name= "titleofstudy" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("titleofstudy", f.Text)
+			End If
+			
+			If f.Name= "IsCleanTrial" And flag = 1 Then
+				Set item = doc.Replaceitemvalue("isCleanTrial", f.Text)
+				cleanTrial = f.Text
+			End If
+			
+			If f.Name= "WebAuthors" And flag = 1 Then
+				Dim webAuthorArray As Variant
+				webAuthorArray = ctdoc.Getitemvalue("WebAuthors")
+				Set item = doc.Replaceitemvalue("WebAuthors", webAuthorArray)
+				item.IsAuthors = True
+			End If
+			
+			If f.Name= "WebReaders" And flag = 1 Then
+				Dim webReaderArray As Variant
+				webReaderArray = ctdoc.Getitemvalue("WebReaders")
+				Set item = doc.Replaceitemvalue("WebReaders", webReaderArray)
+				item.IsReaders = True
+			End If
+			
+			'Completion
+			If completionCounter  &gt;  0 And f.Name = "Form" And f.Text = "Completion" Then
+				Write #file%, "Complete"
+				flag = 3
+			End If
+			
+			If f.Name= "ContactEmail" And flag = 3 Then
+				contactEmailCompletion = f.Text
+			End If
+			
+			If f.Name= "ContactFax" And flag = 3 Then
+				contactFaxCompletion = f.Text
+			End If
+			
+			If f.Name= "ContactName" And flag = 3 Then
+				contactNameCompletion = f.Text
+			End If
+			
+			If f.Name= "ContactPerson" And flag = 3 Then
+				contactPosition = f.Text
+			End If
+			
+			If f.Name= "ContactPhone" And flag = 3 Then
+				contactPhoneCompletion = f.Text
+			End If
+			
+			If f.Name= "CompletedFile" And flag = 3 Then
+				Set item = doc.Replaceitemvalue("CompletedFile", f.Text)
+			End If
+			
+			If f.Name= "CompletedFolio" And flag = 3 Then
+				Set item = doc.Replaceitemvalue("CompletedFolio", f.Text)
+			End If
+			
+			If f.Name= "CompletionDetails" And flag = 3 Then
+				completionDetails = JSONEncode( f.Text )
+			End If
+			
+			If f.Name= "CompletionReason" And flag = 3 Then
+				If f.Text = "" Then
+					completionReason = "Not Provided"
+				Else
+					completionReason = JSONEncode( f.Text )
+				End If
+			End If
+			
+			If f.Name= "FinishDate" And flag = 3 Then
+				trialCompletionDate = Format(f.Text, "yyyy-mm-dd")
+			End If
+			
+			If f.Name= "id" And flag = 3 Then
+				completionRecordUNID = f.Text
+			End If
+			
+			isValidated = ""
+			isSubmitted = ""
+			
+			'Medicine
+			If medCounter  &gt;  0 And f.Name = "Form" And f.Text = "Medicine" Then
+				medCounter2 = medCounter2 + 1	
+				Write #file%, "Medicine"
+				Write #file%, "medCounter2 value: " &amp; medCounter2
+				getMedicines = medString (ctdoc, doc, applicationID, applicationVersion)
+				If medCounter2 = 1 Then
+					Medicines = Medicines + getMedicines
+				Else
+					Medicines = Medicines + "," + getMedicines
+				End If
+			End If
+		
+			'Site
+			If siteCounter  &gt;  0 And f.Name = "Form" And f.Text = "Site" Then
+				siteCounter2 = siteCounter2 + 1	
+				Write #file%, "Site"
+				getSites = siteString(ctdoc, doc, applicationID, applicationVersion)
+				If siteCounter2 = 1 Then
+					Sites = Sites + getSites
+				Else
+					Sites = Sites + "," + getSites
+				End If
+			End If
+		
+			'Biological
+			If bioCounter  &gt;  0 And f.Name = "Form" And f.Text = "Biological" Then
+				bioCounter2 = bioCounter2 + 1	
+				Write #file%, "Biological"
+				getBiologicals = biolString(ctdoc, doc, applicationID, applicationVersion)
+				If bioCounter2 = 1 Then
+					Biologicals = Biologicals + getBiologicals
+				Else
+					Biologicals = Biologicals + "," + getBiologicals
+				End If
+			End If
+		
+			'IBP - do not process, just copy Lotus form
+		'	Call IBPString(doc, applicationID, applicationVersion)
+			'ADR - do not process, just copy Lotus form
+		'	Call ADRString(doc, applicationID, applicationVersion)
+			
+			'Device
+			If deviceCounter  &gt;  0 And f.Name = "Form" And f.Text = "Device" Then
+				Write #file%, "Device"
+				Devices = deviceString(ctdoc, doc, applicationID, applicationVersion)
+			End If
+		
+			'Placebo
+			If placeboCounter  &gt;  0 And f.Name = "Form" And f.Text = "Placebo" Then
+				Write #file%, "Placebo"
+				Placebos = placeboString(ctdoc, doc, applicationID, applicationVersion)
+			End If
+		
+			'Part1
+			If f.Name = "Form" And f.Text = "Part1" Then
+				flag = 2
+			End If
+			
+			If f.Name= "ContactEmail" And flag = 2 Then
+				contactEmail = f.Text
+			End If
+			
+			If f.Name= "ContactFax" And flag = 2 Then
+				contactFax = f.Text
+			End If
+			
+			If f.Name= "ContactName" And flag = 2 Then
+				contactName = f.Text
+			End If
+			
+			If f.Name= "ContactPhone" And flag = 2 Then
+				contactPhone = f.Text
+			End If
+			
+			If f.Name= "ExpectedCompletionDate" And flag = 2 Then
+				expectedCompletionDate = Format(f.Text, "yyyy-mm-dd")
+			End If
+			
+			If f.Name= "id" And flag = 2 Then
+				part1RecordUNID = f.Text
+			End If
+			
+			If f.Name= "IsPotentialRestrictedGoodUsed" And flag = 2 Then
+				isPotentialRestrictedGoodUsed = f.Text
+			End If
+			
+			If f.Name= "PotentialRestrictedGood" And flag = 2 Then
+				potentialRestrictedGoodUsed = f.Text
+			End If
+			
+			If f.Name= "ProtocolNumber" And flag = 2 Then
+				protocolNumber = JSONEncode( f.Text )
+				'newString = Findreplace(protocolNumber, """", "'")
+				'protocolNumber = newString
+			End If
+			
+			If f.Name= "StartDate" And flag = 2 Then
+				trialStartDate = Format(f.Text, "yyyy-mm-dd")
+			End If
+			
+			If f.Name= "titleofstudy" And flag = 2 Then
+				titleOfStudy = JSONEncode( f.Text )
+			End If
+			
+			If f.Name= "TotalPatients" And flag = 2 Then
+				totalPatients = f.Text
+			End If
+			
+			If f.Name= "TrialTherapeuticArea" And flag = 2 Then
+				trialTherapeuticArea = JSONEncode( f.Text )
+			End If
+			
+			If f.Name= "TrialTypeDescription" And flag = 2 Then
+				trialTypeDescription = JSONEncode( f.Text )
+			End If
+			
+			If f.Name= "TrialClassification" And flag = 2 Then
+				trialClassArray = ctdoc.Getitemvalue("TrialClassification")
+				
+				For i=0 To Ubound(trialClassArray)
+					If i=0 Then
+						trialClassification = """" + trialClassArray(i) + """"
+					Else
+						trialClassification = "" + trialClassification +",""" + trialClassArray(i) + """"
+					End If
+				Next
+			End If
+			
+			If f.Name= "TrialType" And flag = 2 Then
+				trialTypeArray = ctdoc.Getitemvalue("TrialType")
+				
+				For i=0 To Ubound(trialTypeArray)
+					If i=0 Then
+						trialType = """" + trialTypeArray(i) + """"
+					Else
+						trialType = "" + trialType +",""" + trialTypeArray(i) + """"
+					End If
+				Next
+			End If
+			
+			'TrialConductedInCountry
+			If countryCounter  &gt;  0 And f.Name = "Form" And f.Text = "TrialConductedInCountry" Then
+				For i=1 To countryCounter
+					Write #file%, "Which country?"
+					TrialConductedInCountries = countryString(ctdoc, doc, applicationID, applicationVersion)
+				Next
+			End If
+		End Forall
+		flag = 0
+		
+		If counter Mod 50 = 0 Then
+			Print ApplicationID "@ " counter
+		End If
+		counter = counter + 1
+		Set ctdoc = ctdocs.Getnextdocument(ctdoc)
+	Wend
+	
+	If Not doc.Hasitem("id") Then
+		ctAppID = ApplicationID &amp;  "~" &amp;  ApplicationVersion
+		Set item = doc.Replaceitemvalue("id", ctAppID)
+		Set item = doc.Replaceitemvalue("RecordUNID", ctAppID)
+		identifier = ctAppID
+	End If
+	
+		JSONString = |{
+	    "label":"id",
+	    "identifier":"id",
+	    "items":{
+			"Type":"Application",
+			"Form":"Application",
+			"Key":{
+				"ApplicationId":"| &amp;  applicationID &amp;  |",
+				"ApplicationVersion": "| &amp;  applicationVersion &amp;  |",
+				"id":"| &amp;  identifier &amp;  |"
+			},
+			"ApplicationId":"| &amp;  applicationID &amp;  |",
+			"ApplicationVersion":"| &amp;  applicationVersion &amp;  |",
+			"id":"| &amp;  identifier &amp;  |",
+			"RecordUNID":"| &amp;  identifier &amp;  |",
+			"ClinicalTrialType": "CTN",
+			"IsActiveVersion":"| &amp;  isActiveVersion &amp;  |",
+			"ApplicantName":"| &amp;  applicantName &amp;  |",
+			"ApplicationStage":"| &amp; 	applicationStage &amp;  |",
+			"ApplicationStageCode":"| &amp;  applicationStageCode &amp;  |",
+			"ApplicationStatus": "Draft", 
+			"ApplicationStatusCode": "DRAFT",
+			"AuditLog":{
+				"label":"AuditMessage",
+				"items":[],
+				"id":"| &amp;  identifier &amp;  |",
+				"Key": {
+					"ApplicationId":"| &amp;  applicationID &amp;  |",
+					"ApplicationVersion":"| &amp;  applicationVersion &amp;  |",
+					"id":"| &amp;  identifier &amp;  |"
+				},
+				"ApplicationId":"| &amp;  applicationID &amp;  |",
+				"ApplicationVersion":"| &amp;  applicationVersion &amp;  |"
+			},
+			"BiologicalProductDescription":"| &amp;  biologicalProductDescription &amp;  |",
+			"ChangeReport":"", 
+			"Completion":{
+				"Type":"Completion",
+				"Form":"Completion",
+				"id":"| &amp;  completionRecordUNID &amp;  |",
+				"Key":{
+					"ApplicationId":"| &amp;  applicationID &amp;  |",
+					"ApplicationVersion":"| &amp;  applicationVersion &amp;  |",
+					"id":"| &amp;  applicationID &amp;  |",  
+				},
+				"ApplicationId":"| &amp;  applicationID &amp;  |",
+				"ApplicationVersion":"| &amp;  applicationVersion &amp;  |",
+				"RecordUNID":"| &amp;  completionRecordUNID &amp;  |",
+				"DataSection":4,
+				"CompletionDetails":"| &amp;  completionDetails &amp;  |",
+				"CompletionReason":"| &amp;  completionReason &amp;  |",
+				"ContactEmail":"| &amp;  contactEmailCompletion &amp;  |",
+				"ContactFax":"| &amp;  contactFaxCompletion &amp;  |",
+				"ContactName":"| &amp;  contactNameCompletion &amp;  |",
+				"ContactPhone":"| &amp;  contactPhoneCompletion &amp;  |",
+				"ContactPosition":"| &amp;  contactPosition &amp;  |",
+				"TrialCompletionDate":"| &amp;  trialCompletionDate &amp;  |"
+			}, 
+			"CreatedBy":"| &amp;  createdBy &amp;  |",
+			"CreatedOn":"| &amp;  createdOn &amp;  |",
+			"ErrorReport":"", 
+			"ExpectedCompletionDate":"| &amp;  expectedCompletionDate &amp;  |",
+			"InvoiceDate":"", 
+			"InvoiceNumber":"", 
+			"IsExportedToGP":"", 
+			"IsPaymentReceived":"", 
+			"IsReceiptImportedFromGP":"", 
+			"IsSubmitted":"| &amp;  isSubmitted &amp;  |",
+			"IsValidated":"| &amp;  isValidated &amp;  |",
+			"IsWorkMgmtEntryCreatedCompletion":"",
+			"LastEdited":"| &amp;  Now &amp;  |",
+			"LastEditor":"| &amp;  lastEditor &amp;  |",
+			"SponsorAddress":"| &amp;  sponsorAddress &amp;  |",
+			"SponsorAddress_Id":"| &amp;  sponsorAddress_Id &amp;  |",
+			"SponsorID":"| &amp;  sponsorID &amp;  |",
+			"SponsorName":"| &amp;  sponsorName &amp;  |",
+			"SubmissionDate":"| &amp;  submissionDate &amp;  |",
+			"SubmissionId":"| &amp;  submissionID &amp;  |",
+			"TitleOfStudy":"| &amp;  titleOfStudy &amp;  |",
+			"Part1":{
+				"Type":"Part1",
+				"Form":"Part1",
+				"id":"| &amp;  part1RecordUNID &amp;  |",
+				"Key":{
+					"ApplicationId":"| &amp;  applicationID &amp;  |",
+					"ApplicationVersion":"| &amp;  applicationVersion &amp;  |",
+					"id":"| &amp;  part1ID &amp;  |",
+					"DataSection":1
+				},
+				"ApplicationId":"| &amp;  applicationID &amp;  |",
+				"ApplicationVersion":"| &amp;  applicationVersion &amp;  |",
+				"RecordUNID":"| &amp;  part1RecordUNID &amp;  |",
+				"DataSection":1,
+				"SponsorAttachment":"",
+				"SponsorAttachment_Label":"",
+				"BiologicalProductDescription":"| &amp;  biologicalProductDescription &amp;  |",
+				"CertificationFileAttachmentFileNames":"",
+				"CertificationFileAttachmentIds":"",
+				"ContactEmail":"| &amp;  contactEmail &amp;  |",
+				"ContactName":"| &amp;  contactName &amp;  |",
+				"ContactPhone":"| &amp;  contactPhone &amp;  |",
+				"ExpectedCompletionDate":"| &amp;  expectedCompletionDate &amp;  |",
+				"IsPotentialRestrictedGoodUsed":"| &amp;  isPotentialRestrictedGoodUsed &amp;  |",
+				"DataDetails":"| &amp;  dataDetails &amp;  |",
+				"PotentialRestrictedGoodDesc":"| &amp;  potentialRestrictedGoodUsed &amp;  |",
+				"ProtocolNumber":"| &amp;  protocolNumber &amp;  |",
+				"TotalPatients":"| &amp;  totalPatients &amp;  |",
+				"TitleOfStudy":"| &amp;  titleOfStudy &amp;  |",
+				"TrialTherapeuticArea":"| &amp;  trialTherapeuticArea &amp;  |",
+				"TrialStartDate":"| &amp;  trialStartDate &amp;  |",
+				"TrialTypeDescription":"| &amp;  trialTypeDescription &amp;  |",
+				"IsWorkMgmtEntryCreated":"",
+				"WorkMgmtEntryCreateDate":"",
+				"WorkMgmtProcessId":"",
+				"TrialClassification":[| &amp;  trialClassification &amp;  |],
+				"PrecedingTrials":[],
+				"TrialType":[| &amp;  trialType &amp;  |],
+				"AnimalExcipients":{
+					"identifier":"id",
+					"id":"| &amp;  applicationID &amp;  |~1~Part1~AnimalExcipients",
+					"Key":{
+						"ApplicationId":"| &amp;  applicationID &amp;  |",
+						"ApplicationVersion":"| &amp;  applicationVersion &amp;  |",
+						"id":"| &amp;  applicationID &amp;  |~1~Part1~AnimalExcipients",
+						"DataSection":"1"
+					},
+					"items":[]
+				},
+				"Biologicals":{
+					"identifier":"id",
+					"id":"| &amp;  biologicalRecordUNID &amp;  |",
+					"Key":{
+						"ApplicationId":"| &amp;  applicationID &amp;  |",
+						"ApplicationVersion":"| &amp;  applicationVersion &amp;  |",
+						"id":"| &amp;  biologicalRecordUNID &amp;  |",
+						"DataSection":"1"
+					},
+					"items":[| &amp;  Biologicals &amp;  |]
+				},
+	            "Medicines":{
+					"identifier":"id",
+					"id":"| &amp;  medicineRecordUNID &amp;  |",
+					"Key":{
+						"ApplicationId":"| &amp;  applicationID &amp;  |",
+						"ApplicationVersion":"| &amp;  applicationVersion &amp;  |",
+						"id":"| &amp;  medicineRecordUNID &amp;  |",
+						"DataSection":"1"
+					},
+					"items":[| &amp;  Medicines &amp;  |]
+				},
+				"Devices":{
+					"identifier":"id",
+					"id":"| &amp;  deviceRecordUNID &amp;  |",
+					"Key":{
+						"ApplicationId":"| &amp;  applicationID &amp;  |",
+						"ApplicationVersion":"| &amp;  applicationVersion &amp;  |",
+						"id":"| &amp;  deviceRecordUNID &amp;  |",
+						"DataSection":"1"
+					},
+					"items":[| &amp;  Devices &amp;  |]
+				},
+	            "Placebos":{
+					"identifier":"id",
+					"id":"| &amp;  placeboRecordUNID &amp;  |",
+					"Key":{
+						"ApplicationId":"| &amp;  applicationID &amp;  |",
+						"ApplicationVersion":"| &amp;  applicationVersion &amp;  |",
+						"id":"| &amp;  placeboRecordUNID &amp;  |",
+						"DataSection":"1"
+					},
+					"items":[| &amp;  Placebos &amp;  |]
+				},
+				"Comparators":{
+					"identifier":"id",
+					"id":"| &amp;  applicationID &amp;  |~1~Part1~Comparators",
+					"Key":{
+						"ApplicationId":"| &amp;  applicationID &amp;  |",
+						"ApplicationVersion":"1",
+						"id":"| &amp;  applicationID &amp;  |~1~Part1~Comparators",
+						"DataSection":"1"
+					},
+					"items":[]
+				},
+				"Sites":{
+					"identifier":"id",
+					"label":"TrialSite",
+					"id":"| &amp;  applicationID &amp;  |~1~Part1~Sites",
+					"Key":{
+						"ApplicationId":"| &amp;  applicationID &amp;  |",
+						"ApplicationVersion":"| &amp;  applicationVersion &amp;  |",
+						"id":"| &amp;  siteRecordUNID &amp;  |",
+						"DataSection":"1"
+					},
+					"ApplicationId":"| &amp;  applicationID &amp;  |",
+					"ApplicationVersion":"| &amp;  applicationVersion &amp;  |",
+					"DataSection":"1",
+					"items":[| &amp;  Sites &amp;  |]
+				},
+	             "TrialConductedInCountries":{
+					"identifier":"id",
+	                "id":"| &amp;  trialConductedInCountriesRecordUNID &amp;  |",
+	                "Key":{
+						"ApplicationId":"| &amp;  applicationID &amp;  |",
+	                    "ApplicationVersion":"| &amp;  applicationVersion &amp;  |",
+	                    "id":"| &amp;  trialConductedInCountriesRecordUNID &amp;  |",
+	                    "DataSection":"1"
+	                },
+					"items":[| &amp;  TrialConductedInCountries &amp;  |]
+				},
+	            "GMO":"Not Provided",
+                "Nanoparticles":"Not Provided",
+				"GeneTherapyDetails":"Not Provided",
+				"BiologicalNotInPhaseOne":"",
+				"BiologicalManufacturerDetails":"Not Provided",
+				"BiologicalProductDescription":"Not Provided",
+				"StartDate":"| &amp;  trialStartDate &amp;  |",
+				"IsPotentialRestrictedGoodUsed":"No",
+	            "IsActiveVersion":"| &amp;  isActiveVersion &amp;  |"
+	        },
+			"Part2":{
+				"identifier":"",
+	            "Type":"Part2",
+	            "Form":"Part2",
+	            "id":"",
+	            "Key":{
+	                "ApplicationId":"",
+	                "ApplicationVersion":"",
+	                "id":"",
+	                "DataSection":2
+	            },
+				"ApplicationId":"",
+				"ApplicationVersion":"",
+				"RecordUNID":"",
+				"DataSection":2,
+				"ContactName":"",
+				"ContactPhone":"",
+				"ContactFax":"",
+				"ContactEmail":"",
+				"StartDate":"",
+				"FinishDate":"",
+				"NotificationType":"",
+				"NotificationType_Label":"",
+				"TrialType":[],
+				"TrialTypeDescription":"",
+				"TitleOfStudy":"",
+				"TrialClassification":[],
+				"ProtocolNumber":"",
+				"GMO":"",
+				"Nanoparticles":"",
+				"Placebos":{
+					"identifier":"id",
+					"id":"",
+					"Key":{
+						"ApplicationId":"",
+						"ApplicationVersion":"",
+						"id":"",
+						"DataSection":"2"
+					},
+	                "items":[]
+	            },
+				"Comparators":{
+					"identifier":"id",
+					"id":"",
+					"Key": {
+						"ApplicationId":"",
+						"ApplicationVersion":"1",
+						"id":"",
+						"DataSection":"2"
+				},
+			},
+		},	
+		"UpdateDetails":{
+			"identifier":"RecordUNID",
+			"Type":"UpdateDetails",
+			"Form":"UpdateDetails",
+			"id":"| &amp;  applicationID &amp;  |~1~UpdateDetails| &amp;  |",
+			"Key":{			 
+				"ApplicationId":"CT-2015-CTN-02002-1",
+				"ApplicationVersion":"1",
+				"id":"| &amp;  applicationID &amp;  |~1~UpdateDetails| &amp; |",
+				"DataSection":"3"
+				},
+			"RecordUNID":"| &amp;  applicationID &amp;  |~1~UpdateDetails| &amp;  |",
+			"DataSection":"3",
+			"ChangeApprovalStatus":"",
+			"ChangeDateTime":"",
+			"ChangeId":"",
+			"ChangeInitiatedBy":"",
+			"Comments":"",
+			"ContactEmail":"",
+			"ContactName":"",
+			"ContactPhone":"",
+			"ApplicationId":"| &amp;  applicationID &amp;  |",
+			"ApplicationVersion":"1",
+			"TrialStartDate":"",
+			"TrialFinishDate":"",
+			"BiologicalProductDescription":"",
+			"BiologicalNotInPhaseOne":"",
+			"BiologicalManufacturerDetails":"",
+			"GeneTherapyDetails":"",
+			"Nanoparticles":"",
+			"GMO":"",
+			"IsPotentialRestrictedGoodUsed":"",
+			"ProtocolNumber":"",
+			"TotalPatients":"",
+			"TitleOfStudy":"",
+			"IsDistinctGood":"",
+			"TrialClassification":[],
+			"PrecedingTrials":[],
+			"TrialType":[],
+			"TrialType_Label":"",
+			"Sites":{
+				"identifier":"id",
+				"label":"TrialSite",
+				"id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~Sites",
+				"Key":{
+					"ApplicationId":"| &amp;  applicationID &amp;  |",
+					"ApplicationVersion":"1",
+					"id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~Sites",
+					"DataSection":"3"
+				},
+				"items":[],
+				"LastEntryKey":"0",
+				"ApplicationId":"| &amp;  applicationID &amp;  |",
+				"ApplicationVersion":"1",
+				"DataSection":"3",
+				"ApplicationStage":"1"
+			},
+			"AnimalExcipients":{
+				"identifier":"id",
+				"id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~AnimalExcipients",
+				"Key":{
+					"ApplicationId":"CT-2015-CTN-02002-1",
+					"ApplicationVersion":"1",
+					"id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~AnimalExcipients",
+					"DataSection":"3"
+				},
+				"items":[],
+				"ApplicationId":"| &amp;  applicationID &amp;  |",
+				"ApplicationVersion":"1",
+				"ApplicationStage":"1"
+			},
+			"Biologicals":{
+				"identifier":"id",
+				"id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~Biologicals",
+				"Key":{
+					"ApplicationId":"CT-2015-CTN-02002-1",
+					"ApplicationVersion":"1",
+					"id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~Biologicals",
+					"DataSection":"3"
+				},
+				"items":[],
+				"LastEntryKey":"0",
+				"ApplicationId":"| &amp;  applicationID &amp;  |",
+				"ApplicationVersion":"1",
+				"ApplicationStage":"1"
+			},
+			"Medicines":{
+				"identifier":"id",
+				"id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~Medicines",
+				"Key":{
+					"ApplicationId":"| &amp;  applicationID &amp;  |",
+					"ApplicationVersion":"1",
+					"id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~Medicines",
+					"DataSection":"3"
+				},
+				"items":[],
+				"LastEntryKey":"0",
+				"ApplicationId":"| &amp;  applicationID &amp;  |",
+				"ApplicationVersion":"1",
+				"ApplicationStage":"1"
+			},
+			"Devices":{
+				"identifier":"id",
+				"id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~Devices",
+				"Key":{
+					"ApplicationId":"| &amp;  applicationID &amp;  |",
+					"ApplicationVersion":"1",
+					"id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~Devices",
+					"DataSection":"3"
+				},
+				"items":[],
+				"LastEntryKey":"0",
+				"ApplicationId":"| &amp;  applicationID &amp;  |",
+				"ApplicationVersion":"1",
+				"ApplicationStage":"1"
+			},
+			"MedicineIngredients":{
+				"identifier":"id",
+				"id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~MedicineIngredients",
+				"Key":{
+					"ApplicationId":"| &amp;  applicationID &amp;  |",
+					"ApplicationVersion":"1",
+					"id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~MedicineIngredients",
+					"DataSection":"3"
+				},
+				"items":[],
+				"LastEntryKey":"0",
+				"ApplicationId":"| &amp;  applicationID &amp;  |",
+				"ApplicationVersion":"1","ApplicationStage":"1"
+			},
+			"BiologicalIngredients":{
+				"identifier":"id",
+				"id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~BiologicalIngredients",
+				"Key":{
+					"ApplicationId":"| &amp;  applicationID &amp;  |",
+					"ApplicationVersion":"1",
+					"id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~BiologicalIngredients",
+					"DataSection":"3"
+				},
+				"items":[],
+				"LastEntryKey":"0",
+				"ApplicationId":"| &amp;  applicationID &amp;  |",
+				"ApplicationVersion":"1",
+				"ApplicationStage":"1"
+			},
+			"TrialConductedInCountries":{
+				"identifier":"id",
+				"id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~TrialConductedInCountries",
+				"Key":{
+					"ApplicationId":"| &amp;  applicationID &amp;  |",
+					"ApplicationVersion":"1",
+					"id":"| &amp;  applicationID &amp;  |~1~UpdateDetails~TrialConductedInCountries",
+					"DataSection":"3"
+				},
+				"items":[]
+			},
+			"ApplicationStage":"1"
+		},
+		"ValidationLog":{
+			"identifier":"RecordUNID",
+			"label":"Message",
+			"items":[],
+			"id":"| &amp;  identifier &amp;  |~1",
+			"Key":{
+				"ApplicationId":"| &amp;  applicationID &amp;  |",
+				"ApplicationVersion":"| &amp;  applicationVersion &amp;  |",
+				"id":"| &amp;  identifier &amp;  |"
+			},
+			"ApplicationId":"| &amp;  applicationID &amp;  |",
+			"ApplicationVersion":"| &amp;  applicationVersion &amp;  |"
+		},
+		"ValidationStatus":"0",
+		"WorkMgmtEntryCreateDateCompletion":"",
+		"WorkMgmtProcessIdCompletion":"",
+		"WMID_Review":"",
+		"WMID_Application":"",
+		"IsPushBackTriggered":"0",
+		"IsPushBackSubmittedBack":"0",
+		"PushBackTriggerDates":[],
+		"PushBackSubmittedBackDates":[],
+		"VariationNonFeeList":[],
+		"ClientName":"| &amp;  clientName &amp;  |",
+		"ClientId":"| &amp;  clientID &amp;  |",
+		"LabelName":"",
+		"SponsorAddress_Label":"| &amp;  sponsorAddressLabel &amp;  |",
+		"ClientReference":"| &amp;  clientReference &amp;  |",
+		"isClean":"| &amp;  cleanTrial &amp;  |"
+	}}|
+
+	Write #file%, "---------------------------------------------------------------"
+	
+	Set item = doc.Replaceitemvalue("$UpdatedBy", "Admin")
+	
+	Set aitem = doc.Getfirstitem("WebAuthors")
+	If Not (aitem Is Nothing) Then
+		aitem.IsAuthors = True
+	End If
+		
+	Set aitem = doc.Getfirstitem("WebReaders")
+	If Not (aitem Is Nothing) Then
+		aitem.IsReaders = True
+	End If
+	
+	Call doc.Save(True, True)
+	Call ProcessPOSTRequest(doc, JSONString)
+	Next
+	Close #file%
+exitGracefully:
+	Exit Function
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	Resume exitGracefully
+End Function
+
+</lotusscript></code><code event='medString'><lotusscript>
+%REM
+	Function medString
+	Description: Comments for Function
+%END REM
+Function medString (ctdoc As NotesDocument, doc As NotesDocument, applicationID As String, applicationVersion As String)
+	Dim medicationString As String, uniqueID As String, activeName As String, dosageForm As String, dosageForm_Label As String
+	Dim doseFrequency As String, tradeCodeName As String, routeOfAdmin As String, routeOfAdmin_Label As String
+	Dim productStrength As String, productStrengthUnit As String, presentation As String, productStrengthUnit_Label As String
+	Dim item As Variant, productStrengthProcess As String, activeNameText As String, newString As String
+	
+	
+	Forall f In ctdoc.Items
+		If f.Name = "ActiveName" Then
+			newString = ""
+			activeName = JSONEncode( f.text )
+			'newString = Findreplace(activeName, """", "'")
+			'activeName = newString
+		End If
+		
+		If f.Name = "ActiveNameText" Then
+			newString = ""
+			Set item = doc.Replaceitemvalue("ActiveNameText", f.Text)
+			activeNameText = JSONEncode( f.Text )
+			'newString = Findreplace(activeNameText, """", "'")
+			'activeNameText = newString
+		End If
+		
+		If f.Name = "DosageForm" Then
+			dosageForm = JSONEncode( f.text )
+		End If
+		
+		If f.Name = "DosageForm_Label" Then
+			dosageForm_Label = JSONEncode( f.text )
+		End If
+		
+		If f.Name = "id" Then
+			uniqueID = f.text
+		End If
+		
+		If f.Name = "ProductStrength" Then
+			productStrength = JSONEncode( f.text )
+		End If
+		
+		If f.Name = "ProductStrengthDataToProcess" Then
+			Set item = doc.Replaceitemvalue("ProductStrengthDataToProcess", f.Text)
+			productStrengthProcess = JSONEncode( f.Text )
+		End If
+		
+		If f.Name = "ProductStrengthUnit" Then
+			productStrengthUnit = JSONEncode( f.text )
+		End If
+		
+		If f.Name = "ProductStrengthUnit_Label" Then
+			productStrengthUnit_Label = JSONEncode( f.text )
+		End If
+		
+		If f.Name = "RouteOfAdmin" Then
+			routeOfAdmin = f.text
+		End If
+		
+		If f.Name = "RouteOfAdmin_Label" Then
+			routeOfAdmin_Label = JSONEncode( f.text )
+		End If
+		
+		If f.Name = "TradeCodeName" Then
+			newString = ""
+			tradeCodeName = JSONEncode( f.text )
+			'newString = Findreplace(tradeCodeName, """", "'")
+			'tradeCodeName = newString
+		End If
+		
+	End Forall
+	
+	
+	If dosageForm = "" Then
+		dosageForm = "notprovided"
+	End If
+	doseFrequency = "Not Provided"
+	presentation = "Not Provided"
+	routeOfAdmin = "NA"
+
+	medicationString = "{""id"":[""" &amp; uniqueID &amp; _
+	"""],""identifier"":[""RecordUNID""],""label"":[""ActiveName""],""Type"":[""Medicine""],""Form"":[""Medicine""],""ApplicationId"":[""" &amp; _
+	applicationID &amp; """],""ApplicationVersion"":[""" &amp; applicationVersion &amp; _
+	"""],""DataSection"":[""1""],""RecordUNID"":[""" &amp; uniqueID &amp; """],""ActiveName"":[""" &amp;  activeName &amp; _
+	"""],""ActiveNameText"":[""" &amp; activeNameText &amp; """],""DosageForm"":[""" &amp; dosageForm &amp; _
+	"""],""DosageForm_Label"":[""" &amp; dosageForm_Label &amp; """],""DoseFrequency"":[""" &amp; _
+	doseFrequency &amp; """],""TradeCodeName"":[""" &amp; tradeCodeName &amp; _
+	"""],""IntendedUse"":[""""],""Indication"":[""Not Provided""],""DosageFrequency"":[""Not Provided""]," &amp; _
+	"""MedicineManufacturerDetails"":[""Not Provided""],""MedicineNotInPhaseOne"":[""""]," &amp; _
+	"""RouteOfAdmin"":[""" &amp; routeOfAdmin &amp; """],""RouteOfAdmin_Label"":[""" &amp; _
+	routeOfAdmin_Label &amp; """],""ProductStrength"":[""" &amp; productStrength &amp; """],""ProductStrengthDataToProcess"":[""" &amp; _
+	productStrengthProcess &amp; """],""ProductStrengthUnit"":[""" &amp; productStrengthUnit &amp; """],""Presentation"":[""" &amp; _
+	presentation &amp; """],""ProductStrengthUnit_Label"":[""" &amp; _
+	productStrengthUnit_Label &amp; """]}"
+			
+	medString = medicationString
+	
+	
+End Function
+
+</lotusscript></code><code event='JSONEncode'><lotusscript>
+Function JSONEncode (inputStr As String) As String
+	'lifted from http://searchdomino.techtarget.com/tip/1,289483,sid4_gci1048230,00.html
+	Dim i As Integer
+	Dim outputStr As String
+	Dim char As String
+	
+'	inputStr = Replace(inputStr, |\|, |\\|) 'must be done first.
+'	inputStr = Replace(inputStr, |"|, |\"|)
+'	inputStr = Replace(inputStr, |/|, |\/|)
+'	inputStr = Replace(inputStr, Chr(13), ||)
+'	inputStr = Replace(inputStr, Chr(10), ||)
+'	inputStr = Replace(inputStr, Chr(9), ||)
+	
+	' single replace faster, must list backslash (reverse solidus) first
+	' replacing carriage return, newline, and tabs with empty string as we do not want them in the JSON output.
+	inputStr = Replace(inputStr, Split(|\:":/:| &amp;  Chr(13) &amp;  |:| &amp;  Chr(10) &amp;  |:| &amp;  Chr(9), ":"), Split(|\\:\":\/:::|,":"))
+	
+	JSONEncode = inputStr
+End Function</lotusscript></code>
+<item name='$POID'><datetime>20160620T120205,32+10</datetime></item></agent>
+

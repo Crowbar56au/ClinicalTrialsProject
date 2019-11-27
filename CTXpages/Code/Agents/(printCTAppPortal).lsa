@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(printCTAppPortal)' alias='printCTAppPortal' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3'
+ publicaccess='false' designerversion='8.5.3' comment='print draft bioapp from the portal'>
+<noteinfo noteid='586' unid='DE4A3F824585E9B8CA257F7700070A6D' sequence='14'>
+<created><datetime dst='true'>20160315T121654,21+11</datetime></created>
+<modified><datetime>20160628T151506,89+10</datetime></modified>
+<revised><datetime>20160628T151506,88+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,88+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,34+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151506,95+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+Option Declare
+
+</lotusscript></code><code event='initialize'><lotusscript>'Use "PrintApplication"
+Sub Initialize
+	On Error Goto errHandler
+	Dim s As New NotesSession
+	Dim dbCurrent As NotesDatabase
+	Dim docContext As NotesDocument
+	Dim strQueryString As String
+	Dim strUNID As String
+	Dim strTitle As String
+	Dim appdoc As NotesDocument
+	Dim xx As Integer
+	Set dbCurrent = s.CurrentDatabase
+	Set docContext = s.DocumentContext
+	strQueryString = doccontext.Query_String(0)
+	strUNID = GetWebVariable(strQueryString, "unid")
+	If Len(strunid) &lt; 32 Then
+		Print "Error processing print preview request"
+		Exit Sub
+	End If
+	
+	Set appdoc = dbCurrent.GetDocumentByUNID(strUNID)
+	Dim appid As String, appver As String, status As String, subdate As String, paydate As String
+	If Not appdoc Is Nothing Then
+		If appdoc.HasItem("applicationid") Then
+			appid=appdoc.getfirstitem("applicationid").text
+			If appdoc.Hasitem("SubmissionDate") Then
+				subdate = appdoc.GetFirstItem("SubmissionDate").Text
+				If subdate &lt;&gt; "" Then
+					xx = 0
+					xx = Instr(subdate, " ")
+					subdate = Left(subdate, xx-1)
+				End If
+			End If
+			If appdoc.Hasitem("PaymentReceiptDate") Then
+				paydate = appdoc.GetFirstItem("PaymentReceiptDate").Text
+				If paydate &lt;&gt; "" Then
+					xx = 0
+					xx = Instr(paydate, " ")
+					paydate = Left(paydate, xx-1)
+				End If
+			End If
+			If appdoc.HasItem("applicationversion") Then
+				appver=appdoc.getfirstitem("applicationversion").text
+				Print "[/ebs/trials/ct.nsf/ct?readform&amp;ID=" + appid &amp; "&amp;V=" &amp; appver &amp; "&amp;PP=1&amp;status="+ appdoc.getfirstitem("applicationstatus").text +"&amp;subdate=" + subdate + "&amp;paydate=" + paydate + "]"
+				'Print "[/ebs/trials/ct.nsf/ct?readform&amp;ID=" + appid &amp; "&amp;V=" &amp; appver &amp; "&amp;PP=1&amp;status="+ appdoc.getfirstitem("applicationstatus").text + "]"
+			Else
+				Print "The Application with database ID '" + strUNID + "' does not have a valid Application Version. Please contact TGA Technical Support regarding this issue."
+			End If
+		Else
+			Print "The Application with database ID '" + strUNID + "' does not have a valid Application ID. Please contact TGA Technical Support regarding this issue."
+		End If
+	Else
+		Print "Cannot locate the requested Application using that ID and Version number. please contact TGA Technical Support regarding this issue."
+	End If
+exitGracefully:
+	Exit Sub
+errHandler:
+	Print "Error processing print preview request &lt;br /&gt;"
+	Print "Error " &amp; Err &amp; " at line " &amp; Erl &amp; " - " &amp; Error
+	Resume exitGracefully
+End Sub
+
+</lotusscript></code><code event='GetWebVariable'><lotusscript>Function GetWebVariable (querystring As String, argname As String) As String
+	Dim tmpstr As String	
+	GetWebVariable = ""
+	tmpstr = Strright(querystring, argname + "=")
+	
+	If (Instr(tmpstr, "&amp;") &lt;&gt; 0) Then
+		GetWebVariable = Strleft(tmpstr, "&amp;")
+	Else
+		GetWebVariable = tmpstr
+	End If
+End Function</lotusscript></code>
+<item name='$POID'><datetime>20160620T120206,64+10</datetime></item></agent>
+

@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<page name='UINavigator' xmlns='http://www.lotus.com/dxl' version='9.0' maintenanceversion='1.0'
+ replicaid='CA257FDB001B5780' hide='web' publicaccess='false' designerversion='7'
+ bgcolor='navy' renderpassthrough='true'>
+<noteinfo noteid='3ca' unid='D67E8973DF8E0F86CA257FD8000B2898' sequence='14'>
+<created><datetime>20160620T120152,88+10</datetime></created>
+<modified><datetime>20160628T151505,69+10</datetime></modified>
+<revised><datetime>20160628T151505,68+10</datetime></revised>
+<lastaccessed><datetime>20160628T151505,68+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,36+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1' leftmargin='0.7875in'/>
+<par def='1'><embeddedoutline outline='nMain' showtwistie='true' osstyletwistie='true'
+ scrollbars='false' widthtype='fitwindow' heighttype='fitcontent' height='1.8438in'
+ expand='first'><title normalcolor='white' mouseovercolor='white'><layout
+ labelalign='topleft' labelhoffset='0' labelvoffset='0'/></title><toplevel
+ normalcolor='silver' selectedcolor='white' mouseovercolor='yellow'><font
+ size='11pt' style='bold'/><eoutlinebackground mouseovercolor='navy'/><layout
+ labelalign='topleft' imagealign='topleft' labelhoffset='0' labelvoffset='0'/></toplevel><sublevel
+ normalcolor='silver' selectedcolor='white' mouseovercolor='yellow'><eoutlinebackground
+ mouseovercolor='navy'/><layout labelalign='topleft' entryhoffset='0.0396in'
+ entryvoffset='0.0396in' imagealign='topleft' labelhoffset='0.0396in' labelvoffset='0'/></sublevel></embeddedoutline></par></richtext></body>
+<item name='OriginalModTime' sign='true'><datetime>20060703T112852,84+10</datetime></item>
+<item name='$$ScriptName' summary='false' sign='true'><text>UINavigator</text></item></page>
+

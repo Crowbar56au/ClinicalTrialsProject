@@ -1,0 +1,233 @@
+/* Form styles */
+label {
+	font-size: 96% !important;
+	font-weight: bold !important;
+	color: #002746;
+}
+
+.labelDeclaration {
+	font-size: 96% !important;
+	font-weight: bold !important;
+	color: #002746;
+}
+.noticeBox {
+	margin: 5px 15px;	
+	padding: 5px;
+	border: 1px solid #cccccc;
+}
+
+.noticeConfirm {
+	border: 1px solid #009933;
+	background: #EBFFEB url("iconConfirm.png") no-repeat 2px 4px;	
+	padding-left: 25px;
+}
+
+.noticeWarning {
+	border: 1px solid #FF9900;
+	background: #FFFFCC url("iconWarningYellow.png") no-repeat 2px 4px;	
+	padding-left: 25px;
+}
+
+.noticeError{
+	border: 1px solid #FF0000;
+	background: #FFE6E6 url("iconError.png") no-repeat 2px 4px;
+	padding-left: 25px;	
+}
+
+fieldset {
+	border: 1px solid rgb(83,107,134);
+	margin: 5px 0px 15px 0px;
+	min-width: 320px;
+}
+
+.columnPane fieldset {
+	margin-right: 10px;	
+}
+	
+fieldset.alternate {
+	border: 1px solid rgb(137,181,112);
+	margin: 5px 0px 15px 0px;
+}
+
+legend {
+	font-size: 90% !important;
+	font-weight: bold !important;
+	color: #FFFFFF;
+	width: 85%;
+	background-color: rgb(83,107,134);
+	padding: 2px;
+	margin-left: 15px;
+}
+
+fieldset.alternate legend {
+	background-color: rgb(137,181,112);
+	color: #ffffff;	
+}
+
+.formTable {
+	width: 98%;
+	border-collapse: collapse;
+}
+
+.formTable td {
+	border-bottom: 1px solid #eeeeee;
+	vertical-align: top;
+	padding: 5px;
+}
+
+.formTable td td {
+	border-bottom: none;
+	vertical-align: top;
+	padding: 1px;
+}
+
+.popoutTable {
+	width: 350px;
+	margin: 5px;
+	border: 1px solid #002746;	
+}
+
+.labelCell {
+	width: 80px;
+}
+
+.labelCellSmall {
+	width: 40px;
+}
+
+.labelCellMedium {
+	width: 140px;
+}
+
+.labelCellLarge {
+	width: 200px;
+}
+
+.nobreakCell {
+	white-space: nowrap;		
+}
+
+.validationCell {
+	width: 6px;
+}
+.mandatory {
+	color: #ff0000;	
+}
+
+.fieldCell {
+	width: 80px;
+}
+
+.helperCell {
+	width: 32px;
+}
+
+.helperImage {
+	vertical-align: top;
+}
+	
+.instructions, .instructionsInline, .instructionsInlineBold {
+	font-style: italic;	
+	font-size: 90%;
+	color: #333333;
+}
+
+.instructionsInline {
+	display: inline-block;
+	margin-right: 10px;	
+}
+
+.instructionsInlineBold {
+	font-weight: bold;	
+	font-size: 110%;
+}
+
+.columnContainer {
+}
+
+.columnPane {
+	width: 50%;
+	float: left;
+	min-width: 320px;
+}
+
+.validationError {
+	background-color: #FFE6E6;
+}
+
+.minWidth {
+	width: 640px;
+	min-width: 640px;	
+}
+
+.dijitTextBox {
+	padding: 2px;
+	color: #000000;
+}
+
+.xspInputFieldEditBox {
+	line-height: 1em;	
+	padding: 2px;	
+}
+
+.dijitInputField {
+	padding: 0px 1px !important;
+}
+
+.dijitDialogPaneActionBar {
+	padding: 5px !important;
+}
+
+.dijitButtonNode {
+	-moz-border-radius: 0 !important;
+	border-radius: 0 !important;	
+}
+
+fieldset.xspRadioButton, fieldset.xspCheckBox {
+	border: none;
+	margin: 0px;
+	padding: 0px;
+	width: auto;
+}
+
+table.xspRadioButton td, table.xspCheckBox td {
+	border: none;	
+	padding: 0px;
+}
+
+table.xspRadioButton label, table.xspCheckBox label {
+	font-size: 100% !important;
+	color: #333333;
+}
+
+.fieldCell .xspDataTableViewPanelHeaderStart, .fieldCell .xspDataTableViewPanelHeaderMiddle, .fieldCell .xspDataTableViewPanelHeaderEnd,
+.fieldCell .xspDataTableViewPanelFooterStart, .fieldCell .xspDataTableViewPanelFooterMiddle, .fieldCell .xspDataTableViewPanelFooterEnd {
+	display: none;
+}
+
+.xspDataTableViewPanel {
+	margin: 0px !important;
+	padding: 0px !important;
+	border-collapse: collapse;		
+}
+
+.xspDataTableViewPanel td {
+	margin: 0px !important;	
+	padding: 0px !important;	
+}
+	
+.xspDataTable {
+	margin: 5px 0px !important;	
+}
+
+.xspDataTable td {
+	padding: 4px !important;	
+}
+
+.xspDataTable thead {
+	background-color: #eeeeee;
+}
+
+thead {
+	color: #00264C;
+}

@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='utf-8'?>
+<view name='(CT Submissions for Portal)' alias='luSubs_CT' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='mobile'
+ showinmenu='false' publicaccess='true' designerversion='8.5.3' comment='read only portal view of submitted applications - Notes Only docs'
+ unreadmarks='none' onopengoto='top' onrefresh='displayindicator' headers='beveled'
+ opencollapsed='false' showresponsehierarchy='false' showmargin='true' shrinkrows='true'
+ extendlastcolumn='true' showhierarchies='false' unreadcolor='black' rowlinecount='3'
+ headerlinecount='1' rowspacing='1' bgcolor='white' altrowcolor='#efefef'
+ totalscolor='gray' headerbgcolor='white' boldunreadrows='false' evaluateactions='false'
+ allownewdocuments='false' allowcustomizations='false' hidemarginborder='false'
+ marginwidth='0px' marginbgcolor='white' uniquekeys='false'>
+<noteinfo noteid='47e' unid='8651597BCC0BA16FCA257F770006FF31' sequence='14'>
+<created><datetime dst='true'>20160315T121625,45+11</datetime></created>
+<modified><datetime>20160628T151506,11+10</datetime></modified>
+<revised><datetime>20160628T151506,10+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,10+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,84+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='selection'><formula>SELECT Type = "Application" &amp; @IsAvailable(IsNotes) &amp; !@IsAvailable($Conflict) &amp; !@IsAvailable(Archive) &amp; @IsAvailable(SubmissionDate) &amp; !@IsAvailable(isCleanTrial)</formula></code>
+<actionbar bgcolor='navy' bordercolor='black'>
+<actionbuttonstyle showdropdown='true' bgcolor='#6260a1'/><font size='9pt'
+ color='white'/><border width='0px 0px 1px'/>
+<action title='Categori_ze' showinbar='false' systemcommand='categorize'/>
+<action title='_Edit Document' showinbar='false' systemcommand='edit'/>
+<action title='Send Docu_ment' showinbar='false' systemcommand='send'/>
+<action title='_Forward' showinbar='false' systemcommand='forward'/>
+<action title='_Move To Folder...' showinbar='false' systemcommand='movetofolder'/>
+<action title='_Remove From Folder' showinbar='false' systemcommand='removefromfolder'/></actionbar>
+<column sort='descending' hidedetailrows='false' itemname='Received' width='9'
+ resizable='false' separatemultiplevalues='false' sortnoaccent='true' sortnocase='true'
+ showaslinks='false'><font size='8pt' name='Arial' pitch='variable' truetype='true'
+ familyid='20'/><columnheader title='Received'><font size='9pt' style='bold'/></columnheader><datetimeformat
+ show='date' date='yearmonthday' fourdigityear='true' time='hourminute' zone='never'
+ dateformat='weekdaydaymonthyear' dayformat='twodigitday' monthformat='twodigitmonth'
+ yearformat='fourdigityear' weekdayformat='shortname' dateseparator1=' ' dateseparator2='/'
+ dateseparator3='/' timeseparator=':' preference='usersetting'/><numberformat
+ format='general' punctuated='false' parens='false' percent='false' bytes='false'/><code
+ event='value'><formula>strDay := @Text(@Day(SubmissionDate));
+strDay := @Repeat("0"; 1; 2-@Length(strDay)) + strDay;
+strMonth := @Text(@Month(SubmissionDate));
+strMonth := @Repeat("0"; 1; 2-@Length(strMonth)) + strMonth;
+@Text(@Year(SubmissionDate)) + "-" + strMonth + "-" + strDay</formula></code></column>
+<column hidedetailrows='false' itemname='$0' width='19.3750' resizable='false'
+ separatemultiplevalues='false' sortnoaccent='true' sortnocase='true' showaslinks='false'><font
+ size='8pt' name='Arial' pitch='variable' truetype='true' familyid='20'/><columnheader
+ title='Identifier'><font size='9pt' style='bold'/></columnheader><numberformat
+ legacy='true' format='general' varying='true' punctuated='false' parens='false'
+ percent='false' bytes='false'/><code event='value'><formula>ApplicationID + "-v" + @Text(ApplicationVersion)</formula></code></column>
+<column hidedetailrows='false' itemname='Workflow Status' width='15.2500'
+ resizable='false' separatemultiplevalues='false' sortnoaccent='true' sortnocase='true'
+ showaslinks='false'><font size='8pt' name='Arial' pitch='variable' truetype='true'
+ familyid='20'/><columnheader title='Workflow Status'><font size='9pt' style='bold'/></columnheader><numberformat
+ legacy='true' format='general' varying='true' punctuated='false' parens='false'
+ percent='false' bytes='false'/><code event='value'><formula>@If(@Contains(ApplicationStatus;"failed");"Pending Write to Register";ApplicationStatus)</formula></code></column>
+<column hidedetailrows='false' itemname='ClientReference' width='20' resizable='false'
+ separatemultiplevalues='false' sortnoaccent='true' sortnocase='true' showaslinks='false'><font
+ size='8pt' name='Arial' pitch='variable' truetype='true' familyid='20'/><columnheader
+ title='Client Reference'><font size='9pt' style='bold'/></columnheader><numberformat
+ legacy='true' format='general' varying='true' punctuated='false' parens='false'
+ percent='false' bytes='false'/><code event='value'><formula>@If(@Length(ClientReference) &gt; 100;
+	@Left(ClientReference; 100)+"...";
+	ClientReference
+)</formula></code></column>
+<column hidedetailrows='false' itemname='Information' width='37.2500' resizable='false'
+ separatemultiplevalues='false' sortnoaccent='true' sortnocase='true' showaslinks='false'><font
+ size='8pt' name='Arial' pitch='variable' truetype='true' familyid='20'/><columnheader
+ title='Information'><font size='9pt' style='bold'/></columnheader><numberformat
+ legacy='true' format='general' varying='true' punctuated='false' parens='false'
+ percent='false' bytes='false'/><code event='value'><formula>@If((@IsAvailable(ProtocolNumber) &amp; (ProtocolNumber != ""));
+	"(" + ProtocolNumber + ") ";
+	"") +
+@If(@Length(TitleOfStudy) &gt; 100;
+	@Left(TitleOfStudy; 100)+"...";
+	TitleOfStudy
+)</formula></code></column>
+<column hidedetailrows='false' itemname='Sponsor' width='10' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='false' sortnocase='true' showaslinks='false'><font
+ size='8pt' name='Arial' pitch='variable' truetype='true' familyid='20'/><columnheader
+ title='Sponsor'><font size='9pt' style='bold'/></columnheader><numberformat
+ legacy='true' format='general' varying='true' punctuated='false' parens='false'
+ percent='false' bytes='false'/><code event='value'><formula>SponsorName</formula></code></column>
+<column hidedetailrows='false' itemname='*Invoice' width='6.2500' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='false' sortnocase='true' showaslinks='false'><columnheader
+ title='*Invoice'><font size='9pt' style='bold'/></columnheader><numberformat
+ format='general' varying='true' punctuated='false' parens='false' percent='false'
+ bytes='false' decimalsym='.' thousandssep=',' currencysymtype='custom' currencysym='$'
+ usecustomsym='false'/><code event='value'><formula>@If( (@IsError(ApplicationFees) |  !@IsNumber(ApplicationFees) | ( @IsNumber(ApplicationFees) &amp; ApplicationFees = 0)); "N"; "Y")</formula></code></column></view>
+

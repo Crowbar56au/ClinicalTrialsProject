@@ -1,0 +1,189 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form name='(Adverse Drug Reactions)' alias='ADR' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' publicaccess='false'
+ designerversion='8.5.3' comment='Form to collect Clinical Trials migration data for ADRs'
+ renderpassthrough='true'>
+<noteinfo noteid='41a' unid='277ED1627CF8166CCA257FD8000B2AA8' sequence='14'>
+<created><datetime>20160620T120158,16+10</datetime></created>
+<modified><datetime>20160628T151505,88+10</datetime></modified>
+<revised><datetime>20160628T151505,87+10</datetime></revised>
+<lastaccessed><datetime>20160628T151505,87+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,64+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1' leftmargin='0.7868in' spacebefore='1.5' hide='notes web mobile'/><subformref
+ name='CommonActionButtons'/>
+<pardef id='2' leftmargin='0.7500in' hide='notes web mobile'/>
+<par def='2'><run><font size='9pt' name='Arial' pitch='variable' truetype='true'
+ familyid='20' color='red'/></run></par>
+<table widthtype='fitmargins' cellbordercolor='silver' colorstyle='altrows'
+ bgcolor='white' altbgcolor='#f7f7f7' rowspacing='0.0396in' refwidth='14.4167in'><tablecolumn
+ width='1.5750in'/><tablecolumn width='100%'/>
+<tablerow>
+<tablecell borderwidth='0px 0px 1px'>
+<pardef id='4' align='right' leftmargin='1%' rightmargin='99%' keepwithnext='true'
+ keeptogether='true'/>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Report Date:</run></par></tablecell>
+<tablecell borderwidth='0px 0px 1px'>
+<pardef id='5' leftmargin='1%' rightmargin='99%' keepwithnext='true' keeptogether='true'/>
+<par def='5'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='ADR_ReportDate'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='7' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Date Received:</run></par></tablecell>
+<tablecell borderwidth='1px 0px'>
+<par def='5'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='ADR_DateReceived'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='6' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Report Type:</run></par></tablecell>
+<tablecell borderwidth='1px 0px'>
+<par def='5'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='ADR_ReportType'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='6' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Suspect Drugs:</run></par></tablecell>
+<tablecell borderwidth='1px 0px'>
+<par def='5'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='ADR_SuspectDrugs'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='6' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>File No:</run></par></tablecell>
+<tablecell borderwidth='1px 0px'>
+<par def='5'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='ADR_FileNo'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='6' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Folio No:</run></par></tablecell>
+<tablecell borderwidth='1px 0px'>
+<par def='5'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='ADR_FolioNo'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='6' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Other Drugs Involved:</run></par></tablecell>
+<tablecell borderwidth='1px 0px'>
+<par def='5'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='ADR_OtherDrugsInvolved'><code
+ event='defaultvalue'><formula>@ThisValue</formula></code></field></run><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='6' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt'
+ name='Arial' pitch='variable' truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Patient Initials:</run></par></tablecell>
+<tablecell borderwidth='1px 0px'>
+<par def='5'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='ADR_PatientInitials'><code
+ event='defaultvalue'><formula>@ThisValue</formula></code></field></run><compositedata
+ type='98' prevtype='65418' nexttype='222' afterparcount='6' containertype='65418'
+ aftercontainercount='1' afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt'
+ name='Arial' pitch='variable' truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Gender:</run></par></tablecell>
+<tablecell borderwidth='1px 0px'>
+<par def='5'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='ADR_Gender'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='6' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>DOB:</run></par></tablecell>
+<tablecell borderwidth='1px 0px'>
+<par def='5'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='ADR_DOB'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='6' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Fatal or Non Fatal:</run></par></tablecell>
+<tablecell borderwidth='1px 0px'>
+<par def='5'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='ADR_Fatal_NonFatal'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='6' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='navy'/>Comments:</run></par></tablecell>
+<tablecell borderwidth='1px 0px'>
+<par def='5'>   <run><font name='Arial' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='ADR_Comments'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><compositedata type='98' prevtype='65418'
+ nexttype='222' afterparcount='6' containertype='65418' aftercontainercount='1'
+ afterbegincount='3'>
+Yg4BAIQAAAAAAAAAAAA=
+</compositedata><run><font size='9pt' name='Arial' pitch='variable'
+ truetype='true' familyid='20' color='red'/></run></par></tablecell></tablerow></table>
+<pardef id='6'/>
+<par def='6'/>
+<pardef id='7' leftmargin='1in' hide='notes web'/><subformref name='Sponsor Web Security'/>
+<par def='7'/></richtext></body>
+<item name='$SubForm_RepIDs' sign='true'><textlist><text>0000000000000000</text><text
+>0000000000000000</text></textlist></item>
+<item name='$$ScriptName' summary='false' sign='true'><text>ADR</text></item></form>
+

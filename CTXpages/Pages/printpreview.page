@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='utf-8'?>
+<page name='printpreview' xmlns='http://www.lotus.com/dxl' version='9.0' maintenanceversion='1.0'
+ replicaid='CA257FDB001B5780' treatashtml='true' publicaccess='false' designerversion='8.5.3'
+ renderpassthrough='true'>
+<noteinfo noteid='392' unid='952264965E8AED06CA257FD8000B2891' sequence='14'>
+<created><datetime>20160620T120152,81+10</datetime></created>
+<modified><datetime>20160628T151505,36+10</datetime></modified>
+<revised><datetime>20160628T151505,35+10</datetime></revised>
+<lastaccessed><datetime>20160628T151505,35+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,22+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1' leftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='1'>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"&gt;</par>
+<par def='1'>&lt;html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"&gt;&lt;head&gt;&lt;title&gt;</par>
+<par def='1'>TGA eBS :: Clinical Trial Submissions&lt;/title&gt;</par>
+<par def='1'>&lt;META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE"&gt;</par>
+<par def='1'>&lt;META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE"&gt;</par>
+<par def='1'>&lt;META HTTP-EQUIV="Expires" CONTENT="-1"&gt;</par>
+<par def='1'>&lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8" /&gt;</par>
+<par def='1'>&lt;style type="text/css"&gt;</par>
+<par def='1'>@media print {</par>
+<pardef id='2' leftmargin='1.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='2'>body {line-height: 120%; background: white;}</par>
+<par def='2'>#header{display:none;}</par>
+<par def='1'>}</par>
+<par def='1'>&lt;/style&gt;</par>
+<par def='1'>&lt;script type="text/javascript"&gt;&lt;!-- </par>
+<par def='1'>function readyToLoad(){</par>
+<par def='2'>var result = window.opener.getPrintPreviewData();</par>
+<pardef id='3' leftmargin='1.5000in' firstlineleftmargin='1.2500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='3'>document.getElementById('dlgAppID').innerHTML = result.id;</par>
+<par def='3'>document.getElementById('dlgAppSubmissionID').innerHTML = result.submissionID;</par>
+<par def='3'>document.getElementById('dlgAppSponsorName').innerHTML = result.sponsorName;</par>
+<par def='3'>document.getElementById('dlgAppSponsorAddress').innerHTML = result.sponsorAddress;</par>
+<par def='1'>}</par>
+<par def='1'> --&gt;&lt;/script&gt;</par>
+<par def='1'>&lt;/head&gt;</par>
+<par def='1'>&lt;body onload="readyToLoad()"&gt;</par>
+<par def='2'>&lt;div id="header"&gt;</par>
+<pardef id='4' leftmargin='2.2500in' firstlineleftmargin='1.2500in'/>
+<par def='4'>&lt;button onClick="window.print();"&gt;Print&lt;/button&gt;</par>
+<par def='2'>&lt;button onClick="self.close();"&gt;Close&lt;/button&gt;</par>
+<par def='2'>&lt;hr&gt;&lt;/hr&gt;</par>
+<pardef id='5' leftmargin='1.2500in' firstlineleftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='5'>&lt;/div&gt;&lt;!-- end header --&gt;</par>
+<par def='5'>&lt;div id="content"&gt;</par>
+<par def='2'>&lt;table width="100%"&gt;&lt;tbody&gt;</par>
+<pardef id='6' leftmargin='1.5000in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='6'>&lt;tr&gt;&lt;td colspan="2"&gt;&lt;h3&gt;<computedtext><code
+ event='value'><formula>tmp := @DbLookup("":"NoCache";"";"Keywords";"SUBMISSIONDOCTITLE"; "KeywordDesc");
+@If(@IsError(tmp);"Error";tmp)</formula></code></computedtext>&lt;/h3&gt;&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='6'>&lt;tr&gt;&lt;td colspan="2"&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='6'>&lt;tr&gt;</par>
+<pardef id='7' leftmargin='1.7500in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='7'>&lt;td width="25%"&gt;&lt;b&gt;Application No.:&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;span id="dlgAppID"&gt;&lt;/span&gt;&lt;/td&gt;</par>
+<par def='6'>&lt;/tr&gt;</par>
+<par def='6'>&lt;tr&gt;</par>
+<par def='7'>&lt;td&gt;&lt;b&gt;Submission No.:&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;span id="dlgAppSubmissionID"&gt;&lt;/span&gt;&lt;/td&gt;</par>
+<par def='6'>&lt;/tr&gt;</par>
+<par def='6'>&lt;tr&gt;</par>
+<par def='7'>&lt;td&gt;&lt;b&gt;Sponsor Name:&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;span id="dlgAppSponsorName"&gt;&lt;/span&gt;&lt;/td&gt;</par>
+<par def='6'>&lt;/tr&gt;</par>
+<par def='6'>&lt;tr&gt;</par>
+<par def='7'>&lt;td&gt;&lt;b&gt;Sponsor Address:&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;span id="dlgAppSponsorAddress"&gt;&lt;/span&gt;&lt;/td&gt;</par>
+<par def='6'>&lt;/tr&gt;</par>
+<par def='6'>&lt;tr&gt;&lt;td colspan="2"&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='6'>&lt;tr&gt;&lt;td&gt;&lt;b&gt;Contact Name:&lt;/b&gt;&lt;/td&gt;&lt;td&gt;_______________________________&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='6'>&lt;tr&gt;&lt;td&gt;&lt;b&gt;Contact Phone:&lt;/b&gt;&lt;/td&gt;&lt;td&gt;_______________________________&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='6'>&lt;tr&gt;&lt;td colspan="2"&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;</par>
+<par def='6'>&lt;tr&gt;&lt;td colspan="2"&gt;<computedtext><code event='value'><formula
+>tmp := @DbLookup("":"NoCache";"";"Keywords";"SUBMISSIONDOCBODY"; "KeywordDesc");
+@If(@IsError(tmp);"Error";tmp)</formula></code></computedtext>&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;</par>
+<par def='2'>&lt;/table&gt;</par>
+<pardef id='8' leftmargin='1.5000in' firstlineleftmargin='1in' tabs='L0.5000in L1in L1.5000in L2in L2.5000in L3in L3.5000in L4in'/>
+<par def='8'>&lt;/div&gt; &lt;!-- end content --&gt;</par>
+<par def='1'>&lt;/body&gt;</par>
+<par def='1'>&lt;/html&gt;</par></richtext></body>
+<item name='$$ScriptName' summary='false' sign='true'><text>printpreview</text></item></page>
+

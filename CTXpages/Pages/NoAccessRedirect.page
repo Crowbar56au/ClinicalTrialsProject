@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<page name='NoAccessRedirect' xmlns='http://www.lotus.com/dxl' version='9.0'
+ maintenanceversion='1.0' replicaid='CA257FDB001B5780' treatashtml='true'
+ publicaccess='false' designerversion='7' renderpassthrough='true'>
+<noteinfo noteid='36e' unid='F172909172951ED2CA257FD8000B28A7' sequence='14'>
+<created><datetime>20160620T120153,03+10</datetime></created>
+<modified><datetime>20160628T151505,11+10</datetime></modified>
+<revised><datetime>20160628T151505,10+10</datetime></revised>
+<lastaccessed><datetime>20160628T151505,10+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,15+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1'/>
+<par def='1'><run html='true'>&lt;script&gt;window.location = "/"&lt;/script&gt; </run></par></richtext></body>
+<item name='$$ScriptName' summary='false' sign='true'><text>NoAccessRedirect</text></item></page>
+

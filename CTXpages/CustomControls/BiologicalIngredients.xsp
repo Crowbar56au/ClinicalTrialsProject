@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xp:view xmlns:xp="http://www.ibm.com/xsp/core">
+	<xp:this.resources>
+		<xp:styleSheet href="/applicationForm.css"></xp:styleSheet>
+		<xp:styleSheet href="/applicationIcons.css"></xp:styleSheet>
+		<xp:styleSheet href="/applicationLayout.css"></xp:styleSheet>
+		<xp:styleSheet href="/basestyle.css"></xp:styleSheet>
+		<xp:styleSheet href="/developer.css"></xp:styleSheet>
+	</xp:this.resources>
+	<xp:table border="0" styleClass="formTable">
+		<xp:tr>
+			<xp:td>
+				<xp:label value="Biological Ingredient Details" id="lblBiologicalIngredientDetails"
+					for="btnAddBiologicalIngredients">
+				</xp:label>
+			</xp:td>
+			<xp:td styleClass="validationCell">
+				<xp:span styleClass="mandatory">*</xp:span>
+			</xp:td>
+			<xp:td>
+				<xp:button value="Add ingredients"
+					id="btnAddBiologicalIngredient" dojoType="dijit.form.Button">
+					<xp:this.disabled><![CDATA[#{javascript:var action = context.getUrlParameter("action");
+if (action == "newDocument") {
+	return true;
+}else{
+	return false;
+}}]]></xp:this.disabled>
+					<xp:eventHandler event="onclick" submit="true"
+						immediate="true" refreshMode="partial"
+						refreshId="refreshmePanel">
+						<xp:this.action><![CDATA[#{javascript:addBiologicalIngredientDetail();}]]></xp:this.action>
+					</xp:eventHandler>
+				</xp:button>
+				
+			<xp:button value="Remove selected ingredient(s)" id="btnRemoveBiologicalIngredients" dojoType="dijit.form.Button" title="Remove Selected Biological(s)">
+												<xp:eventHandler
+													event="onclick" submit="true" id="eventHandler13"
+													disableValidators="true"
+													onStart="showWaitDialog('Deletion in progress ...');"
+													refreshMode="partial" refreshId="gridBiologicals"
+													onError="hideWaitDialog();">
+													<xp:this.script><![CDATA[try{
+	var grid = dijit.byId('#{id:gridBiologicalIngredients}');
+	var items = grid.selection.getSelected();
+	if (items.length) {
+		if (XSP.confirm("Please confirm you would like to remove the selected Biological Ingredient(s)?")) { 
+			var UNID_Array = new Array();
+			i = 0;
+			dojo.forEach(items, function(selectedItem) {
+				if (selectedItem !== null) {
+					UNID_Array[i] = grid.store.getValue(selectedItem, "unid").toString();
+					i++;
+				}
+			});
+			XSP.getElementById("#{id:unidstoreEOS}").value = UNID_Array;
+			grid.rowSelectCell.toggleAllSelection(false);
+			
+			setToDraft();
+			return true;
+		} else {
+			return false;
+		} 
+	}else{
+		XSP.alert("Please select the Biological Ingredient(s) you would like to remove.");
+		return false;
+	}
+	
+}catch(e){
+	alert(e);
+	console.log(e);
+}]]></xp:this.script>
+													<xp:this.action><![CDATA[#{javascript:try {
+	saveApp(application, part1);
+	removeSubDocuments(application);
+} catch(e){
+	print(database.getTitle() + " BiologicalIngredients CC BiologicalIngredients remove btn click error: " + e);
+}}]]></xp:this.action>
+													<xp:this.onComplete><![CDATA[try{
+	var refreshIDList = new Array();
+	refreshIDList[0] = "#{id:gridBiologicals}";
+	
+	partialRefreshMulti(refreshIDList, 0);
+}catch(e){
+	console.log(e);
+} finally {
+	hideWaitDialog();
+	setToDraft();
+}]]></xp:this.onComplete>
+												</xp:eventHandler>
+			</xp:button></xp:td>
+		</xp:tr>
+		<xp:tr>
+			<xp:td styleClass="labelCellLarge"></xp:td>
+			<xp:td styleClass="validationCell"></xp:td>
+			<xp:td>
+				<xp:panel id="gridBiologicals">
+					<xp:eventHandler event="onClientLoad"
+						submit="false">
+						<xp:this.script><![CDATA[try {
+	var db = getNSFBase().toLowerCase();
+	var xagent = 'xAgentBiologicalIngredients.xsp'; 
+	var applicationid = '#{javascript:viewScope.applicationid}';
+	var params = 'applicationid=' + applicationid + '&stage=';
+	var fullurl = db + '/' + xagent + '?' + params + '&R=' + Math.random();
+	var jsonBiologicalIngredientStore = new dojo.data.ItemFileReadStore({url:fullurl});
+	
+	var gridId = getItemId('','gridBiologicalIngredients');
+	var grid1 = null;
+	
+	dojo.addOnLoad(function(){
+		var layout1 = [{
+			defaultCell: {editable: false, type: dojox.grid.cells._Widget},
+			rows:[
+			{field: "name", name: "Name", width: 20},
+			{field: "quantity", name: "Quantity", width: 5},
+			{field: "unit", name: "Unit", width: 10},
+			{field: "countrylist", name: "Country of Origin", width: 15},
+			{get:formatterButtonEdit, name: "Open", width: 5}
+			]
+		}];	 
+		
+		// Grid selection tracker
+		//gridSelectionManager.addGrid(gridId);
+		
+		grid1 = new dojox.grid.EnhancedGrid({
+			store: jsonBiologicalIngredientStore,
+			structure: layout1,
+			autoHeight: true,
+			autoWidth: true,
+			keepSelection: true,
+			plugins:{indirectSelection: true, dnd: true},
+			noDataMessage: 'No Biological Ingredient data available'
+		}, gridId);
+		
+		grid1.focus._delayedCellFocus = function(){};
+		grid1.startup();
+		
+		dojo.connect(grid1, '_onFetchComplete', function(){gridFetchComplete()});
+		grid1.selection.clickSelectEvent = function() {};  // Disable click events
+		
+		dojo.connect(grid1, "onRowDblClick", function(evt){
+			var idx = evt.rowIndex;         
+	  		var item  = this.getItem(idx); 
+	  		var value = this.store.getValue(item, "unid");
+	  		console.log('row unid: ' + value);
+	  		XSP.getElementById("#{id:unidstoreL2EOS}").value = value;
+	  		XSP.getElementById("#{id:unidnameEOS}").value = "biologicalingredientUNID";
+	  		XSP.getElementById("#{id:dialogEOS}").value = "biologicalIngredientDetailDialog";
+	  		onGridDoubleClickEOS();
+	  	});
+		dojo.connect(grid1, 'onSelected', function(rowIdx) {
+			// Disable default onSelect behaviour
+			grid1.updateRow(rowIdx);
+		});
+		dojo.connect(grid1, 'onDeselected', function(rowIdx) {
+			// Disable default onDeselect behaviour
+			grid1.updateRow(rowIdx);
+		});
+//	  	dojo.connect(grid1, 'onCellClick', function(evt) {
+//			// Custom function to handle select / deselect events
+//			gridSelectionManager.trackRowSelection(evt, gridId);
+//		});	  	
+//		dojo.connect(grid1, 'onEndSelect', function(type, startPoint, endPoint) {
+//			// Custom function to handle multiple row selection events
+//			gridSelectionManager.trackMultiRowSelection(gridId, type, startPoint, endPoint);
+//		});		
+//		dojo.connect(grid1, 'onEndDeselect', function(type, startPoint, endPoint) {
+//			// Custom function to handle multiple row deselection events
+//			gridSelectionManager.trackMultiRowDeSelection(gridId, type, startPoint, endPoint);
+//		});
+	});
+} catch(e) {
+	console.log("biological Ingredient custom control: gridBiologicalIngredients onClientLoad error: " + e);
+}
+
+function gridFetchComplete(){ 
+	try {  
+			var grid = dijit.byId(gridId);
+			if(grid.rowCount > 0) { 			     
+			    dijit.byId("#{id:btnRemoveBiologicalIngredients}").setAttribute('disabled',false);
+			} else { 			    
+				dijit.byId("#{id:btnRemoveBiologicalIngredients}").setAttribute('disabled',true);
+			} 
+	} catch (e) {
+		XSP.error("gridBiologicalIngredients gridFetchComplete() - error: " + e); 
+	} 		
+}]]></xp:this.script>
+					</xp:eventHandler>
+				</xp:panel>
+			</xp:td>
+			<xp:td></xp:td>
+		</xp:tr>
+	</xp:table>
+</xp:view>

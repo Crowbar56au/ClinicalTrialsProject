@@ -1,0 +1,1612 @@
+'++LotusScript Development Environment:2:5:(Options):0:74
+'|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+'||| NOTE: THIS SCRIPT LIBRARY IS ALSO PRESENT IN BOTH DRAFT APPLICATIONS
+'||| AND SUBMITTED APPLICATIONS.  THEY SHOULD BE EXACTLY THE SAME.
+'||| PLEASE KEEP BOTH COPIES UP TO DATE AND IN SYNC
+'|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Option Public
+Option Declare
+Use "GetDatabases" 
+'Use "GetProfileValue" 'SMS 18/02/08
+%REM 'SMS 17.01.06 CR218-220 change	
+ManufacturerDetails function
+%END REM
+
+%REM
+SMS 19/02/07, 20/02/07, 21/02/07, 17/05/07, 03/09/07, 05/09/07  AOS development
+new field changes made to reflect AOS requirements
+code for printing LicenceType removed (SMS 27/02/08)
+'SMS 26/06/08 homoepathic reference & mother substance print hidden
+SB 12 nov 09
+Changes made to ApplicationDetail, now printing fileds details added during nanotech project
+%END REM
+
+
+'++LotusScript Development Environment:2:5:(Forward):0:1
+Declare Sub Initialize
+Declare Sub ApplicationDetails(toPrint As String,filenum As Integer)
+Declare Function Header(Title As String) As String
+Declare Sub FormulationDetails(toPrint As String,filenum As Integer, docF As NotesDocument)
+Declare Sub InitializeDatabase()
+Declare Sub IngredientDetails(toPrint As String,filenum As Integer, FormulationID As String)
+Declare Function GetLookupValues(db As NotesDatabase, viewName As String,_
+fieldName As String, key As String, mandatory As Integer) As String
+Declare Sub ManufacturerDetails(toPrint As String,filenum As Integer, docF As NotesDocument)
+Declare Sub ProductDetails(toPrint As String,filenum As Integer)
+Declare Sub PreparationSteps(toPrint As String,filenum As Integer, FormulationID As String, IngredientID As String)
+Declare Sub Carriers(toPrint As String,filenum As Integer, FormulationID As String, IngredientID As String)
+Declare Sub Components(toPrint As String,filenum As Integer, FormulationID, IngredientID As String)
+Declare Sub PrintApplicationFromNotes(filenum As Integer)
+Declare Sub ProcessApplications(filenum As Integer)
+Declare Sub PrintApplicationFromWeb(ApplicationUNID As String)
+Declare Sub RRSolvent(toPrint As String,filenum As Integer, FormulationID As String, IngredientID As String)
+Declare Function GetProfileValueR(strFieldName As String) As String
+Declare Sub Diluents(toPrint As String,filenum As Integer, FormulationID As String, IngredientID As String)
+Declare Sub MedicineDetails(toPrint As String,filenum As Integer)
+Declare Function FilterRichTextTag(strSource As String) As String
+Declare Sub ChangeMultipleListingDetails(toPrint As String,filenum As Integer)
+Declare Sub CodeStockDetails(toPrint As String,filenum As Integer)
+Declare Sub IngredientsProcess(toPrint As String, filenum As Integer, FormulationID As String,_
+colIngredient As NotesDocumentCollection, Role As String)
+Declare Sub IngredientPIProcess(toPrint As String, filenum As Integer, FormulationID As String, colIngredient As NotesDocumentCollection)
+Declare Function fsglConvert ( sglQuantity As Single , strUnits As String ) As Single
+Declare Function returnResponse(bSuccess As Boolean, strAction As String, strParam As String)
+
+'++LotusScript Development Environment:2:5:(Declarations):0:10
+Const CSSBODY = |BODY {font-family:  sans-serif, verdana, helvetica; font-size: 10pt}|
+Const CSSTABLE = |TABLE {font-family: sans-serif, verdana, helvetica; font-size: 10pt}|
+Const CSSTR = |TR {vertical-align: top}|
+Const CSSH = |H1 {font-size: 12pt} H2 {font-size: 10pt}|
+Const CSSPAGE = |.pagebreak {page-break-before: always}|
+
+Const PAGEBREAK = |<hr><div class="pagebreak"></div>|
+
+Dim session As notessession
+Dim cdoc As notesdocument
+Dim dbCurrent As NotesDatabase
+Dim dbClientWeb As NotesDatabase
+Dim dbValidation As NotesDatabase
+Dim dbIngredient As NotesDatabase
+Dim viewApplicationSubs As NotesView
+Dim viewIngredientSubs As NotesView
+Dim viewUnitConversion As NotesView
+Dim viewFormulation As NotesView
+Dim viewPlantPart As NotesView
+Dim viewPlantPreparation As NotesView
+
+Dim strApplicationForm As String     
+Dim strKey As String
+Dim toPrint As String
+Dim strZeroPrefix As String
+Dim strLastFunctionEntered As String
+
+'SMS 20/02/07 declaration for animal origin child docs
+Dim itemMultiVal As NotesItem 
+Dim collAnimal As NotesDocumentCollection
+Dim docAnimal As NotesDocument
+'---------------------------------------
+
+Dim dbCodeTables As NotesDatabase
+
+'PWB: 08Oct07 - AOS portal compatibility
+Dim gstrPrint As String
+Dim bWebClient As Boolean
+Dim strTitle As String
+Dim gstrGraphicsPath As String
+Dim countForm As Integer
+'++LotusScript Development Environment:2:2:Initialize:1:10
+Sub Initialize
+	
+End Sub
+'++LotusScript Development Environment:2:2:ApplicationDetails:1:8
+Sub ApplicationDetails(toPrint As String,filenum As Integer)
+	
+	On Error Goto errHandler
+	
+	strLastFunctionEntered = "ApplicationDetails"
+	
+     'Builds a HTML string to add to the text file
+	
+	Dim i As Integer
+	Dim doc As NotesDocument
+	Dim col As NotesDocumentCollection
+	Dim itemValidationReport As Variant
+	Dim strValidationReport As String
+	Dim varResult As Variant
+	Dim strMacro As String
+	
+	toPrint = ""
+	
+	If strApplicationForm <> "Change Multiple Listings Application" Then
+		toprint =  toprint & |<table width=100% cellpadding=2><tr><td width=25%><b>Product Name:</b></td><td>| & cdoc.ProductName(0) & |</td></tr>|   
+		toprint = toprint & |</table>|
+	End If
+	
+	gstrPrint = gstrPrint + toPrint
+	
+	'export names
+	strKey = Cstr(cdoc.ApplicationID(0)) + "ExportNames"
+	Set col = viewApplicationSubs.GetAllDocumentsByKey(strKey, True)
+	If col.count > 0 Then
+		For i = 1 To col.count
+			Set doc = col.GetNthDocument(i)
+			If doc.HasItem("ExportName") Then
+				If doc.ExportName(0) <> "" Then						
+					toprint = |<table width=100% cellpadding=2>|     
+					If i = 1 Then
+						toprint = toprint & |<tr><td width=25%><b>Export Name(s):</b></td><td>| & doc.ExportName(0) & |</td></tr>| 
+					Else
+						toprint = toprint & |<tr><td width=25%><b></b></td><td>| & doc.ExportName(0) & |</td></tr>|   
+					End If                              
+					toprint = toprint & |</table>|
+					gstrPrint = gstrPrint + toPrint
+				End If
+			End If
+			
+		Next
+	End If
+     'product type, client name & sponsor name
+	
+	toprint = |<table width=100% cellpadding=2>|
+	
+	toprint = toprint & |<tr><td width=25%><b>Product Code:</b></td><td>| & GetLookupValues(dbValidation, "LUProductCodeLM", "ProductCodeDesc", cdoc.ProductCode(0), True) & |</td></tr>|
+	
+	toprint = toprint & |<tr><td width=25%><b>Client Name:</b></td><td>| & GetLookupValues(dbClientWeb, "LUClientByID", "ClientName", cdoc.ClientID(0), True) & |</td></tr>| &_ 
+	|<tr><td><b>Sponsor Name:</b></td><td>| & cdoc.sponsorname(0) & |</td></tr>|		
+	
+	If (bWebClient) Then 
+		toPrint = toPrint & |<tr><td><b>Client Reference:</b></td><td>| & cdoc.ClientApplicationID(0) & |</td></tr>| 
+	End If
+	
+	toprint = toprint & |</table><br>|
+	gstrPrint = gstrPrint + toPrint
+	
+	toprint = |<table width=100% cellpadding=2>|
+     'yes/no flags
+	If strApplicationForm <> "Change Multiple Listings Application" Then  		
+		
+		If cdoc.Section30Response(0) = "Y" Then
+			toprint = toprint & |<tr><td width=25%><b>Is this Application in response to a Section 30:</b></td><td>| & "Yes" & |</td></tr>|
+			toprint = toprint & |<tr><td width=25%> &nbsp; &nbsp; &nbsp; Section 30 AUST L:  </td><td>| &  cdoc.OriginalAUSTL(0) & |</td></tr>| 
+		Else
+			toprint = toprint & |<tr><td width=25%><b>Is this Application in response to a Section 30:</b></td><td>| & "No" & |</td></tr>|
+		End If		
+	End If
+	
+	If strApplicationForm = "Application General" Or strApplicationForm = "Application Composite Pack"  Then
+		If cdoc.CodeStock(0) = "Y" Then
+			toPrint = toPrint & |<tr><td><b>Can this product be used as a code stock:</b></td><td>| & "Yes" & |</td></tr>| 
+		Else
+			toPrint = toPrint & |<tr><td><b>Can this product be used as a code stock:</b></td><td>| & "No" & |</td></tr>| 
+		End If		
+		
+	End If
+	toprint = toprint & |</table><br>|
+	gstrPrint = gstrPrint + toPrint
+	
+	If strApplicationForm = "Application Code Stock" Then		
+		toprint = |<table width=100% cellpadding=2>|
+		toprint = toprint & |<tr><td width=25%><b>Stock Source:</b></td><td>| & cdoc.StockSource(0) & |</td></tr>| 
+		toprint = toprint & |<tr><td width=25%><b></b></td><td>| & cdoc.CodeStockName(0) & |</td></tr>| 
+		toprint = toprint & |<tr><td width=25%><b></b></td><td>| & "(a letter of permission from the owner is required)" & |</td></tr>| 		
+		toprint = toprint & |</table><br>|
+		gstrPrint = gstrPrint + toPrint		
+	End If
+	
+	toprint = |<table width=100% cellpadding=2>|
+	
+     'application status, type & cost
+	If strApplicationForm <> "Change Multiple Listings Application" Then
+		
+		If cdoc.ReplaceExisting(0) = "N" Then
+			toprint = toprint & |<tr><td width=25%><b>This application is to:</b></td><td>| & "create a new listing" & |</td></tr>|
+		Else
+			toprint = toprint & |<tr><td width=25%><b>This application is to:</b></td><td>| & "change a current listing" & |</td></tr>|
+			toprint = toprint & |<tr><td width=25%><b>AUST L:</b></td><td>| & cdoc.CloneSource(0) & |</td></tr>| 'SMS 10/05/07 AOS: label change
+		End If
+		toprint = toprint & |<tr><td width=25%><b>Submission Cost:</b></td><td>| & cdoc.SubmissionCost(0)  & |</td></tr>| &_
+		|<tr><td nowrap><b>Payment Exemption No:</b></td><td>| & cdoc.PaymentExemptionNo(0) & |</td></tr>| &_
+		|<tr><td><b>Application Status:</b></td><td>| & cdoc.ApplicationStatus(0) & |</td></tr>| &_
+		|<tr><td><b>Application Type:</b></td><td>| & cdoc.ApplicationType(0) & |</td></tr>| 
+		toprint = toprint & |</table><br>|          			
+	Else
+		If cdoc.ApplicationStatus(0) = "Draft" Then						
+			toprint = toprint & |<tr><td width=25%><b>Submission Cost:</b></td><td>| & cdoc.SubmissionCost(0) & |</td></tr>| &_
+			|<tr><td><b>Application Status:</b></td><td>| & cdoc.ApplicationStatus(0) & |</td></tr>| 
+			toprint = toprint & |</table><br>|			
+		Else			
+			toprint = toprint & |<tr><td width=25%><b>Submission Cost:</b></td><td>| & cdoc.SubmissionCost(0)& |</td></tr>| &_
+			|<tr><td><b>Application Status:</b></td><td>| & cdoc.ApplicationStatus(0) & |</td></tr>| &_
+			|<tr><td><b>Application Type:</b></td><td>| & cdoc.ApplicationType(0) & |</td></tr>| 
+			toprint = toprint & |</table><br>|
+		End If
+	End If
+	gstrPrint = gstrPrint + toPrint
+	If cdoc.HasItem("ValidationReport") Then
+	     'validation report
+		
+		If strApplicationForm <> "Change Multiple Listings Application" Then
+			Set itemValidationReport = cdoc.GetFirstItem("ValidationReport")
+			strValidationReport  = ItemValidationReport.Text
+			strValidationReport = FilterRichTextTag(strValidationReport) 			
+		Else			
+			strValidationReport = FilterRichTextTag(cdoc.ValidationReport(0)) 			
+		End If
+		
+		If (strValidationReport <> "") Then
+			toprint = |<table width=100% cellpadding=2>|
+			toprint = toprint & |<tr><td width=25%><b>Validation Report:</b></td><td>| & cdoc.ValidFrom(0) & |</td></tr></table><br>|
+			toprint = toprint & |<table width=100%><tr><td>| & strValidationReport & |</td></tr></table><br>|
+			gstrPrint = gstrPrint + toPrint
+		End If		
+	End If
+	
+exitGracefully:
+	Exit Sub
+	
+errHandler:
+	Msgbox "Error " & Err & " at line " & Erl & " - " & Error
+	Call returnResponse(False, "", "There was an unexpected error while attempting to print the document requested: Error " & Err & " at line " & Erl & " - " & Error)
+	Resume exitGracefully
+	
+End Sub
+'++LotusScript Development Environment:2:1:Header:1:8
+Function Header(Title As String) As String
+	strLastFunctionEntered = "Header"
+	
+	Dim Style As String
+	
+	Style = |<STYLE TYPE="text/css">| &_
+	CSSBODY &_
+	CSSTABLE &_
+	CSSTR &_
+	CSSH &_
+	CSSPAGE &_
+	|</STYLE>|
+	
+	Header = Style & |<TITLE>| & Title & |</TITLE>|
+	
+End Function
+
+
+'++LotusScript Development Environment:2:2:FormulationDetails:1:8
+Sub FormulationDetails(toPrint As String,filenum As Integer, docF As NotesDocument)
+	strLastFunctionEntered = "FormulationDetails"
+	
+	Dim col As NotesDocumentCollection
+	Dim doc As NotesDocument
+	Dim i As Integer
+	Dim j As Integer
+	toPrint = ""
+	
+	'dosage form
+	If strApplicationForm = "Application Composite Pack" Then
+		toprint = |<h2>| & "COMPONENT - " & Ucase(docF.FormulationName(0)) & |</h2></center>|
+		
+		toprint =  toprint & |<table width=100% cellpadding=2><tr><td width=25%><b>Dosage Form:</b></td><td>| & GetLookupValues(dbValidation, "LUDosageFormLM", "DosageDescription", docF.DosageForm(0), True) & |</td></tr>|
+		
+		toprint = toprint & |</table>|
+	Else
+		toprint = |<h2>| & "PRODUCT DETAILS" & |</h2></center>|  'SMS 23/03/07 AOS : formualtion details changed to product details
+		
+		toprint =  toprint & |<table width=100% cellpadding=2><tr><td width=25%><b>Dosage Form:</b></td><td>| & GetLookupValues(dbValidation, "LUDosageFormLM", "DosageDescription", docF.DosageForm(0), True) & |</td></tr>|
+		
+		toprint = toprint & |</table>|
+	End If
+	gstrPrint = gstrPrint + toPrint
+	
+	
+	     'route of administration 
+	strKey = Cstr(docF.ApplicationID(0)) + "RouteOfAdmin"
+	Set col = viewApplicationSubs.GetAllDocumentsByKey(strKey, True)
+	If col.count > 0 Then
+		j = 1
+		For i = 1 To col.count
+			If i = 1 Then
+				toprint = |<table width=100% cellpadding=2>| 
+			End If
+			Set doc = col.GetNthDocument(i)
+			If doc.FormulationEntryID(0) = docF.FormulationEntryID(0) Then                
+				If j = 1 Then
+					toprint = toprint & |<tr><td width=25% nowrap><b>Route of Administration:</b></td><td>| & doc.RouteOfAdminDesc(0) & |</td></tr>| 
+					j = 2
+				Else                         
+					toprint = toprint & |<tr><td width=25%><b></b></td><td>| & doc.RouteOfAdminDesc(0) & |</td></tr>|   
+				End If                  
+			End If
+		Next
+		toprint = toprint & |</table>|
+		gstrPrint = gstrPrint + toPrint
+	End If    
+	
+	
+     'container & dose details
+	toprint = |<table width=100% cellpadding=2>|
+	If docF.ContainerType(0) <> "" Then
+'		toPrint = toPrint & |<tr><td><b>Container Type:</b></td><td>| & GetLookupValues(dbValidation, "LUContainerTypeLM", "ContainerTypeDesc", docF.ContainerType(0), True) & |</td></tr>|
+		toprint = toprint & |<tr><td width=25%><b>Container Type:</b></td><td>| & GetLookupValues(dbValidation, "LUContainerTypeLM", "ContainerTypeDesc", docF.ContainerType(0), True) & |</td></tr>|
+	End If
+	
+	If Cstr(docF.ContainerVolume(0)) <> "" Or  docF.ContainerUnit(0) <> "" Then 
+		toPrint = toPrint & |<tr><td><b>Container Volume:</b></td><td>| & Cstr(docF.ContainerVolume(0)) & "  " & docF.ContainerUnit(0) & |</td></tr>|
+	End If
+	If docF.ContainerClosure(0) <> "" Then
+		toPrint = toPrint & |<tr><td><b>Container Closure:</b></td><td nowrap>| & GetLookupValues(dbValidation, "LUContainerClosureLM", "ContainerClosureDesc", docF.ContainerClosure(0), True)  & |</td></tr>|
+	End If
+	'SMS 20/02/07 AOS development.
+	If docF.ContainerCondition(0) <> "" Then
+	'	toPrint = toPrint & |<tr><td><b>Container Condition:</b></td><td nowrap>| & GetLookupValues(dbCodeTables, "DCTLookup", "ShortDescription", "L~CONCONDITION~"+docF.ContainerCondition(0), True)  & |</td></tr>|
+		toprint = toprint & |<tr><td width=25% nowrap><b>Container Condition:</b></td><td nowrap>| & GetLookupValues(dbCodeTables, "DCTLookup", "ShortDescription", "L~CONCONDITION~"+docF.ContainerCondition(0), True)  & |</td></tr>|
+	End If     
+	'---------------------------------------------------
+	If Cstr(docF.SingleDoseMaxQuant(0)) <> "" Or docF.SingleDoseMaxUnit(0) <> "" Then
+		toPrint = toPrint & |<tr><td><b>Maximum single dose:</b></td> <td>| & Cstr(docF.SingleDoseMaxQuant(0)) & "  " & docF.SingleDoseMaxUnit(0) & |</td></tr>|
+	End If
+	If Cstr(docF.DailyDoseMaxQuant(0)) <> "" Or  docF.DailyDoseMaxUnit(0) <> "" Then
+		toPrint = toPrint & |<tr><td><b>Maximum daily dose:</b></td> <td >| & Cstr(docF.DailyDoseMaxQuant(0)) & "  " & docF.DailyDoseMaxUnit(0) & |</td></tr>|
+	End If
+	If Cstr(docF.DoseMinWeightQuant(0)) <> "" Or  docF.DoseMinWeightUnit(0) <> "" Then
+		toPrint = toPrint & |<tr><td><b>Minimum weight of divided dosage form (tablets, capsules, metered dose sprays etc.):</b></td><td>| & Cstr(docF.DoseMinWeightQuant(0)) & "  " & docF.DoseMinWeightUnit(0) & |</td></tr>|
+	End If
+	
+	toprint = toprint & |</table><br>|
+	gstrPrint = gstrPrint + toPrint
+End Sub
+'++LotusScript Development Environment:2:2:InitializeDatabase:1:8
+Sub InitializeDatabase()
+	
+	On Error Goto errHandler
+	
+	strLastFunctionEntered = "InitializeDatabase"
+	
+	Set dbClientWeb =  fdbGetClientWeb
+	Set dbValidation = fdbGetValRules	
+	gstrGraphicsPath = Replace(fdbGetGraphics.FilePath, "\", "/")
+	
+	Set dbCodeTables = fdbGetCodeTables     'SMS 20/02/07 AOS development
+	Set viewApplicationSubs = dbCurrent.GetView("$ApplicationSubs")
+	Set viewIngredientSubs = dbCurrent.GetView("$IngredientSubs")
+	
+exitGracefully:
+	Exit Sub
+	
+errHandler:
+	Call returnResponse(False, "", "There was an unexpected error while attempting to print the document requested: Error " & Err & " at line " & Erl & " - " & Error)
+	Resume exitGracefully
+	
+End Sub
+'++LotusScript Development Environment:2:2:IngredientDetails:1:8
+Sub IngredientDetails(toPrint As String,filenum As Integer, FormulationID As String)
+	strLastFunctionEntered = "IngredientDetails"
+	
+	Dim i As Integer     
+	Dim j As Integer
+	Dim col As NotesDocumentCollection
+	Dim viewIngredientSummary As NotesView
+	Dim strRole(6) As String
+	Dim flagDisplayPI  As Integer
+	
+     'print order is Active Ingredient(A),  Active Homoeopathic(H), Excipient(E) and Proprietary Ingredient(P)
+	
+	If strApplicationForm = "Application Composite Pack" Then
+		toprint = |<h2>| & "FORMULATION DETAILS" & |</h2></center>|  
+	Else
+		toprint = |<h2><u>| & "FORMULATION DETAILS" & |</h2></u></center>| 
+	End If
+	gstrPrint = gstrPrint + toPrint
+	
+     'ingredient details     
+	strKey = Cstr(cdoc.ApplicationID(0)) + FormulationID
+	
+	If (bWebClient) Then
+		If strApplicationForm = "Application Code Stock" Then
+			Set viewIngredientSummary = dbCurrent.GetView("(IngredientSummaryNoExcipients)")		
+		Else 
+			Set viewIngredientSummary = dbCurrent.GetView("(IngredientSummary)")
+		End If
+	Else
+		Set viewIngredientSummary = dbCurrent.GetView("(IngredientSummaryCopyfromDraft)")
+	End If
+	
+	strRole(0) = "AS"
+	strRole(1) = "AH"
+	'SMS 20/02/07 new ingredient sub-types added	
+	strRole(2) = "AE"
+	strRole(3) = "AA" 
+	strRole(4) = "API"
+	strRole(5) = "ES"
+	strRole(6) = "EPI"
+	
+	Set col = viewIngredientSummary.GetAllDocumentsByKey(strKey, True)
+	
+     'process PI
+	
+	For i = 0 To 6
+		Call IngredientsProcess(toPrint,filenum, FormulationID, col, strRole(i))		
+		If i = 4 Then
+               'we have to process active ingredients sourced from PI			
+			Call IngredientPIProcess(toPrint,filenum, FormulationID, col)
+		End If
+	Next
+	
+	toPrint = ""
+End Sub
+'++LotusScript Development Environment:2:1:GetLookupValues:2:8
+Function GetLookupValues(db As NotesDatabase, viewName As String,_
+fieldName As String, key As String, mandatory As Integer) As String
+	
+	strLastFunctionEntered = "GetLookupValues"
+	
+	Dim doc As NotesDocument
+	Dim view As NotesView
+	
+	Set view = db.GetView(viewName)
+	
+	Set doc = view.GetDocumentByKey(key, True)
+	If Not doc Is Nothing Then
+		GetLookupValues = doc.GetItemValue(fieldName)(0)
+	Else
+		If mandatory Then
+			GetLookupValues = "unable to find the description of " & key
+		Else
+			GetLookupValues = ""
+		End If
+	End If
+	
+End Function
+'++LotusScript Development Environment:2:2:ManufacturerDetails:1:8
+Sub ManufacturerDetails(toPrint As String,filenum As Integer, docF As NotesDocument)
+	
+	strLastFunctionEntered = "ManufacturerDetails"
+	
+	Dim i As Integer
+	Dim j As Integer
+	Dim k As Integer
+	Dim doc As NotesDocument
+	Dim docStep As NotesDocument
+	Dim colSteps As NotesDocumentCollection
+	Dim col As NotesDocumentCollection
+	
+	If strApplicationForm = "Change Multiple Listings Application" Then		
+		toprint = |<br><br><h2>| & "NEW MANUFACTURERS" & |</h2>|
+	Else		
+		toprint = |<br><br><h2>| & "MANUFACTURER DETAILS" & |</h2>|
+	End If
+	
+	gstrPrint = gstrPrint + toPrint
+	
+	strKey = Cstr(docF.ApplicationID(0)) + "Man"
+	Set col = viewApplicationSubs.GetAllDocumentsByKey(strKey, True)
+	Set doc = col.GetFirstDocument
+	While Not doc Is Nothing
+		
+	     'manufacturer details     
+		If cdoc.Form(0) <> "CodeStockApp" Then
+			If doc.FormulationEntryID(0) = docF.FormulationEntryID(0) Then
+				toprint = |<table width=100% cellpadding=2>|  
+				
+				toprint = toprint & |<tr><td width=25%><b>Name:</b></td><td>| & doc.ManufacturerName(0) & |</td></tr>|           
+				If doc.AusManufacturer(0) = "Aus" Then
+				'SMS 17.01.06 CR218-220 change						
+					toprint = toprint & |<tr><td width=25%><b>Manufacturer ID:</b></td><td>| & doc.AusManufacturerID(0) & |</td></tr>|
+					If doc.GetItemValue("LicenceID")(0) <> "" Then
+						toprint = toprint & |<tr><td width=25%><b>Licence ID:</b></td><td>| & doc.LicenceID(0) & |</td></tr>|
+					End If						
+				Else
+'SMS 17.01.06 CR218-220 change						
+					toprint = toprint & |<tr><td width=25%><b>ID:</b></td><td>| & doc.OSManufacturerID(0) & |</td></tr>| 
+					If doc.GetItemValue("LicenceID")(0) <> "" Then
+						toprint = toprint & |<tr><td width=25%><b>Clearance ID:</b></td><td>| & doc.LicenceID(0) & |</td></tr>|
+					End If	
+					
+	'SMS 17.01.06 CR218-220 change	
+				End If				
+				toprint = toprint & |<tr><td width=25%><b>Location:</b></td><td>| & doc.ManufacturerLocationText(0) & |</td></tr>|         
+				
+				toprint = toprint & |</table>|
+				gstrPrint = gstrPrint + toPrint
+				
+               'manufacturing steps
+				strKey = Cstr(docF.ApplicationID(0)) + "ManSteps"
+				Set colSteps = viewApplicationSubs.GetAllDocumentsByKey(strKey, True)
+				If colSteps.count > 0 Then
+					k = 1
+					toprint = |<table width=100% cellpadding=2>|  
+					For j = 1 To colSteps.count
+						Set docStep = colSteps.GetNthDocument(j)  
+						If doc.ManufacturerID(0) = docStep.ManufacturerID(0) Then							
+							If k = 1 Then
+								toprint = toprint & |<tr><td width=25%><b>Manufacturing Steps:</b></td><td>| & docStep.ManufacturerStepDesc(0) & |</td></tr>|             
+								k = k + 1
+							Else
+								toprint = toprint & |<tr><td width=25%><b></b></td><td>| & docStep.ManufacturerStepDesc(0) & |</td></tr>|           
+							End If
+							
+						End If
+					Next     
+					toprint = toprint & |</table><br>|
+					gstrPrint = gstrPrint + toPrint
+				End If
+			End If
+		Else  'process CodeStockApp
+			
+			toprint = |<table width=100% cellpadding=2>|  
+			toprint = toprint & |<tr><td width=25%><b>Name:</b></td><td>| & doc.ManufacturerName(0) & |</td></tr>|
+			
+			If doc.AusManufacturer(0) = "Aus" Then
+				'SMS 17.01.06 CR218-220 change					
+				toprint = toprint & |<tr><td width=25%><b>Manufacturer ID:</b></td><td>| & doc.AusManufacturerID(0) & |</td></tr>|
+				If doc.GetItemValue("LicenceID")(0) <> "" Then
+					toprint = toprint & |<tr><td width=25%><b>Licence ID:</b></td><td>| & doc.LicenceID(0) & |</td></tr>|
+				End If				
+			Else				
+				toprint = toprint & |<tr><td width=25%><b>ID:</b></td><td>| & doc.OSManufacturerID(0) & |</td></tr>| 
+				If doc.GetItemValue("LicenceID")(0) <> "" Then
+					toprint = toprint & |<tr><td width=25%><b>Clearance ID:</b></td><td>| & doc.LicenceID(0) & |</td></tr>|
+				End If					
+				'SMS 17.01.06 CR218-220 change				
+			End If			
+			toprint = toprint & |<tr><td width=25%><b>Location:</b></td><td>| & doc.ManufacturerLocationText(0) & |</td></tr>|          
+			toprint = toprint & |</table>|
+			gstrPrint = gstrPrint + toPrint
+			
+	         'manufacturing steps
+			strKey = Cstr(docF.ApplicationID(0)) + "ManSteps"
+			Set colSteps = viewApplicationSubs.GetAllDocumentsByKey(strKey, True)
+			If colSteps.count > 0 Then
+				k = 1
+				toprint = |<table width=100% cellpadding=2>|  
+				For j = 1 To colSteps.count
+					Set docStep = colSteps.GetNthDocument(j)  
+					If doc.ManufacturerID(0) = docStep.ManufacturerID(0) Then
+						If k = 1 Then								
+							toprint = toprint & |<tr><td width=25%><b>Manufacturing Steps:</b></td><td>| & docStep.ManufacturerStepDesc(0) & |</td></tr>|             
+							k = k + 1
+						Else
+							toprint = toprint & |<tr><td width=25%><b></b></td><td>| & docStep.ManufacturerStepDesc(0) & |</td></tr>|     						
+						End If
+					End If
+				Next     
+				toprint = toprint & |</table><br>|
+				gstrPrint = gstrPrint + toPrint
+			End If				
+		End If
+		
+		Set doc = col.GetNextDocument(doc)		
+	Wend
+	
+End Sub
+'++LotusScript Development Environment:2:2:ProductDetails:1:8
+Sub ProductDetails(toPrint As String,filenum As Integer)
+	
+	strLastFunctionEntered = "ProductDetails"
+	
+	Dim col As NotesDocumentCollection
+	Dim doc As NotesDocument
+	Dim view As NotesView
+	Dim i As Integer
+	Dim j As Integer
+	Dim k As Integer
+	Dim m As Integer
+	
+	i=0
+	toprint = |<br><br><h2>| & "INDICATIONS & WARNINGS" & |</h2></center>|
+	toprint = toprint & |</table>|
+	gstrPrint = gstrPrint + toPrint
+	
+     'coded indication details
+	Set view = dbCurrent.GetView("$Indications")
+	strKey = Cstr(cdoc.ApplicationID(0)) + "IndicationCoded"
+	Set col = view.GetAllDocumentsByKey(strKey, True)
+	j = 0
+	If col.count > 0 Then
+		j = 1
+		For i = 1 To col.count
+			Set doc = col.GetNthDocument(i)  
+			toprint = |<table width=100% cellpadding=2>|
+			If j = 1 Then
+				toprint = toprint & |<tr><td width=25%><b>Coded Indication:</b></td><td>| & doc.IndicationText(0) & |</td></tr>|
+				j = j + 1
+			Else
+				toprint = toprint & |<tr><td width=25%><b></b></td><td>| & doc.IndicationText(0) & |</td></tr>|
+			End If
+			toprint = toprint & |</table>|
+			gstrPrint = gstrPrint + toPrint
+		Next
+	End If
+	
+     'custom indication details
+	strKey = Cstr(cdoc.ApplicationID(0)) + "IndicationCustom"
+	Set col = view.GetAllDocumentsByKey(strKey, True)
+	k = 0
+	If col.count > 0 Then
+		k = 1
+		For i = 1 To col.count
+			Set doc = col.GetNthDocument(i)  
+			If j = 0 Then
+				toprint = |<table width=100% cellpadding=2>|
+			Else
+				toprint = |<br><table width=100% cellpadding=2>|
+				j = 0
+			End If
+			If k = 1 Then
+				toprint = toprint & |<tr><td width=25%><b>Custom Indication:</b></td><td>| & doc.IndicationText(0) & |</td></tr>|
+				k = k + 1
+			Else
+				toprint = toprint & |<tr><td width=25%><b></b></td><td>| & doc.IndicationText(0) & |</td></tr>|
+			End If
+			toprint = toprint & |</table>|
+			gstrPrint = gstrPrint + toPrint
+		Next
+	End If
+	
+     'warning details
+	strKey = Cstr(cdoc.ApplicationID(0)) + "Warning"
+	Set col = viewApplicationSubs.GetAllDocumentsByKey(strKey, True)
+	m = 0
+	If col.count > 0 Then
+		m = 1
+		For i = 1 To col.count
+			Set doc = col.GetNthDocument(i)  
+			If k = 0 And j = 0 Then
+				toprint = |<table width=100% cellpadding=2>|
+			Else
+				toprint = |<br><table width=100% cellpadding=2>|
+				k = 0
+				j = 0
+			End If
+			If m = 1 Then
+				toprint = toprint & |<tr><td width=25%><b>Warning:</b></td><td>| & "(" & doc.CodedWarning(0) & ") " & doc.WarningText(0) & |</td></tr>|
+				m = m + 1
+			Else
+				toprint = toprint & |<tr><td width=25%><b></b></td><td>| & "(" & doc.CodedWarning(0) & ") " & doc.WarningText(0)  & |</td></tr>|
+			End If
+			toprint = toprint & |</table>|
+			gstrPrint = gstrPrint + toPrint
+		Next
+	End If
+	
+	
+	'Subsection 26B(1) Notification details
+	Dim sDeclarationText	As String
+	
+	If cdoc.HasItem("bNewClone") Then          'SMS 30/04/08 eBS build 2
+		If (cdoc.ReplaceExisting(0) = "N") Or _
+		(cdoc.ApplicationType(0) = "Grouping") Or _
+		(((cdoc.ApplicationType(0)="New") Or (cdoc.ApplicationType(0)="New (A new AUST L will be generated)")) And _
+		(cdoc.bNewClone(0) = 0)) Then
+			
+			strKey = Cstr(cdoc.ApplicationID(0)) + "Declaration"
+			Set doc = viewApplicationSubs.GetDocumentByKey(strKey, True)
+			toprint = |<table width=100% cellpadding=2>|
+			If doc Is Nothing Then
+				sDeclarationText = "Electronically notify the Secretary that the certification requirements of Subsection 26B (1) do not apply to an application."
+			Else
+				sDeclarationText = doc.Declaration(0)		
+			End If
+			toprint = toprint & |<tr><td width=25%><b>Subsection 26B(1) Notification:</b></td><td>| & sDeclarationText & |</td></tr>|	
+			toprint = toprint & |</table>|
+			gstrPrint = gstrPrint + toPrint
+		End If	
+	End If
+	
+End Sub
+'++LotusScript Development Environment:2:2:PreparationSteps:1:8
+Sub PreparationSteps(toPrint As String,filenum As Integer, FormulationID As String, IngredientID As String)
+	
+	strLastFunctionEntered = "PreparationSteps"
+	
+	Dim i As Integer
+	Dim j As Integer
+	Dim k As Integer
+	Dim view As NotesView
+	Dim doc As NotesDocument
+	Dim docSolvent As NotesDocument
+	Dim colSolvents As NotesDocumentCollection
+	Dim col As NotesDocumentCollection
+	Dim viewExtractionSteps As NotesView
+	
+     'preparation step details  
+	strKey = cdoc.ApplicationID(0) + FormulationID + IngredientID + "ExtractionStep"
+	Set col = viewIngredientSubs.GetAllDocumentsByKey(strKey, True)
+	
+	If col.count > 0 Then		
+		toprint = |<table width=100% cellpadding=3>|
+		toprint = toprint & |<tr><td width=8%>&nbsp</td><td><b>Preparation Steps:</b></td><td></td></tr>|
+		toprint = toprint & |</table>|
+		gstrPrint = gstrPrint + toPrint
+		
+		For i = 1 To col.count
+			Set doc = col.GetNthDocument(i)  
+			
+			toprint = |<table width=100% cellpadding=3>|  
+			toprint = toprint & |<tr><td width=10%>&nbsp</td><td width=15%><b>Plant Preparation:</b></td><td>| & doc.ExtractionDesc(0)               
+			
+			If doc.AHNFlag_3(0) = "Y" Then
+				toPrint = toPrint & "  (" & Cstr(doc.Ratio1Edit(0)) & ":" & Cstr(doc.Ratio2Edit(0)) & ")"  
+			Else
+				If doc.AHNFlag_5(0) = "D" Then
+					toPrint = toPrint  & "(1:" & Cstr(doc.ParentRatio(0)) & ")" 
+				Else
+					toPrint = toPrint & " (" & Cstr(doc.ParentRatio(0)) & ":1)"  
+				End If
+			End If
+			
+			toprint = toprint & |<tr><td width=10%>&nbsp</td><td width=15%><b>Plant Preparation Step:</b></td><td>| & Cstr(doc.OrderNumber(0))               
+			toprint = toprint & |</td></tr>|   
+			toprint = toprint & |</table>|
+			
+			gstrPrint = gstrPrint + toPrint
+			
+               'solvent details
+			strKey = cdoc.ApplicationID(0) + cdoc.FormulationEntryID(0) + IngredientID + "Solvent"
+			Set colSolvents = viewIngredientSubs.GetAllDocumentsByKey(strKey, True)         
+			If colSolvents.count > 0 Then
+				toprint = |<table width=100% cellpadding=3>| '	'SB 21 Nov 08 JIRA EBSP-89  this line is moved outside the loop to avoid cration of repeated table
+				k = 1
+				For j = 1 To colSolvents.count
+					Set docSolvent = colSolvents.GetNthDocument(j)  
+					
+					If docSolvent.EXTRACTIONSTEPID(0) = doc.EXTRACTIONSTEPID(0) Then
+						
+						toprint = toprint & |<tr><td width=12%>&nbsp</td><td width=13%><b>Solvents:</b></td><td>| & docSolvent.SolventDesc(0) & "&nbsp&nbsp&nbsp" & Cstr(docSolvent.Percentage(0)) & "%" & |</td></tr>|       
+						k = k + 1
+					Else
+						'SB 21 Nov 08 JIRA EBSP-89 
+						'toprint = toprint & |<tr><td width=10%>&nbsp</td><td width=15%><b>&nbsp</b></td><td>| & docSolvent.SolventDesc(0) & "&nbsp&nbsp&nbsp" & Cstr(docSolvent.Percentage(0)) & "%" & |</td></tr>|                        
+					End If					
+'				End If
+				Next     
+				toprint = toprint & |</table>|
+				gstrPrint = gstrPrint + toPrint
+			End If
+		Next
+	End If
+End Sub
+'++LotusScript Development Environment:2:2:Carriers:1:8
+Sub Carriers(toPrint As String,filenum As Integer, FormulationID As String, IngredientID As String)
+	
+	strLastFunctionEntered = "Carriers"
+	
+	Dim i As Integer
+	Dim doc As NotesDocument
+	Dim col As NotesDocumentCollection
+	
+	toPrint = ""
+	
+     'carrier details  
+	strKey = cdoc.ApplicationID(0) + FormulationID + IngredientID + "Carrier"
+	Set col = viewIngredientSubs.GetAllDocumentsByKey(strKey, True)
+	If col.count > 0 Then
+		For i = 1 To col.count
+			Set doc = col.GetNthDocument(i)  
+			If i = 1 Then
+				toprint = |<table width=100% cellpadding=3>|
+				toprint = toprint & |<tr><td width=8%></td><td width=17%><b>Carriers:</b></td><td>| 
+			Else
+				toprint = toprint & |<tr><td width=8%></td><td width=17%><b>&nbsp</b></td><td>| 
+			End If
+			toprint = toprint & doc.CarrierNameDesc(0) 
+			toprint = toprint & "  " &  Cstr(doc.CarrierQuantity(0)) & "  " & doc.CarrierUnit(0) & |</td></tr>|                 
+		Next
+		toprint = toprint & |</table>|
+		gstrPrint = gstrPrint + toPrint
+	End If
+	
+	
+End Sub
+'++LotusScript Development Environment:2:2:Components:1:8
+Sub Components(toPrint As String,filenum As Integer, FormulationID, IngredientID As String)
+	
+	strLastFunctionEntered = "Components"
+	
+	Dim i As Integer
+	Dim doc As NotesDocument
+	Dim col As NotesDocumentCollection
+	
+		   'component details  
+	strKey = cdoc.ApplicationID(0) + FormulationID + IngredientID + "Component"
+	Set col = viewIngredientSubs.GetAllDocumentsByKey(strKey, True)
+	If col.count > 0 Then
+		For i = 1 To col.count
+			Set doc = col.GetNthDocument(i)  
+			If i = 1 Then
+				toprint = |<table width=100% cellpadding=3>|
+				toprint = toprint & |<tr><td width=8%>&nbsp</td><td width=17%><b>Equivalents:</b></td><td>|   'SMS 10/04/08 AOS: label change
+			Else
+				toprint = toprint & |<tr><td width=8%>&nbsp</td><td width=17%><b>&nbsp</b></td><td>|
+			End If
+			toprint = toprint & doc.SubstanceName(0) 
+			If doc.StandardisedOn(0) = "Y" Then
+				toprint = toprint & "  Standardised"   
+			End If
+			toprint = toprint & "  " & Cstr(doc.SubstanceQuantity(0)) & "  " & doc.SubstanceUnit(0) & |</td></tr>|                 
+		Next
+		toprint = toprint & |</table>|
+		gstrPrint = gstrPrint + toPrint    
+	End If
+	
+End Sub
+'++LotusScript Development Environment:2:2:PrintApplicationFromNotes:1:8
+Sub PrintApplicationFromNotes(filenum As Integer)
+	
+	bWebClient = False
+	
+     'initialize databases
+	Call InitializeDatabase()
+	
+	Call ProcessApplications(filenum)
+	
+End Sub
+'++LotusScript Development Environment:2:2:ProcessApplications:1:8
+Sub ProcessApplications(filenum As Integer)
+	
+	On Error Goto errHandler
+	
+	strLastFunctionEntered = "ProcessApplications"
+	
+	Dim colFormulations As NotesDocumentCollection
+	Dim docFormulation As NotesDocument
+	Dim i As Integer
+	
+	Select Case cdoc.Form(0)
+	Case "GenApp":
+		strApplicationForm = "Application General"
+	Case "CodeStockApp":
+		strApplicationForm = "Application Code Stock"
+	Case "CompApp":
+		strApplicationForm = "Application Composite Pack"  
+	Case "MediKitApp":
+		strApplicationForm = "Medicine Kit Listing Application"  
+	Case "MultiChangeApp":
+		strApplicationForm = "Change Multiple Listings Application"  
+	Case "bioapp":
+		strApplicationForm = "Application"
+	Case Else:
+          'something wrong
+		Exit Sub
+	End Select
+	
+	
+    'Print the header details
+	strTitle = "Application ID: " & cdoc.ApplicationID(0)
+	toprint="<html><head>" & Header(strTitle) & "</head><body>"
+	gstrPrint = gstrPrint + toPrint
+	
+	'product name
+	toPrint = |<table style="width:100%"><tbody><tr><td>| &_
+	|<span style="font-size: 1.6em; font-weight: bold; line-height: 2em;">|& strApplicationForm &|</span>| &_
+	|</td><td style="width:1%"><img src="/|&gstrGraphicsPath &|/smTGAeBS.png"| &|></td></tr></tbody></table>| &_
+	|<hr class="major"><table width=100%><tbody>|     'SMS 15/02/08 form "Application General" was hard coded. Changed now
+	
+	gstrPrint = gstrPrint + toPrint
+     'application details
+	Call ApplicationDetails(toPrint,filenum)
+	
+     'formulation details
+	If strApplicationForm = "Medicine Kit Listing Application"  Then
+		Call MedicineDetails(toPrint,filenum)
+	Else
+		If strApplicationForm = "Change Multiple Listings Application" Then
+			Call ChangeMultipleListingDetails(toPrint,filenum)			
+		Else
+			If strApplicationForm = "Application Composite Pack"_
+			Or  strApplicationForm = "Application Code Stock"  Then
+				strKey = Cstr(cdoc.ApplicationID(0)) + "Formulation"
+				Set colFormulations = viewApplicationSubs.GetAllDocumentsByKey(strKey, True)
+				Set docFormulation = colFormulations.GetFirstDocument
+				While Not docFormulation Is Nothing
+					Call FormulationDetails(toPrint,filenum, docFormulation)
+					Call IngredientDetails(toPrint,filenum, docFormulation.FormulationEntryID(0))
+					Set docFormulation = colFormulations.GetNextDocument(docFormulation)
+				Wend
+			Else
+                    'general applications 
+				Call FormulationDetails(toPrint,filenum, cdoc)
+				Call IngredientDetails(toPrint,filenum, cdoc.FormulationEntryID(0))
+			End If
+		End If
+	End If
+	
+	If strApplicationForm <> "Change Multiple Listings Application" Then
+		If strApplicationForm = "Application Composite Pack"  Then
+			strApplicationForm = ""
+		End If
+		Call ManufacturerDetails(toPrint,filenum, cdoc)
+           'product details
+		Call ProductDetails(toPrint,filenum)
+	End If
+	
+printStep:
+	toPrint="</tbody></table><hr class='major'><br></body></html>"
+	gstrPrint = gstrPrint + toPrint
+	
+	If bWebClient Then
+		Print "Content-Type:text/html"
+		Print gstrPrint
+	Else
+		Print #fileNum, gstrPrint
+	End If
+	
+exitGracefully:
+	Msgbox "safe exit from ProcessApplications sub"
+	Exit Sub
+	
+errHandler:
+	Call returnResponse(False, "", "There was an unexpected error while attempting to print the document requested: Error " & Err & " at line " & Erl & " - " & Error)
+	Resume exitGracefully
+	
+End Sub
+'++LotusScript Development Environment:2:2:PrintApplicationFromWeb:1:8
+Sub PrintApplicationFromWeb(ApplicationUNID As String)
+	
+	On Error Goto errHandler
+	
+	bwebClient = True
+	
+     'initialize databases
+	Call InitializeDatabase()
+	
+	Set cdoc = dbCurrent.GetDocumentByUNID(ApplicationUNID)
+	If cdoc Is Nothing Then
+          'can't find the application doc
+		Exit Sub
+	End If
+	
+	Call ProcessApplications(0)
+	
+exitGracefully:
+	Exit Sub
+	
+errHandler:
+	Call returnResponse(False, "", "There was an unexpected error while attempting to print the document requested: Error " & Err & " at line " & Erl & " - " & Error)
+	Resume exitGracefully
+	
+End Sub
+'++LotusScript Development Environment:2:2:RRSolvent:1:8
+Sub RRSolvent(toPrint As String,filenum As Integer, FormulationID As String, IngredientID As String)
+	
+	strLastFunctionEntered = "RRSolvent"
+	
+	Dim i As Integer
+	Dim doc As NotesDocument
+	Dim col As NotesDocumentCollection
+	
+	
+	   'remaining restricted solvent details  
+	strKey = cdoc.ApplicationID(0) + FormulationID + IngredientID + "RestrictedSolvent"
+	Set col = viewIngredientSubs.GetAllDocumentsByKey(strKey, True)
+	If col.count > 0 Then
+		For i = 1 To col.count
+			Set doc = col.GetNthDocument(i)  
+			If i = 1 Then
+				toprint = |<table width=100% cellpadding=3>|
+				toprint = toprint & |<tr><td width=8%>&nbsp</td><td width=17%><b>Remaining Restricted Solvents:</b></td><td>|
+			Else
+				toprint = toprint & |<tr><td width=8%>&nbsp</td><td width=17%><b>&nbsp</b></td><td>|
+			End If
+			toprint = toprint & doc.SolventDesc(0)
+			toprint = toprint & "  " & Cstr(doc.SolventQuantity(0)) & "  " & doc.SolventUnit(0) & |</td></tr>|                 
+		Next
+		toprint = toprint & |</table>|
+		gstrPrint = gstrPrint + toPrint  
+	End If
+	
+End Sub
+'++LotusScript Development Environment:2:1:GetProfileValueR:1:8
+Function GetProfileValueR(strFieldName As String) As String
+     'Read the System profile and return the value of the specified field name
+	strLastFunctionEntered = "GetProfileValueR"
+	
+	Dim docProfile As NotesDocument
+	Dim varFieldValue As Variant
+	
+	Set docProfile = dbCurrent.GetProfileDocument("System Profile Document")
+	If docProfile Is Nothing Then
+		Error 10050, "Cannot open system profile."
+	Else
+		varFieldValue = docProfile.GetItemValue(strFieldName)
+		GetProfileValueR = varFieldValue(0)
+	End If
+	
+End Function
+'++LotusScript Development Environment:2:2:Diluents:1:8
+Sub Diluents(toPrint As String,filenum As Integer, FormulationID As String, IngredientID As String)
+	
+	strLastFunctionEntered = "Diluents"
+	
+	Dim i As Integer
+	Dim doc As NotesDocument
+	Dim col As NotesDocumentCollection
+	Dim strTemp As String
+	
+	     'diluent details  
+	strKey = cdoc.ApplicationID(0) + FormulationID + IngredientID + "Diluent"
+	Set col = viewIngredientSubs.GetAllDocumentsByKey(strKey, True)
+	If col.count > 0 Then
+		For i = 1 To col.count
+			Set doc = col.GetNthDocument(i)  
+			If i = 1 Then
+				toprint = |<table width=100% cellpadding=3>|
+			End If
+			toprint = toprint & |<tr><td width=8%></td><td width=17%><b>Diluents:</b></td><td>|
+			toprint = toprint & doc. DiluentDesc(0) 
+			toprint = toprint & "  " & Cstr(doc.Percentage(0)) & "%"  & |</td></tr>|       
+			If i = 1 Then
+				strTemp = |<table width=100% cellpadding=3>|
+				If doc.DiluentNotPresent(0) = "Yes" Then
+					strTemp = strTemp & |<tr><td width=8%></td><td width=17%><b>Diluents present in final product:</b></td><td>| & "No"  & |</td></tr>|                 
+				Else
+					strTemp = strTemp & |<tr><td width=8%></td><td width=17%><b>Diluents present in final product:</b></td><td>| & "Yes"  & |</td></tr>|                 
+				End If
+				strTemp = strTemp & |</table>|
+			End If
+		Next
+		toprint = toprint  & |</table>| & strTemp
+		gstrPrint = gstrPrint + toPrint
+	End If
+	
+End Sub
+'++LotusScript Development Environment:2:2:MedicineDetails:1:8
+Sub MedicineDetails(toPrint As String,filenum As Integer)
+	
+	strLastFunctionEntered = "MedicineDetails"
+	
+	Dim col As NotesDocumentCollection
+	Dim doc As NotesDocument
+	Dim i As Integer
+	Dim strMedicine As String
+	
+	  'Medicine
+	strKey = Cstr(cdoc.ApplicationID(0)) + "Medicine"
+	Set col = viewApplicationSubs.GetAllDocumentsByKey(strKey, True)
+	If col.count > 0 Then   
+		For i = 1 To col.count
+			If i = 1 Then
+				toprint = |<table width=100% cellpadding=2>| 
+			End If
+			Set doc = col.GetNthDocument(i)
+			If Cstr(doc.Medicine(0)) = "" Then
+				strMedicine = "(Exempt Medicine) - " + doc.MedicineDesc(0)
+			Else
+				strMedicine = "(ARTG No. " + Cstr(doc.Medicine(0)) + ") - " + doc.MedicineDesc(0) 'SMS 10/05/07 AOS: label change-reverted
+			End If
+			If i = 1 Then
+				toprint = toprint & |<tr><td width=25% nowrap><b>Medicine Name:</b></td><td>| & strMedicine & |</td></tr>| 
+			Else                         
+				toprint = toprint & |<tr><td width=25%><b></b></td><td>| & strMedicine & |</td></tr>|   
+			End If                  
+		Next
+		toprint = toprint & |</table>|
+		gstrPrint = gstrPrint + toPrint
+	End If    
+	
+	
+End Sub
+'++LotusScript Development Environment:2:1:FilterRichTextTag:1:8
+Function FilterRichTextTag(strSource As String) As String
+	
+	strLastFunctionEntered = "FilterRichTextTag"
+	
+	Dim strPattern1 As String
+	Dim strPattern2 As String
+	Dim strTemp1 As String
+	Dim strTemp2 As String
+	Dim strResult As String     
+	Dim strChar As String
+	Dim i As Integer
+	
+	If Len(Trim(strSource)) = 0 Then
+		FilterRichTextTag = ""
+	Else
+		strPattern1 = "[<font face=Arial size=2>]"
+		strPattern2 = "[</font>]"
+		For i = 1 To Len(strSource)
+			strChar = Mid(strSource, i, 1)
+			strResult = strResult & strChar
+			If Len(strResult) > 8 Then
+				strTemp2 = Mid$(strResult, Len(strResult) - 9 + 1, Len(strResult))
+				If strTemp2 = strPattern2 Then
+					strResult = Mid$(strResult, 1, Len(strResult) - 9)
+					strResult = strResult & "<br><br>"
+				End If
+			End If
+			If Len(strResult) > 25 Then
+				strTemp1 = Mid$(strResult, Len(strResult) - 26 + 1, Len(strResult))
+				If strTemp1 = strPattern1 Then
+					strResult = Mid$(strResult, 1, Len(strResult) - 26)
+				End If
+			End If   
+		Next
+		
+		FilterRichTextTag = strResult
+		
+	End If
+	
+End Function
+'++LotusScript Development Environment:2:2:ChangeMultipleListingDetails:1:8
+Sub ChangeMultipleListingDetails(toPrint As String,filenum As Integer)
+	
+	strLastFunctionEntered = "ChangeMultipleListingDetails"
+	
+	Dim col As NotesDocumentCollection
+	Dim doc As NotesDocument
+	Dim i As Integer
+	Dim itemValidationReport As NotesRichTextItem
+	Dim strValidationReport As String
+	Dim varSteps As Variant
+	Dim strStep As String
+	Dim intPos As Integer
+	Dim sDeclarationText As String
+	
+	toPrint = ""
+	
+     'Change multiple listings
+	strKey = Cstr(cdoc.ApplicationID(0)) + "MedicineAUSTL"
+	Set col = viewApplicationSubs.GetAllDocumentsByKey(strKey, True)
+	If col.count > 0 Then
+		toPrint = toPrint & |<tr><td><b>Listing Selection:</b></td><td></td></tr>|
+		
+		For i = 1 To col.count
+			Set doc = col.GetNthDocument(i)
+			toPrint = toPrint & |<tr><td style="padding-left:2em;"><b>Medicine AUST L:</b></td><td>| & doc.Medicine(0) & |</td></tr>| 
+			toPrint = toPrint & |<tr><td style="padding-left:2em;"><b>Product Name:</b></td><td>| & doc.ProductName(0) & |</td></tr>| 
+			toPrint = toPrint & |<tr><td style="padding-left:2em;"><b>Application Status:</b></td><td>| & doc.ApplicationStatus(0) & |</td></tr>| 
+			If doc.ApplicationStatus(0) <> "Passed Validation" Then
+				Set itemValidationReport = doc.GetFirstItem("ValidationReport")
+				strValidationReport  = ItemValidationReport.Text
+				strValidationReport = FilterRichTextTag(strValidationReport) 
+				toPrint = toPrint & |<tr><td><b>Validation Report:</b></td><td>| & doc.ValidFrom(0) & |</td></tr>| 
+				toPrint = toPrint & |<tr><td></td><td>| & strValidationReport & |</td></tr>|                     
+			End If
+		Next
+	End If
+	toPrint = toPrint & |<tr><td><b>Product Name Text Replacement:</b></td><td></td></tr>|
+	toPrint = toPrint & |<tr><td style="padding-left:2em;"><b>Replace:</b></td><td>| & cdoc.RemoveNameString(0) & |</td></tr>| 
+	toPrint = toPrint & |<tr><td style="padding-left:2em;"><b>With:</b></td><td>| & cdoc.ReplaceNameString(0) & |</td></tr>|      
+	toPrint = toPrint & |<tr><td><b>Common Manufacturing Steps:</b></td><td></td></tr>|
+	
+	If cdoc.RemoveManufactSteps(0) <> "" Then
+          'Set varSteps = cdoc.RemoveManufactSteps
+		i = 1
+		Forall v In cdoc.RemoveManufactSteps
+			
+			Forall w In cdoc.CommonSteps
+				intPos = Instr(w, v)
+				If intPos > 0 Then
+					strStep = Left(w, intPos -2)
+				End If
+			End Forall
+			
+			If i = 1 Then
+				toPrint = toPrint & |<tr><td style="padding-left:2em;"><b>Remove Steps:</b></td><td>| & strStep & |</td></tr>| 
+				i = 2
+			Else
+				toPrint = toPrint & |<tr><td style="padding-left:2em;"></td><td>| & strStep & |</td></tr>| 
+			End If
+			
+		End Forall
+	Else
+		toPrint = toPrint & |<tr><td style="padding-left:2em;"><b>Remove Steps:</b></td><td>| & "" & |</td></tr>| 
+	End If
+	gstrPrint = gstrPrint + toPrint
+	Call ManufacturerDetails(toPrint,filenum, cdoc)
+	
+	'Subsection 26B(1) Notification details
+	If (cdoc.RemoveNameString(0) <> "") Then
+		
+		strKey = Cstr(cdoc.ApplicationID(0)) + "Declaration"
+		Set doc = viewApplicationSubs.GetDocumentByKey(strKey, True)
+		If doc Is Nothing Then
+			sDeclarationText = "Electronically notify the Secretary that the certification requirements of Subsection 26B (1) do not apply to an application."
+		Else
+			sDeclarationText = doc.Declaration(0)		
+		End If
+		toPrint = toPrint & |<tr><td><b>Subsection 26B(1) Notification:</b></td><td>| & sDeclarationText & |</td></tr>|
+	End If	
+	
+	gstrPrint = gstrPrint + toPrint
+	toPrint = ""
+End Sub
+'++LotusScript Development Environment:2:2:CodeStockDetails:1:8
+Sub CodeStockDetails(toPrint As String,filenum As Integer)
+	
+End Sub
+'++LotusScript Development Environment:2:2:IngredientsProcess:2:8
+Sub IngredientsProcess(toPrint As String, filenum As Integer, FormulationID As String,_
+colIngredient As NotesDocumentCollection, Role As String)
+	
+	strLastFunctionEntered = "IngredientsProcess"
+	
+	Dim i As Integer
+	Dim iAnimal As Integer
+	Dim count As Integer
+	Dim doc As NotesDocument
+	Dim strIngredientRole As String
+	Dim viewCountryOfOrigin As NotesView
+	Dim docCountryOfOrigin As NotesDocument
+	Dim strCountryOfCorigin
+	Dim strCountryOfOrigin As String
+	
+	If colIngredient.count > 0 Then
+		count = 0
+		For i = 1 To colIngredient.count
+			Set doc = colIngredient.GetNthDocument(i)
+			If doc.Form(0) = "Ingredient" Or doc.Form(0) = "tmpPI" Then
+				If doc.FormulationType(0)&doc.IngredientRole(0) = Role Then
+      			    'check if we need to print the heading
+					'SMS 29/08/07 AOS: new formulation ingredient type codes added
+					If doc.FormulationType(0) = "A" Then
+						If countForm<>1 Then					
+							toprint = |<br><h2>| & "ACTIVE INGREDIENTS:" & |</h2>|
+							gstrPrint = gstrPrint + toPrint
+							countForm = 1
+						End If
+						
+						If count = 0  And doc.IngredientRole(0) = "S" Then
+							toprint = |<br><table width=100% cellpadding=2><td width=1%></td><td width=27%>STANDARD</td>|		
+							gstrPrint = gstrPrint + toPrint
+							count = 1
+						End If
+						
+						If count = 0 And doc.IngredientRole(0) = "H" Then							
+							toprint = |<br><table width=100% cellpadding=2><td width=1%></td><td width=27%>HOMOEOPATHICS</td>|
+							gstrPrint = gstrPrint + toPrint
+							count = 1
+						End If
+						If count = 0 And doc.IngredientRole(0) = "PI" Then							
+							toprint = |<table width=100% cellpadding=2><td width=1%></td><td width=27%>PROPRIETARY INGREDIENTS</td>|
+							gstrPrint = gstrPrint + toPrint
+							count = 1
+						End If
+						
+					'SMS 23/03/07 AOS development: new ingredient sub types added----------------	
+						If count = 0 And doc.IngredientRole(0) = "E" Then
+							toprint = |<table width=100% cellpadding=2><td width=1%></td><td width=27%>ESSENCE</td>|
+							gstrPrint = gstrPrint + toPrint
+							count = 1
+						End If
+						
+						If count = 0 And doc.IngredientRole(0) = "A" Then							
+							toprint = |<br><table width=100% cellpadding=2><td width=1%></td><td width=27%>ANTHROPOSOPHIC</td>|
+							gstrPrint = gstrPrint + toPrint
+							count = 1
+						End If
+				'--------------------------------------------------------------------------------------------								
+					Else						
+						If countForm<>2 Then					
+							toprint = |<br><h2>| & "EXCIPIENT INGREDIENTS:" &|</h2>|
+							gstrPrint = gstrPrint + toPrint
+							countForm = 2
+						End If
+						
+						If count = 0  And doc.IngredientRole(0) = "S" Then
+							toprint = |<table width=100% cellpadding=2><td width=1%></td><td width=27%>STANDARD</td>|
+							gstrPrint = gstrPrint + toPrint
+							count = 1
+						End If
+						
+						If count = 0 And doc.IngredientRole(0) = "PI" Then							
+							toprint = |<table width=100% cellpadding=2><td width=1%></td><td width=27%>PROPRIETARY INGREDIENTS</td>|
+							gstrPrint = gstrPrint + toPrint
+							count = 1
+						End If
+						
+					End If
+					If count = 1Then
+						toprint = |<table width=100% cellpadding=2>|  
+						toprint = toprint & |</table><br>|		
+						
+					End If					
+				End If
+			End If
+			
+			If doc.Form(0) = "Ingredient" Then
+				If doc.FormulationType(0)&doc.IngredientRole(0) = Role Then
+					
+                    'ingredient name 
+					
+					toprint = toprint &  |<table width=100% cellpadding=3><tr><td width=4%></td><td width=21%><b>Ingredient:</b></td><td>| & doc.IngredientName(0) 
+					
+					toprint = toprint & "  " & Cstr(doc.IngredientQuantity(0)) & "  " & doc.IngredientUnits(0) & |</tr>| 
+					toprint = toprint &  |</td></tr>| & |</table>|			
+					gstrPrint = gstrPrint + toPrint
+					
+					toprint = |<table width=100% cellpadding=3>|  
+					
+					
+					If doc.IngredientRole(0) = "PI" Then         'SMS 03/09/07 AOS: latest formulation ing type code added
+                              'PI number
+						toprint = toprint & |<tr><td width=8%></td><td width=17%></td><td>| & "(PI number:" & doc.IngredientCode(0) & ")" & |</td></tr>|   
+					End If
+                         'ingredient quantity & unit
+					If doc.IngredientType(0) = "AHN" Then
+                              'plant part
+						toprint = toprint & |<tr><td width=8%></td><td width=17%><b>Plant Part:</b></td><td>| & doc.PlantPartDesc(0) & |</td></tr>|   
+						
+					End If
+					If doc.IngredientType(0) = "AHN" And (doc.FormulationType(0) = "A" And doc.IngredientRole(0) = "S")_
+					Or doc.IngredientType(0) = "AHN" And (doc.FormulationType(0) = "E" And doc.IngredientRole(0) = "S")_
+					Or doc.IngredientType(0) = "AFN" And (doc.FormulationType(0) = "E" And doc.IngredientRole(0) = "S") Then
+                              'plant preparation
+						toprint = toprint & |<tr><td width=8%></td><td width=17%><b>Plant Preparation:</b></td><td>| & doc.PlantPrepDesc(0) & |</td></tr>|   
+					End If
+					If doc.AHNFlag_1(0) = "Y" And (doc.IngredientType(0) = "AHN" Or doc.IngredientType(0) = "AFN") Then
+                              'preparation ratio
+						If doc.RatioType(0) = "Dilution" Then
+							toprint = toprint & |<tr><td width=8%></td><td width=17%><b>Ratio:</b></td><td>| & "  (" & "1:"  & Cstr(doc.Ratio(0)) & ")" &  |</td></tr>|   
+						Else							
+							toprint = toprint & |<tr><td width=8%></td><td width=17%><b>Ratio:</b></td><td>| & "  (" &  Cstr(doc.Ratio(0)) & ":1)" &  |</td></tr>|   
+						End If
+					End If
+					
+					toprint = toprint & |</table>|
+					gstrPrint = gstrPrint + toPrint
+					
+					toprint = |<table width=100% cellpadding=3>|  
+					
+					
+					If doc.IngredientType(0) = "AHS" Or doc.IngredientType(0) = "AHN" Or doc.IngredientType(0) = "AFN" Then
+                              'equivalent preparation
+						If doc.EquivalentPreparationEdit(0) <> "Not declared" Then							
+							toprint = toprint & |<tr><td width=8%></td><td width=17%><b>Equivalent Preparation:</b></td><td>| & doc.EquivalentPreparationEdit(0)
+						End If                         
+					End If
+					If doc.EquivalentPreparationEdit(0) <> "Not declared" Then
+                              'equivalent quantity & unit
+						toprint = toprint & "  "  & Cstr(doc.EquivalentQuantityFrom(0)) & "  " & doc.EquivalentUnit(0) & |</td></tr>|
+					Else
+						toprint = toprint &  |</td></tr>|
+					End If
+					
+					toprint = toprint & |</table>|
+					gstrPrint = gstrPrint + toPrint
+					
+					toprint = |<table width=100% cellpadding=3>|  
+					
+					If doc.IngredientRole(0) = "H" Then
+                              'potency and label name						
+						toprint = toprint & |<tr><td width=8%></td><td width=17%><b>Label Name & Potency:</b></td><td>| & doc.LabelNameAndPotency(0)   & |</td></tr>|       
+						
+						      'SMS 01/03/07 AOS development: new potency unit field	
+						If doc.PotencyUnit(0) <> "" Then
+							toprint = toprint & |<tr><td width=8%></td><td width=17%><b>Potency:</b></td><td>| & doc.Potency(0)&doc.PotencyUnit(0) & |</td></tr>|   
+						Else							
+							toprint = toprint & |<tr><td width=8%></td><td width=17%><b>Potency:</b></td><td>| & doc.Potency(0) & "X" & |</td></tr>|   
+						End If
+						
+					End If
+					
+					toprint = toprint & |</table>|
+					gstrPrint = gstrPrint + toPrint
+					
+					toprint = |<table width=100% cellpadding=3>|  
+					
+%REM			
+					'SMS 25/06/08 ACC-161: not required anymore
+					
+					'SMS 01/03/07 AOS development. New field 'Concentration of Mother Subtance' & 'Manufacturer Method' for Essence
+					If doc.IngredientRole(0) = "E" Then						
+						toprint = toprint & |<tr><td width=8%></td><td width=17%><b>Concentration of Mother Substance:</b></td><td>| & doc.MotherSubstance(0) & " " & doc.MotherSubstanceUnit(0) & |</td></tr>|   						
+						
+						toprint = toprint & |<tr><td width=8%></td><td width=17%><b>Manufacturer Method:</b></td><td>|  & GetLookupValues(dbCodeTables, "DCTLookup", "ShortDescription", "L~MANMETHOD~"+doc.ManMethod(0), True) & |</td></tr>|   						
+					End If
+										
+					'New field 'Reference'
+										
+					If doc.reference(0) <> "" And (doc.IngredientRole(0) = "H" Or doc.IngredientRole(0) = "A" Or doc.IngredientRole(0) = "E") Then
+						toprint = toprint & |<tr><td width=8%></td><td width=17%><b>Reference:</b></td><td>|  & GetLookupValues(dbCodeTables, "DCTLookup", "ShortDescription", "L~HOMREF~"+doc.Reference(0), True) & |</td></tr>|   												
+					End If
+					'---------------------------------------------------------------------------------------------------------------------------------------------
+%END REM
+					If doc.AnimalQuestion(0) = "Ask" Then
+                              'chemical animal origin
+						If doc.ChemAnimalOrigin(0) = "Y" Then
+							toprint = toprint & |<tr><td width=8%></td><td width=17%><b>Animal Origin?:</b></td><td>| & "Yes" & |</td></tr>|
+						Else
+							toprint = toprint & |<tr><td width=8%></td><td width=17%><b>Animal Origin?:</b></td><td>| & "No" & |</td></tr>|
+						End If
+					End If
+					
+					toprint = toprint & |</table>|
+					gstrPrint = gstrPrint + toPrint
+					
+					toprint = |<table width=100% cellpadding=3>|  
+					
+					If doc.AnimalQuestion(0) = "Yes"_
+					Or ( doc.AnimalQuestion(0) = "Ask" And doc.ChemAnimalOrigin(0) = "Y") Then
+                       		'SMS 20/02/07 Code modified to pick Animal origin data from new child docs						
+						
+						strkey = doc.ApplicationID(0) + doc.FormulationEntryID(0) + doc.IngredientID(0) + "AnimalOrigin"
+						Set collAnimal = viewIngredientSubs.GetAllDocumentsByKey(strkey)
+						If collAnimal.Count >0 Then
+							Set docAnimal = collAnimal.GetFirstDocument
+							iAnimal=0
+							Do While Not docAnimal Is Nothing								
+								Set itemMultiVal = docAnimal.GetFirstItem("CountryOfOriginDisp")
+								
+								If iAnimal = 0 Then
+									toprint = toprint & |<tr><td width=10%></td><td width=15%><b>Country Of Origin:</b></td><td>|  & itemMultiVal.Text & |</td></tr>|             
+									iAnimal = iAnimal + 1
+								Else
+									toprint = toprint & |<tr><td width=10%></td><td width=15%><b></b></td><td>|  & itemMultiVal.Text & |</td></tr>|       								
+								End If
+								
+								toprint = toprint & |<tr><td width=10%></td><td width=15%><b>Animal Type:</b></td><td>| & docAnimal.AnimalTypeDesc(0) & |</td></tr>|
+								toprint = toprint & |<tr><td width=10%></td><td width=15%><b>Animal Part:</b></td><td>| & docAnimal.AnimalPartDesc(0) & |</td></tr>|                         
+								toprint = toprint & |<tr><td width=10%></td><td width=15%><b>Animal Preparation:</b></td><td>| & docAnimal.AnimalPrepDesc(0) & |</td></tr>|   
+								
+								Set docAnimal = collAnimal.GetNextDocument(docAnimal)
+							Loop                 
+						End If
+					End If
+					toprint = toprint & |</table>|
+					gstrPrint = gstrPrint + toPrint
+					
+					'check preparation steps"
+					Call PreparationSteps(toPrint,filenum, FormulationID, doc.IngredientID(0))
+					
+                         'check carriers
+					Call Carriers(toPrint,filenum, FormulationID, doc.IngredientID(0))
+					
+                         'check diluets
+					Call Diluents(toPrint,filenum, FormulationID, doc.IngredientID(0))
+					
+                         'check components
+					Call Components(toPrint,filenum, FormulationID, doc.IngredientID(0))
+					
+                         'check remaining restricted solvent
+					Call RRSolvent(toPrint,filenum, FormulationID, doc.IngredientID(0))
+					
+				End If
+			End If						
+		Next
+	End If
+End Sub
+'++LotusScript Development Environment:2:2:IngredientPIProcess:1:8
+Sub IngredientPIProcess(toPrint As String, filenum As Integer, FormulationID As String, colIngredient As NotesDocumentCollection)
+	
+	strLastFunctionEntered = "IngredientPIProcess"
+	
+	Dim i As Integer
+	Dim j As Integer
+	Dim count As Integer
+	Dim doc As NotesDocument
+	Dim strIngredientRole As String
+	Dim viewCountryOfOrigin As NotesView
+	Dim docCountryOfOrigin As NotesDocument
+	Dim strCountryOfCorigin
+	
+	Dim strCountryOfOrigin As String
+	Dim x As Integer
+	Dim strEquiv() As String
+	Dim flagFirstComp As Integer
+	Dim sglIngredientQty As Single
+	Dim strIngredientUnits As String
+	
+	toPrint = ""
+	
+	If colIngredient.count > 0 Then
+		For i = 1 To colIngredient.count
+			Set doc = colIngredient.GetNthDocument(i)  
+			If doc.Form(0) = "tmpPI" Then                    
+                    'ingredient name 
+				toprint = |<br><table width=100% cellpadding=2>|  
+		'		toPrint = toPrint & |<tr><td ><b>Ingredient:</b></td><td>| & doc.IngredientName(0)  
+				'toprint = toprint &  |<table width=100% cellpadding=3><tr><td width=4%></td><td width=21%><b>Ingredient:</b></td><td>| & doc.IngredientName(0) 
+				
+				toprint = toprint & |<tr><td width=8%></td><td width=17%><b>Ingredient:</b></td><td>| & doc.IngredientName(0) 
+				
+				If doc.PlantPart(0) <> "" Then
+                              'plant part
+					toPrint = toPrint & "  " & doc.PlantPart(0)
+				End If                    
+				
+				If doc.PLANTPREPARATION(0) <> "" Then
+                              'plant prep
+					toPrint = toPrint & "  " & doc.PLANTPREPARATION(0)
+				End If                    
+				
+				
+				toPrint = toPrint & "  (from PI - " &  doc.PINumber(0) & ")"
+                         'ingredient quantity
+				If Cstr(doc.INGREDIENTQTY(0)) <> "" And doc.INGREDIENTUNIT(0) <> "" Then
+					toPrint = toPrint & "  " & Cstr(doc.INGREDIENTQTY(0)) & "  " & doc.INGREDIENTUNIT(0)
+				End If
+				toprint = toprint &  |</td></tr>|
+				toprint = toprint & |</table>|
+				
+				If doc.HasItem("Equivalent_Type") Then
+                         'Display Equivalent Info
+					For j = 0 To Ubound(doc.Equivalent_Type)
+						If doc.Equivalent_Type(j) = "EQUIVALENT" Then
+							If doc.EQUIVPLANTPREP(j) <> "Not declared" Then
+								
+								toprint = toprint & |<table width=100% cellpadding=3>|
+								toprint = toprint & |<tr><td width=8%></td><td width=17%><b>Equivalent Preparation:</b></td><td>| & doc.EQUIVPLANTPREP(j)
+								
+								If Cstr(doc.EQUIVALENTQTY(j)) <> "" And doc.INGREDIENTUNIT(0) <> "" Then
+									toPrint = toPrint & "  "  & Cstr(doc.EQUIVALENTQTY(j)) & "  " & doc.INGREDIENTUNIT(0)
+								End If
+								toPrint = toPrint & |</td></tr>|
+							End If 
+							Exit For				
+						End If
+					Next
+                         'Display Component Info
+					flagFirstComp = True                         
+					For j = 0 To Ubound(doc.Equivalent_Type)
+						If doc.Equivalent_Type(j) = "COMPONENT" Then							
+							If flagFirstComp Then
+								toprint = toprint & |<table width=100% cellpadding=3>|
+								toprint = toprint & |<tr><td width=8%>&nbsp</td><td width=17%><b>Components:</b></td><td>|
+								flagFirstComp = False
+								
+							Else
+								
+								toprint = toprint & |<tr><td width=8%>&nbsp</td><td width=17%><b>&nbsp</b></td><td>|
+							End If
+							
+							toPrint = toPrint & doc.EQUIVALENTINGREDIENTNAME(j) 
+							If Cstr(doc.EQUIVALENTQTY(j)) <> "" And doc.INGREDIENTUNIT(0) <> "" Then
+								toPrint = toPrint & "  "  & Cstr(doc.EQUIVALENTQTY(j)) & "  " & doc.INGREDIENTUNIT(0)
+							End If
+							toPrint = toPrint & |</td></tr>|
+						End If
+						
+					Next
+				End If
+				gstrPrint = gstrPrint + toPrint
+			End If
+		Next
+	End If	
+	
+	
+End Sub
+'++LotusScript Development Environment:2:1:fsglConvert:1:8
+Function fsglConvert ( sglQuantity As Single , strUnits As String ) As Single
+     'Author: Jared Homes
+     'Date Written: 2/6/01
+     'Purpose: This function converts the front part of a
+     'unit to grams
+	
+	strLastFunctionEntered = "fsglConvert"
+	
+	Const FACTOR = 100000000000
+	
+	Dim docConvert As NotesDocument
+	Dim intPos As Integer
+	Dim strFirstUnit As String
+	Dim sglTempQty As Single
+	
+	intPos = Instr ( 1 , strUnits , "/" )
+	
+	If intPos <> 0 Then strFirstUnit = Left ( strUnits , intPos - 1 ) Else strFirstUnit = strUnits
+	
+	Set docConvert = viewUnitConversion.GetDocumentByKey ( strFirstUnit , True )
+	
+	If Not docConvert Is Nothing Then 
+		sglTempQty = docConvert.ConversionFactor(0)
+		sglTempQty = sglTempQty * sglQuantity
+          'Note - massaging of this value using factors required to obtain correct value.
+		sglTempQty = sglTempQty * FACTOR + 0.5
+		sglTempQty = Int ( sglTempQty )
+		fsglConvert = 0.4
+		fsglConvert = sglTempQty / FACTOR
+	Else
+		fsglConvert = 0
+	End If
+	
+End Function
+'++LotusScript Development Environment:2:1:returnResponse:1:8
+Function returnResponse(bSuccess As Boolean, strAction As String, strParam As String)
+	Const csCONTENT_TYPE_JSON = "Content-Type:application/json"	
+	Dim strJSON As String
+	
+	strJSON = | {"Success":"| + Cstr(bSuccess) + |", "Action":"| + strAction + |", "Message":"| + strParam + |"}|
+	
+	Print csCONTENT_TYPE_JSON
+	Print strJSON
+	
+End Function

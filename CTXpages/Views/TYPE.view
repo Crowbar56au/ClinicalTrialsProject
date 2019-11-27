@@ -1,0 +1,116 @@
+<?xml version='1.0' encoding='utf-8'?>
+<view name='TYPE' xmlns='http://www.lotus.com/dxl' version='9.0' maintenanceversion='1.0'
+ replicaid='CA257FDB001B5780' showinmenu='false' publicaccess='false' designerversion='8.5.3'
+ comment='All by &apos;TYPE&apos;' unreadmarks='none' onopengoto='lastopened'
+ onrefresh='displayindicator' headers='flat' opencollapsed='true' showresponsehierarchy='true'
+ showmargin='true' shrinkrows='true' extendlastcolumn='false' showhierarchies='false'
+ unreadcolor='black' rowlinecount='8' headerlinecount='1' rowspacing='1.25'
+ bgcolor='white' altrowcolor='#f7f7f7' totalscolor='black' headerbgcolor='#b2b2b2'
+ boldunreadrows='false' evaluateactions='false' allownewdocuments='false'
+ allowcustomizations='true' hidemarginborder='false' marginwidth='5px 0px 0px'
+ belowheadermargin='5px' marginbgcolor='#b2b2b2' gridstyle='solid' gridcolor='#e1e1e1'
+ uniquekeys='false' formatnoteid='0CC131B1AD9AB6BACA2577C00081ED37'>
+<noteinfo noteid='3c2' unid='EEA2A21B672AA364CA257F770006FAEA' sequence='14'>
+<created><datetime dst='true'>20160315T121614,50+11</datetime></created>
+<modified><datetime>20160628T151505,67+10</datetime></modified>
+<revised><datetime>20160628T151505,66+10</datetime></revised>
+<lastaccessed><datetime>20160904T020405,66+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,34+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='selection'><formula>SELECT @All</formula></code><code event='form'><formula
+>"Application"</formula></code>
+<actionbar bgcolor='navy' bordercolor='black'><actionbarstyle height='4.4290ex'><font
+ size='9pt' name='Verdana' pitch='variable' truetype='true' familyid='20'/></actionbarstyle>
+<actionbuttonstyle bgcolor='system'/><font size='9pt' color='system'/><border
+ style='solid' width='0px 0px 1px' color='navy'/>
+<action title='Help' icon='45' showinmenu='false' align='right'><code event='options'><lotusscript
+>Option Declare
+Use "HelpScripts"
+</lotusscript></code><code event='click'><lotusscript>Sub Click(Source As Button)
+     Call GetViewHelpDoc("LM_V_SAP_All_Applications_by_Application_Id")
+End Sub
+</lotusscript></code></action></actionbar>
+<column sort='ascending' resort='both' resort2='ascending' resort2column='1'
+ hidedetailrows='false' itemname='ApplicationId' width='15' resizable='true'
+ separatemultiplevalues='true' sortnoaccent='false' sortnocase='true' showaslinks='false'
+ categorized='true' twisties='true'><font name='Verdana' pitch='variable'
+ truetype='true' familyid='20'/><columnheader align='center' title='Application ID'><font
+ size='9pt' style='bold' name='Verdana' pitch='variable' truetype='true' familyid='20'/></columnheader></column>
+<column sort='ascending' resort='descending' hidedetailrows='false' itemname='Type'
+ width='15' resizable='true' separatemultiplevalues='false' sortnoaccent='false'
+ sortnocase='true' showaslinks='false'><font name='Verdana' pitch='variable'
+ truetype='true' familyid='20'/><columnheader align='center' title='Type'><font
+ size='9pt' style='bold' name='Verdana' pitch='variable' truetype='true' familyid='20'/></columnheader></column>
+<column resort='both' resort2='ascending' resort2column='1' hidedetailrows='false'
+ itemname='SponsorName' width='30' resizable='true' separatemultiplevalues='false'
+ sortnoaccent='false' sortnocase='true' showaslinks='false'><font name='Verdana'
+ pitch='variable' truetype='true' familyid='20'/><columnheader align='center'
+ title='Sponsor Name'><font size='9pt' style='bold' name='Verdana' pitch='variable'
+ truetype='true' familyid='20'/></columnheader></column>
+<column resort='both' resort2='ascending' resort2column='1' hidedetailrows='false'
+ itemname='LabelName' width='40' resizable='true' separatemultiplevalues='false'
+ sortnoaccent='false' sortnocase='true' showaslinks='false'><font name='Verdana'
+ pitch='variable' truetype='true' familyid='20'/><columnheader align='center'
+ title='Label'><font size='9pt' style='bold' name='Verdana' pitch='variable'
+ truetype='true' familyid='20'/></columnheader></column>
+<column resort='both' resort2='ascending' resort2column='1' hidedetailrows='false'
+ itemname='ApplicationStatus' width='10' resizable='true' separatemultiplevalues='false'
+ sortnoaccent='false' sortnocase='true' showaslinks='false'><font name='Verdana'
+ pitch='variable' truetype='true' familyid='20'/><columnheader align='center'
+ title='Status'><font size='9pt' style='bold' name='Verdana' pitch='variable'
+ truetype='true' familyid='20'/></columnheader></column>
+<item name='$SCRIPTOBJ_1' sign='true'>
+<rawitemdata type='14'>
+AQAAAkxTT0IDABQIZW4AAAQAFAA4AAQAAAAUBpQCAAAAAAQAZANQBQAAAAAoANgAHAA8AP//9AAA
+AAAAAAAAAAIAAAAYAGwBAAAAAGwBbAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAGAAYAAEAAAAsAiwCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALAIsAgAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAYAAADMAFAFMARQBQAAAABwA3ADAAAAAKACoALMAMwAAAAAAAAAAAAAAAAA
+AAAAAMAEwAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAEABQBMb3R1cyBQcm9kdWN0AAAAVjAuMAAAAAAAAAAAAAAAAAAA
+AAAEAAAAOAAAAAAAAAAUBgAAlAIAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAAAA
+AAUAAABXMzJJvQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAwCYAgAAAABYAAoAJABWADUAQQBDAFQASQBPAE4AUwAAAAAAcAADAE4ARQBXAAAAhAAGAEQA
+RQBMAEUAVABFAAAAAACoAAoASQBOAEkAVABJAEEATABJAFoARQAAAAAAEAEJAFQARQBSAE0ASQBO
+AEEAVABFAAAAJAIGAE8AQgBKAEUAQwBUAAAAAACMAAAAAAAAAMQACwBIAGUAbABwAFMAYwByAGkA
+cAB0AHMAAAA4AQsASABFAEwAUABTAEMAUgBJAFAAVABTAAAA//8GAFMATwBVAFIAQwBFAAAAAAAk
+AQoAQgBJAE4ARABFAFYARQBOAFQAUwAAAAAASAELAE8AQgBKAEUAQwBUAE4AQQBNAEUAXwAAAMgB
+BgBCAFUAVABUAE8ATgAAAAAAbAEGACUATABTAEkARABFAAAAAADoAQUAQwBMAEkAQwBLAAAA/AEO
+AEcARQBUAFYASQBFAFcASABFAEwAUABEAE8AQwAAAAAA//8rAEwATQBfAFYAXwBTAEEAUABfAEEA
+bABsAF8AQQBwAHAAbABpAGMAYQB0AGkAbwBuAHMAXwBiAHkAXwBBAHAAcABsAGkAYwBhAHQAaQBv
+AG4AXwBJAGQAAABcAg0ATgBPAFQARQBTAEQAQQBUAEEAQgBBAFMARQAAADgCBgAlAEwAUwBYAEIA
+RQAAAAAA//8QAE4ATwBUAEUAUwBVAEkAVwBPAFIASwBTAFAAQQBDAEUAAAAAAP//BgAlAEwAUwBY
+AFUASQAAAAAA//8PAE4ATwBUAEUAUwBVAEkARABPAEMAVQBNAEUATgBUAAAAdAIJAE4ATwBUAEUA
+UwBWAEkARQBXAAAA//8NAE4ATwBUAEUAUwBEAE8AQwBVAE0ARQBOAFQAAAAFABgGAAAAAKNriWsY
+AAAAAACsAACPawkAAAAAAAAAAAgAAABsAQAA3AAAAAAAAAACAAAAsABcAQAAAAAAAAAAAAAAAAAA
+AACwALAAAAAAAAAAAAAAAAAAAAAAAAAAAABcAVwBAAAAAAAAAAABAAAAAgAAAAwAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AwABAFwBAAD4AAYIAAAAABoAAAAoAf//AAAAABAAAACgAgAAFAEAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABFhMp7S5pEL9d
+AN0BEYa3AAAAAAAAAAAAAAAAAAAAAGQAAAAAAAAAAAAAAAAAAAACAMAAAAAUAgAAAABaBAEA//8A
+AAMAIAAAAAAAyAAJAgAAzAAIAAAAAAAAADwBAAAAAAAAAQAAAAQCBAIAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAIEAgAAAAAAAAAAAQAAAAgAAAAqAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMA
+AQAAAAAAyAAJAgAAzAATAAAAPAEAANUAAAAAAAAAIQAEAJAEAAAIAEAAAAAAAEwBAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AQALAAYACQKgAgkCcAMJAjAECQLABAkCUAUZABoAwADsAf//AAAAABAAAABwAwAAzAEAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAACFBMp7S5pEL9dAN0BEYa3AAAAAAAAAAAAAAAAAAAAAGQAAAAAAAAAAAAAAAAAAAACAJQCMAMA
+AMwAAAACAAEA//8AABIAFAAAAAAA//8JAgAAAAASBAAAAACgApQC//8AAAAABgADAAAACQKgAgkC
+oAIGCAYIGQAaAJQCKAL//wAAAAAQAAAAMAQAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhUTKe0uaRC/XQDdARGGtwAA
+AAAAAAAAAAAAAAAAAABkAAAAAAAAAAAAAAAAAAAAAgBkAwAEAACgAgAACgABAP//AAASABQAAAAA
+AP//CQIAAAAAAAYAAAAAcANkA///AAAAAAQAAQAAAAkCcAMJAnADGQAQAAAAwARQBTwCAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAABBUTKe0uaRC/XQDdARGGtwAAAAAAAAAAAAAAAAAAAABkAAAAAAAAAAAAAAAAAAAAAgBkAwAA
+AABwAwAACgABAP//AAAQAAAAUAUAAGACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAxQTKe0uaRC/XQDdARGGtwAAAAAAAAAA
+AAAAAAAAAABkAAAAAAAAAAAAAAAAAAAAAgCUAgAAAAAwBAAAAgABAP//AAAQAAQAAAAAAHgCAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAABBQTKe0uaRC/XQDdARGGty4UEyntLmkQv10A3QERhrdkAAAAAAAAAAAAAAAAAAAAAgCU
+AuAFAADABAAAAgABAP//AAASABQAAAAAAP//CQIAAAAAjQQAAAAAUAWUAv//AAAAAAYAAgAAAAkC
+UAUJAlAFCQKgAhkABAA8AAAAAAA6AAAaAwDSkAAdAAAaDABbXAFJsADKzACmGg0AR1wBy9UAAABs
+ARoOAB0aEgApLAJ9cAEjGhMAHQIAAAARABgAAAAAAP//AQADAAQAAAAHANwACQA8ARAACgAAAA==
+</rawitemdata></item></view>
+

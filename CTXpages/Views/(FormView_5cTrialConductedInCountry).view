@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<view name='(FormView\TrialConductedInCountry)' alias='FormViewTrialConductedInCountry'
+ xmlns='http://www.lotus.com/dxl' version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780'
+ hide='web mobile' showinmenu='false' publicaccess='false' designerversion='8.5.3'
+ comment='Used in the Bilogical Application Form to Display Product against the application'
+ unreadmarks='none' onopengoto='top' onrefresh='refresh' headers='beveled'
+ opencollapsed='false' showresponsehierarchy='false' showmargin='true' shrinkrows='false'
+ extendlastcolumn='true' showhierarchies='false' unreadcolor='black' rowlinecount='1'
+ headerlinecount='1' rowspacing='1.5' bgcolor='white' altrowcolor='#f7f7f7'
+ totalscolor='black' headerbgcolor='white' boldunreadrows='false' evaluateactions='false'
+ allownewdocuments='false' allowcustomizations='false' hidemarginborder='false'
+ marginwidth='0px' marginbgcolor='white' gridstyle='solid' gridcolor='#d2d2d2'
+ uniquekeys='false' indexrefresh='automatic' indexdiscard='inactivebyinterval'
+ indexdiscardinterval='24' initialbuildrestricted='false' noemptycategories='true'
+ formatnoteid='DF37F98E2D4A9A29CA2577A30082CDB1'>
+<noteinfo noteid='4b6' unid='3E6C77DEE2911A57CA257F770006FEC7' sequence='14'>
+<created><datetime dst='true'>20160315T121624,39+11</datetime></created>
+<modified><datetime>20160628T151506,31+10</datetime></modified>
+<revised><datetime>20160628T151506,30+10</datetime></revised>
+<lastaccessed><datetime dst='true'>20191127T020256,17+11</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,96+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='selection'><formula>SELECT (Type="TrialConductedInCountry")  &amp; IsActiveVersion="1"</formula></code><code
+ event='form'><formula>Type</formula></code><code event='querypaste'><lotusscript
+>Sub Querypaste(Source As Notesuiview, Continue As Variant)
+	Continue = False
+End Sub
+</lotusscript></code><code event='queryopendocument'><lotusscript>Sub Queryopendocument(Source As Notesuiview, Continue As Variant)
+	Continue = False
+End Sub
+</lotusscript></code>
+<actionbar bgcolor='#f0f0f0' bordercolor='black'>
+<actionbuttonstyle bgcolor='#f0f0f0'/><font size='9pt' color='system'/><border
+ style='solid' width='0px 0px 1px' color='system'/>
+<action title='Categori_ze' showinbar='false' systemcommand='categorize'/>
+<action title='_Edit Document' showinbar='false' systemcommand='edit'/>
+<action title='_Send Document' showinbar='false' systemcommand='send'/>
+<action title='_Forward' showinbar='false' systemcommand='forward'/>
+<action title='_Move To Folder...' showinbar='false' systemcommand='movetofolder'/>
+<action title='_Remove From Folder' showinbar='false' systemcommand='removefromfolder'/></actionbar>
+<column sort='ascending' hidedetailrows='false' itemname='$find' width='1.3750'
+ resizable='true' separatemultiplevalues='true' sortnoaccent='true' sortnocase='true'
+ showaslinks='false' categorized='true' twisties='true'><font color='navy'
+ style='bold' name='Arial' pitch='variable' truetype='true' familyid='20'/><columnheader
+><font size='9pt' style='bold'/></columnheader><code event='value'><formula
+>@Text(ApplicationID)+"~"+@Text(ApplicationVersion) + "~" + DataSection</formula></code></column>
+<column sort='descending' hidedetailrows='false' itemname='$sort' width='11.6250'
+ resizable='true' separatemultiplevalues='true' sortnoaccent='true' sortnocase='true'
+ flatinr5='true' showaslinks='false' categorized='true' hidden='true' twisties='true'><font
+ color='olive' name='Arial' pitch='variable' truetype='true' familyid='20'/><columnheader
+><font size='9pt' style='bold'/></columnheader><code event='value'><formula
+>@ReplaceSubstring(@Right(@Right(RecordUNID;"~");"~");"~";"\\")</formula></code></column>
+<column hidedetailrows='false' itemname='TrialConductedInCountry_Label' width='25'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='true' sortnocase='true'
+ showaslinks='false'><font size='9pt' name='Arial' pitch='variable' truetype='true'
+ familyid='20'/><columnheader><font size='9pt' style='bold'/></columnheader></column></view>
+

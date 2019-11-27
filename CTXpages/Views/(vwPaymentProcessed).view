@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='utf-8'?>
+<view name='(vwPaymentProcessed)' alias='vwPaymentProcessed' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' showinmenu='false'
+ publicaccess='false' designerversion='8.5.3' unreadmarks='none' onopengoto='lastopened'
+ onrefresh='displayindicator' headers='beveled' opencollapsed='true' showresponsehierarchy='true'
+ showmargin='true' shrinkrows='false' extendlastcolumn='true' showhierarchies='false'
+ unreadcolor='black' rowlinecount='3' headerlinecount='1' rowspacing='1' bgcolor='white'
+ altrowcolor='#efefef' totalscolor='gray' headerbgcolor='white' boldunreadrows='false'
+ evaluateactions='false' allownewdocuments='false' allowcustomizations='false'
+ hidemarginborder='false' marginwidth='0px' marginbgcolor='white' uniquekeys='false'
+ indexdiscard='inactivebyinterval' indexdiscardinterval='336' initialbuildrestricted='false'
+ noemptycategories='false'>
+<noteinfo noteid='5e6' unid='7D122A830F4AA8DDCA257F770006FDC5' sequence='14'>
+<created><datetime dst='true'>20160315T121621,81+11</datetime></created>
+<modified><datetime>20160628T151507,07+10</datetime></modified>
+<revised><datetime>20160628T151507,06+10</datetime></revised>
+<lastaccessed><datetime>20160628T151507,06+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,52+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='selection'><formula>SELECT ApplicationStatus="Payment Processed" &amp; INWORKMAN != "Y"</formula></code>
+<actionbar bgcolor='navy' bordercolor='black'>
+<actionbuttonstyle showdropdown='true' bgcolor='#6260a1'/><font size='9pt'
+ color='white'/><border width='0px 0px 1px'/>
+<action title='_Close' icon='27' showinmenu='false' hide='notes web'><code
+ event='click'><formula>@Command([FileCloseWindow])</formula></code></action>
+<action title='_Edit' icon='5' showinmenu='false' systemcommand='edit'/>
+<action title='Categori_ze' showinmenu='false' showinbar='false' systemcommand='categorize'/>
+<action title='Send Docu_ment' showinmenu='false' showinbar='false' systemcommand='send'/>
+<action title='_Forward' showinmenu='false' showinbar='false' systemcommand='forward'/>
+<action title='_Move To Folder...' showinmenu='false' showinbar='false' systemcommand='movetofolder'/>
+<action title='_Remove From Folder' showinmenu='false' showinbar='false' systemcommand='removefromfolder'/></actionbar>
+<column hidedetailrows='false' itemname='SubmissionID' width='10' resizable='true'
+ separatemultiplevalues='false' sortnoaccent='true' sortnocase='true' showaslinks='false'><font
+ size='8pt' name='Arial' pitch='variable' truetype='true' familyid='20'/><columnheader
+ title='SubmissionID'><font size='8pt' style='bold' name='Arial' pitch='variable'
+ truetype='true' familyid='20'/></columnheader><numberformat legacy='true'
+ format='general' varying='true' punctuated='false' parens='false' percent='false'
+ bytes='false'/></column>
+<column hidedetailrows='false' itemname='ApplicationStatus' width='13.5000'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='true' sortnocase='true'
+ showaslinks='false'><font size='8pt' name='Arial' pitch='variable' truetype='true'
+ familyid='20'/><columnheader title='Application Status'><font size='8pt'
+ style='bold' name='Arial' pitch='variable' truetype='true' familyid='20'/></columnheader><numberformat
+ legacy='true' format='general' varying='true' punctuated='false' parens='false'
+ percent='false' bytes='false'/></column></view>
+

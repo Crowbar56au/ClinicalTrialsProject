@@ -1,0 +1,127 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form name='(Attachment)' alias='Attachment' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='web mobile'
+ nocompose='true' publicaccess='false' designerversion='7' comment='backend'
+ renderpassthrough='true'>
+<noteinfo noteid='432' unid='118E991092A6DD48CA257FD8000B2A94' sequence='14'>
+<created><datetime>20160620T120157,96+10</datetime></created>
+<modified><datetime>20160628T151505,96+10</datetime></modified>
+<revised><datetime>20160628T151505,95+10</datetime></revised>
+<lastaccessed><datetime>20160628T151505,95+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,70+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='windowtitle'><formula>Type + " - " + ApplicationId</formula></code>
+<body><richtext>
+<pardef id='1' leftmargin='0.7868in' spacebefore='1.5' hide='notes web mobile'/><subformref
+ name='CommonActionButtons'/>
+<pardef id='2'/>
+<par def='2'><run><font name='Verdana' pitch='variable' truetype='true' familyid='20'/></run></par>
+<table widthtype='fitmargins' cellbordercolor='#e1e1e1' colorstyle='altrows'
+ bgcolor='white' altbgcolor='#efefef' rowspacing='0.0396in' refwidth='10.5000in'><tablecolumn
+ width='1.9688in'/><tablecolumn width='100%'/>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<pardef id='4' align='right' leftmargin='1%' rightmargin='99%' keepwithnext='true'
+ keeptogether='true'/>
+<par def='4'><run><font size='9pt' name='Verdana' pitch='variable' truetype='true'
+ familyid='20' color='navy'/>Source Database:</run></par></tablecell>
+<tablecell borderwidth='1px 0px'>
+<pardef id='5' leftmargin='1%' keepwithnext='true' keeptogether='true'/>
+<par def='5'><run><font size='9pt' name='Verdana' pitch='variable' truetype='true'
+ familyid='20'/></run><run><font size='9pt' name='Verdana' pitch='variable'
+ truetype='true' familyid='20'/><field type='text' kind='computedwhencomposed'
+ name='SourceNotesDatabase'><code event='defaultvalue'><formula>@ThisValue</formula></code></field></run><run
+><font size='9pt' name='Verdana' pitch='variable' truetype='true' familyid='20'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font size='9pt' name='Verdana' pitch='variable' truetype='true'
+ familyid='20' color='navy'/>Source ID:</run></par></tablecell>
+<tablecell borderwidth='1px 0px'>
+<par def='5'><run><font size='9pt' name='Verdana' pitch='variable' truetype='true'
+ familyid='20'/></run><run><font size='9pt' name='Verdana' pitch='variable'
+ truetype='true' familyid='20'/><field type='text' kind='computedwhencomposed'
+ name='SourceReferenceID'><code event='defaultvalue'><formula>@ThisValue</formula></code></field></run><run
+><font size='9pt' style='bold' name='Verdana' pitch='variable' truetype='true'
+ familyid='20'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell valign='center' borderwidth='1px 0px'>
+<par def='4'><run><font size='9pt' name='Verdana' pitch='variable' truetype='true'
+ familyid='20' color='navy'/>Source Version Numbers:</run></par></tablecell>
+<tablecell valign='center' borderwidth='1px 0px'>
+<par def='5'><run><font name='Verdana' pitch='variable' truetype='true' familyid='20'/></run><run
+><font size='9pt' name='Verdana' pitch='variable' truetype='true' familyid='20'/><field
+ type='number' allowmultivalues='true' kind='editable' name='LinkedSourceVersionNumbers'
+ listinputseparators='comma semicolon' listdisplayseparator='semicolon'><numberformat
+ format='general' digits='2' punctuated='false' parens='false' percent='false'
+ bytes='false'/><code event='defaultvalue'><formula>@ThisValue</formula></code></field></run><run
+><font size='9pt' name='Verdana' pitch='variable' truetype='true' familyid='20'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font size='9pt' name='Verdana' pitch='variable' truetype='true'
+ familyid='20' color='navy'/>Attachment Author:</run></par></tablecell>
+<tablecell borderwidth='1px 0px'>
+<par def='5'><run><font name='Verdana' pitch='variable' truetype='true' familyid='20'/></run><run
+><font size='9pt' name='Verdana' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='AttachmentAuthor'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><run><font size='9pt' name='Verdana'
+ pitch='variable' truetype='true' familyid='20'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell valign='center' borderwidth='1px 0px'>
+<par def='4'><run><font size='9pt' name='Verdana' pitch='variable' truetype='true'
+ familyid='20' color='navy'/>Attachment Id:</run></par></tablecell>
+<tablecell valign='center' borderwidth='1px 0px'>
+<par def='5'><run><font name='Verdana' pitch='variable' truetype='true' familyid='20'/></run><run
+><font size='9pt' name='Verdana' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='AttachmentID'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><run><font size='9pt' name='Verdana'
+ pitch='variable' truetype='true' familyid='20'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell borderwidth='1px 0px'>
+<par def='4'><run><font size='9pt' name='Verdana' pitch='variable' truetype='true'
+ familyid='20' color='navy'/>Attachment Context:</run></par></tablecell>
+<tablecell borderwidth='1px 0px'>
+<par def='5'><run><font name='Verdana' pitch='variable' truetype='true' familyid='20'/></run><run
+><font size='9pt' name='Verdana' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='AttachmentContext'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><run><font name='Verdana' pitch='variable'
+ truetype='true' familyid='20' color='navy'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell valign='center' borderwidth='1px 0px'>
+<par def='4'><run><font size='9pt' name='Verdana' pitch='variable' truetype='true'
+ familyid='20' color='navy'/>Attachment Location:</run></par></tablecell>
+<tablecell valign='center' borderwidth='1px 0px'>
+<par def='5'><run><font name='Verdana' pitch='variable' truetype='true' familyid='20'/></run><run
+><font size='9pt' name='Verdana' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='AttachmentLocation'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><run><font size='9pt' name='Verdana'
+ pitch='variable' truetype='true' familyid='20'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell valign='center' borderwidth='1px 0px'>
+<par def='4'><run><font size='9pt' name='Verdana' pitch='variable' truetype='true'
+ familyid='20' color='navy'/>Attachment File Name:</run></par></tablecell>
+<tablecell valign='center' borderwidth='1px 0px'>
+<par def='5'><run><font name='Verdana' pitch='variable' truetype='true' familyid='20'/></run><run
+><font size='9pt' name='Verdana' pitch='variable' truetype='true' familyid='20'/><field
+ type='text' kind='computedwhencomposed' name='AttachmentFileName'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><run><font size='9pt' name='Verdana'
+ pitch='variable' truetype='true' familyid='20'/></run></par></tablecell></tablerow>
+<tablerow>
+<tablecell valign='center' borderwidth='1px 0px'>
+<par def='4'><run><font size='9pt' name='Verdana' pitch='variable' truetype='true'
+ familyid='20' color='navy'/>The Attachment:</run></par></tablecell>
+<tablecell valign='center' borderwidth='1px 0px'>
+<par def='5'><run><font name='Verdana' pitch='variable' truetype='true' familyid='20'/></run><run
+><font size='9pt' name='Verdana' pitch='variable' truetype='true' familyid='20'/><field
+ type='richtext' kind='editable' name='Attachment'><code event='defaultvalue'><formula
+>@ThisValue</formula></code></field></run><run><font size='9pt' name='Verdana'
+ pitch='variable' truetype='true' familyid='20'/></run></par></tablecell></tablerow></table>
+<pardef id='6' leftmargin='1in' hide='notes web'/>
+<par def='6'/><subformref name='Sponsor Web Security'/>
+<par def='6'/></richtext></body>
+<item name='$SubForm_RepIDs' sign='true'><textlist><text>0000000000000000</text><text
+>0000000000000000</text></textlist></item>
+<item name='LinkedSourceVersionNumbers' summary='false' sign='true'><number
+>0</number></item>
+<item name='$$ScriptName' summary='false' sign='true'><text>Attachment</text></item></form>
+

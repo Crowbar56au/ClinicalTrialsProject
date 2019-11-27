@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<sharedfield name='WebAuthors' xmlns='http://www.lotus.com/dxl' version='9.0'
+ maintenanceversion='1.0' replicaid='CA257FDB001B5780' designerversion='7'>
+<noteinfo noteid='3ee' unid='EFC046E760D5DCB0CA257F770007012C' sequence='13'>
+<created><datetime dst='true'>20160315T121630,52+11</datetime></created>
+<modified><datetime>20160628T151505,81+10</datetime></modified>
+<revised><datetime>20160628T151505,80+10</datetime></revised>
+<lastaccessed><datetime>20160628T151505,80+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,53+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><field
+ type='authors' allowmultivalues='true' kind='computed' name='WebAuthors'
+ listinputseparators='comma newline' listdisplayseparator='newline'><code
+ event='defaultvalue'><formula>CID := @Text(@DbLookup( "" : "NoCache" ; "" : UserManageDB ; "LULM" ; @Name( [CN] ; @UserName ) ; "ClientID" ));
+REM {This assumes that the groups are prefixed with SIME, these groups are created by the process new user Agent in the User Management DB};
+@If( @IsError( CID ) ; "ERROR: User " + @Name( [CN] ; @UserName ) + " not found in User Management database" ; "SIME" + CID) : "[BMUOfficers]" : "[LMOfficers]" : "LocalDomainServers" : "OtherDomainServers"</formula></code></field>
+<item name='$HTMLCode' sign='true'>
+<rawitemdata type='1'>
+</rawitemdata></item></sharedfield>
+

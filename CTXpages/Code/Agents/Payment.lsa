@@ -1,0 +1,588 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='Payment' xmlns='http://www.lotus.com/dxl' version='9.0' maintenanceversion='1.0'
+ replicaid='CA257FDB001B5780' hide='v3' publicaccess='false' designerversion='8.5.3'
+ restrictions='unrestricted' activatable='false'>
+<noteinfo noteid='386' unid='046421008A0FBA75CA257F7700070982' sequence='14'>
+<created><datetime dst='true'>20160315T121651,86+11</datetime></created>
+<modified><datetime>20160628T151505,28+10</datetime></modified>
+<revised><datetime>20160628T151505,27+10</datetime></revised>
+<lastaccessed><datetime>20160628T151505,27+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,19+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151505,34+10</datetime></designchange>
+<trigger type='scheduled'>
+<schedule type='byminutes' hours='0' minutes='15' runlocation='specific' runserver='CN=DWCBRDOMI01/OU=SVR/O=TGADEV'>
+<starttime><datetime>T090000,00</datetime></starttime>
+<endtime><datetime>T200000,00</datetime></endtime></schedule></trigger>
+<documentset type='all'/><code event='options'><lotusscript>Option Public
+Option Declare
+
+Use "NotesDocumentArray"
+Use "GetDatabases"
+Use "ErrorLog"
+
+
+%REM
+PB 17.12.2003
+This agent performs the following tasks:
+	- Creation of payment tasks in the FSG intray
+	- Update of values on application documents when payments are received
+
+VN 30/11/2006 TGA024 Invoice Enhancement
+   Update InvoiceNumber field in the GeneratePaymentDocument function
+
+VN 11/10/2007 Project 7
+  - Changed the Declaration part (adding new constant)
+  - Change the GeneratePaymentDocument function.
+
+SMS 22/05/08 SYS-177
+ - generatePaymentDocument
+
+RBL - 04/06/2011
+ - Copied into Clinical Trials from Biologicals and updated accordingly
+ 
+ 
+ '#TSK-40374 03/04/2013 GM Modified the "getLowestLocationID" function 
+
+BW01 - 15/08/2013 INC-28688
+ - Ensure PaymentFees is a numeric datatype before comparison is done on it in "GetDocumentsRequiringPayment" agent.
+ 
+ 
+WP - 16/03/2015 - INC 63529 - Old code using BiologicalCode as key to find the InventoryCode - replace with the N~CTN~New (Variation or PushBack)
+%END REM
+
+</lotusscript></code><code event='declarations'><lotusscript>'########## Script Constants ##########
+'Form Constants
+Private Const csFORM_TASK											=		"task"
+'View Constants
+Private Const csVIEW_LOOKUPACTIVEPAYMENTS			=		"LUActivePayment"
+Private Const csVIEW_LOOKUPUNPAIDAPPLICATIONS	=		"LUUnpaidApplications"
+'Error Constants
+Private Const csERROR_INTRAYDBNOTFOUND				=		"A handle to the Intray database could not be obtained"
+Private Const csERROR_PAYMENTDBNOTFOUND			=		"A handle cannot be obtained to PaymentDb"
+Private Const csERROR_UNPAIDDOCNOTFOUND			=		"A handle cannot be obtained to the current unpaid document"
+'Search Constants
+Private Const csSEARCH_COMPLETEDPAYMENTS			=		"FIELD System = TRIALS AND FIELD Status = Active AND (FIELD PaymentStatus = Paid OR FIELD PaymentStatus = Rejected OR FIELD PaymentStatus = Withdrawn)"
+'Value Constants
+Private Const ciVAL_USERDEFINEDERROR					=		1001
+Private Const csVAL_ACTIVE											=		"Active"
+Private Const csVAL_AGENTSTART									=		"Payment Agent Start"
+Private Const csVAL_AGENTFINISH									=		"Payment Agent Finish"
+Private Const csVAL_COMPLETED									=		"Completed"
+Private Const csVAL_BUSINESSSYSTEM							=		"TRIALS"
+Private Const csVAL_NEW												=		"New"
+Private Const csVAL_PAID												=		"Paid"
+Private Const csVAL_PAYMENT										=		"Payment"
+Private Const csVAL_PAYMENTPROCESSED					=		"Payment Processed"
+Private Const csVAL_REJECTED										=		"Rejected"
+Private Const csVAL_SYSTEMNAME								=		"TRIALS Submitted Applications"
+Private Const csVAL_WITHDRAWN									=		"Withdrawn"
+Private Const csVAL_SysMask											=		"N"
+
+'Field Constants
+Private Const csFIELD_ACTUALSTART							=		"ActualStart"
+Private Const csFIELD_APPLICATIONID							=		"ApplicationId"
+Private Const csFIELD_APPLICATIONIDENTIFIER				=		"ApplicationIdentifier"
+Private Const csFIELD_APPLICATIONSTATUS					=		"ApplicationStatus"
+Private Const csFIELD_APPLICATIONTYPE						=		"ApplicationType"
+Private Const csFIELD_ARTGID										=		"ArtgId"
+Private Const csFIELD_BILLINGLOCATIONID					=        "BillingLocationID" ' VN 11/03/2009 EBE-60
+Private Const csFIELD_CLIENTID									=		"ClientID"			'PH 1/10/2009  EBSP-1160  Added
+Private Const csFIELD_CLASS							=		"Class"
+Private Const csFIELD_CLONESOURCE							=		"CloneSource"
+Private Const csFIELD_FEE											=		"Fee"
+Private Const csFIELD_FORM											=		"Form"
+Private Const csFIELD_PAYMENTSTATUS						=		"PaymentStatus"
+'Private Const csFIELD_PRODUCTNAME							=		"ProductName"
+Private Const csFIELD_PRODUCTNAME							=		"LabelName"
+Private Const csFIELD_PRODUCTREFERENCE				=		"ProductReference"
+Private Const csFIELD_RECEIPTNO								=		"ReceiptNo"
+Private Const csFIELD_RECEIPTNUMBER						=		"ReceiptNumber"
+Private Const csFIELD_INVOICENUMBER 						= 		"InvoiceNumber"
+Private Const csFIELD_INVENTORYCODE 						= 		"InventoryCode"		' VN added InventoryCode	
+Private Const csFIELD_SPECIALTASKTYPE						=		"SpecialTaskType"
+Private Const csFIELD_SPONSORID								=		"SponsorId"
+Private Const csFIELD_SPONSORNAME							=		"SponsorName"
+Private Const csFIELD_STATUS										=		"Status"
+Private Const csFIELD_SUBMISSIONID							=		"SubmissionId"
+Private Const csFIELD_SUBMISSIONDATE						=		"SubmissionDate"
+'Private Const csFIELD_SUBMISSIONCOST						=		"SubmissionCost"
+Private Const csFIELD_SUBMISSIONCOST						=		"ApplicationFees"
+Private Const csFIELD_SUBFORM									=		"Subform"
+Private Const csFIELD_SYSTEM										=		"System"
+Private Const csFIELD_TGAIN											=		"TGAIN"
+Private Const csFIELD_TYPE											=		"Type"
+Private Const csFIELD_WMIDTARGETDB						=		"WMID_TARGETDATABASE"
+Private Const csFIELD_WMIDTARGETDOC						=		"WMID_TARGETDOC"
+Private Const csFIELD_WMIDTASK									=		"WMID_Task"
+
+Private RuleManagementFeeProfile As NotesView
+
+Dim ValidationDb As NotesDatabase
+Dim vwByCondTypeValue As notesview
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	
+	On Error Goto ErrorHandler
+	
+	Print "Payment Agent Start"
+	
+	Dim Session As New NotesSession
+	Dim intrayDb As NotesDatabase
+	Dim fsgDb As NotesDatabase
+	Dim intrayUnpaidDocView As NotesView
+	Dim newUnpaidDocs As NotesDocumentArray
+	Dim newUnpaidDoc As NotesDocument
+
+	
+	Set intrayDb = Session.CurrentDatabase
+	Set fsgDb = fdbGetDWM()
+	Set intrayUnpaidDocView = intrayDb.GetView( csVIEW_LOOKUPUNPAIDAPPLICATIONS )
+	
+	'Get collection of new documents requiring payment
+	Set newUnpaidDocs = GetDocumentsRequiringPayment( fsgDb, intrayUnpaidDocView )
+	
+	'Set validationDb =  fdbGetValRules
+	'/ INC 63529 - Get CT Validation Instead 
+	Set validationDb =  fdbGetDatabase("CTV_Path")
+	Set RuleManagementFeeProfile = validationDb.GetView("vwLuInventoryCode")	
+	Set vwByCondTypeValue =  validationDb.GetView("vwLuCondTypeByValue")	
+	
+	'Generate a payment document for each document in the new unpaid collection
+	If Not newUnpaidDocs Is Nothing Then
+		Set newUnpaidDoc = newUnpaidDocs.GetFirstDocument
+		While Not newUnpaidDoc Is Nothing
+			Call GeneratePaymentDocument( fsgDb, newUnpaidDoc )
+			Set newUnpaidDoc = newUnpaidDocs.GetNextDocument( newUnpaidDoc )
+		Wend
+	End If
+	
+	'Process completed payment documents
+	Call ProcessCompletedPayments( intrayDb, fsgDb )
+	
+Out:
+	Print csVAL_AGENTFINISH
+	Exit Sub
+	
+ErrorHandler:
+	Call HandleError( csVAL_SYSTEMNAME, "Payment::Initialise (Agent)", "1", "Error: " &amp; Str( Err ) &amp; " - " &amp; Error$ ) 'ErrorLog
+	Resume Out
+	
+End Sub
+
+</lotusscript></code><code event='UpdateApplicationDocument'><lotusscript
+>Private Function UpdateApplicationDocument( intrayDb As NotesDatabase, applicationDoc As NotesDocument, paymentDoc As NotesDocument ) As Integer
+	
+	'PB 17.12.2003	
+	'If the payment document is in the intray, update it's parent document status and payment values
+	
+	On Error Goto Errorhandler
+	
+	UpdateApplicationDocument = True
+	
+	'Check the database is valid
+	If Not ( intrayDb.IsOpen ) Then
+		Error ciVAL_USERDEFINEDERROR, csERROR_INTRAYDBNOTFOUND
+	End If
+	
+	'Check we have a valid document
+	If Not ( paymentDoc Is Nothing ) Then
+		If ( paymentDoc.IsValid ) And Not ( paymentDoc.IsDeleted ) Then
+			
+			'Check we have a valid document
+			If Not ( applicationDoc Is Nothing ) Then
+				If ( applicationDoc.IsValid ) And Not ( applicationDoc.IsDeleted ) Then
+					
+					'Update the parent application as a result of the FSG process
+					Select Case paymentDoc.GetItemValue( csFIELD_PAYMENTSTATUS )(0)
+					Case csVAL_PAID
+						'The application is paid, update it with payment values
+						Call applicationDoc.ReplaceItemValue( csFIELD_APPLICATIONSTATUS, csVAL_PAYMENTPROCESSED )
+						Call applicationDoc.ReplaceItemValue( csFIELD_TGAIN, paymentDoc.GetItemValue( csFIELD_TGAIN )(0) )
+						Call applicationDoc.ReplaceItemValue( csFIELD_RECEIPTNO, paymentDoc.GetItemValue( csFIELD_RECEIPTNUMBER )(0) )
+						Call applicationDoc.ReplaceItemValue( csFIELD_RECEIPTNUMBER, paymentDoc.GetItemValue( csFIELD_RECEIPTNUMBER )(0) )			
+						Call applicationDoc.ReplaceItemValue( "PaymentReceiptDate", paymentDoc.GetItemValue( "ActualEnd")(0) )
+					Case csVAL_REJECTED
+						'The application is rejected, update it's status and decision date
+						Call applicationDoc.ReplaceItemValue( csFIELD_APPLICATIONSTATUS, csVAL_REJECTED )
+						'Add date of decision
+					Case csVAL_WITHDRAWN
+						'The application is withdrawn, update it's status and decision date
+						Call applicationDoc.ReplaceItemValue( csFIELD_APPLICATIONSTATUS, csVAL_WITHDRAWN )
+						'Add date of decision
+					End Select
+					
+					'Save the parent document
+					Call applicationDoc.Save( True, False )
+				End If
+			End If
+			
+		End If
+	End If
+	
+Out:
+	Exit Function
+	
+ErrorHandler:
+	UpdateApplicationDocument = False
+	Call HandleError( csVAL_SYSTEMNAME ,"Payment::UpdateApplicationDocument (Agent)", "1" , "Error: " &amp; Str( Err ) &amp; " - " &amp; Error$   ) 'ErrorLog
+	Resume Out
+	
+End Function
+
+</lotusscript></code><code event='GetDocumentsRequiringPayment'><lotusscript
+>Private Function GetDocumentsRequiringPayment( paymentDb As NotesDatabase, unpaidDocumentsView As NotesView ) As Variant
+	
+	'PB 17.12.2003	
+	'Check each document against the payment database, if a related document is found then move on to the 
+	'next document otherwise add the document to the array before moving on to the next document.
+	
+	On Error Goto ErrorHandler
+	
+	Dim docsRequiringPayment As New NotesDocumentArray
+	Dim paymentView As NotesView	
+	Dim currentDoc As NotesDocument
+	Dim paymentDoc As NotesDocument
+	Dim requireFees As Boolean 'BW01
+	
+	If paymentDb Is Nothing Then
+		Error ciVAL_USERDEFINEDERROR, csERROR_PAYMENTDBNOTFOUND
+	End If
+	
+	Set paymentView = paymentDb.GetView( csVIEW_LOOKUPACTIVEPAYMENTS )
+	
+	unpaidDocumentsView.AutoUpdate=False
+	
+	Set currentDoc = unpaidDocumentsView.GetFirstDocument
+	While Not currentDoc Is Nothing 
+		Set paymentDoc = paymentView.GetDocumentByKey( currentDoc.UniversalID )
+		If ( paymentDoc Is Nothing ) Then
+			'&gt;&gt;&gt;BW01
+			requireFees = False
+			If Isnumeric(currentDoc.ApplicationFees(0)) Then
+				If (Cdbl(currentDoc.ApplicationFees(0)) &gt; 0) Then
+					requireFees = True
+				End If
+			End If
+			'Only add the application to unpaid if there is something to pay
+			'If (currentDoc.ApplicationFees(0) &gt; 0) Then
+			If requireFees Then
+				'&lt;&lt;&lt;BW01	
+				'No payment document exists, add this document to the array
+				Call docsRequiringPayment.AddDocument( currentDoc )
+			Else
+				Call currentDoc.ReplaceItemValue( csFIELD_APPLICATIONSTATUS, csVAL_PAYMENTPROCESSED )
+				Call currentDoc.ReplaceItemValue( csFIELD_TGAIN, "TGAIN" )
+				Call currentDoc.ReplaceItemValue( csFIELD_RECEIPTNO,  currentDoc.SubmissionId(0) )
+				Call currentDoc.ReplaceItemValue( csFIELD_RECEIPTNUMBER, currentDoc.SubmissionId(0) )
+				Call currentDoc.ReplaceItemValue( "PaymentReceiptDate", Now)
+				Call currentDoc.Save(True, False)
+			End If
+		End If
+		Set currentDoc = unpaidDocumentsView.GetNextDocument( currentDoc )
+	Wend
+	
+	'Return the documents not associated with payment docs
+	Set GetDocumentsRequiringPayment = docsRequiringPayment
+	
+Out:
+	Exit Function
+	
+ErrorHandler:
+	Set GetDocumentsRequiringPayment = Nothing	
+	Call HandleError( csVAL_SYSTEMNAME ,"Payment::GetDocumentsRequiringPayment (Agent)", "1" , "Error: " &amp; Str( Err ) &amp; " - " &amp; Error$ ) 'ErrorLog
+	Resume Out
+	
+End Function
+
+</lotusscript></code><code event='getLowestLocationID'><lotusscript>Private Function getLowestLocationID(ClientID As String) As Long
+	On Error Goto errorhandler
+	
+	Dim ndbClient As NotesDatabase
+	Dim lookupClient As NotesView 
+	Dim dc As NotesDocumentCollection	
+	Dim doc As NotesDocument 
+	Dim temp As Long 	
+	
+	Set ndbClient = fdbGetClient
+	Set lookupClient = ndbClient.GetView("LULocationByClientID")
+	'#TSK-40374 03/04/2013 GM adding the true parameter to get an exact match
+	Set dc = lookupClient.GetAllDocumentsByKey(ClientID,True )
+	If dc Is Nothing Then 
+		getLowestLocationID = -1
+		Exit Function
+	End If
+	
+	If dc.Count = 0  Then 
+		getLowestLocationID = -1
+		Exit Function
+	End If
+	
+	temp = 0
+	Set doc = dc.GetFirstDocument
+	While Not doc Is Nothing
+		If (Ucase(doc.LOCATION_TYPE(0)) = "P") And (Ucase(doc.Status(0)) = "A")Then
+			If temp = 0 Then 
+				temp = doc.LOCATION_ID(0)
+			Else
+				If temp &gt; doc.LOCATION_ID(0) Then
+					temp = doc.LOCATION_ID(0)
+				End If
+			End If			
+		End If
+		Set doc = dc.GetNextDocument(doc)
+	Wend
+	
+	If temp = 0 Then getLowestLocationID = -1 Else getLowestLocationID = temp
+	Exit Function
+	
+errorhandler:
+	Error Err, Error$ &amp; Chr$(10) &amp; " in procedure " &amp; Getthreadinfo(1) &amp; ", line " &amp; Cstr(Erl)		  	
+End Function
+
+</lotusscript></code><code event='ProcessCompletedPayments'><lotusscript>Private Function ProcessCompletedPayments( intrayDb As NotesDatabase, paymentDb As NotesDatabase ) As Integer
+	
+	'PB 17.12.2003	
+	'Check the payment database for payment documents awaiting completion.  When found update the status of 
+	'the application document.
+	
+	On Error Goto ErrorHandler
+	
+	ProcessCompletedPayments = True
+	
+	Dim verifiedPaymentDocs As NotesDocumentCollection
+	Dim paymentDoc As NotesDocument
+	Dim applicationDoc As NotesDocument
+	
+	'Set verifiedPaymentDocs = paymentDb.FtSearch( csSEARCH_COMPLETEDPAYMENTS, 0 )
+	Set verifiedPaymentDocs = paymentDb.Search( {System = "TRIALS" &amp; Status = "Active" &amp; (PaymentStatus = "Paid" | PaymentStatus = "Rejected" | PaymentStatus = "Withdrawn")}, Nothing, 0 )
+	
+	Set paymentDoc = verifiedPaymentDocs.GetFirstDocument
+	While Not paymentDoc Is Nothing
+		
+		'Get application document from intray
+		Set applicationDoc = intrayDb.GetDocumentByUNID( paymentDoc.WMID_Task(0) )
+		
+		'Process completed payment if application doc is found
+		If Not applicationDoc Is Nothing Then
+			'Update the application document with values from the payment document
+			If ( UpdateApplicationDocument( intrayDb, applicationDoc, paymentDoc ) ) Then
+				'Update of application is successful, finalise document	
+				Call applicationDoc.Save( True, False )
+				
+				'Set paymentDoc status to completed if process is successful
+				Call paymentDoc.ReplaceItemValue( csFIELD_STATUS, csVAL_COMPLETED )
+				Call paymentDoc.Save( True, False )
+			End If
+		Else
+				'Application doc could not be located, we shall do nothing
+		End If
+		
+		Set paymentDoc = verifiedPaymentDocs.GetNextDocument( paymentDoc )
+	Wend
+	
+Out:
+	Exit Function
+	
+ErrorHandler:
+	If ( Err = 4091 ) Then
+		'Error is thrown because document could not be found in database.
+		'We wish to continue as if the method returned nothing.
+		Resume Next
+	Else
+		ProcessCompletedPayments = False
+		Call HandleError( csVAL_SYSTEMNAME ,"Payment::ProcessCompletedPayments (Agent)", "1" , "Error: " &amp; Str( Err ) &amp; " - " &amp; Error$   ) 'ErrorLog
+		Resume Out
+	End If
+	
+End Function
+
+</lotusscript></code><code event='GeneratePaymentDocument'><lotusscript>Private Function GeneratePaymentDocument( paymentDb As NotesDatabase, unpaidDoc As NotesDocument ) As NotesDocument
+	
+	'PB 17.12.2003	
+	'Create a new payment document in the payment database
+	Dim tempDoc As NotesDocument 
+	Dim item As NotesItem 
+	Dim BillingLocationID As Long
+	Dim applicationType As String
+	Dim invCodes As Variant, feesDesc As String
+	
+	
+	On Error Goto ErrorHandler
+	
+	If paymentDb Is Nothing Then
+		Error ciVAL_USERDEFINEDERROR, csERROR_PAYMENTDBNOTFOUND
+	End If
+	
+	If unpaidDoc Is Nothing Then
+		Error ciVAL_USERDEFINEDERROR, csERROR_UNPAIDDOCNOTFOUND
+	End If
+	
+	Dim paymentDoc As New NotesDocument( paymentDb )
+	
+	'Set application location values on document
+	Call paymentDoc.ReplaceItemValue( csFIELD_WMIDTARGETDOC, unpaidDoc.UniversalID )
+	Call paymentDoc.ReplaceItemValue( csFIELD_WMIDTARGETDB, unpaidDoc.ParentDatabase.ReplicaID )
+	
+	'Set generic values on document
+	Call paymentDoc.ReplaceItemValue( csFIELD_FORM, csFORM_TASK )
+	Call paymentDoc.ReplaceItemValue( csFIELD_SPECIALTASKTYPE, csVAL_PAYMENT )	
+	Call paymentDoc.ReplaceItemValue( csFIELD_SUBFORM, csVAL_PAYMENT )
+	Call paymentDoc.ReplaceItemValue( csFIELD_STATUS, csVAL_ACTIVE )
+	Call paymentDoc.ReplaceItemValue( csFIELD_PAYMENTSTATUS, csVAL_NEW )
+	Call paymentDoc.ReplaceItemValue( csFIELD_SYSTEM, csVAL_BUSINESSSYSTEM )
+	
+	'Set specific values on document
+	Call paymentDoc.ReplaceItemValue( csFIELD_WMIDTASK, unpaidDoc.UniversalID )
+	Call paymentDoc.ReplaceItemValue( csFIELD_SUBMISSIONID, unpaidDoc.GetItemValue( csFIELD_SUBMISSIONID )(0) )
+	Call paymentDoc.ReplaceItemValue( csFIELD_APPLICATIONIDENTIFIER, unpaidDoc.GetItemValue( csFIELD_APPLICATIONID )(0) )
+	Call paymentDoc.ReplaceItemValue(  csFIELD_ACTUALSTART, unpaidDoc.GetItemValue( csFIELD_SUBMISSIONDATE )(0) )
+	Call paymentDoc.ReplaceItemValue( csFIELD_FEE, unpaidDoc.GetItemValue( csFIELD_SUBMISSIONCOST )(0) )
+	Call paymentDoc.ReplaceItemValue( csFIELD_SPONSORID, unpaidDoc.GetItemValue( csFIELD_SPONSORID )(0) )
+	Call paymentDoc.ReplaceItemValue( csFIELD_CLIENTID, unpaidDoc.GetItemValue( csFIELD_CLIENTID )(0) )			'PH 1/10/2009  EBSP-1160  Added
+	Call paymentDoc.ReplaceItemValue( csFIELD_SPONSORNAME, unpaidDoc.GetItemValue( csFIELD_SPONSORNAME )(0) )
+	Call paymentDoc.ReplaceItemValue( csFIELD_PRODUCTREFERENCE, unpaidDoc.GetItemValue( csFIELD_PRODUCTNAME )(0) )
+	'Call paymentDoc.ReplaceItemValue( csFIELD_TYPE, unpaidDoc.GetItemValue( csFIELD_APPLICATIONTYPE )(0) )  'replaced with code below RBL 04JUN2011
+	
+	applicationType = unpaidDoc.GetItemValue("ClinicalTrialType")(0)
+	If applicationType = "CTX" Then
+		applicationType = "Exemption"
+	Else
+		applicationType = "Notification"
+	End If
+	Call paymentDoc.ReplaceItemValue( csFIELD_TYPE, applicationType)
+	
+	'no bio class in a trials application RBL 04JUN2011
+	'Call paymentDoc.ReplaceItemValue( csFIELD_CLASS, unpaidDoc.GetItemValue( "BiologicalClass" )(0) )
+	'Set tempdoc =  RuleManagementFeeProfile.GetDocumentByKey(paymentDoc.GetItemValue("Type" )(0))
+	
+	'/ INC 63529
+	'Hide the code, since InventoryCode has been generated by Validated Agent and stored in the document.
+	'Set tempdoc =  RuleManagementFeeProfile.GetDocumentByKey(csVAL_SysMask+"~"+unpaidDoc.GetItemValue("BiologicalClassCode" )(0))	
+	
+	'If Not tempdoc Is Nothing Then   '/ INC 63529
+		Dim strAmount As String, strMatCode As String, MatCodeValue As String
+		Dim tmpCondDoc As NotesDocument, condValues As Variant
+		
+		If unpaidDoc.hasItem("FeesDescription") Then
+			feesDesc = unpaidDoc.Getitemvalue("FeesDescription")(0)
+			If feesDesc &lt;&gt; "" Then
+				Dim x As Integer
+				x = 1
+				invCodes = Evaluate({@Explode("} &amp; feesDesc &amp; {";";")}) 
+				Forall invCd In invCodes
+					strAmount = Strleft(Strright(invCd,"~"),"#")
+					'MsgBox "StrAmount = " &amp; strAmount
+					If strAmount &lt;&gt; "" Then
+						If Val(strAmount) &gt; 0 Then
+							Call paymentDoc.ReplaceItemValue( "Amount" &amp; Cstr(x), Val(strAmount))
+							Call paymentDoc.ReplaceItemValue( "MaterialCode" &amp; Cstr(x), Strleft(invCd,"~"))
+							strMatCode = Strright(invCd,"#")
+							If Instr(strMatCode,",") &gt; 0 Then
+								condValues = Evaluate({@Explode("} &amp; strMatCode &amp; {";",")})
+								Forall condVal In CondValues 
+									Set tmpcondDoc = vwByCondTypeValue.Getdocumentbykey(condVal, True)
+									If Not tmpcondDoc Is Nothing Then
+										If matCodeValue = "" Then
+											matCodeValue = tmpCondDoc.ConditionType(0)
+										Else
+											'matCodeValue = matCodeValue &amp; "," &amp; tmpCondDoc.ConditionType(0)
+											matCodeValue = matCodeValue &amp; Chr(13) &amp; tmpCondDoc.ConditionType(0)  'TSK 65486
+										End If
+									End If	
+								End Forall
+							Else
+								Set tmpcondDoc = vwByCondTypeValue.Getdocumentbykey(strMatCode, True)
+								If Not tmpcondDoc Is Nothing Then
+									matCodeValue = tmpCondDoc.ConditionType(0)		
+								End If	
+							End If
+							'MsgBox "strMatCode = " &amp; strMatCode &amp; " and matCodeValue = " &amp; matCodeValue			
+							Call paymentDoc.ReplaceItemValue( "MaterialDescription" &amp; Cstr(x), matCodeValue)
+							x = x + 1
+						End If
+					End If
+				End Forall
+			'Else
+			'	Call paymentDoc.ReplaceItemValue( "MaterialCode1", unpaidDoc.GetItemValue( csFIELD_INVENTORYCODE )(0))	 '/ INC 63529 - add new lines here
+			'	Call paymentDoc.ReplaceItemValue( "Amount1", unpaidDoc.GetItemValue( csFIELD_SUBMISSIONCOST )(0) )					
+			End If
+		'Else
+			'Call paymentDoc.ReplaceItemValue( "MaterialCode1", tempDoc.GetItemValue( csFIELD_INVENTORYCODE )(0))	    '/ INC 63529
+			'Call paymentDoc.ReplaceItemValue( "MaterialCode1", unpaidDoc.GetItemValue( csFIELD_INVENTORYCODE )(0))	 '/ INC 63529 - add new lines here
+			'Call paymentDoc.ReplaceItemValue( "Amount1", unpaidDoc.GetItemValue( csFIELD_SUBMISSIONCOST )(0) )	
+		End If
+		
+			
+	'End If  '/ INC 63529
+	
+' VN 30/11/2006 TGA024 Invoice Enhancement
+	Call paymentDoc.ReplaceItemValue( csFIELD_INVOICENUMBER, unpaidDoc.GetItemValue( csFIELD_INVOICENUMBER )(0) )	
+	Call paymentDoc.ReplaceItemValue( csFIELD_INVENTORYCODE, unpaidDoc.GetItemValue( csFIELD_INVENTORYCODE ))	
+	
+	'now set the billing location ID
+	Set item = unpaidDoc.GetFirstItem(csFIELD_BILLINGLOCATIONID)
+	BillingLocationID = -1
+	If item Is Nothing Then
+		If (Cstr(unpaidDoc.ClientID(0)) &lt;&gt; "") Then
+			If Isnumeric(unpaidDoc.ClientID(0)) Then
+				BillingLocationID = getLowestLocationID(Cstr(unpaidDoc.ClientID(0)))
+			End If
+		End If	
+	Else
+		If Isnumeric(unpaidDoc.BillingLocationID(0)) Then
+			BillingLocationID = Clng(unpaidDoc.BillingLocationID(0))
+		End If
+		
+	End If
+	Call paymentDoc.ReplaceItemValue(csFIELD_BILLINGLOCATIONID, BillingLocationID)	
+	' RFS-47303 12 Nov 2013 - JV
+	' Populate the ClientID and Billing Location ID with the Sponsor's details when Invoice Sponsor = "Y"
+	paymentDoc.InvoiceSponsor = getInvoiceSponsorFlag(unpaidDoc)	' Copy the Invoice Sponsor flag to the Payment document
+	If paymentDoc.InvoiceSponsor(0) = "Y" Then
+		paymentDoc.ClientID = paymentDoc.SponsorID	' (set above)
+		If Isnumeric(unpaidDoc.SponsorAddress(0)) Then
+			paymentDoc.BillingLocationID = Clng(unpaidDoc.SponsorAddress(0))
+		End If
+	End If
+	' End RFS-47303
+	Call paymentDoc.Save( True, False )
+	
+	'Return the saved payment document
+	Set GeneratePaymentDocument = paymentDoc
+	
+Out:
+	Exit Function
+	
+ErrorHandler:
+	Set GeneratePaymentDocument = Nothing
+	Call HandleError( csVAL_SYSTEMNAME ,"Payment::GeneratePayment (Agent)", "1" , "Error: " &amp; Str( Err ) &amp; " - " &amp; Error$   ) 'ErrorLog
+	Resume Out
+	
+End Function
+
+</lotusscript></code><code event='getInvoiceSponsorFlag'><lotusscript>Function getInvoiceSponsorFlag (Doc As NotesDocument) As String
+	
+	' ******************************************************************************************
+	' Purpose: To lookup the Submission document and determine if the Sponsor is to be invoiced
+	' Author: Jeremy Vandersay - 11/11/2013
+	' ******************************************************************************************
+	
+	Dim Lookup As NotesView, tmpDoc As NotesDocument
+	
+	getInvoiceSponsorFlag = ""
+	
+	If Not(Doc Is Nothing) Then
+		Set Lookup = Doc.ParentDatabase.GetView("lkupSubmissionByAppId")
+		If Not(Lookup Is Nothing) Then
+			Set tmpDoc = Lookup.GetDocumentByKey( Doc.ApplicationID(0) + "~" + Cstr(Doc.ApplicationVersion(0)), True)
+			If Not(tmpDoc Is Nothing) Then
+				getInvoiceSponsorFlag = Ucase(tmpDoc.InvoiceSponsor(0))
+			End If
+		End If
+	End If
+	
+End Function</lotusscript></code>
+<item name='$POID'><datetime>20160620T120204,96+10</datetime></item></agent>
+

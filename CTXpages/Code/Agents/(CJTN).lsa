@@ -1,0 +1,440 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(CJTN)' xmlns='http://www.lotus.com/dxl' version='9.0' maintenanceversion='1.0'
+ replicaid='CA257FDB001B5780' hide='v3' publicaccess='false' designerversion='8.5.3'
+ comment='Convert Json To Notes'>
+<noteinfo noteid='452' unid='742981A86507F53ECA257F7700070D07' sequence='14'>
+<created><datetime dst='true'>20160315T121700,87+11</datetime></created>
+<modified><datetime>20160628T151506,01+10</datetime></modified>
+<revised><datetime>20160628T151506,00+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,00+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,75+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151506,07+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+Option Declare
+Use "ls.snapps.JSONReader"
+Use "MIMEJSONDataInterface"
+
+</lotusscript></code><code event='declarations'><lotusscript>
+%REM
+DFS May 2013
+TGA-INC-29052 -  now writes missing data to main application document from 
+Part1, Part2 and Completion documents so values are available in views.	
+%END REM
+'Dim dcAPPS As notesdocumentcollection
+Dim myAPPS() As NotesDocument
+Dim DocCounter As Long
+Dim subDoc As NotesDocument	'Submission
+
+'/New CT August 2014
+Dim vMedBioById As NotesView
+Dim vNewMedBioIngredients As NotesView
+Dim arrayAppIDs() As String
+
+</lotusscript></code><code event='initialize'><lotusscript>
+Sub Initialize
+	Dim s As New NotesSession, db As NotesDatabase, agentThis As NotesAgent
+	Dim bioapp As NotesDocument
+	Set db = s.currentdatabase
+	Set agentThis = s.CurrentAgent
+	On Error Goto ErrorHandler
+	DocCounter = -1
+	
+	Dim subNoteID As String	'the NoteID of the submission document passed into the Agent
+	Dim docApp As NotesDocument	'One Application
+	Dim itemAppKeys As NotesItem	'List of ApplicationID~ApplicationVersion strings for view lookup
+	Dim item As NotesItem
+	Dim view As NotesView	'the view we use to lookup the above string keys
+	Dim strKey As String	'one of the keys from the itemAppKeys item array
+	Dim x As Long	'counter through the array of ApplicationIDs
+	Dim doccount As Long	'the number of NotesDocuments created in memory
+	Dim JSONString As String	'the string we've converted from the current Application's JSON file
+	Dim AppJSONEntryStore As MIMEJSONEntryStore	'for converting an Application's JSON file to a string
+	Dim tmpStr As String
+	Dim tmpVar As Variant
+	Dim secNames(5) As String
+	Dim xVar As Long
+	Dim tmp As Long
+	Dim protocolnumber As String
+	Dim titleofstudy As String
+	Dim startdate As String
+	Dim expectedcompletiondate As String
+	
+	Dim aryApp(0 To 199, 0 To 4) As String 'DFS Apr 2013 TGA-INC-29052 Allow for 200 submissions at one time
+	Dim iIndexA As Long 'DFS Apr 2013 TGA-INC-29052
+	tmp = 0
+	subNoteID = agentThis.ParameterDocID
+	If subNoteID &lt;&gt; "" Then
+		Set view = db.GetView("LookupByApplicationID")
+		If Not view Is Nothing Then
+			
+			Set subDoc = db.GetDocumentByID(subNoteID)
+			If Not subDoc Is Nothing Then
+				
+				secNames(0) = "SIME" + Cstr(subdoc.ClientID(0))
+				secNames(1) = "[TGA]"
+				secNames(2) = "[Admin]"
+				secNames(3) = "[SIMEReader]"
+				secNames(4) = "LocalDomainServers"
+				secNames(5) = "OtherDomainServers"
+				
+				If subDoc.HasItem("ApplicationIDs") Then
+					
+					Set itemAppKeys = subDoc.GetFirstItem("ApplicationIDs")
+					For x = 0 To Ubound(itemAppKeys.Values)
+						strKey = itemAppKeys.Values(x)
+						If Len(strKey) &gt; 0 Then
+							Set docApp = view.GetDocumentByKey(strKey,True)
+							If Not docApp Is Nothing Then
+								
+								JSONString = ""
+								On Error Resume Next
+								Set tmpVar = New MIMEJSONEntryStore(docApp, "JSONMIMEFILE" ,"JSON.txt")
+								On Error Goto ErrorHandler
+								Set AppJSONEntryStore = tmpVar
+								JSONString = AppJSONEntryStore.toJSON
+								doccount = JSONToNotesDocuments(JSONString)
+								Redim Preserve arrayAppIDs(xVar)
+								arrayAppIDs(xVar) = docApp.ApplicationID(0) + "~" + Cstr(docApp.ApplicationVersion(0))
+								xVar = xVar + 1
+								Print "CT CJTN: Document created"
+							Else
+								Msgbox "CT-JSON2Notes: Cannot find an Application with the key '" + strKey + "'"
+								Print "CT-JSON2Notes: Cannot find an Application with the key '" + strKey + "'"
+							End If
+						Else
+							Msgbox "CT-JSON2Notes: One of the Application Keys saved in the Submission Document is blank. Please check Submission Note ID '" + subNoteID + "'"
+							Print "CT-JSON2Notes: One of the Application Keys saved in the Submission Document is blank. Please check Submission Note ID '" + subNoteID + "'"
+						End If
+					Next
+				Else
+					Msgbox "CT-JSON2Notes: The submission document '" + subNoteID + "' doesn't have a required 'ApplicationIDs' field"
+					Print "CT-JSON2Notes: The submission document '" + subNoteID + "' doesn't have a required 'ApplicationIDs' field"
+				End If
+			Else
+				Msgbox "CT-JSON2Notes: Submission Document with NoteID of '" + subNoteID + "' cannot be found/accessed"
+				Print "CT-JSON2Notes: Submission Document with NoteID of '" + subNoteID + "' cannot be found/accessed"
+			End If
+		Else
+			Msgbox "CT-JSON2Notes: Notes view 'LookupByApplicationID' cannot be found or accessed"
+			Print "CT-JSON2Notes: Notes view 'LookupByApplicationID' cannot be found or accessed"
+		End If
+	Else
+		Msgbox "CT-JSON2Notes: Agent ParameterDocID is empty!"
+		Print "CT-JSON2Notes: Agent ParameterDocID is empty!"
+	End If
+	
+	If doccount &gt; 0 Then
+		On Error Resume Next
+		On Error Goto errorhandler
+		For x = Lbound(myAPPS) To Ubound(myAPPS)	'get the application first
+			If myAPPS(x).HasItem("Type") Then
+				If Lcase(myAPPS(x).getfirstitem("Type").text) = "application" Then
+					myAPPS(x).ReplaceItemValue "SubmissionID", subdoc.getfirstitem("SubmissionID")
+					myAPPS(x).ReplaceItemValue "SubmissionDate", subdoc.getfirstitem("SubmissionDate")
+					myAPPS(x).ReplaceItemValue "InvoiceNumber", subdoc.getfirstitem("InvoiceNumber")
+					myAPPS(x).ReplaceItemValue "InvoiceDate", subdoc.getfirstitem("InvoiceDate")
+					myAPPS(x).ReplaceItemValue "PaymentRefNumber", subdoc.getfirstitem("PaymentRefNumber")
+					myAPPS(x).ReplaceItemValue "InvoiceCreatedDTStamp", subdoc.getfirstitem("InvoiceCreatedDTStamp")
+					myAPPS(x).ReplaceItemValue "SubmitterName", subdoc.GetFirstItem("SubmitterName")
+					myAPPS(x).ReplaceItemValue "IsExportedToGP", False
+					myAPPS(x).ReplaceItemValue "IsReceiptImportedFromGP", False
+					myAPPS(x).ReplaceItemValue "IsPaymentReceived", False
+					myAPPS(x).ReplaceItemValue "PaymentReceiptDate", ""
+					myAPPS(x).ReplaceItemValue "PaymentReceiptNumber", ""
+					myAPPS(x).ReplaceItemValue "ApplicationStatus", "Submitted"
+					myAPPS(x).ReplaceItemValue "IsWorkMgmtEntriesCreated", False
+					
+					If Lcase(myAPPS(x).getfirstitem("IsPushBackTriggered").text) = "1" Then
+						myAPPS(x).ReplaceItemValue "IsPushBackTriggered", ""
+						myAPPS(x).ReplaceItemValue "IsPushBackSubmittedBack", "1"
+						myAPPS(x).ReplaceItemValue "PushBackSubmittedBackDates", Cstr(Now)
+						myAPPS(x).ReplaceItemValue "ApplicationStatus", "Under Review"
+					End If
+			
+				Elseif Lcase(myAPPS(x).getfirstitem("Type").text) = "part1" Then 'DFS Apr 2013 TGA-INC-29052 Part1 doc?
+					
+					'Store study title (CTN)
+					If Trim(myAPPS(x).TitleofStudy(0)) &lt;&gt; "" Then
+						
+						aryApp(iIndexA, 0) = myAPPS(x).ApplicationID(0)
+						titleofstudy = Trim(myAPPS(x).TitleofStudy(0))
+						aryApp(iIndexA, 1) = titleofstudy
+						startdate = myAPPS(x).StartDate(0)
+						aryApp(iIndexA, 2) = startdate
+						expectedcompletiondate = myAPPS(x).ExpectedCompletionDate(0)
+						aryApp(iIndexA, 3) = expectedcompletiondate
+						protocolnumber = myAPPS(x).ProtocolNumber(0)
+						aryApp(iIndexA, 4) = protocolnumber
+						iIndexA = iIndexA + 1
+						
+					End If
+					
+				Elseif Lcase(myAPPS(x).getfirstitem("Type").text) = "part2" Then 'DFS Apr 2013 TGA-INC-29052 Part2 doc?
+					
+					'Store study title (CTX)
+					If Trim(myAPPS(x).TitleofStudy(0)) &lt;&gt; "" Then
+
+						aryApp(iIndexA, 0) = myAPPS(x).ApplicationID(0)
+						titleofstudy = Trim(myAPPS(x).TitleofStudy(0))
+						aryApp(iIndexA, 1) = titleofstudy
+						startdate = myAPPS(x).StartDate(0)
+						aryApp(iIndexA, 2) = startdate
+						expectedcompletiondate = myAPPS(x).ExpectedCompletionDate(0)
+						aryApp(iIndexA, 3) = expectedcompletiondate
+						protocolnumber = myAPPS(x).ProtocolNumber(0)
+						aryApp(iIndexA, 4) = protocolnumber
+						iIndexA = iIndexA + 1
+					End If
+				Elseif Lcase(myAPPS(x).getfirstitem("Type").text) = "updatedetails" Then 'TSK72076 19FEB2016 BL
+					If Trim(myAPPS(x).TitleofStudy(0)) &lt;&gt; "" Then
+						titleofstudy = Trim(myAPPS(x).TitleofStudy(0))
+						aryApp(iIndexA, 1) = titleofstudy
+						startdate = myAPPS(x).StartDate(0)
+						aryApp(iIndexA, 2) = startdate
+						expectedcompletiondate = myAPPS(x).ExpectedCompletionDate(0)
+						aryApp(iIndexA, 3) = expectedcompletiondate
+						protocolnumber = myAPPS(x).ProtocolNumber(0)
+						aryApp(iIndexA, 4) = protocolnumber
+						iIndexA = iIndexA + 1
+					End If
+				End If
+						
+			End If
+		Next
+		'DFS Apr 2013 - Set Title of Study and trial dates on main application doc - TGA-INC-29052
+		Call updAppDoc(aryApp, titleofstudy, startdate, expectedcompletiondate, protocolnumber)
+		
+		On Error Resume Next
+		For x = Lbound(myAPPS) To Ubound(myAPPS)
+			On Error Resume Next
+			On Error Goto errorhandler
+			myAPPS(x).ReplaceItemValue "WebAuthors", secNames
+			Set item = myAPPS(x).GetFirstItem("WebAuthors")
+			item.IsAuthors = True
+			myAPPS(x).ReplaceItemValue "WebReaders", secNames
+			Set item = myAPPS(x).GetFirstItem("WebReaders")
+			item.IsReaders = True
+			Call myAPPS(x).ComputeWithForm(False,False)
+			myAPPS(x).save True, False, True
+		Next
+		
+		'/-- Added changes CT August 2014
+		Set vMedBioById = db.Getview("vwMedicineBiologicalById")
+		If vMedBioById Is Nothing Then
+			Msgbox "Error: could not find view vwMedicineBiologicalById in the Clinical Trials Database."
+			Exit Sub
+		End If
+		
+		Set vNewMedBioIngredients = db.Getview("vwMedBioByAppId")
+		If vNewMedBioIngredients Is Nothing Then
+			Msgbox "Error: could not find view vwMedBioByAppId in the Clinical Trials Database."
+			Exit Sub
+		End If
+		
+		Call vMedBioById.Refresh()
+		Call vNewMedBioIngredients.Refresh()
+		
+		For x=0 To Ubound(arrayAppIDs)
+			Call MakeChildrenResponses(arrayAppIDs(x))	
+		Next
+		'/-- End of Added changes CT August 2014
+		
+	Else
+		Msgbox "CT CJTN: Documents NOT created. Problem, the array of documents wasn't created due to an error with the New MIMEJSONEntryStore object"
+		Print "CT CJTN: Documents NOT created. Problem, the array of documents wasn't created due to an error with the New MIMEJSONEntryStore object"
+	End If
+	
+ErrorResume:
+	Exit Sub
+ErrorHandler:
+	Msgbox  "CT CJTN: ERROR#" + Cstr(Err) + ": " + Error(Err) + " at line " + Cstr(Erl)
+	Resume ErrorResume
+End Sub
+
+</lotusscript></code><code event='updAppDoc'><lotusscript>%REM
+	Sub upAppDoc
+	Description: Updates the application document with the Title of Study value
+	Author; DFS April 2013 - TGA-INC-29052
+%END REM
+Sub updAppDoc(aryApp As Variant, tos As String, sd As String, ecd As String, pn As String)
+	'MsgBox "updAppDoc sub called"
+	'Declarations
+	
+	Dim Nview As NotesView
+	Dim Nappdoc As NotesDocument
+	Dim iIndexA As Integer
+	Dim iIndexB As Integer
+
+	'Continue after error
+	On Error Resume Next
+
+	'Update Application docs with Trial Dates and Title of Study
+	
+	For iIndexA = Lbound(myAPPS) To Ubound(myAPPS)
+		
+		If myAPPS(iIndexA).HasItem("Type") Then
+			If Lcase(myAPPS(iIndexA).getfirstitem("Type").text) = "application" Then
+				'Find Application in array of titles
+				
+				iIndexB = Arraygetindex( aryApp, myAPPS(iIndexA).ApplicationID(0) )
+				'Update Application Doc with Title of Study
+				
+				If Not( Isnull( iIndexB ) ) Then
+					'TSK72076 19FEB2016 BL
+					myAPPS(iIndexA).TitleOfStudy = tos
+					myAPPS(iIndexA).StartDate = sd
+					myAPPS(iIndexA).ExpectedCompletionDate = ecd
+					myAPPS(iIndexA).ProtocolNumber = pn
+				Else
+					'MsgBox "iIndexB is NULL"
+				End If 
+				
+			End If
+		End If
+		
+	Next
+	'MsgBox "updAppDoc sub finished"
+End Sub
+
+</lotusscript></code><code event='MakeChildrenResponses'><lotusscript>Sub MakeChildrenResponses(appID As String)
+	On Error Goto hang
+	
+	Dim pDoc As NotesDocument
+	Dim cDoc As NotesDocument
+	Dim x As Integer, pId As String
+	Dim formName As String
+	Dim dc As NotesDocumentCollection
+	Dim dcChilds As NotesDocumentCollection
+	
+	Set dc = vNewMedBioIngredients.Getalldocumentsbykey(appID, True)
+	If dc.count = 0 Then Exit Sub
+	
+	Set cDoc = dc.Getfirstdocument()
+	Do While Not (cDoc Is Nothing)
+		formName = cDoc.Form(0)
+		pId = ""
+		If Lcase(formName) = "medicineingredient"   Then
+			pId = cDoc.medicineId(0) 
+		End If
+		If Lcase(formName) = "biologicalingredient" Then
+			pId = cDoc.biologicalId(0)
+		End If
+		
+		If pId &lt;&gt; "" Then
+			'/ lookup for the parent
+			Set pDoc = vMedBioById.Getdocumentbykey(pId, True)
+			Set dcChilds = vMedBioById.GetAlldocumentsbykey(pId, True)
+			'/ make response for the parent			
+			If dcChilds.count &gt; 0 Then
+				For x=1 To dcChilds.count
+					Set pDoc = dcChilds.Getnthdocument(x)
+					If Not (pDoc Is Nothing) Then
+						If pDoc.DataSection(0) = cDoc.DataSection(0) Then
+							Call cDoc.Makeresponse(pDoc)
+							Call cDoc.Save(True, False)							
+						End If
+					End If
+					
+				Next
+			End If
+		End If
+		Set cDoc = dc.GetNextdocument(cDoc)
+	Loop
+	Exit Sub
+	
+hang:
+	Dim ErrorMessage As String 
+	ErrorMessage = "Sub: MakeChildrenResponses Number:" + Cstr(Err()) +" ErrorMsg: " + Error() + " on line #:" + Cstr(Erl()) + "\n"
+	Msgbox ErrorMessage
+	Error Err, ErrorMessage
+	Exit Sub
+End Sub
+
+</lotusscript></code><code event='JSONToNotesDocuments'><lotusscript>Function JSONToNotesDocuments(JSONString As String) As Variant 
+	On Error Goto ErrorHandler
+	Dim jsonReader As JSONReader
+	Dim vResults As Variant
+	Dim dbThis As NotesDatabase
+	Dim isDocumentsArrayInit As Boolean
+	Dim doccount As Long
+	
+	isDocumentsArrayInit = False
+	
+	Set jsonReader = New JSONReader
+	Set vResults = jsonReader.Parse(JSONString)	'This is a JSONObject created using the ls.snapps.JSONReader library
+	DocCount = ReadJSONObject(vResults) 'Recursivly called
+	JSONToNotesDocuments = DocCount
+ErrorResume:
+	Exit Function
+ErrorHandler:
+	Msgbox  "CT CJTN [JSONToNotesDocuments]: ERROR#" + Cstr(Err) + ": " + Error(Err) + " at line " + Cstr(Erl)
+	Resume ErrorResume
+End Function
+
+</lotusscript></code><code event='ReadJSONObject'><lotusscript>Function ReadJSONObject(JSONObj As Variant) As Long
+	On Error Goto ErrorHandler
+	Dim s As New NotesSession
+	Dim JSONEntries As Variant, subJSONEntries As Variant
+	Dim ObjType As String , subObjType As String 
+	Dim doc As NotesDocument, isDocumentEntry As Boolean
+	
+	JSONEntries = JSONObj.Items
+	
+	isDocumentEntry=False
+	If Iselement(JSONEntries("RecordUNID")) And Iselement(JSONEntries("id"))  And Iselement(JSONEntries("Type")) Then
+		'Create a Notes Document only in the case where the entry has UNID and ID JSON Elements, as according to the JSON every document Entry has to have a UNID, Id aswell as a TYPE element
+		Set doc = New NotesDocument(s.currentdatabase)
+		ReadJSONObject=ReadJSONObject+ 1
+		isDocumentEntry=True
+		Print "CT CJTN: Document element found"
+	End If
+	
+	Forall JSONEntry In JSONEntries
+		ObjType = Typename(JSONEntry)
+		If  objType = "JSONOBJECT" Then
+			'If this is an Object, its a Document/Document Collection entry call ReadJSONObject to process the nested document
+			ReadJSONObject=ReadJSONObject + ReadJSONObject(JSONEntry)
+		Elseif objType = "JSONARRAY" Then
+			'JSONEntry.Items would be of type EMPTY in cases where the Object has no entries in the ITEMS array of JSON where the Dummy EMPTY JSON objects have been created
+			If Typename(JSONEntry.Items) &lt;&gt; "EMPTY" Then
+				subObjType = Typename(JSONEntry.Items(0))
+				If subObjType &lt;&gt; "JSONOBJECT" Then	'THE REAL DATA ELEMENT / ENTRY Type MULTIVALUE
+					If isDocumentEntry Then
+						doc.ReplaceItemValue Listtag(JSONEntry), JSONEntry.Items
+					End If
+				Else	'Else This is a Collection of other Documents
+					Forall JSONSubEntry In JSONEntry.Items
+						ReadJSONObject=ReadJSONObject + ReadJSONObject(JSONSubEntry)
+					End Forall
+				End If
+			Else
+				If isDocumentEntry Then
+					doc.ReplaceItemValue Listtag(JSONEntry), ""
+				End If
+			End If	
+		Else
+			If isDocumentEntry Then	'THE REAL DATA ELEMENT / ENTRY
+				doc.ReplaceItemValue Listtag(JSONEntry), JSONEntry
+			End If
+		End If
+	End Forall
+	
+	If isDocumentEntry Then
+		DocCounter=DocCounter+1
+		doc.ReplaceItemValue "IsNotes", 1
+		doc.ReplaceItemValue "IsActiveVersion", "1"
+		Redim Preserve myAPPS(DocCounter)
+		Set myAPPS(DocCounter)= doc
+	End If
+	
+ErrorResume:
+	Exit Function
+ErrorHandler:
+	Msgbox  "CT CJTN [ReadJSONObject]: ERROR#" + Cstr(Err) + ": " + Error(Err) + " at line " + Cstr(Erl)
+	Resume ErrorResume
+End Function</lotusscript></code>
+<item name='$POID'><datetime>20160620T120210,19+10</datetime></item></agent>
+

@@ -1,0 +1,166 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(ProfileXMLValues)' alias='ProfileXMLValues' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3'
+ publicaccess='false' designerversion='7' comment='Prints out the name/value pairs in the profile document as XML'>
+<noteinfo noteid='59e' unid='0FAB273A3DAA2FFBCA257F7700070BEA' sequence='14'>
+<created><datetime dst='true'>20160315T121658,02+11</datetime></created>
+<modified><datetime>20160628T151506,92+10</datetime></modified>
+<revised><datetime>20160628T151506,91+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,91+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,37+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151506,96+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+Option Declare
+
+</lotusscript></code><code event='declarations'><lotusscript>Dim session As notessession
+Dim arrXML() As String	'simply coz its not worth the overhead of passing the array BYVAL to the QuickSort function
+
+
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	Dim dbThis As notesdatabase
+	Dim docContext As notesdocument
+	Dim docProfile As notesdocument
+	Dim multivalue As Long
+	Dim rtHTML As NotesRichTextItem
+	Dim strXML As String
+	Dim lngArrayCounter As Long
+	On Error Resume Next
+	
+	Set  session = New notessession
+	Set dbThis = session.CurrentDatabase
+	Set docContext = session.DocumentContext
+	Set docProfile = dbThis.GetProfileDocument("System Profile Document")
+	
+	Print "Content-Type: text/xml"
+	Print |&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;|
+	
+	If docProfile Is Nothing Then
+		Print |&lt;document profile="False" /&gt;|+Chr$(13)
+	Else
+		Redim arrXML( 0 To Ubound(docProfile.Items) )
+		
+		Print |&lt;document profile="True"&gt;|+Chr$(13)
+		lngArrayCounter = -1
+		Forall tmpItem In docProfile.Items
+			lngArrayCounter = lngArrayCounter + 1
+			strXML = ""
+			If Ubound(tmpItem.values) &gt; 0 Then
+				strXML = |&lt;item name="| + tmpItem.Name + |" list="True" values="| + xmlfilter(Ubound(tmpItem.values)) + |" length="| + Cstr(tmpItem.valuelength) + |"&gt;|+Chr$(13)
+				For multivalue = 0 To Ubound(tmpItem.values)
+					strXML = strXML + |&lt;list id="| + Cstr(multivalue) + |"&gt;|
+					strXML = strXML + xmlfilter(tmpItem.values(multivalue))
+					strXML = strXML + "&lt;/list&gt;"+Chr$(13)
+				Next
+			Else
+				strXML = |&lt;item name="| + xmlfilter(tmpItem.Name) + |" length="| + Cstr(tmpItem.valuelength) + |"&gt;|
+				strXML = strXML + xmlfilter(tmpItem.text)
+			End If
+			arrXML(lngArrayCounter) = strXML + |&lt;/item&gt;| + Chr$(13)
+		End Forall
+	End If
+	
+	QuickSort_arrXML
+	For lngArrayCounter = 0 To Ubound(arrXML)
+		Print arrXML(lngArrayCounter)
+	Next
+	Print |&lt;/document&gt;|
+End Sub
+
+</lotusscript></code><code event='xmlfilter'><lotusscript>Private Function xmlfilter(strText As String) As String
+	On Error Goto ErrorHandler
+	Dim lngTextPos As Long
+	Dim strIn As String
+	Dim strOut As String
+	Dim strNew As String
+	
+	If Len(strText) &lt; 1 Then Exit Function
+	
+	For lngTextPos = 1 To Len(strText)
+		strIn = Mid(strText, lngTextPos, 1)
+		Select Case strIn
+		Case "&amp;"		'what about url encoded ascii notation?
+			strOut = "&amp;amp;"
+			If Lcase(Mid(strText, lngTextPos, 5) = "&amp;amp;") Then
+				lngTextPos = lngTextPos+4
+			Elseif Lcase(Mid(strText, lngTextPos, 4) = "&amp;lt;") Then
+				lngTextPos = lngTextPos+3
+				strOut = "&amp;lt;"
+			Elseif Lcase(Mid(strText, lngTextPos, 4) = "&amp;gt;") Then
+				lngTextPos = lngTextPos+3
+				strOut = "&amp;gt;"
+			End If
+		Case "&lt;"
+			strOut = "&amp;lt;"
+		Case "&gt;"
+			strOut = "&amp;gt;"
+		Case Else
+			strOut = strIn
+		End Select
+		strNew = strNew + strOut
+	Next
+	xmlfilter = strNew
+ErrorResume:
+	Exit Function
+ErrorHandler:
+	Print "Error in " &amp; Lsi_info(2) +"/"+ Lsi_info(12) + " at line #" + Cstr(Erl) + ": (" + Cstr(Err) + ") " + Error(Err)
+	xmlfilter = "Error"
+	Resume ErrorResume
+End Function
+</lotusscript></code><code event='QuickSort_arrXML'><lotusscript>Private Sub QuickSort_arrXML()
+	Dim value As Variant, temp As Variant, sp As Integer
+	Dim leftStk(32) As Long, rightStk(32) As Long
+	Dim leftNdx As Long, rightNdx As Long
+	Dim i As Long, j As Long
+	Dim numEls As Long
+	
+	numEls = Ubound(arrXML)
+	leftNdx = Lbound(arrXML)
+	rightNdx = numEls
+	sp = 1
+	leftStk(sp) = leftNdx
+	rightStk(sp) = rightNdx
+	
+	Do
+		If rightNdx &gt; leftNdx Then
+			value = arrXML(rightNdx)
+			i = leftNdx - 1
+			j = rightNdx
+			Do
+				Do
+					i = i + 1
+				Loop Until arrXML(i) &gt;= value
+				Do
+					j = j - 1
+				Loop Until j = leftNdx Or arrXML(j) &lt;= value
+				temp = arrXML(i)
+				arrXML(i) = arrXML(j)
+				arrXML(j) = temp
+			Loop Until j &lt;= i
+			temp = arrXML(j)  ' swap found items
+			arrXML(j) = arrXML(i)
+			arrXML(i) = arrXML(rightNdx)
+			arrXML(rightNdx) = temp
+			sp = sp + 1  ' push on the stack the pair of pointers that differ most
+			If (i - leftNdx) &gt; (rightNdx - i) Then
+				leftStk(sp) = leftNdx
+				rightStk(sp) = i - 1
+				leftNdx = i + 1
+			Else
+				leftStk(sp) = i + 1
+				rightStk(sp) = rightNdx
+				rightNdx = i - 1
+			End If
+		Else  ' pop a new pair of pointers off the stacks
+			leftNdx = leftStk(sp)
+			rightNdx = rightStk(sp)
+			sp = sp - 1
+			If sp = 0 Then Exit Do
+		End If
+	Loop
+End Sub</lotusscript></code>
+<item name='$POID'><datetime>20160620T120208,24+10</datetime></item></agent>
+

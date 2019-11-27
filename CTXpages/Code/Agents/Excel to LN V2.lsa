@@ -1,0 +1,2765 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='Excel to LN V2' alias='Latest Code for Migration Excel to Notes - Read Instructions Inside Please'
+ xmlns='http://www.lotus.com/dxl' version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780'
+ hide='v3' publicaccess='false' designerversion='8.5.3'>
+<noteinfo noteid='2b6' unid='FB381F701E99FF29CA257F77000709B3' sequence='14'>
+<created><datetime dst='true'>20160315T121652,35+11</datetime></created>
+<modified><datetime>20160628T151504,53+10</datetime></modified>
+<revised><datetime>20160628T151504,52+10</datetime></revised>
+<lastaccessed><datetime>20160628T151504,52+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152009,68+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151504,57+10</datetime></designchange>
+<trigger type='actionsmenu'/>
+<documentset type='runonce'/><code event='options'><lotusscript>%REM
+	
+	Agent Excel to LN V2
+	Created Sep 9, 2014 by Wisnu Prawoto/DEVELOPER/TGADEV
+	Description: Comments for Agent
+	
+	Modified 26FEB2015 Bruce Langner
+	Commented out calls to create attachments. As of INC61834 attachments are no longer
+	required.
+	
+	Instructions:
+	
+		WARNING: YOU CAN NOT JUST RUN THIS AGENT WITHOUT SETTING UP EVERYTHING BELOW !!!!!!
+	
+		Setup:	
+	
+			1. Copy the Latest Client Web and Clientm.nsf from PROD to DEV (could be replace it)
+			
+			2. Replace this line for ClientWeb and Clientm.nsf if we put into different folder
+				Call clientdb.open("DWCBRDOMI01/SVR/TGADEV","ebs\Client\Clientm.nsf")
+				
+			3. Excel Filename and Path need to be provided or replaced for these lines:
+				  	"D:\Lotus Notes\Migration\Dataset\Trials_Test.xls"
+					"D:\Lotus Notes\Migration\Dataset\DataMigrationResults.xls" -&gt; this will be created
+			
+			4. For Excel File need to matched with the structure that Jeremy Alexis or Paul Blackman has provided in the TRIM otherwise it will not work
+					Please make sure that each column has to match for field name and order.
+					
+			4. For EXCEL File to be migrated, PLEASE MAKE SURE THAT the WORKSHEET MUST MATCHED the ORDER for these lines:
+					All these lines code in Initialize function.
+					 - Application must be in Worksheet no 3 - Worksheets(3), or you have to replace this line to match it
+					 - Medicine must be in Worksheets  no 1 - Worksheets(1)
+					 - Site must be in Worksheets no 2 - Worksheets(2)
+					 - ADR must be in Worksheets no 4 - Worksheets(4)
+					 - IBP must be in Worksheets no 5 - Worksheets(5)
+					 
+			4. There are couple hardcoded path in this agent:
+					"\ebs\trials\filerepo.nsf"
+				
+			5. How to Run this agent:
+				- Run from Notes Client or Designer
+				- You must first select the "Application" for option to run, this will migrate Parent Applications.
+				- Once it is done, the you need to run this agent again and select one by one of the Children or all.
+					Prefer runnning one by one, so it will be finished all, otherwise it will run more than 9 hours and you will have to redo it again if stop or crashs
+				- Once all Children has been migrated, the you need to wait for all the view indexes to be rebuilt (ask someone to updall view indexes in this database).
+				- Then You should run the "Notes to JSON Updated" agent from this database.
+					This will create CT form web and all associated JSON data from those data migrated above.
+					
+%END REM
+
+Option Public
+Option Declare
+
+Use "GetDatabases"
+Use "ls.snapps.JSONReader"
+Use "JSONToNotesDocument"
+
+</lotusscript></code><code event='declarations'><lotusscript>'Use "GetCodeTable"
+' Items for Progress Bar
+Const NPB_STATUSBAR% = 32
+'Declare Function NEMProgressBegin Lib "nnotesws.dll" ( ByVal wFlags As Integer ) As Long
+'Declare Sub NEMProgressEnd Lib "nnotesws.dll" ( ByVal hwnd As Long )
+'Declare Sub NEMProgressSetBarPos Lib "nnotesws.dll" ( ByVal hwnd As Long, ByVal dwPos As Long)
+'Declare Sub NEMProgressSetBarRange Lib "nnotesws.dll" ( ByVal hwnd As Long, ByVal dwMax As Long )
+'Declare Sub NEMProgressSetText Lib "nnotesws.dll" ( ByVal hwnd As Long, ByVal pcszLine1 As String,ByVal pcszLine2 As String )
+
+
+' Remember to check worksheet number
+
+Public Const CLINTRIALNO = 5
+
+' Define field properties for JSON file
+Dim fieldsAndValues(1 To 143, 1 To 2) As String
+
+'These all ProcessJSONSupportData Errors
+Const ERR_LOOKUPVIEW_ARGMISSING = 1001
+Const ERR_LOOKUPVIEW_ISNULL = 1002
+Const ERR_IDENTIFIER_ARGMISSING = 1003
+Const ERR_IDENTIFIER_ARGNOTDEFINED = 1004
+
+Const CMD_SUBMIT_APPLICATION = "SUBMITAPP"
+
+Public oldDocument As NotesDocument 
+Dim outputJS As Long
+Dim JSONflag As Integer
+Dim bioCount As Integer
+
+'Define global variables
+Dim globalApplicationID As String
+Dim globalApplicationVersion As String
+
+' Part 1 variables
+Dim protocolNumber As String
+Dim globalTrialType()
+Dim globalTrialClassification()
+Dim startDate As String
+Dim expectedCompletion As String
+Dim titleStudy As String
+Dim trialCountry As String
+Dim trialCountryCode As String
+Dim trialTypeDesc As String, streamNo As String
+
+' Medication variables
+Dim biologicalsList()
+Dim productStrengthUnitLabel As String
+
+'Completion variables
+Dim finishDate As String
+Dim completionReason As String
+Dim completionDetails As String
+Dim completedFile As String 'hidden value in form
+Dim completedFolio As String 'hidden value in form
+
+'Define Excel column positions - edit values here where necessary
+Const POS_ProtocolNum = 2
+Const POS_ApplicationID = 1
+Const POS_TitleOfStudy = 3
+Const POS_ClinicalTrialType = 4
+Const POS_TrialType = 6
+Const Pos_Stream = 7
+Const POS_StartDate = 8
+Const POS_ExpectedCompletionDate = 9
+Const POS_Placebo = 10
+Const POS_International = 11
+Const POS_Abortifacient = 12
+Const POS_GeneTherapy = 13
+Const POS_Device = 14
+Const POS_Sponsor = 15
+Const POS_SponsorStreet1 = 16
+Const POS_SponsorStreet2 = 17
+Const POS_SponsorTown = 18
+Const POS_SponsorState = 19
+Const POS_SponsorPostCode = 20
+Const POS_AttentionTo = 21
+Const POS_CompletionReason = 22
+Const POS_CompletedFile = 23
+Const POS_CompletedFolio = 24
+Const POS_FinishDate = 25
+Const POS_PrematureTerminationDetails = 26
+
+' Sites Excel data columns
+Const POS_IncorrectEntry = 2
+Const POS_TrialSiteName = 3
+Const POS_TrialSiteStreetNumber = 4
+Const POS_TrialSiteStreetName = 5
+Const POS_TrialSiteStreetType = 6
+Const POS_TrialSiteSuburb = 7
+Const POS_TrialSiteState = 8
+Const POS_TrialSitePostCode = 9
+Const POS_TrialSiteExtraInfo = 10
+Const POS_HRECName = 11
+Const POS_HRECStreetNumber = 12
+Const POS_HRECStreetName = 13
+Const POS_HRECStreetType = 14
+Const POS_HRECSuburb = 15
+Const POS_HRECState = 16
+Const POS_HRECEPostCode = 17
+Const POS_HRECExtraInfo = 18
+Const POS_ApprovingAuthorityName = 19
+Const POS_DateReceived = 20
+Const POS_DateAcknowledged = 21
+Const POS_ExpectedSiteStartDate = 22
+Const POS_FileNo = 23
+Const POS_FolioNo = 24
+Const POS_TGAINNo = 25
+Const POS_PrincipalInvestigator = 26
+
+' Medication Column Variables
+Const POS_MedActiveName = 2
+Const POS_MedTradeName = 3
+Const POS_MedCodeName = 4
+Const POS_MedDosageForm = 5
+Const POS_MedProductStrength = 6
+Const POS_BiologicalOrigin = 7
+Const POS_ErrorValue = 8
+
+'IBP Column Variables
+Const POS_ClinicalTrialNo = 1
+'Const POS_RecordNo = 2
+Const POS_S31No = 2
+Const POS_AmendmentOnly = 3
+Const POS_DateRequested = 4
+Const POS_ReplyDue = 5
+Const POS_IBPDateReceived = 6
+Const POS_NameMedicalOfficer = 7
+Const POS_DateForwardedToMO = 8
+Const POS_IBPRMSDate = 9
+Const POS_InvestigatorBrochure = 10
+Const POS_IBP_Protocol = 11
+Const POS_IBP_Other = 12
+Const POS_IBP_Other_Information = 13
+Const POS_DateAmendmentReceived = 14
+Const POS_AmendmentRMSDate = 15
+Const POS_Amendment_NameMO = 16
+Const POS_Amendment_DateForwardedToMO = 17
+Const POS_AmendmentComment = 18
+
+'ADR Column Variables
+Const POS_ADR_ReportDate = 2
+Const POS_ADR_DateReceived = 3
+Const POS_ReportType = 4
+Const POS_SuspectDrugs= 5
+Const POS_ADR_FileNo = 6 
+Const POS_ADR_FolioNo = 7
+Const POS_OtherDrugsInvolved = 8
+Const POS_PatientInitials = 9
+Const POS_ADR_Gender = 10
+Const POS_ADR_DOB = 11
+Const POS_ADR_FatalOrNon = 12
+Const POS_ADR_Comments = 13
+
+Dim hwnd As Long, count As Integer
+Dim timeOn!, timeRan!
+Const scriptElement = "CTApp"
+' Excel sheet properties
+Dim flag As Integer
+Dim row As Long
+	
+Dim appID As String, yearVal As String, ctNum As String, schemeType As String
+
+	
+' Define general properties
+Dim x As Integer, i As Integer
+Dim msg As String', temp As Variant
+	
+'Dim d1 As Integer
+Dim UserManagerDBName As String 
+		
+' Initialise all second column items to empty string	
+	
+Dim fieldCount As Integer
+Dim msgString As String
+Dim ctLen As Integer
+	
+Dim vAppByCTTrialNo As NotesView
+Dim vSitesByCTTrialNo As NotesView
+Dim clientwdb As NotesDatabase
+Dim clientdb As notesdatabase
+Dim lupostalview As NotesView
+Dim luClientsview As NotesView
+
+Dim dctwdb As NotesDatabase
+Dim ludosageformview As NotesView
+'Dim luUoPformview As NotesView
+
+
+
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	On Error Goto ErrorOut
+	
+	' Define database properties
+	Dim session As New NotesSession
+	Dim uiws As New NotesUIWorkspace
+	Dim db As NotesDatabase
+	
+	Dim doc As NotesDocument
+	Dim form As NotesForm
+	Dim item As Variant
+	Dim formname As String
+	'----------------------------
+	
+	Dim temp As Variant 
+	temp = Evaluate(|@ReplaceSubstring(@Word(@GetProfileField("System Profile Document";"SUM_Path");"!!";2); "\\"; "/")|)
+	UserManagerDBName = temp(0)
+	If UserManagerDBName="" Then UserManagerDBName = "ebs/UserMgt.nsf"
+	
+	Dim values(5) As Variant
+	Dim response As Variant
+	values(0) = "Application"
+	values(1) = "Medicine"
+	values(2) = "Site"
+	values(3) = "ADR"
+	values(4) = "IBP"
+	values(5) = "All Children"
+	
+	response = uiws.Prompt (PROMPT_OKCANCELLIST, "Select a Migration.", "Select a Migration, you have to run Application Migration first.", values(0), values)
+	If Trim(response) = "" Then Exit Sub
+	
+	Dim appID As String, yearVal As String, ctNum As String, schemeType As String
+	
+	' Define Excel file properties
+	Dim fn As Variant
+	Dim xlApp As Variant, xlSheet As Variant, xlWb As Variant
+	Dim xlFilename As String
+	Dim rows As Long
+	Dim cols As Integer
+	
+	' Assign properties
+	Set db = session.Currentdatabase
+	Set clientwdb = fdbGetClientWeb
+	Set dctwdb = fdbGetDCTCodeTables
+	
+	'Set luUoPformview = dctwdb.GetView("DCTLookup")
+	Set ludosageformview = dctwdb.GetView("DCTLookup")
+	
+	'/ Use client database not Client Web to find Inactive or Active client
+	Set clientdb = New NotesDatabase("","")
+	Call clientdb.open("DWCBRDOMI01/SVR/TGADEV","ebs\Client\Clientm.nsf")
+	Set lupostalview = clientwdb.GetView("(LULocationsPostal)")
+	Set luClientsview  = clientdb.GetView("LUClientByID")
+	
+	On Error Goto ErrorHandler
+	Const scriptElement = "Initialize"
+	
+	' Ensure database is open and accessible
+	If ( db.IsOpen ) Then
+		Print db.Title
+	Else
+		Call db.Open( "", "" )
+		Print db.Title
+	End If
+	
+	Set vAppByCTTrialNo = db.Getview("AppsByCriticalTrialNo")
+	
+	x=0
+	xlFilename = "D:\Lotus Notes\Migration\Dataset\Trials.xlsx"
+	
+	' Connect to Excel
+	Print "Connecting to Excel..."
+	
+	Set xlApp = CreateObject("Excel.Application")
+	xlApp.Visible = False 'Excel program not visible
+	
+	Set xlWb=xlApp.Workbooks.Open(xlFilename)
+	
+	If response = "Application" Then
+		Print "Processing Application Migration First...."
+		'/ CTAPP NEEDS TO RUN FIRST
+		'/ Need to run for CTApp first, because we need that view AppsByCriticalTrialNo to get the Readers and Authors fields
+		Set xlSheet = xlWb.Worksheets(3)
+		xlSheet.Activate
+		xlSheet.Cells.SpecialCells(11).Activate ' Selects last cell in the used range of worksheet
+		rows = xlApp.ActiveWindow.ActiveCell.Row  
+		cols = xlApp.ActiveWindow.ActiveCell.Column  
+		
+		formname="Application"
+		Set form = db.getform(formname)
+		Call CTApp(formname, session, uiws, db, doc, form, item, xlWb, xlApp, xlSheet, rows, cols)
+
+		Print "Refreshing view Application by ClinicalTrialNo...."
+		Call vAppByCTTrialNo.refresh()
+		Sleep 20
+		Print "Finished Processing Application Migration First...."
+		Goto Finished		
+	End If
+		
+	Print "Processing Data for " &amp; response &amp; " Migration...."		
+		
+	If (response = "Medicine") Or (response = "All Children") Then
+		Set xlSheet = xlWb.Worksheets(1)
+		xlSheet.Activate
+		xlSheet.Cells.SpecialCells(11).Activate ' Selects last cell in the used range of worksheet
+		rows = xlApp.ActiveWindow.ActiveCell.Row  
+		cols = xlApp.ActiveWindow.ActiveCell.Column 
+		formname="Medicine"			
+		Set form = db.getform(formname) 
+		Call medForm(formname, session, uiws, db, doc, form, item, xlWb, xlApp, xlSheet, rows, cols)
+	End If
+	If (response = "Site") Or (response = "All Children") Then
+		Set xlSheet = xlWb.Worksheets(2)
+		xlSheet.Activate
+		xlSheet.Cells.SpecialCells(11).Activate ' Selects last cell in the used range of worksheet
+		rows = xlApp.ActiveWindow.ActiveCell.Row  
+		cols = xlApp.ActiveWindow.ActiveCell.Column 
+		formname="Site"			
+		Set form = db.getform(formname)
+		Call SitesForm(formname, session, uiws, db, doc, form, item, xlWb, xlApp, xlSheet, rows, cols)
+	End If
+	
+	'/ Hide ADR and IBP
+	If (response = "ADR") Or (response = "All Children") Then
+		Set xlSheet = xlWb.Worksheets(5)
+		xlSheet.Activate
+		xlSheet.Cells.SpecialCells(11).Activate ' Selects last cell in the used range of worksheet
+		rows = xlApp.ActiveWindow.ActiveCell.Row  
+		cols = xlApp.ActiveWindow.ActiveCell.Column 
+		formname="ADR"			
+		Set form = db.getform(formname)
+		Call ADR(formname, session, uiws, db, doc, form, item, xlWb, xlApp, xlSheet, rows, cols)
+	End If
+	If (response = "IBP") Or (response = "All Children") Then
+		Set xlSheet = xlWb.Worksheets(4)
+		xlSheet.Activate
+		xlSheet.Cells.SpecialCells(11).Activate ' Selects last cell in the used range of worksheet
+		rows = xlApp.ActiveWindow.ActiveCell.Row  
+		cols = xlApp.ActiveWindow.ActiveCell.Column 
+		formname="IBP"			
+		Set form = db.getform(formname)
+		Call IBP(formname, session, uiws, db, doc, form, item, xlWb, xlApp, xlSheet, rows, cols)
+	End If
+	
+	Print " "	
+	Print "Finished Processing Application Childrens Migration...."
+	
+	
+Finished:
+	xlWb.Close False
+	xlApp.Quit
+	Set xlApp = Nothing
+
+	Exit Sub
+	
+	
+ErrorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	
+	If Err = 184 Then 
+		Msgbox "No file chosen. Exiting Import." 
+		Print "No file chosen. Exiting Import." 
+		Resume ErrorOut 
+	End If ' err=184  
+	
+	If Err = 6 Then 
+		Messagebox "Cannot import more than 65,536 rows  of data." 
+		Print "Too many rows in Excel document.  Exiting Import. Disconnecting from Excel..." 
+		
+		'Close the Excel file without saving
+		xlWb.Close False 
+		
+		'Close Excel 
+		xlApp.Quit 
+		
+		'Free memory
+		Set xlApp = Nothing  
+		Resume ErrorOut 
+	End If ' err=184  
+	
+	If (Err) And (Not Err = 184) And  (Not Err = 6) Then  
+		Msgbox "Lotus Notes Error # " &amp; Err &amp;".  Please contact your Notes administrator  for help. Exiting Import." 
+		Print "Error # "&amp; Err  
+		
+		If Not xlWb Is Nothing Then 
+			xlWb.Close False  
+		End If ' Not xlsWorkbook Is Nothing  
+		
+		If Not xlApp Is Nothing Then 
+			xlApp.Quit False  
+		End If 'Not xlsApp Is Nothing  
+		
+		Resume ErrorOut  
+		
+	End If '(Err) And (Not Err = 184)  And (Not Err = 6)   
+	
+	Exit Sub
+ErrorOut: 
+	Print "Error in Initialise Excel to LN V2 agent. The error is " &amp; Error$ &amp; " and the line is " &amp; Erl
+	Exit Sub
+End Sub
+
+</lotusscript></code><code event='processTrialType'><lotusscript>%REM
+	Function processTrialType
+	Description: Comments for Function
+%END REM
+Function processTrialType(doc As NotesDocument, xlSheet As Variant, row As Long, item As Variant) As Variant
+	Dim isPhase1 As String, isPhase2 As String, isPhase3 As String, isPhase4 As String, isBio As String
+	Dim length As Integer, 	j As Integer, p As Integer				
+	Dim gettrialtype As String
+	
+	On Error Goto errorHandler
+	Const scriptElement = "processTrialType"
+	
+	Dim trialtype(1 To 5) As String
+	trialtype(1) = ""
+	trialtype(2) = ""
+	trialtype(3) = ""
+	trialtype(4) = ""
+	trialtype(5) = ""
+	
+	' Review when complete data is provided as this may change cell references
+	gettrialtype = xlSheet.Cells(row, 6).Value
+	streamNo = xlSheet.Cells(row,POS_Stream).Value
+	
+	If (Lcase(gettrialtype) = "other") Or (Fulltrim(gettrialtype) = "&lt;&gt;") And (Lcase(streamNo) = "device") Then
+			gettrialtype = "Device"
+			trialTypeDesc = "Other"
+	End If			
+	
+	
+	Select Case gettrialtype
+		Case "Phase 1": trialtype(1) = "1"
+		Case "Phase 2": trialtype(1) = "2"
+		Case "Phase 3": trialtype(1) = "3"
+		Case "Phase 4": trialtype(1) = "4"
+		Case "Bioavailability/Bioequivalence": trialtype(1) = "B"
+		Case "Bioavailability/equivalence": trialtype(1) = "B"
+		Case "Device": trialtype(1) = "D"
+		Case Else
+			trialtype(1) = ""
+	End Select
+	
+	length% = Ubound(trialtype)
+	
+	Redim globalTrialType(0)
+	
+	p = 0
+	For j=1 To length
+		If trialtype(j) &lt;&gt; "" Then
+			Redim Preserve globalTrialType(p)
+			globalTrialType(p) = trialtype(j)
+			p = p + 1
+		End If
+	Next
+	
+	Dim isArr As Integer
+	Forall v In globalTrialType
+		isArr = True
+		Exit Forall
+	End Forall
+	
+	If isArr = True Then
+		Set item = doc.Replaceitemvalue("TrialType", globalTrialType)
+	End If
+
+	'-------------TrialType Properties------------------------
+	'Phase 1|1
+	'Phase 2|2
+	'Phase 3|3
+	'Phase 4|4
+	'Bioavailability/Bioequivalence|B
+	
+exitGracefully:
+	Exit Function
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	Resume exitGracefully
+	
+End Function
+
+</lotusscript></code><code event='part1Form'><lotusscript>%REM
+	Function part1Creation
+	Description: Comments for Function
+%END REM
+Function part1Form(session As NotesSession, db As NotesDatabase, sponsorID As String)
+	On Error Goto errorHandler
+	Const scriptElement = "part1Form"
+	
+	Dim doc As NotesDocument, form As NotesForm, item As Variant, default As Variant
+	Dim uniqueID As String
+	
+	Set db = session.Currentdatabase
+	default = "Not Provided"
+	
+	Set doc = db.Createdocument
+	doc.Form = "Part1"
+	Set item = doc.Replaceitemvalue("ApplicationID", globalApplicationID)
+	Set item = doc.Replaceitemvalue("ApplicationVersion", globalApplicationVersion)
+	'Print globalApplicationID &amp;"~" &amp;globalApplicationVersion &amp;"~Part1"
+	uniqueID = globalApplicationID &amp;"~" &amp;globalApplicationVersion &amp;"~Part1"
+	Set item = doc.Replaceitemvalue("RecordUNID", uniqueID )
+	Set item = doc.Replaceitemvalue("id", uniqueID)
+	Set item = doc.Replaceitemvalue("Type", "Part1")
+	Set item = doc.Replaceitemvalue("Form", "Part1")
+	Set item = doc.Replaceitemvalue("ProtocolNumber", protocolNumber)
+
+	Set item = doc.Replaceitemvalue("TrialClassification",  globalTrialClassification)
+	Set item = doc.Replaceitemvalue("DataSection",  "1")
+	Set item = doc.Replaceitemvalue("IsActiveVersion",  "1")
+	
+	Set item = doc.Replaceitemvalue("ContactName",  default)
+	Set item = doc.Replaceitemvalue("ContactPhone",  "0212345678")
+	'Set item = doc.Replaceitemvalue("ContactFax",  "0212345678")
+	Set item = doc.Replaceitemvalue("ContactEmail",  "notprovided@byorg.com")
+	Set item = doc.Replaceitemvalue("StartDate", startDate)
+	Set item = doc.Replaceitemvalue("ExpectedCompletionDate", expectedCompletion)
+	Set item = doc.Replaceitemvalue("TitleOfStudy", titleStudy)
+	Set item = doc.Replaceitemvalue("IsPotentialRestrictedGoodUsed", "No")
+	'Set item = doc.Replaceitemvalue("PotentialRestrictedGood", "Potential use of restricted goods information not provided.  Default set to 'No' ")
+	Set item = doc.Replaceitemvalue("TotalPatients", default)
+	
+	Set item = doc.Replaceitemvalue("Stream", streamNo)
+	Set item = doc.Replaceitemvalue("TrialType",  globalTrialType)
+	Set item = doc.Replaceitemvalue("TrialTherapeuticArea", default)
+	Set item = doc.Replaceitemvalue("TrialTypeDescription", trialTypeDesc)
+	
+	
+	Set item = doc.Replaceitemvalue("GMO", default)
+	Set item = doc.Replaceitemvalue("Nanoparticles", default)
+	Set item = doc.Replaceitemvalue("GeneTherapyDetails", default)
+	Set item = doc.Replaceitemvalue("NumberOfPagesPart1", "0")
+	Set item = doc.Replaceitemvalue("NumberOfPagesPart2", "0")
+	Set item = doc.Replaceitemvalue("NumberOfPagesPart3", "0")
+	Set item = doc.Replaceitemvalue("NumberOfPagesPart4", "0")
+	Set item = doc.Replaceitemvalue("NumberOfPagesPart5", "0")
+	Set item = doc.Replaceitemvalue("NumberOfPagesPart6", "0")
+	Set item = doc.Replaceitemvalue("NumberOfPagesPart7", "0")
+	Set item = doc.Replaceitemvalue("SponsorID", sponsorID)
+	
+	Set item = doc.Replaceitemvalue("BiologicalNotInPhaseOne", "")
+	Set item = doc.Replaceitemvalue("BiologicalManufacturerDetails", default)
+	Set item = doc.Replaceitemvalue("BiologicalProductDescription", default)
+	
+	
+	If Not trialCountry = "" Then
+		Set item = doc.Replaceitemvalue("TrialConductedInCountry", trialCountry)
+		Set item = doc.Replaceitemvalue("TrialConductedInCountry_Label", trialCountryCode)
+	End If
+	
+	Call SetApplicationDocumentAuditNSecurity(doc)
+	Call doc.Save(True, True)
+	
+exitGracefully:
+	Exit Function
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	Resume exitGracefully
+End Function
+
+</lotusscript></code><code event='getSponsorIDByCTNo'><lotusscript>%REM
+	Sub getItemsByCTNo
+	Description: Comments for Sub
+%END REM
+Function getSponsorIDByCTNo(CT_TrialNo As String) As String
+	Dim ctAppDoc As NotesDocument
+	Dim tmpVal As String
+	tmpVal = ""
+	
+	Set ctAppDoc = vAppByCTTrialNo.Getdocumentbykey(CT_TrialNo, True)
+	If Not (ctAppDoc Is Nothing) Then
+		tmpVal = ctAppDoc.SponsorID(0)
+	End If
+	getSponsorIDByCTNo = tmpVal
+End Function
+
+</lotusscript></code><code event='processMedicines'><lotusscript>%REM
+	Function processMedicines
+	Description: Comments for Function
+%END REM
+Function processMedicines(clinicalTrialNo As String, session As NotesSession, xlSheet As Variant, row As Long, item As Variant, rows As Long,_
+ cols As Integer, xlWb As Variant, xlApp As Variant)
+	
+	On Error Goto errorHandler
+	Const scriptElement = "processMedicines"
+	
+	Dim count As Integer, i As Integer, p As Integer, length As Integer, dataSection1 As String, itemCount As Integer
+	Dim uniqueID As String, medString As String, activename As String, tradecodename As String, default As String
+	Dim checkBiological As String, defaultNum As String
+	Dim failed As Boolean
+	
+	dataSection1 = "1"
+	default = "Not Provided"
+	defaultNum = "0"
+	failed = False
+	
+	Dim doc As NotesDocument, form As NotesForm, db As NotesDatabase
+		
+	Set db = session.Currentdatabase
+	default = "Not Provided"
+	
+	Set doc = db.Createdocument
+	doc.Form = "Medicine"
+	
+	uniqueID = globalApplicationID &amp;"~1~Part1~Medicines~" &amp; UUID(0,0)
+	Set item = doc.Replaceitemvalue("ClinicalTrialType", "CTN")
+	Set item = doc.Replaceitemvalue("id", uniqueID)
+	Set item = doc.Replaceitemvalue("identifier", "RecordUNID")
+	Set item = doc.Replaceitemvalue("label", "ActiveName")
+	Set item = doc.Replaceitemvalue("Type", "Medicine")
+	Set item = doc.Replaceitemvalue("Form", "Medicine")
+	Set item = doc.Replaceitemvalue("ApplicationID", globalApplicationID)
+	Set item = doc.Replaceitemvalue("ApplicationVersion", globalApplicationVersion)
+	Set item = doc.Replaceitemvalue("DataSection", dataSection1)
+	Set item = doc.Replaceitemvalue("RecordUNID", uniqueID)
+	
+	Set item = doc.Replaceitemvalue("ActiveName", xlsheet.Cells(row, 2).Value)
+	Set item = doc.Replaceitemvalue("TradeName", xlsheet.Cells(row, 3).Value)
+	Set item = doc.Replaceitemvalue("CodeName", xlsheet.Cells(row, 4).Value)
+	Set item = doc.Replaceitemvalue("DosageForm_Label", xlsheet.Cells(row, POS_MedDosageForm).Value)
+	Set item = doc.Replaceitemvalue("DoseFrequency", default)
+	Set item = doc.Replaceitemvalue("RouteofAdmin", default)
+	Set item = doc.Replaceitemvalue("RouteofAdmin_Label", default)
+	Set item = doc.Replaceitemvalue("Presentation", default)
+	
+	Set item = doc.Replaceitemvalue("IntendedUse", "")
+	Set item = doc.Replaceitemvalue("Indication", default)
+	Set item = doc.Replaceitemvalue("DosageFrequency", default)
+	Set item = doc.Replaceitemvalue("MedicineManufacturerDetails", default)
+	Set item = doc.Replaceitemvalue("MedicineNotInPhaseOne", "")
+	
+	Call findDosageForm(doc, xlsheet.Cells(row, POS_MedDosageForm).Value, item)
+	
+	' Validate medication strength units
+	Dim regex As Variant
+	Dim txtPattern As String, txtResult As String
+	Dim numPattern As String, numResult As String, spaceRemovalPattern As String
+	Dim match As Boolean
+	Dim strengthData As String
+	Dim replaceString As String
+	Dim finalStrengthUnit As String
+	
+	strengthData = xlsheet.Cells(row, POS_MedProductStrength).Value
+	numPattern = |(\s?)([a-zA-Z/%])+([0-9]?)*|'|([E\s]?[a-zA-DF-Z/%])+([0-9]?)*|
+	txtPattern = |^[0-9.\s]*([\s?][E?]{1}[\d?]+)*| 'comma for clean medicines only e.g. |^[0-9.,\s]*([\s?][E?]{1}[\d?]+)*|
+	spaceRemovalPattern = |[^\s]|
+	replaceString = ""
+	
+	' Create Regular Expression Object
+	Set regex = CreateObject("VBScript.Regexp")
+	regex.Global = True
+	regex.IgnoreCase = True
+	
+	' Obtain strength number	
+	regex.Pattern = numPattern
+	numResult = regex.Replace(strengthData, replaceString)
+	
+	' Test for pattern match
+	'match = regex.Test(strengthData)
+	
+	' Obtain replacement string
+	regex.Pattern = txtPattern
+	txtResult = regex.Replace(strengthData, replaceString)
+	
+	' Validate units of proportion
+	Select Case Trim(Lcase(txtResult))
+		Case "anti xa iu": txtResult = "anti-Xa IU"
+		Case "micrograms": txtResult = "microgram"
+		Case "milligram": txtResult = "mg"
+		Case "milligrams": txtResult = "mg"
+		Case "mbq /ml": txtResult = "MBq/mL"
+		Case "mgs": txtResult = "mg"
+		Case "mg/ g": txtResult = "mg/g"
+		Case "mg / ml": txtResult = "mg/ml"
+		Case "mls": txtResult = "mL"
+		Case "billion cfus": txtResult = "billion CFU"
+		Case "grams": txtResult = "g"
+		Case "gms": txtResult = "g"
+		Case "gm": txtResult = "g"
+		Case "gram": txtResult = "g"
+		Case "micrograms/ml": txtResult = "microgram/mL"
+		Case "micrograms / ml": txtResult = "microgram/mL"
+		Case "g/m2": txtResult = "gm/msq"	
+		Case "i.u": txtResult = "IU"
+		Case "gm/ml": txtResult = "g/mL"
+		Case "mg/gm": txtResult = "mg/g"
+		Case "iu /ml": txtResult = "IU/mL"
+		Case "%w/v": txtResult = "% w/v"
+		Case "mg/kg": txtResult = "mg/kg"
+		Case "%w/w": txtResult = "% w/w"
+		Case "w/v": txtResult = "% w/v"
+		Case "litre": txtResult = "L"
+		Case "gm/m2": txtResult = "gm/msq"
+	End Select
+	
+	If txtResult = "" Or numResult = "" Then
+		finalStrengthUnit = findStrengthUnit("", session, doc, xlSheet, row, item, rows, cols)
+	Else
+		finalStrengthUnit = findStrengthUnit(Trim(txtResult), session, doc, xlSheet, row, item, rows, cols)
+	End If
+	
+	If finalStrengthUnit = "" Then
+		failed = True
+		xlsheet.Cells(row, POS_ErrorValue).Value = "FAIL"
+		xlApp.DisplayAlerts = False
+		xlWb.SaveAs("D:\Lotus Notes\Migration\Dataset\DataMigrationResults.xls")
+		xlApp.DisplayAlerts = False
+		Set item = doc.Replaceitemvalue("ProductStrengthDataToProcess", xlsheet.Cells(row, POS_MedProductStrength).Value)
+		Set item = doc.Replaceitemvalue("ProductStrength", defaultNum)
+		Set item = doc.Replaceitemvalue("ProductStrengthUnit_Label", "Invalid")
+		Set item = doc.Replaceitemvalue("ProductStrengthUnit", "NA")
+	Else
+		Set item = doc.Replaceitemvalue("ProductStrengthDataToProcess", "")
+		Set item = doc.Replaceitemvalue("ProductStrength", numResult)
+		Set item = doc.Replaceitemvalue("ProductStrengthUnit", finalStrengthUnit)
+		Set item = doc.Replaceitemvalue("ProductStrengthUnit_Label", productStrengthUnitLabel)
+	End If
+	
+	' Validate tradecodename		
+	If (xlsheet.Cells(row, POS_MedTradeName).Value = "Nil" Or xlsheet.Cells(row, POS_MedTradeName).Value = "N/A")_
+	And (xlsheet.Cells(row, POS_MedCodeName).Value = "Nil" Or xlsheet.Cells(row, POS_MedCodeName).Value = "N/A") Then
+		Set item = doc.Replaceitemvalue("TradeCodeName", "Nil")
+		tradecodename = "Nil"	
+	Elseif (xlsheet.Cells(row, POS_MedCodeName).Value = "Nil" Or xlsheet.Cells(row, POS_MedCodeName).Value = "N/A")_
+	And Not (xlsheet.Cells(row, POS_MedTradeName).Value = "Nil" Or xlsheet.Cells(row, POS_MedTradeName).Value = "N/A") Then
+		Set item = doc.Replaceitemvalue("TradeCodeName", xlsheet.Cells(row, POS_MedTradeName).Value)
+		tradecodename = xlsheet.Cells(row, POS_MedTradeName).Value
+	Elseif Not (xlsheet.Cells(row, POS_MedCodeName).Value = "Nil" Or xlsheet.Cells(row, POS_MedCodeName).Value = "N/A")_
+	And (xlsheet.Cells(row, POS_MedTradeName).Value = "Nil" Or xlsheet.Cells(row, POS_MedTradeName).Value = "N/A") Then
+		Set item = doc.Replaceitemvalue("TradeCodeName", xlsheet.Cells(row, POS_MedCodeName).Value)
+		tradecodename = xlsheet.Cells(row, POS_MedCodeName).Value
+	Else
+		tradeCodeName = xlsheet.Cells(row, 3).Value &amp; "/" &amp; xlsheet.Cells(row, 2).Value &amp; "/" &amp; xlsheet.Cells(row, 4).Value
+		Set item = doc.Replaceitemvalue("TradeCodeName", TradeCodeName)
+		'Set item = doc.Replaceitemvalue("TradeCodeName", xlsheet.Cells(row, POS_MedTradeName).Value &amp; "/" &amp; xlsheet.Cells(row, POS_MedCodeName).Value)
+		'tradecodename = xlsheet.Cells(row, POS_MedTradeName).Value &amp;"/" &amp; xlsheet.Cells(row, POS_MedCodeName).Value
+	End If
+	
+	'Flag if medicine is of biological origin
+	If xlsheet.Cells(row,POS_BiologicalOrigin).Value = "Yes" Then
+		Redim Preserve biologicalsList(bioCount)
+		biologicalsList(bioCount) = xlsheet.Cells(row, POS_ClinicalTrialNo).Value
+		bioCount = bioCount + 1
+		Call processBiological(clinicalTrialNo, session, activename, tradecodename, item)
+	End If
+
+	Set item = doc.Replaceitemvalue("IsActiveVersion", "1")
+	
+	If failed Then
+		Call setAppNotCleanFromMedicine(clinicalTrialNo)
+		Call doc.replaceItemValue("IsFailed","1")
+	Else 
+		Call doc.replaceItemValue("IsFailed","0")
+	End If
+
+	Call SetDocumentAuditNSecurity(doc, clinicalTrialNo)
+	Call doc.Save (True, True)
+
+exitGracefully:
+	Exit Function
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	Resume exitGracefully
+
+End Function
+
+
+
+
+</lotusscript></code><code event='ADR'><lotusscript>%REM
+	Function ADR
+	Description: Comments for Function
+%END REM
+Function ADR(formname As String, session As NotesSession, uiws As NotesUIWorkspace, db As NotesDatabase,_
+	doc As NotesDocument, form As NotesForm, item As Variant, xlWb As Variant, xlApp As Variant,_
+	xlSheet As Variant, rows As Long, cols As Integer)
+
+	Dim hwnd As Long, count As Integer
+	Dim timeOn!, timeRan!
+	
+	On Error Goto errorHandler
+	Const scriptElement = "ADR"
+	timeOn = Timer
+	
+	Dim clinicalTrialNo As String, default As String, uniqueID As String
+	
+	' Excel sheet properties
+	Dim flag As Integer
+	Dim row As Long
+	
+	Dim appID As String, yearVal As String, ctNum As String, schemeType As String
+	Dim sponsorID As String, sponsorName As String, sponsorAddress As String, sponsorAddressToFind As String
+	
+	' Define general properties
+	Dim x As Integer, i As Integer
+	Dim msg As String, temp As Variant
+	
+	' Start at row 0
+	row = 0
+	
+	Print "Processing ADR data..."
+	Dim d1 As Integer
+	
+	' Initialise all second column items to empty string	
+	
+	Dim fieldCount As Integer
+	Dim msgString As String
+	'fieldCount = 0
+	'bioCount = 0
+	
+	Do While True
+		row = row + 1
+		
+		' Check end of rows
+		If row = rows+1 Then Goto Done
+		
+		' Define fields for notes
+		If row=1 Then
+			For i=1 To cols
+				Redim Preserve fd(i)
+				fd(i)=xlSheet.Cells(row, i).Value
+				flag=0
+				
+				If flag=1 Then
+					Goto Skip
+				End If
+				
+				If Not flag=1 Then
+				End If 'Not flag =1
+				
+Skip:
+			Next 'For i=1 to cols
+		End If 'row=1
+		
+		'Import each row into new document
+		If Not row =1 And Not xlSheet.Cells(row, 2).Value = "" Then
+			
+			count = row/rows*100
+			
+			'Create new doc
+			Set doc = db.Createdocument
+			doc.Form = formname		 
+			
+			For i=1 To cols
+				' Formulate application ID of format (CT-YYYY-schemeType-clinicaltrialnumber-1)
+				If i=POS_ClinicalTrialNo Then ' will need to add check to see if blank
+					
+					default = "Not Provided"
+					
+					clinicalTrialNo = xlSheet.Cells(row, POS_ClinicalTrialNo).Value
+					yearVal = Mid(xlSheet.Cells(row, POS_ClinicalTrialNo).Value, 1, 4)
+					ctNum = Mid(xlSheet.Cells(row, POS_ClinicalTrialNo).Value, 5, 5)
+					If Len(ctNum) &lt;5 Then
+						ctLen = Len(ctNum)
+						For x=1 To (CLINTRIALNO-ctLen)
+							ctNum = "0"&amp;ctNum
+						Next
+					End If
+					schemeType = "CTN"
+					appID = "CT-" &amp;yearVal &amp;"-" &amp;schemeType &amp;"-" &amp;ctNum &amp;"-1"
+					
+					Set item = doc.Replaceitemvalue("ApplicationId", appID)
+					Print appID &amp;" in ADR"
+					globalApplicationID = appID
+					globalApplicationVersion = "1"
+					
+					Set doc = db.Createdocument
+					doc.Form = "ADR"
+					Set item = doc.Replaceitemvalue("ApplicationID", globalApplicationID)
+					Set item = doc.Replaceitemvalue("ApplicationVersion", globalApplicationVersion)
+					Set item = doc.Replaceitemvalue("ClinicalTrialType", "CTN")
+					Set item = doc.Replaceitemvalue("IsActiveVersion", "1")
+					uniqueID = globalApplicationID &amp;"~1~ADR~" &amp; UUID(0,0)
+					Set item = doc.Replaceitemvalue("id", uniqueID)
+					Set item = doc.Replaceitemvalue("identifier", "RecordUNID")
+					'Set item = doc.Replaceitemvalue("label", "IBP")
+					Set item = doc.Replaceitemvalue("Type", "ADR")
+					Set item = doc.Replaceitemvalue("Form", "ADR")
+					Set item = doc.Replaceitemvalue("DataSection", "8")
+					Set item = doc.Replaceitemvalue("RecordUNID", uniqueID)
+					
+					'*******************************************************************
+					'ADR fields
+					'*******************************************************************
+					Set item = doc.Replaceitemvalue("ADR_ReportDate", xlSheet.Cells(row,POS_ADR_ReportDate).Value)
+					Set item = doc.Replaceitemvalue("ADR_DateReceived", xlSheet.Cells(row,POS_ADR_DateReceived).Value)
+					Set item = doc.Replaceitemvalue("ADR_ReportType", xlSheet.Cells(row,POS_ReportType).Value)
+					Set item = doc.Replaceitemvalue("ADR_SuspectDrugs", xlSheet.Cells(row,POS_SuspectDrugs).Value)
+					Set item = doc.Replaceitemvalue("ADR_FileNo", xlSheet.Cells(row,POS_ADR_FileNo).Value)
+					Set item = doc.Replaceitemvalue("ADR_FolioNo", xlSheet.Cells(row,POS_ADR_FolioNo).Value)
+					Set item = doc.Replaceitemvalue("ADR_OtherDrugsInvolved", xlSheet.Cells(row,POS_OtherDrugsInvolved).Value)
+					Set item = doc.Replaceitemvalue("ADR_PatientInitials", xlSheet.Cells(row,POS_PatientInitials).Value)
+					Set item = doc.Replaceitemvalue("ADR_Gender", xlSheet.Cells(row,POS_ADR_Gender).Value)
+					Set item = doc.Replaceitemvalue("ADR_DOB", xlSheet.Cells(row,POS_ADR_DOB).Value)
+					Set item = doc.Replaceitemvalue("ADR_Fatal_NonFatal", xlSheet.Cells(row,POS_ADR_FatalOrNon).Value)
+					Set item = doc.Replaceitemvalue("ADR_Comments", xlSheet.Cells(row,POS_ADR_Comments).Value)
+					'--------------------------------------------------------------------
+				End If
+			Next ' i=1 to cols
+			'bioCount = 0
+			' Save new document
+			Call SetDocumentAuditNSecurity(doc, clinicalTrialNo)
+			Call doc.Save(True, True)
+		End If ' Not
+
+	Loop ' Do while true
+
+Done:
+	Print "Disconnecting from Excel Sheet4 - ADRs..."
+	Print " "
+	
+exitGracefully:
+	Exit Function
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	'NEMProgressEnd hwnd
+	Resume exitGracefully
+	
+End Function
+
+</lotusscript></code><code event='processBiological'><lotusscript>%REM
+	Function processBiological
+	Description: Comments for Function
+%END REM
+Function processBiological(clinicalTrialNo As String, session As NotesSession, activeName As String, tradeCodeName As String, item As Variant)
+	
+	Dim bioString As String, bioArray(), uniqueID As String, dataSection1 As String, codePlaceholder As String
+	Dim placeholder As String, db As NotesDatabase, doc As NotesDocument
+	Dim i As Integer, length As Integer
+	
+	On Error Goto errorHandler
+	Const scriptElement = "processBiological"
+	
+	uniqueID = globalApplicationID &amp;"~1~Part1~Biologicals~" &amp; UUID(0,0)
+	dataSection1 = "1"
+	codePlaceholder = "NA"
+	placeholder = "Not Provided"
+	
+	Set db = session.Currentdatabase
+	
+	Set doc = db.Createdocument
+	doc.Form = "Biological"
+	
+	Set item = doc.Replaceitemvalue("ApplicationID", globalApplicationID)
+	Set item = doc.Replaceitemvalue("ApplicationVersion", globalApplicationVersion)
+	Set item = doc.Replaceitemvalue("IsActiveVersion", "1")
+	Set item = doc.Replaceitemvalue("BiologicalProductDescription", placeholder)
+	Set item = doc.Replaceitemvalue("ClinicalTrialType", "CTN")
+	Set item = doc.Replaceitemvalue("id", uniqueID)
+	Set item = doc.Replaceitemvalue("identifier", "RecordUNID")
+	Set item = doc.Replaceitemvalue("label", "ProductName")
+	Set item = doc.Replaceitemvalue("Type", "Biological")
+	Set item = doc.Replaceitemvalue("Form", "Biological")
+	Set item = doc.Replaceitemvalue("DataSection", dataSection1)
+	Set item = doc.Replaceitemvalue("RecordUNID", uniqueID)
+	
+	Set item = doc.Replaceitemvalue("AnimalOrigin", codePlaceholder)
+	Set item = doc.Replaceitemvalue("AnimalOrigin_Label", placeholder)
+	Set item = doc.Replaceitemvalue("DosageForm_Label", placeholder)
+	Set item = doc.Replaceitemvalue("DosageForm", codePlaceholder)
+	Set item = doc.Replaceitemvalue("LabelName", tradeCodeName)
+	Set item = doc.Replaceitemvalue("ProductName", activeName)
+	Set item = doc.Replaceitemvalue("ProductNameText", "")
+	Set item = doc.Replaceitemvalue("RouteOfAdmin", codePlaceholder)
+	Set item = doc.Replaceitemvalue("RouteOfAdmin_Label", placeholder)
+	Set item = doc.Replaceitemvalue("CountryList", codePlaceholder)
+	Set item = doc.Replaceitemvalue("CountryList_Label", placeholder)
+	Set item = doc.Replaceitemvalue("TradeCodeName", TradeCodeName)
+	
+	
+	
+	Call SetDocumentAuditNSecurity(doc, clinicalTrialNo)
+	Call doc.Save(True, True)
+	
+exitGracefully:
+	Exit Function
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	Resume exitGracefully
+End Function
+
+</lotusscript></code><code event='SetDocumentAuditNSecurity'><lotusscript
+>Sub SetDocumentAuditNSecurity(doc As NotesDocument, CT_TrialNo As String)
+	'Update UpdateAudit Log
+	Dim itmCreatedBy As NotesItem 
+	Dim itmCreatedOn As NotesItem
+	Dim itmUpdatedBy As NotesItem 
+	Dim itmUpdatedOn As NotesItem
+
+	Dim itmReaders As NotesItem
+	Dim itmAuthors As NotesItem 
+	Dim clientID As Variant, sponsorID As String
+	Dim SecurityEntries As Variant 
+	
+	With doc
+		If .hasItem("LastEditor") Then
+			Set itmUpdatedBy = .getFirstItem("LastEditor")
+		Else
+			Set itmUpdatedBy = New NotesItem(doc, "LastEditor", "", NAMES)
+		End If
+		
+		If .hasItem("LastEdited") Then
+			Set itmUpdatedOn = .getFirstItem("LastEdited")
+		Else
+			Set itmUpdatedOn = New NotesItem(doc, "LastEdited", "")
+		End If
+		
+		If  (.IsNewNote) Then
+			Set itmCreatedBy = New NotesItem(doc, "CreatedBy", Evaluate(|@UserName|, doc), NAMES)
+			Set itmCreatedOn = New NotesItem(doc, "CreatedOn", Now)
+		Else
+			itmUpdatedBy.Values = Evaluate(|@Trim(@UserName : LastEditor)|, doc)
+			itmUpdatedOn.Values = Evaluate(|@If(@IsNull(LastEdited);@Now;@Now : LastEdited)|, doc)
+		End If
+		
+		'Update Security
+		clientID = Evaluate(|@Text(@DbLookup( "" : "NoCache" ; "" : "| + UserManagerDBName + |" ; "LULM" ; @Name( [CN] ; @UserName ) ; "ClientID" ;[FAILSILENT]))|)
+		If clientID(0) &lt;&gt; "" Then
+			clientID(0) = "SIME" + clientID(0) 
+		End If
+
+		sponsorID = getSponsorIDByCTNo(CT_TrialNo)
+		SecurityEntries = Evaluate(|@Trim("SIME|+ SponsorID + |":"[Admin]" : "[TGA]" : "LocalDomainServers" : "OtherDomainServers")|)
+		
+		Set itmReaders = New NotesItem(doc, "WebReaders", SecurityEntries, READERS)
+		Set itmAuthors = New NotesItem(doc, "WebAuthors", SecurityEntries, AUTHORS)
+	End With
+	
+	Call doc.Replaceitemvalue("IsNotes", 1)
+End Sub
+
+</lotusscript></code><code event='findSponsorAddress'><lotusscript>%REM
+	Function findSponsorAddress
+	Description: Comments for Function
+%END REM
+Function findSponsorAddress(idnumber As String, findAddress As String, sponsorAddress As String, doc As NotesDocument,_
+	item As Variant)
+	
+	On Error Goto errorHandler
+	Const scriptElement = "findSponsorAddress"
+	Dim flag As Integer
+	
+	'/ Default is Unclean
+	Set item = doc.Replaceitemvalue("IsCleanTrial", "0")
+
+	Dim cwdoc As NotesDocument
+	Dim cwdocs As NotesDocumentCollection
+	Dim clientDoc As NotesDocument
+	Dim found As Boolean
+
+	Set clientDoc = luClientsview.Getdocumentbykey(idnumber, True)
+	If Not clientDoc Is Nothing Then
+		found = False
+		If clientDoc.STATUS(0) = "A" Then
+			Set item = doc.Replaceitemvalue("SponsorStatus", "A")
+		Else
+			Set item = doc.Replaceitemvalue("SponsorStatus", "I")
+		End If
+		
+		Set cwdocs = lupostalview.Getalldocumentsbykey(idnumber, True)
+		Set cwdoc = cwdocs.Getfirstdocument()
+		
+		Dim locationID As String, addressL1 As String, addressL2 As String
+		Dim town As String, state As String, postcode As String
+		
+		Set item = doc.Replaceitemvalue("ClientID", idnumber)
+		Set item = doc.Replaceitemvalue("SponsorId", idnumber)
+
+		flag = 1
+		While Not cwdoc Is Nothing
+			'find the adddressline-1 match for Excel Sponsor Street1 data
+			'return the locationid into the sponsorasdddres
+			
+			Forall f In cwdoc.Items
+				If f.Name = "ADDRESS_LINE1" And findAddress &lt;&gt; "" And Trim(Lcase(findAddress)) = Trim(Lcase(f.Text)) Then
+					addressL1 = f.Text
+					flag = 0
+				End If
+				
+				If f.Name = "ADDRESS_LINE2" Then
+					addressL2 = f.Text
+				End If
+				
+				If f.Name = "LocationID" Then
+					locationID = f.Text
+				End If
+				
+				If f.Name = "TOWN" Then
+					town = f.Text
+				End If
+				
+				If f.Name = "State" Then
+					state = f.Text
+				End If
+				
+				If f.Name = "Postcode" Then
+					postcode = f.Text
+				End If
+				
+				If flag = 0 Then
+					Set item = doc.Replaceitemvalue("SponsorAddress_Id", locationID)
+					Set item = doc.Replaceitemvalue("SponsorAddress_Label", Trim(addressL1 &amp;"" &amp;addressL2) &amp;" " &amp;town &amp;" " &amp;State &amp;" " &amp;Postcode)
+					Set item = doc.Replaceitemvalue("SponsorAddress", locationID)
+					Set item = doc.Replaceitemvalue("IsCleanTrial", "1")
+					found = True
+					'Exit forall
+				Else
+					Set item = doc.Replaceitemvalue("SponsorAddress_Label", sponsorAddress)
+				End If
+			End Forall
+			
+			flag = 1
+
+				Set cwdoc = cwdocs.Getnextdocument(cwdoc)				
+			
+		Wend
+
+		If Not found Then
+			Set item = doc.Replaceitemvalue("SponsorAddress_Label", sponsorAddress)
+		End If
+		
+	Else
+		Set item = doc.Replaceitemvalue("SponsorStatus", "0")
+		Set item = doc.Replaceitemvalue("ClientID", "")
+		Set item = doc.Replaceitemvalue("SponsorId", "")
+	End If
+
+Finish:
+
+exitGracefully:
+	Exit Function
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	Resume exitGracefully
+End Function
+
+</lotusscript></code><code event='IBP'><lotusscript>%REM
+	Function IBP
+	Description: Comments for Function
+%END REM
+Function IBP(formname As String, session As NotesSession, uiws As NotesUIWorkspace, db As NotesDatabase,_
+	doc As NotesDocument, form As NotesForm, item As Variant, xlWb As Variant, xlApp As Variant,_
+	xlSheet As Variant, rows As Long, cols As Integer)
+
+	Dim hwnd As Long, count As Integer
+	Dim timeOn!, timeRan!
+	
+	On Error Goto errorHandler
+	Const scriptElement = "IBP"
+	timeOn = Timer
+	
+	Dim clinicalTrialNo As String, default As String, uniqueID As String
+	
+	' Excel sheet properties
+	Dim flag As Integer
+	Dim row As Long
+	
+	Dim appID As String, yearVal As String, ctNum As String, schemeType As String
+	Dim sponsorID As String, sponsorName As String, sponsorAddress As String, sponsorAddressToFind As String
+	
+	' Define general properties
+	Dim x As Integer, i As Integer
+	Dim msg As String, temp As Variant
+	
+	' Start at row 0
+	row = 0
+	
+	Print "Processing IBP data..."
+	Dim d1 As Integer
+	
+	' Initialise all second column items to empty string	
+	
+	Dim fieldCount As Integer
+	Dim msgString As String
+	'fieldCount = 0
+	'bioCount = 0
+	
+	Do While True
+		row = row + 1
+		
+		' Check end of rows
+		If row = rows+1 Then Goto Done
+		
+		' Define fields for notes
+		If row=1 Then
+			For i=1 To cols
+				Redim Preserve fd(i)
+				fd(i)=xlSheet.Cells(row, i).Value
+				flag=0
+				
+				If flag=1 Then
+					Goto Skip
+				End If
+				
+				If Not flag=1 Then
+				End If 'Not flag =1
+				
+Skip:
+			Next 'For i=1 to cols
+		End If 'row=1
+		
+		'Import each row into new document
+		If Not row =1 And Not xlSheet.Cells(row, 3).Value = "" Then
+			
+			'Create new doc
+			Set doc = db.Createdocument
+			doc.Form = formname		 
+			
+			default = "Not Provided"
+			
+			clinicalTrialNo = xlSheet.Cells(row, POS_ClinicalTrialNo).Value
+			yearVal = Mid(xlSheet.Cells(row, POS_ClinicalTrialNo).Value, 1, 4)
+			ctNum = Mid(xlSheet.Cells(row, POS_ClinicalTrialNo).Value, 5, 5)
+			If Len(ctNum) &lt;5 Then
+				ctLen = Len(ctNum)
+				For x=1 To (CLINTRIALNO-ctLen)
+					ctNum = "0"&amp;ctNum
+				Next
+			End If
+			schemeType = "CTN"
+			appID = "CT-" &amp;yearVal &amp;"-" &amp;schemeType &amp;"-" &amp;ctNum &amp;"-1"
+			
+			Set item = doc.Replaceitemvalue("ApplicationId", appID)
+			Print appID &amp;" in IBP"
+			globalApplicationID = appID
+			globalApplicationVersion = "1"
+			
+			Set doc = db.Createdocument
+			doc.Form = "IBP"
+			Set item = doc.Replaceitemvalue("ApplicationID", globalApplicationID)
+			Set item = doc.Replaceitemvalue("ApplicationVersion", globalApplicationVersion)
+			Set item = doc.Replaceitemvalue("ClinicalTrialType", "CTN")
+			Set item = doc.Replaceitemvalue("IsActiveVersion", "1")
+			uniqueID = globalApplicationID &amp;"~1~IBP~" &amp; UUID(0,0)
+			Set item = doc.Replaceitemvalue("id", uniqueID)
+			Set item = doc.Replaceitemvalue("identifier", "RecordUNID")
+			'Set item = doc.Replaceitemvalue("label", "IBP")
+			Set item = doc.Replaceitemvalue("Type", "IBP")
+			Set item = doc.Replaceitemvalue("Form", "IBP")
+			Set item = doc.Replaceitemvalue("DataSection", "7")
+			Set item = doc.Replaceitemvalue("RecordUNID", uniqueID)
+			
+			'*******************************************************************
+			'IBP fields
+			'*******************************************************************
+			'Set item = doc.Replaceitemvalue("RecordNo", xlSheet.Cells(row,POS_RecordNo).Value)		
+			Set item = doc.Replaceitemvalue("S31no", xlSheet.Cells(row,POS_S31No).Value)
+			Set item = doc.Replaceitemvalue("AmendmentOnly", xlSheet.Cells(row,POS_AmendmentOnly).Value)
+			Set item = doc.Replaceitemvalue("IBP_DateRequested", xlSheet.Cells(row,POS_DateRequested).Value)
+			Set item = doc.Replaceitemvalue("IBP_ReplyDue", xlSheet.Cells(row,POS_ReplyDue).Value)
+			Set item = doc.Replaceitemvalue("IBP_DateReceived", xlSheet.Cells(row,POS_IBPDateReceived).Value)
+			Set item = doc.Replaceitemvalue("IBP_MedicalOfficer", xlSheet.Cells(row,POS_NameMedicalOfficer).Value)
+			Set item = doc.Replaceitemvalue("DateForwardedToMedicalOfficer", xlSheet.Cells(row,POS_DateForwardedToMO).Value)
+			Set item = doc.Replaceitemvalue("IBP_RMSDate", xlSheet.Cells(row,POS_IBPRMSDate).Value)
+			Set item = doc.Replaceitemvalue("InvestigatorBrochure", xlSheet.Cells(row,POS_InvestigatorBrochure).Value)
+			Set item = doc.Replaceitemvalue("Protocol", xlSheet.Cells(row,POS_IBP_Protocol).Value)
+			Set item = doc.Replaceitemvalue("IBP_Other", xlSheet.Cells(row,POS_IBP_Other).Value)
+			Set item = doc.Replaceitemvalue("IBP_OtherInformation", xlSheet.Cells(row,POS_IBP_Other_Information).Value)
+			Set item = doc.Replaceitemvalue("IBP_DateAmendmentReceived", xlSheet.Cells(row,POS_DateAmendmentReceived).Value)
+			Set item = doc.Replaceitemvalue("Amendment_RMSDate", xlSheet.Cells(row,POS_AmendmentRMSDate).Value)
+			Set item = doc.Replaceitemvalue("Amendment_MedicalOfficer", xlSheet.Cells(row,POS_Amendment_NameMO).Value)
+			Set item = doc.Replaceitemvalue("Amendment_DateForwardedToMO", xlSheet.Cells(row,POS_Amendment_DateForwardedToMO).Value)
+			Set item = doc.Replaceitemvalue("Amendment_Comment", xlSheet.Cells(row,POS_AmendmentComment).Value)
+			'--------------------------------------------------------------------
+					
+			' Save new document
+			Call SetDocumentAuditNSecurity(doc, clinicalTrialNo)
+			Call doc.Save(True, True)
+		End If ' Not
+	Loop ' Do while true
+
+Done:
+	Print "Disconnecting from Excel Sheet5 - IBPs..."
+	
+exitGracefully:
+	Exit Function
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	Resume exitGracefully
+End Function
+
+
+
+</lotusscript></code><code event='setAppNotCleanFromMedicine'><lotusscript
+>Sub setAppNotCleanFromMedicine(CT_TrialNo As String)
+	Dim ctAppDoc As NotesDocument
+	
+	Set ctAppDoc = vAppByCTTrialNo.Getdocumentbykey(CT_TrialNo, True)
+	If Not (ctAppDoc Is Nothing) Then
+		Call ctAppDoc.replaceItemValue("IsCleanTrial","0")
+		Call ctAppDoc.save(True, False)
+	End If
+	
+End Sub
+
+</lotusscript></code><code event='processSites'><lotusscript>%REM
+	Function processSites
+	Description: Comments for Function
+%END REM
+Function processSites(session As NotesSession, xlSheet As Variant, row As Long, item As Variant, rows As Long,_
+	trialNum As String) As Variant
+	
+	Dim count As Integer, i As Integer, p As Integer, length As Integer
+	' possible unique id generator: http://www.codestore.net/store.nsf/unid/BLOG-20090714
+	
+	Dim sponsorAttachment As String, sponsorAttachLabel As String, HREC_Code As String, HREC_Name As String
+	Dim HREC_State As String, HREC_Attachment As String, HRECAttachLabel As String, PrInvestigatorName As String
+	Dim PrInvestigatorState As String, PrInvestigatorAttachment As String, PrInvestigatorAttachLabel As String
+	Dim trialSiteAddress As String, trialSiteState As String, trialSite As String, copyEdited As String, expStartDate As String
+	Dim trialSiteStateLabel As String, sponsorDecl As String, PrInvestigatorDecl As String, HREC_StateLabel As String
+	Dim HREC_Decl As String, ApprovingAuthStateLabel As String, ApprovingAuthDecl As String, dataSection1 As String
+	Dim appAuthorityName As String, appAuthorityState As String, appAuthorityStateLabel As String, siteExtraInfo As String
+	Dim myarray()
+	
+	Dim siteString As String
+	Dim applicationID As String, uniqueID As String, generalID As String
+
+	dataSection1 = "1"
+	
+	On Error Goto errorHandler
+	Const scriptElement = "processSites"
+	
+	Dim doc As NotesDocument, form As NotesForm, default As Variant, db As NotesDatabase
+	Dim ClinicalTrialNo As String
+	
+	Set db = session.Currentdatabase
+	default = "Not Provided"
+	
+	Set doc = db.Createdocument
+	doc.Form = "Site"
+	ClinicalTrialNo =  xlSheet.Cells(row, POS_ClinicalTrialNo).Value
+	Set item = doc.Replaceitemvalue("ApplicationID", globalApplicationID)
+	Set item = doc.Replaceitemvalue("ApplicationVersion", globalApplicationVersion)
+	Set item = doc.Replaceitemvalue("ClinicalTrialNo", ClinicalTrialNo)
+	Set item = doc.Replaceitemvalue("ClinicalTrialType", "CTN")
+	
+	uniqueID = globalApplicationID &amp;"~1~Part1~Sites~" &amp; UUID(0,0)
+	generalID = globalApplicationID &amp;"~1~Part1~Sites"
+	Set item = doc.Replaceitemvalue("id", uniqueID)
+	Set item = doc.Replaceitemvalue("RecordUNID", uniqueID)
+	Set item = doc.Replaceitemvalue("identifier", "id")
+	Set item = doc.Replaceitemvalue("label", "TrialSite")
+	Set item = doc.Replaceitemvalue("Type", "Site")
+	Set item = doc.Replaceitemvalue("Form", "Site")
+	Set item = doc.Replaceitemvalue("DataSection", dataSection1)
+	
+	'INC61834 BL attachments no longer required
+	'*********DO NOT DELETE - Produces attachments*************************************************************
+	'Call attachFiles(ClinicalTrialNo, uniqueID, 1,Trim(xlSheet.Cells(row, POS_ApprovingAuthorityName).Value),_
+	'Trim(xlSheet.Cells(row, POS_DateReceived).Value), Trim(xlSheet.Cells(row, POS_DateAcknowledged).Value),_
+	'Trim(xlSheet.Cells(row, POS_FileNo).Value), Trim(xlSheet.Cells(row, POS_FolioNo).Value),_
+	'Trim(xlSheet.Cells(row, POS_TGAINNo).Value), "")
+	'**********************************************************************************************************
+	
+	'Set item = doc.Replaceitemvalue("SponsorAttachment", default)
+	'Set item = doc.Replaceitemvalue("SponsorAttachment_Label", default)
+	Set item = doc.Replaceitemvalue("ExpectedSiteStartDate", xlsheet.Cells(row, POS_ExpectedSiteStartDate).Value)
+	Set item = doc.Replaceitemvalue("ApprovingAuthorityName", default)
+	'Set item = doc.Replaceitemvalue("ApprovingAuthorityState", default)
+	'Set item = doc.Replaceitemvalue("ApprovingAuthorityState_Label", default)
+	
+	Set item = doc.Replaceitemvalue("ApprovingAuthorityContactEmail", "notprovided@byorg.com")
+	Set item = doc.Replaceitemvalue("ApprovingAuthorityContactPhone", "0212345678")
+	Set item = doc.Replaceitemvalue("ApprovingAuthorityOfficer", default)
+	Set item = doc.Replaceitemvalue("ApprovingAuthorityPosition", default)
+	
+	Set item = doc.Replaceitemvalue("HRECCode", default)
+	Set item = doc.Replaceitemvalue("HRECName", xlsheet.Cells(row, POS_HRECName).Value)
+	
+	Set item = doc.Replaceitemvalue("HRECContactEmail", "notprovided@byorg.com")
+	Set item = doc.Replaceitemvalue("HRECContactOfficer", default)
+	Set item = doc.Replaceitemvalue("HRECContactPhone", "0212345678")
+	Set item = doc.Replaceitemvalue("HRECPosition", default)
+	
+	'Set item = doc.Replaceitemvalue("HRECState", xlsheet.Cells(row, POS_HRECState).Value)
+	'Set item = doc.Replaceitemvalue("HREC Extra Information", xlsheet.Cells(row, POS_HRECExtraInfo).Value)
+	'Set item = doc.Replaceitemvalue("HREC Postcode", xlsheet.Cells(row, POS_HRECEPostCode).Value)
+	'Set item = doc.Replaceitemvalue("HREC Street Name", xlsheet.Cells(row, POS_HRECStreetName).Value)
+	'Set item = doc.Replaceitemvalue("HREC Street Number", xlsheet.Cells(row, POS_HRECStreetNumber).Value)
+	'Set item = doc.Replaceitemvalue("HREC Town Suburb", xlsheet.Cells(row, POS_HRECSuburb).Value)
+	'Set item = doc.Replaceitemvalue("HRECAttachment", default)
+	'Set item = doc.Replaceitemvalue("HRECAttachment_Label", default)
+	'Set item = doc.Replaceitemvalue("HRECDeclaration", default)
+	
+	Set item = doc.Replaceitemvalue("PrincipalInvestigatorName", xlsheet.Cells(row, POS_PrincipalInvestigator).Value)
+	'Set item = doc.Replaceitemvalue("PrincipalInvestigatorState", default)
+	Set item = doc.Replaceitemvalue("PrincipalInvestigatorContactEmail", "notprovided@byorg.com")
+	Set item = doc.Replaceitemvalue("PrincipalInvestigatorContactPhone", "0212345678")
+	'Set item = doc.Replaceitemvalue("PrincipalInvestigatorAttachment", default)
+	'Set item = doc.Replaceitemvalue("PrincipalInvestigatorAttachment_Label", default)
+
+	trialSiteAddress = xlsheet.Cells(row, POS_TrialSiteStreetNumber).Value &amp;" " &amp;_
+	xlsheet.Cells(row, POS_TrialSiteStreetName).Value &amp;" " &amp;xlsheet.Cells(row, POS_TrialSiteStreetType).Value &amp;_
+	", " &amp;xlsheet.Cells(row, POS_TrialSiteSuburb).Value &amp;", " &amp;xlsheet.Cells(row, POS_TrialSitePostCode).Value
+
+	Set item = doc.Replaceitemvalue("TrialSiteState", xlsheet.Cells(row, POS_TrialSiteState).Value)
+	Set item = doc.Replaceitemvalue("TrialSite", xlsheet.Cells(row, POS_TrialSiteName).Value)
+	Set item = doc.Replaceitemvalue("copyHasBeenEdited", xlsheet.Cells(row, POS_IncorrectEntry).Value)
+	
+	'		' Append Extra Site Information to Site Address field
+	siteExtraInfo = xlsheet.Cells(row, POS_TrialSiteExtraInfo).Value
+	If Not siteExtraInfo = "" Then
+		trialSiteAddress = siteExtraInfo &amp; ", " &amp; trialSiteAddress 
+		Set item = doc.Replaceitemvalue("TrialSiteAddress", trialSiteAddress)
+	Else
+		trialSiteAddress = trialSiteAddress
+		Set item = doc.Replaceitemvalue("TrialSiteAddress", trialSiteAddress)
+	End If
+	
+	'Set item = doc.Replaceitemvalue("TrialSiteStateLabel", xlsheet.Cells(i, POS_TrialSiteStateLabel).Value)
+	'Set item = doc.Replaceitemvalue("SponsorDeclaration", default)
+	'INC61834 BL attachments no longer required
+	'Set item = doc.Replaceitemvalue("PrincipalInvestigatorDeclaration", default)
+	'Set item = doc.Replaceitemvalue("ApprovingAuthorityState_Label", default)
+	'Set item = doc.Replaceitemvalue("ApprovingAuthorityDeclaration", default)
+	Set item = doc.Replaceitemvalue("ApprovingCertAssigned", xlsheet.Cells(row, POS_ApprovingAuthorityName).Value)
+	Set item = doc.Replaceitemvalue("DateReceived", xlsheet.Cells(row, POS_DateReceived).Value)
+	Set item = doc.Replaceitemvalue("DateAcknowledged", xlsheet.Cells(row, POS_DateAcknowledged).Value)
+	Set item = doc.Replaceitemvalue("FileNo", xlsheet.Cells(row, POS_FileNo).Value)
+	Set item = doc.Replaceitemvalue("FolioNo", xlsheet.Cells(row, POS_FolioNo).Value)
+	Set item = doc.Replaceitemvalue("TGAINNo", xlsheet.Cells(row, POS_TGAINNo).Value)
+
+	'	
+	'		'Get correct label for given State
+	%REM
+		
+
+	Select Case xlsheet.Cells(row, POS_HRECState).Value
+		Case "ACT": Set item = doc.Replaceitemvalue("HRECState_Label","Australian Capital Territory")
+		Case "NSW": Set item = doc.Replaceitemvalue("HRECState_Label","New South Wales")
+		Case "NT": Set item = doc.Replaceitemvalue("HRECState_Label","Northern Territory")
+		Case "QLD": Set item = doc.Replaceitemvalue("HRECState_Label","Queensland")
+		Case "SA": Set item = doc.Replaceitemvalue("HRECState_Label","South Australia")
+		Case "TAS": Set item = doc.Replaceitemvalue("HRECState_Label","Tasmania")
+		Case "VIC": Set item = doc.Replaceitemvalue("HRECState_Label","Victoria")
+		Case "WA": Set item = doc.Replaceitemvalue("HRECState_Label","Western Australia")
+	End Select
+	%END REM
+
+	Select Case xlsheet.Cells(row, POS_TrialSiteState).Value
+		Case "ACT": Set item = doc.Replaceitemvalue("TrialSiteState_Label","Australian Capital Territory")
+		Case "NSW": Set item = doc.Replaceitemvalue("TrialSiteState_Label","New South Wales")
+		Case "NT": Set item = doc.Replaceitemvalue("TrialSiteState_Label","Northern Territory")
+		Case "QLD": Set item = doc.Replaceitemvalue("TrialSiteState_Label","Queensland")
+		Case "SA": Set item = doc.Replaceitemvalue("TrialSiteState_Label","South Australia")
+		Case "TAS": Set item = doc.Replaceitemvalue("TrialSiteState_Label","Tasmania")
+		Case "VIC": Set item = doc.Replaceitemvalue("TrialSiteState_Label","Victoria")
+		Case "WA": Set item = doc.Replaceitemvalue("TrialSiteState_Label","Western Australia")
+	End Select
+		
+	Set item = doc.Replaceitemvalue("IsActiveVersion", "1")
+	
+	Call SetDocumentAuditNSecurity(doc, ClinicalTrialNo)
+	Call doc.Save (True, True)
+
+exitGracefully:
+	Exit Function
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	Resume exitGracefully
+
+End Function
+
+</lotusscript></code><code event='CreateMIMETextAttachment'><lotusscript>Function CreateMIMETextAttachment(doc As NotesDocument, stream As NotesStream, fileName As String)
+	
+	Dim s As New NotesSession
+	Dim mime As NotesMIMEEntity, header As NotesMIMEHeader 
+	Dim child As NotesMIMEEntity
+	Dim blankStream As NotesStream
+	Dim expectedHeaderVal As String, headerVal As String 
+
+	s.ConvertMIME = False ' Do not convert MIME to rich text
+	expectedHeaderVal = Lcase(|attachment; filename="| + fileName + |"|)
+	
+	Set mime = doc.GetMIMEEntity("JSONMIMEFILE")
+	If mime Is Nothing Then
+		Set mime = doc.CreateMIMEEntity("JSONMIMEFILE")
+	Else
+		'For Existing Documents
+		Set child = mime.GetFirstChildEntity
+		Do While Not (child Is Nothing)
+			Set header = child.GetNthHeader("Content-Disposition")
+			headerVal = Lcase(header.GetHeaderValAndParams())
+			If headerVal = expectedHeaderVal Then
+				Exit Do
+			End If
+			
+			Set child = child.GetNextEntity()
+		Loop
+	End If
+	
+	Set header = mime.GetNthHeader("Content-Type")    
+	If header Is Nothing Then
+		Set header = mime.CreateHeader("Content-Type")
+		Call header.SetHeaderVal("multipart/mixed")
+	End If
+	
+	If child Is Nothing Then
+		Set child = mime.CreateChildEntity
+		Set header = child.CreateHeader("Content-Type")
+		Call header.SetHeaderValAndParams("text/plain; charset=UTF-8")
+		
+		Set header = child.CreateHeader("Content-Description")
+		Call header.SetHeaderVal(|"| + fileName + |"|)
+		
+		Set header = child.CreateHeader("Content-Disposition")
+		Call header.SetHeaderValAndParams(|attachment; filename="| + fileName + |"|)	
+	End If
+	
+	Call child.SetContentFromText(stream, "text/plain; charset=UTF-8; name=" + fileName, ENC_IDENTITY_8BIT)
+	Call doc.CloseMIMEEntities(True, "JSONMIMEFILE")
+	
+	s.ConvertMIME = True ' Do not convert MIME to rich text
+    'The Calling Routine should take the resposibility to close/flush the stream
+End Function
+
+</lotusscript></code><code event='processDevice'><lotusscript>%REM
+	Function processDevice
+	Description: Comments for Function
+%END REM
+Function processDevice(sponsorID As String, session As NotesSession, xlSheet As Variant, row As Long, item As Variant) As Variant
+	Dim deviceString As String, uniqueID As String, dataSection1 As String, placeholder As String
+	Dim codePlaceholder As String, valuePlaceholder As String
+	
+	On Error Goto errorHandler
+	Const scriptElement = "processDevice"
+	
+	Dim doc As NotesDocument, form As NotesForm, db As NotesDatabase
+	
+	' Assign properties
+	Set db = session.Currentdatabase
+	
+	Set doc = db.Createdocument
+	doc.Form = "Device"
+	
+	uniqueID = globalApplicationID &amp;"~1~Part1~Devices~" &amp; UUID(0,0)
+	dataSection1 = "1"
+	placeholder = "Not Provided"
+	codePlaceholder = "NA"
+	valuePlaceholder = "Device"
+	
+	Set item = doc.Replaceitemvalue("ClinicalTrialType", "CTN")
+	Set item = doc.Replaceitemvalue("id", uniqueID)
+	Set item = doc.Replaceitemvalue("identifier", "RecordUNID")
+	Set item = doc.Replaceitemvalue("Type", "Device")
+	Set item = doc.Replaceitemvalue("Form", "Device")
+	Set item = doc.Replaceitemvalue("label", "ProductName")
+	Set item = doc.Replaceitemvalue("ApplicationID", globalApplicationID)
+	Set item = doc.Replaceitemvalue("ApplicationVersion", globalApplicationVersion)
+	Set item = doc.Replaceitemvalue("DataSection", dataSection1)
+	Set item = doc.Replaceitemvalue("RecordUNID", uniqueID)
+	Set item = doc.Replaceitemvalue("ProductName", valuePlaceholder)
+	Set item = doc.Replaceitemvalue("Manufacturer", codePlaceholder)
+	Set item = doc.Replaceitemvalue("Manufacturer_Label", placeholder)
+	Set item = doc.Replaceitemvalue("Description", placeholder)
+	Set item = doc.Replaceitemvalue("IsActiveVersion", "1")
+	Set item = doc.Replaceitemvalue("SponsorID", sponsorID)
+
+	Set item = doc.Replaceitemvalue("IsAKit", "")
+	Set item = doc.Replaceitemvalue("GMDNS", "")
+	Set item = doc.Replaceitemvalue("IntendedUse", "")
+	Set item = doc.Replaceitemvalue("IntendedUseOtherDescription", placeholder)
+	
+	Call SetApplicationDocumentAuditNSecurity(doc)
+	Call doc.Save (True, True)
+
+exitGracefully:
+	Exit Function
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	Resume exitGracefully
+End Function
+
+</lotusscript></code><code event='processPlacebo'><lotusscript>%REM
+	Function processPlacebo
+	Description: Comments for Function
+%END REM
+Function processPlacebo(sponsorID As String, session As NotesSession, xlSheet As Variant, row As Long, item As Variant) As Variant
+	Dim placeboString As String, uniqueID As String, dataSection1 As String, placeholder As String, dosePlaceholder As String
+	Dim codePlaceholder As String, valuePlaceholder As String
+	
+	On Error Goto errorHandler
+	Const scriptElement = "processPlacebo"
+	
+	Dim doc As NotesDocument, form As NotesForm, db As NotesDatabase
+	
+	' Assign properties
+	Set db = session.Currentdatabase
+	
+	Set doc = db.Createdocument
+	doc.Form = "Placebo"
+	
+	uniqueID = globalApplicationID &amp;"~1~Part1~Placebos~" &amp; UUID(0,0)
+	dataSection1 = "1"
+	placeholder = "Not Provided"
+	dosePlaceholder = "0"
+	codePlaceholder = "NA"
+	valuePlaceholder = "Placebo"
+	
+	Set item = doc.Replaceitemvalue("ClinicalTrialType", "CTN")
+	Set item = doc.Replaceitemvalue("id", uniqueID)
+	Set item = doc.Replaceitemvalue("RecordUNID", uniqueID)
+	Set item = doc.Replaceitemvalue("identifier", "RecordUNID")
+	Set item = doc.Replaceitemvalue("Type", "Placebo")
+	Set item = doc.Replaceitemvalue("Form", "Placebo")
+	Set item = doc.Replaceitemvalue("label", "ProductName")
+	Set item = doc.Replaceitemvalue("ApplicationID", globalApplicationID)
+	Set item = doc.Replaceitemvalue("ApplicationVersion", globalApplicationVersion)
+	Set item = doc.Replaceitemvalue("DataSection", dataSection1)
+	'Set item = doc.Replaceitemvalue("ActiveName", placeholder)
+	'Set item = doc.Replaceitemvalue("DosageForm", codePlaceholder)
+	'Set item = doc.Replaceitemvalue("DosageForm_Label", placeholder)
+	'Set item = doc.Replaceitemvalue("Dose", codePlaceholder)
+	'Set item = doc.Replaceitemvalue("Dose_Label", codePlaceholder)
+	Set item = doc.Replaceitemvalue("ProductName", valuePlaceholder)
+	Set item = doc.Replaceitemvalue("RouteOfAdmin", codePlaceholder)
+	Set item = doc.Replaceitemvalue("RouteOfAdmin_Label", placeholder)
+	'Set item = doc.Replaceitemvalue("Strength", dosePlaceholder)
+	'Set item = doc.Replaceitemvalue("DoseFrequency", valuePlaceholder)
+	Set item = doc.Replaceitemvalue("IsActiveVersion", "1")
+	Set item = doc.Replaceitemvalue("SponsorID", sponsorID)
+	Set item = doc.Replaceitemvalue("PlaceboDescription", placeholder)
+	
+	
+	Call SetApplicationDocumentAuditNSecurity(doc)
+	Call doc.Save (True, True)
+	
+	exitGracefully:
+	Exit Function
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	Resume exitGracefully
+	
+End Function
+
+</lotusscript></code><code event='processMedicines2'><lotusscript>%REM
+	Function processMedicines2
+	Description: Comments for Function
+%END REM
+Function processMedicines2(clinicalTrialNo As String, session As NotesSession, xlSheet As Variant, row As Long, item As Variant, rows As Long,_
+	cols As Integer, xlWb As Variant, xlApp As Variant)
+	
+	On Error Goto errorHandler
+	Const scriptElement = "processMedicines2"
+	
+	Dim activename As String, tradecodename As String	
+
+	activename = xlsheet.Cells(row, POS_MedActiveName).Value
+
+	' Validate tradecodename		
+	If (xlsheet.Cells(row, POS_MedTradeName).Value = "Nil" Or xlsheet.Cells(row, POS_MedTradeName).Value = "N/A")_
+	And (xlsheet.Cells(row, POS_MedCodeName).Value = "Nil" Or xlsheet.Cells(row, POS_MedCodeName).Value = "N/A") Then
+		'Set item = doc.Replaceitemvalue("TradeCodeName", "Nil")
+		tradecodename = "Nil"	
+	Elseif (xlsheet.Cells(row, POS_MedCodeName).Value = "Nil" Or xlsheet.Cells(row, POS_MedCodeName).Value = "N/A")_
+	And Not (xlsheet.Cells(row, POS_MedTradeName).Value = "Nil" Or xlsheet.Cells(row, POS_MedTradeName).Value = "N/A") Then
+		'Set item = doc.Replaceitemvalue("TradeCodeName", xlsheet.Cells(row, POS_MedTradeName).Value)
+		tradecodename = xlsheet.Cells(row, POS_MedTradeName).Value
+	Elseif Not (xlsheet.Cells(row, POS_MedCodeName).Value = "Nil" Or xlsheet.Cells(row, POS_MedCodeName).Value = "N/A")_
+	And (xlsheet.Cells(row, POS_MedTradeName).Value = "Nil" Or xlsheet.Cells(row, POS_MedTradeName).Value = "N/A") Then
+		'Set item = doc.Replaceitemvalue("TradeCodeName", xlsheet.Cells(row, POS_MedCodeName).Value)
+		tradecodename = xlsheet.Cells(row, POS_MedCodeName).Value
+	Else
+		'Set item = doc.Replaceitemvalue("TradeCodeName", xlsheet.Cells(row, POS_MedTradeName).Value &amp;_
+		'"/" &amp; xlsheet.Cells(row, POS_MedCodeName).Value)
+		tradecodename = xlsheet.Cells(row, POS_MedTradeName).Value &amp;"/" &amp; xlsheet.Cells(row, POS_MedCodeName).Value
+	End If
+	
+	'Flag if medicine is of biological origin
+	If xlsheet.Cells(row,POS_BiologicalOrigin).Value = "Yes" Then
+'		ReDim Preserve biologicalsList(bioCount)
+'		biologicalsList(bioCount) = xlsheet.Cells(row, POS_ClinicalTrialNo).Value
+'		bioCount = bioCount + 1
+		Call processBiological(clinicalTrialNo, session, activename, tradecodename, item)
+	End If
+
+exitGracefully:
+	Exit Function
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	Resume exitGracefully
+	
+End Function
+
+</lotusscript></code><code event='completionDetailsForm'><lotusscript>%REM
+	Function completionDetailsForm
+	Description: Comments for Function
+%END REM
+Function completionDetailsForm(sponsorID As String, session As NotesSession, completionReason As String , completionDetails As String,_
+ finishDate As String, completedFile As String, completedFolio As String)
+	On Error Goto errorHandler
+	Const scriptElement = "completionDetailsForm"
+	
+	Dim doc As NotesDocument, form As NotesForm, item As Variant, db As NotesDatabase, default As String, uniqueID As String
+	
+	Set db = session.Currentdatabase
+	default = "Not Provided"
+	
+	Set doc = db.Createdocument
+	doc.Form = "Completion"
+	Set item = doc.Replaceitemvalue("ApplicationID", globalApplicationID)
+	Set item = doc.Replaceitemvalue("ApplicationVersion", globalApplicationVersion)
+	Set item = doc.Replaceitemvalue("Type", "Completion")
+	Set item = doc.Replaceitemvalue("Form", "Completion")
+	uniqueID = globalApplicationID &amp;"~" &amp;globalApplicationVersion &amp;"~Completion"
+	Set item = doc.Replaceitemvalue("id", uniqueID)
+	Set item = doc.Replaceitemvalue("RecordUNID", uniqueID)
+	Set item = doc.Replaceitemvalue("DataSection", "4")
+	Set item = doc.Replaceitemvalue("CompletionDetails", completionDetails)
+	Set item = doc.Replaceitemvalue("CompletionReason", completionReason)
+	Set item = doc.Replaceitemvalue("CompletedFile", completedFile)
+	Set item = doc.Replaceitemvalue("CompletedFolio", completedFolio)
+	Set item = doc.Replaceitemvalue("FinishDate", finishDate)
+	Set item = doc.Replaceitemvalue("ContactName", default)
+	Set item = doc.Replaceitemvalue("ContactPhone", "02 1234 5678")
+	Set item = doc.Replaceitemvalue("ContactFax", "02 1234 5678")
+	Set item = doc.Replaceitemvalue("ContactEmail", "notprovided@byorg.com")
+	Set item = doc.Replaceitemvalue("ContactPerson", default)
+	Set item = doc.Replaceitemvalue("IsActiveVersion", "1")
+	Set item = doc.Replaceitemvalue("SponsorID", sponsorID)
+	
+	Call SetApplicationDocumentAuditNSecurity(doc)
+	Call doc.Save(True, True)
+	
+exitGracefully:
+	Exit Function
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	Resume exitGracefully
+End Function
+
+</lotusscript></code><code event='processTrialClassificationList'><lotusscript
+>
+%REM
+	Function processTrialClassificationList
+	Description: Used to map Trial Classification list items
+%END REM
+Function processTrialClassificationList(sponsorID As String, session As NotesSession, doc As NotesDocument, xlSheet As Variant, row As Long, item As Variant) As Variant
+	
+	' Define specific form items
+	' -----------------------------------TrialClassification item------------------------------------------
+	Dim isAnimal As String, isInternational As String, isMedicine As String, isDevice As String
+	Dim isPrTrials As String, isPlacebo As String, isCompControlled As String, isGeneModified As String
+	Dim isNonparticles As String, isMulticentre As String, isGeneTherapy As String, isBiological As String
+	Dim count As Integer, length As Integer, i As Integer
+	
+	On Error Goto errorHandler
+	Const scriptElement = "processTrialClassificationList"
+	
+	Dim tClassification(1 To 12) As String
+	
+	trialCountry = "NA"
+	trialCountryCode = "NA"
+		
+	' Involves Biological
+	Dim isArr As Integer
+
+	Forall v In biologicalsList
+		isArr = True
+		Exit Forall
+	End Forall
+
+	If isArr = True Then
+		For i=0 To Ubound(biologicalsList)
+			If biologicalsList(i) = xlSheet.Cells(row, POS_ApplicationID).Value Then
+				isBiological = "1"
+				Goto submitVal
+			Else
+				isbiological = "0"
+			End If
+		Next
+	End If
+
+submitVal:
+	tClassification(1) = isBiological
+	
+	' Uses Medicine
+	isMedicine = "1" ' all entries will have medicine ticked as default
+'	If Not xlSheet.Cells(row, POS_MedActiveName).Value = "" Then
+'		isMedicine = "1"
+'	Else
+'		isMedicine = 0
+'	End If
+	tClassification(2) = isMedicine
+	
+	' Uses Device
+	isDevice  = xlSheet.Cells(row, POS_Device).Value
+	If isDevice = 1 Then
+		Call processDevice(sponsorID, session, xlSheet, row, item)
+	End If
+	tClassification(3) = isDevice
+	
+	' Animal Excipients
+	isAnimal = 0 ' no data exists
+	tClassification(4) = isAnimal
+	
+	' Conducted in Other Countries
+	isInternational = xlSheet.Cells(row, POS_International).Value
+	tClassification(5) = isInternational
+	If isInternational = 1 Then
+		trialCountry = "International"
+		trialCountryCode = "INT"
+	End If
+
+	' Relevant Preceding Trials
+	isPrTrials = 0 ' no data exists
+	tClassification(6) = isPrTrials
+	
+	' Placebo Controlled
+	isPlacebo = xlSheet.Cells(row, POS_Placebo).Value
+	If isPlacebo =1 Then
+		Call processPlacebo(sponsorID, session, xlSheet, row, item)
+	End If
+	tClassification(7) = isPlacebo
+	
+	' Comparator Controlled
+	isCompControlled = 0 ' no data exists
+	tClassification(8) = isCompControlled
+	
+	' Involves GMO
+	isGeneModified = 0 ' no data exists
+	tClassification(9) = isGeneModified
+	
+	' Contains Nanoparticles
+	isNonparticles = 0 ' no data exists
+	tClassification(10) = isNonparticles
+	
+	' Multicentre Trial
+	isMulticentre = 0 ' no data exists
+	tClassification(11) = isMulticentre
+	
+	' Involves Gene Therapy
+	isGeneTherapy = xlSheet.Cells(row, POS_GeneTherapy).Value
+	tClassification(12) = isGeneTherapy
+	
+	Dim j As Integer, p As Integer, d1 As Integer
+
+	Redim globalTrialClassification(0)
+		
+	length% = Ubound(tClassification)
+	p = 0
+	
+	For j=1 To length
+		If tClassification(j) = "1" Then
+			Redim Preserve globalTrialClassification(p)
+			globalTrialClassification(p)=Cstr(j-1)
+			p = p + 1
+		End If
+	Next
+	
+	Dim isArr2 As Integer
+
+	Forall v In globalTrialClassification
+		isArr2 = True
+		Exit Forall
+	End Forall
+
+	If isArr2 = True Then
+		Set item = doc.Replaceitemvalue("TrialClassification", globalTrialClassification)
+	End If
+	
+	'--------------TrialClassification Dialog List Data---------------
+	'Is a Biological|0
+	'Involves the Use of a Medicine|1
+	'Involves the Use of a Device|2
+	'Involves Animal excipients|3
+	'Is being conducted in other countries|4
+	'Has relevant preceding trials|5
+	'Is Placebo controlled|6
+	'Is Comparator control|7
+	'Involves a Genetically Modified Organism|8
+	'Involves a Product Containing Nanoparticles|9
+	'Multicentre Trial|10
+	'Gene Therapy|11
+
+exitGracefully:
+	Exit Function
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	Resume exitGracefully
+	
+End Function
+
+</lotusscript></code><code event='CTApp'><lotusscript>%REM
+	Function CTApp
+	Description: Comments for Function
+%END REM
+
+Function CTApp(formname As String, session As NotesSession, uiws As NotesUIWorkspace, db As NotesDatabase,_
+	doc As NotesDocument, form As NotesForm, item As Variant, xlWb As Variant, xlApp As Variant,_
+	xlSheet As Variant, rows As Long, cols As Integer)
+
+	Dim hwnd As Long, count As Integer
+	Dim timeOn!, timeRan!
+	
+	On Error Goto errorHandler
+	Const scriptElement = "CTApp"
+	timeOn = Timer
+	' Excel sheet properties
+	Dim flag As Integer
+	Dim row As Long
+	
+	Dim appID As String, yearVal As String, ctNum As String, schemeType As String, ClinicalTrialNo As String
+	Dim sponsorID As String, sponsorName As String, sponsorAddress As String, sponsorAddressToFind As String
+	Dim contactName As String
+	
+	' Define general properties
+	Dim x As Integer, i As Integer
+	Dim msg As String, temp As Variant
+	
+	' Start at row 0
+	row = 0
+	
+	Print "Starting import from Excel file..."
+	Dim d1 As Integer
+	
+	' Initialise all second column items to empty string	
+	Dim fieldCount As Integer
+	Dim msgString As String
+	fieldCount = 0
+	bioCount = 0
+	
+	Do While True  '(row &lt;= 11) '
+		row = row + 1
+		
+		' Check end of rows
+		If row = rows+1 Then Goto Done
+		
+		' Define fields for notes
+		If row=1 Then
+			For i=1 To cols
+				Redim Preserve fd(i)
+				fd(i)=xlSheet.Cells(row, i).Value
+				flag=0
+				
+				If flag=1 Then
+					Goto Skip
+				End If
+				
+				If Not flag=1 Then
+				End If 'Not flag =1
+				
+Skip:
+			Next 'For i=1 to cols
+		End If 'row=1
+		
+		'Import each row into new document
+		If Not row =1 And Not xlSheet.Cells(row, 1).Value = "" And xlSheet.Cells(row, POS_ClinicalTrialType).Value = "CTN" Then
+			
+			'Create new doc
+			Set doc = db.Createdocument
+			doc.Form = formname		
+			sponsorID = Trim(Strleft(xlSheet.Cells(row, POS_Sponsor).Value, "-")) 
+			ClinicalTrialNo = xlSheet.Cells(row, POS_ApplicationID).Value
+			contactName = xlSheet.Cells(row, POS_AttentionTo).Value
+			
+			For i=1 To cols
+				' Formulate application ID of format (CT-YYYY-schemeType-clinicaltrialnumber-1)
+				If i=POS_ApplicationID Then ' will need to add check to see if blank
+					yearVal = Mid(ClinicalTrialNo, 1, 4)
+					ctNum = Mid(ClinicalTrialNo, 5, 5)
+					Dim ctLen As Integer
+					If Len(ctNum) &lt;5 Then
+						ctLen = Len(ctNum)
+						For x=1 To (CLINTRIALNO-ctLen)
+							ctNum = "0" &amp; ctNum
+						Next
+					End If
+					schemeType = Trim(xlSheet.Cells(row, POS_ClinicalTrialType).Value)
+					appID = "CT-" &amp;yearVal &amp;"-" &amp;schemeType &amp;"-" &amp;ctNum &amp;"-1"
+					Print "Processing "  &amp; appID
+					Set item = doc.Replaceitemvalue("ApplicationId", appID)
+					Set item = doc.Replaceitemvalue("SubmissionId", yearVal &amp;ctNum)
+					globalApplicationID = appID
+					globalApplicationVersion = "1"
+					
+					'INC61834 BL attachments no longer required
+					'*********DO NOT DELETE - Produces attachments, have commented out for brevity in testing*****************
+					'Call attachFiles("", appID &amp;"~1~Part1",0, Trim(xlSheet.Cells(row, POS_ApprovingAuthorityName).Value),_
+					'"", "", "", "", "", SponsorID)
+					'*********************************************************************************************************
+
+				Elseif i=POS_FinishDate Then
+					If xlSheet.Cells(row, POS_FinishDate).Value = "" Then
+						Set item = doc.Replaceitemvalue("IsActiveVersion", "1")
+						Set item = doc.Replaceitemvalue("ApplicationStage", "1")
+						Set item = doc.Replaceitemvalue("ApplicationStatus", "Draft")
+						Set item = doc.Replaceitemvalue("clientreference", ctNum &amp; " - Migrated CT Trial")
+						Set item = doc.Replaceitemvalue("ApplicationStatusCode", "DRAFT")
+					Else
+						Set item = doc.Replaceitemvalue("IsActiveVersion", "0")
+						Set item = doc.Replaceitemvalue("ApplicationStage", "3")
+						Set item = doc.Replaceitemvalue("CompletionReason", xlSheet.Cells(row, POS_CompletionReason).Value)
+						Set item = doc.Replaceitemvalue("CompletionDetails", xlSheet.Cells(row, POS_PrematureTerminationDetails).Value)
+						Set item = doc.Replaceitemvalue("TrialCompletionDate", xlSheet.Cells(row, POS_FinishDate).Value)
+						Set item = doc.Replaceitemvalue("ApplicationStatus", "Completed")
+						Set item = doc.Replaceitemvalue("clientreference",  ctNum &amp; " - Completed Migrated CT Trial")
+						completionReason = xlSheet.Cells(row, POS_CompletionReason).Value
+						completionDetails = xlSheet.Cells(row, POS_PrematureTerminationDetails).Value
+						finishDate = xlSheet.Cells(row, POS_FinishDate).Value
+						completedFile = xlSheet.Cells(row, POS_CompletedFile).Value
+						completedFolio = xlSheet.Cells(row, POS_CompletedFolio).Value
+						Call completionDetailsForm(sponsorID, session, completionReason, completionDetails, finishDate, completedFile, completedFolio)
+					End If
+					
+				Elseif i=POS_TrialType Then
+					Call processTrialType(doc, xlSheet, row, item)					
+				Elseif i=POS_Placebo Then
+					Call processTrialClassificationList(sponsorID, session, doc, xlSheet, row, item)
+				Elseif i=POS_International Then
+					If xlSheet.Cells(row, POS_International).Value = 1 Then
+						Call processTrialConductedInCountries(sponsorID, db, xlSheet, row, item, rows,  cols)
+					End If
+				Elseif i = POS_Sponsor Then
+					'sponsorID = Trim(StrLeft(xlSheet.Cells(row, POS_Sponsor).Value, "-"))
+					sponsorName = Trim(Strright(xlSheet.Cells(row, POS_Sponsor).Value, "-"))
+					Set item = doc.Replaceitemvalue("SponsorName", sponsorName)
+					Set item = doc.Replaceitemvalue("ClientName", sponsorName)
+					sponsorAddressToFind = Trim(xlSheet.Cells(row, POS_SponsorStreet1).Value)			
+
+					' Default address, if no match found
+					sponsorAddress = Trim(Trim(xlSheet.Cells(row, POS_SponsorStreet1).Value &amp;" " &amp;_
+					xlSheet.Cells(row, POS_SponsorStreet2).Value) &amp;" " &amp;xlSheet.Cells(row, POS_SponsorTown).Value &amp;_
+					" " &amp;xlSheet.Cells(row, POS_SponsorState).Value &amp;" " &amp;xlSheet.Cells(row, POS_SponsorPostCode).Value)
+					Call findSponsorAddress(sponsorID, sponsorAddressToFind, sponsorAddress, doc, item)
+
+				Else
+					'*******************************************************************
+					' General fields
+					'*******************************************************************
+					Set item = doc.Replaceitemvalue("ClinicalTrialType", xlSheet.Cells(row,POS_ClinicalTrialType).Value)
+					Set item = doc.Replaceitemvalue("ClinicalTrialNo", ClinicalTrialNo)
+					Set item = doc.Replaceitemvalue("Type", "Application")
+					Set item = doc.Replaceitemvalue("VersionCreateDate", xlSheet.Cells(row,POS_StartDate).Value)
+					Set item = doc.Replaceitemvalue("IsPushBackTriggered", "0")
+					
+					Set item = doc.Replaceitemvalue("Abortifacient", xlSheet.Cells(row,POS_Abortifacient).Value)
+					
+					titleStudy = Findreplace(xlSheet.Cells(row,POS_TitleOfStudy).Value, """", "'")
+					Set item = doc.Replaceitemvalue("TitleOfStudy", titleStudy)
+							
+					expectedCompletion = xlSheet.Cells(row,POS_ExpectedCompletionDate).Value
+
+					'*******************************************************************
+					' Application Details fields
+					'*******************************************************************
+					Set item = doc.Replaceitemvalue("ApplicationVersion", "1")
+					globalApplicationVersion = "1"
+					'*******************************************************************
+					' Part1 fields
+					'*******************************************************************
+					protocolNumber = xlSheet.Cells(row,POS_ProtocolNum).Value
+					startDate = xlSheet.Cells(row,POS_StartDate).Value
+
+					'*******************************************************************
+					' Completion Details fields
+					'*******************************************************************
+					Set item = doc.Replaceitemvalue("CompletionReason", xlSheet.Cells(row,POS_CompletionReason).Value)
+					Set item = doc.Replaceitemvalue("FinishDate", xlSheet.Cells(row,POS_FinishDate).Value)
+					Set item = doc.Replaceitemvalue("PrincipalInvestigator",  xlSheet.Cells(row,POS_PrincipalInvestigator).Value)
+				End If
+			Next ' i=1 to cols
+			bioCount = 0
+			' Save new document
+			Call SetApplicationDocumentAuditNSecurity(doc)
+			Call doc.Save(True, True)
+			Call part1Form(session, db, sponsorID)
+			'Call ProcessPOSTRequest(doc)	
+
+		End If ' Not
+
+	Loop ' Do while true
+	
+Done:
+	Print "Disconnecting from Excel Sheet2 - Trials..."
+	Print " "
+	
+exitGracefully:
+	Exit Function
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	'NEMProgressEnd hwnd
+	Resume exitGracefully
+	
+End Function
+
+
+
+</lotusscript></code><code event='medForm'><lotusscript>%REM
+	Function medForm
+	Description: Comments for Function
+%END REM
+Function medForm(formname As String, session As NotesSession, uiws As NotesUIWorkspace, db As NotesDatabase,_
+	doc As NotesDocument, form As NotesForm, item As Variant, xlWb As Variant, xlApp As Variant,_
+	xlSheet As Variant, rows As Long, cols As Integer)
+	
+	On Error Goto errorHandler
+	Const scriptElement = "medForm"
+	
+	Dim clinicalTrialNo As String
+	
+	timeOn = Timer
+	
+	' Start at row 0
+	row = 0
+	
+	Print "Starting import from Excel file..."
+	bioCount = 0
+	
+	Do While True
+		row = row + 1
+		
+		' Check end of rows
+		If row = rows+1 Then Goto Done
+		
+		' Define fields for notes
+		If row=1 Then
+			For i=1 To cols
+				Redim Preserve fd(i)
+				fd(i)=xlSheet.Cells(row, i).Value
+				flag=0
+				
+				If flag=1 Then
+					Goto Skip
+				End If
+				
+				If Not flag=1 Then
+				End If 'Not flag =1
+				
+Skip:
+			Next 'For i=1 to cols
+		End If 'row=1
+		
+		'Import each row into new document
+		If Not row =1 And Not xlSheet.Cells(row, 1).Value = "" Then
+			
+			'Create new doc
+			Set doc = db.Createdocument
+			doc.Form = formname		 
+			
+			clinicalTrialNo = xlSheet.Cells(row, POS_ClinicalTrialNo).Value
+			yearVal = Mid(xlSheet.Cells(row, POS_ClinicalTrialNo).Value, 1, 4)
+			ctNum = Mid(xlSheet.Cells(row, POS_ClinicalTrialNo).Value, 5, 5)
+			If Len(ctNum) &lt;5 Then
+				ctLen = Len(ctNum)
+				For x=1 To (CLINTRIALNO-ctLen)
+					ctNum = "0"&amp;ctNum
+				Next
+			End If
+			schemeType = "CTN"
+			appID = "CT-" &amp;yearVal &amp;"-" &amp;schemeType &amp;"-" &amp;ctNum &amp;"-1"
+			
+			Set item = doc.Replaceitemvalue("ApplicationId", appID)
+			Print appID &amp;" in Drugs"
+			globalApplicationID = appID
+			globalApplicationVersion = "1"
+			Call processMedicines (clinicalTrialNo, session, xlSheet, row, item, rows, cols, xlWb, xlApp)
+			'Call processMedicines2 (clinicalTrialNo, session, xlSheet, row, item, rows, cols, xlWb, xlApp)
+			
+		End If ' Not
+	Loop ' Do while true
+
+Done:
+	Print "Disconnecting from Excel Sheet1 - Medicines..."
+	Print " "
+	
+exitGracefully:
+	Exit Function
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	Resume exitGracefully	
+End Function
+
+</lotusscript></code><code event='Sitesform'><lotusscript>Function Sitesform (formname As String, session As NotesSession, uiws As NotesUIWorkspace, db As NotesDatabase,_
+	doc As NotesDocument, form As NotesForm, item As Variant, xlWb As Variant, xlApp As Variant,_
+	xlSheet As Variant, rows As Long, cols As Integer)
+	
+	On Error Goto errorHandler
+	Const scriptElement = "Sitesform"
+	
+	Dim clinicalTrialNo As String
+	
+	Dim siteDoc As NotesDocument
+	Dim stCTNo As String
+	Dim stCounter As Long
+	stCounter = 0
+	
+	timeOn = Timer
+			
+	' Start at row 0
+	row = 0
+	
+	Print "Starting import from Excel file..."
+	bioCount = 0
+	
+	Do While True
+		row = row + 1
+		
+		' Check end of rows
+		If row = rows+1 Then Goto Done
+		
+		' Define fields for notes
+		If row=1 Then
+			For i=1 To cols
+				Redim Preserve fd(i)
+				fd(i)=xlSheet.Cells(row, i).Value
+				flag=0
+				
+				If flag=1 Then
+					Goto Skip
+				End If
+				
+				If Not flag=1 Then
+				End If 'Not flag =1
+				
+Skip:
+			Next 'For i=1 to cols
+		End If 'row=1
+		
+		'Import each row into new document
+		If Not row =1 And Not xlSheet.Cells(row, 1).Value = "" Then
+					
+			'Create new doc
+			Set doc = db.Createdocument
+			doc.Form = formname		 
+			
+			clinicalTrialNo = xlSheet.Cells(row, POS_ClinicalTrialNo).Value
+			yearVal = Mid(xlSheet.Cells(row, POS_ClinicalTrialNo).Value, 1, 4)
+			ctNum = Mid(xlSheet.Cells(row, POS_ClinicalTrialNo).Value, 5, 5)
+			If Len(ctNum) &lt;5 Then
+				ctLen = Len(ctNum)
+				For x=1 To (CLINTRIALNO-ctLen)
+					ctNum = "0"&amp;ctNum
+				Next
+			End If
+			schemeType = "CTN"
+			appID = "CT-" &amp;yearVal &amp;"-" &amp;schemeType &amp;"-" &amp;ctNum &amp;"-1"
+			
+			Set item = doc.Replaceitemvalue("ApplicationId", appID)
+			Print appID &amp;" in Sites"
+			globalApplicationID = appID
+			globalApplicationVersion = "1"
+			Call processSites (session, xlSheet, row, item, rows, clinicalTrialNo)
+				
+			bioCount = 0
+		
+		End If ' Not
+	Loop ' Do while true
+
+Done:
+
+	Print "Disconnecting from Excel Sheet3 - Sites..."
+	Print " "
+	
+exitGracefully:
+	Exit Function
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	'NEMProgressEnd hwnd
+	Resume exitGracefully
+	
+End Function
+
+</lotusscript></code><code event='attachFiles'><lotusscript>%REM
+	Sub attachFiles
+	Description: Comments for Sub
+%END REM
+Sub attachFiles(ClinicalTrialNo As String, uniqueID As String, flag As Integer, approvCert As String, dateReceived As String, dateAcknowledged As String,_
+	fileNo As String, folioNo As String, TGAINNo As String, sponsorID As String)
+
+	On Error Goto ErrorHandler
+	Const scriptElement = "attachFiles"
+	
+	Dim s As New NotesSession, docContext As NotesDocument
+	Dim stream As NotesStream
+	Dim submitsuccess As Long
+	Dim tmpstr As Variant
+	Dim formname As String, attachLocation(1 To 4) As String, textForFileString As String, extraSiteInformation As String
+	Dim i As Integer
+	Dim db As NotesDatabase
+	Set db = s.CurrentDatabase
+	Set stream = s.CreateStream
+	
+	Dim dbThis As New NotesDatabase(db.server,"\ebs\trials\filerepo.nsf")
+	
+	If dbThis.IsOpen Then
+		'Print "The database filerepo.nsf is already open." 
+	Else
+		Dim flag2 As Boolean
+		Call dbThis.Open("","")
+	End If
+	
+	attachLocation(1) = "dialog_Site_SponsorDeclaration"
+	attachLocation(2) = "dialog_Site_PrincipalInvestigatorDeclaration"
+	attachLocation(3) = "dialog_Site_HRECDeclaration"
+	attachLocation(4) = "dialog_Site_ApprovingAuthorityDeclaration"
+	
+	submitsuccess =0
+	formname = "FileAttachment"
+	Set docContext = dbThis.Createdocument
+	docContext.Form = formname
+	
+	extraSiteInformation =  Chr(13) &amp;"The following details relate to this site record: " &amp;Chr(13) &amp;_
+	"Approving cert assigned: " &amp;approvCert &amp;Chr(13) &amp;_
+	"Date Received: " &amp;dateReceived &amp;Chr(13) &amp;_
+	"Date Acknowledged: " &amp;dateAcknowledged &amp;Chr(13) &amp;_
+	"File No: " &amp;fileNo &amp;Chr(13) &amp;_
+	"Folio No: " &amp;folioNo &amp;Chr(13) &amp;_
+	"TGAIN No: " &amp;TGAINNo &amp;Chr(13)
+	
+	textForFileString = "This record was migrated to the Clinical Trials system on " &amp; Format(Now, "General Date") &amp;_
+	" at " &amp;Format(Now, "Long Time")
+	
+	If flag = 0 Then
+		textForFileString = textForFileString
+	Else
+		textForFileString = textForFileString &amp;extraSiteInformation
+	End If
+	
+	If Flag = 0 Then
+		docContext.ReplaceItemValue "Form","FileAttachment"
+		docContext.ReplaceItemValue "Type","FileAttachment"
+		docContext.ReplaceItemValue "AttachmentFileName","PlaceholderDeclaration.txt"
+		docContext.ReplaceItemValue "AttachmentAuthor","Admin"
+		docContext.ReplaceItemValue "AttachmentContext",uniqueID
+		docContext.ReplaceItemValue "AttachmentLocation","Part1_SponsorDeclaration"
+		docContext.ReplaceItemValue "LinkedSourceVersionNumbers","1"
+		docContext.ReplaceItemValue "SourceNotesDatabase","ebs\trials\ct.nsf"
+		docContext.ReplaceItemValue "SourceReferenceID",globalApplicationID
+		docContext.RemoveItem "Query_String_Decoded"
+		docContext.Save True, False
+		
+		If docContext.HasItem("AttachmentID") Then
+			tmpstr= docContext.getFirstItem("AttachmentID").text
+		End If
+		If Len(tmpstr) &lt; 1 Then tmpstr = Evaluate(|@NoteId|,docContext)
+		docContext.ReplaceItemValue "AttachmentID", tmpstr
+		docContext.Save True, False
+		
+		Call stream.WriteText(textForFileString,EOL_NONE)	
+		Call CreateMIMETextAttachment(docContext, stream, "SponsorDeclaration.txt") 'used to be docJSON
+		Call stream.Truncate
+		Call stream.Close
+		docContext.Save True, False
+		
+		submitsuccess=1
+	Else
+		For i =Lbound(attachLocation) To Ubound(attachLocation)
+			docContext.ReplaceItemValue "Form","FileAttachment"
+			docContext.ReplaceItemValue "Type","FileAttachment"
+			docContext.ReplaceItemValue "AttachmentFileName","PlaceholderDeclaration.txt"
+			docContext.ReplaceItemValue "AttachmentAuthor","Admin"
+			docContext.ReplaceItemValue "AttachmentContext",uniqueID
+			docContext.ReplaceItemValue "AttachmentLocation",attachLocation(i)
+			docContext.ReplaceItemValue "LinkedSourceVersionNumbers",globalApplicationVersion
+			docContext.ReplaceItemValue "SourceNotesDatabase","ebs\trials\ct.nsf"
+			docContext.ReplaceItemValue "SourceReferenceID",globalApplicationID
+			docContext.RemoveItem "Query_String_Decoded"
+			docContext.Save True, False
+			If docContext.HasItem("AttachmentID") Then
+				tmpstr= docContext.getFirstItem("AttachmentID").text
+			End If
+			'If Len(tmpstr) &lt; 1 Then 
+			tmpstr = Evaluate(|@NoteId|,docContext)
+			docContext.ReplaceItemValue "AttachmentID", tmpstr
+			docContext.Save True, False		
+			
+			Call stream.WriteText(textForFileString,EOL_NONE)	
+			Call CreateMIMETextAttachment(docContext, stream, "PlaceholderDeclaration.txt") 'used to be docJSON
+			Call stream.Truncate
+			Call stream.Close
+			docContext.Save True, False
+			
+			submitsuccess=1
+			Set docContext = dbThis.Createdocument
+			docContext.Form = formname
+		Next
+	End If
+	
+	'Need to pass SponsorID here ....
+	If ClinicalTrialNo &lt;&gt; "" Then
+		Call SetDocumentAuditNSecurity(docContext, ClinicalTrialNo)
+	Else 	
+		docContext.ReplaceItemValue "SponsorID", SponsorID
+		Call SetApplicationDocumentAuditNSecurity(docContext)
+	End If
+	
+	Call docContext.save(True, False)
+	
+exitGracefully:
+	Exit Sub
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	Resume exitGracefully
+
+End Sub
+
+
+
+</lotusscript></code><code event='processTrialConductedInCountries'><lotusscript
+>%REM
+	Function processTrialConductedInCountries
+	Description: Comments for Function
+%END REM
+Function processTrialConductedInCountries(sponsorID As String, db As notesdatabase, xlSheet As Variant, row As Long, item As Variant, rows As Long,  cols As Integer) As Variant
+	On Error Goto errorHandler
+	Const scriptElement = "processTrialConductedInCountries"
+	
+	Dim doc As NotesDocument
+	Dim uniqueID As String
+	
+	'Create new doc
+	Set doc = db.Createdocument
+	doc.Form = "TrialConductedInCountry"
+	
+	Set item = doc.Replaceitemvalue("IsActiveVersion", "1")
+	Set item = doc.Replaceitemvalue("DataSection", "1")
+	Set item = doc.Replaceitemvalue("ApplicationStatus", "Active")
+	Set item = doc.Replaceitemvalue("ApplicationVersion", "1")
+	Set item = doc.Replaceitemvalue("TrialConductedinCountry", "INT")
+	Set item = doc.Replaceitemvalue("TrialConductedInCountry_Label", "International")
+	Set item = doc.Replaceitemvalue("identifier", "RecordUNID")
+	Set item = doc.Replaceitemvalue("label", "TrialConductedInCountry_Label")
+	Set item = doc.Replaceitemvalue("Type", "TrialConductedInCountry")
+	
+	yearVal = Mid(xlSheet.Cells(row, POS_ApplicationID).Value, 1, 4)
+	ctNum = Mid(xlSheet.Cells(row, POS_ApplicationID).Value, 5, 5)
+	Dim ctLen As Integer
+	If Len(ctNum) &lt;5 Then
+		ctLen = Len(ctNum)
+		For x=1 To (CLINTRIALNO-ctLen)
+			ctNum = "0"&amp;ctNum
+		Next
+	End If
+	schemeType = Trim(xlSheet.Cells(row, POS_ClinicalTrialType).Value)
+	appID = "CT-" &amp;yearVal &amp;"-" &amp;schemeType &amp;"-" &amp;ctNum &amp;"-1"
+	globalApplicationID = appID
+	globalApplicationVersion = "1"
+	uniqueID = globalApplicationID &amp;"~1~Part1~TrialConductedInCountries~" &amp; UUID(0,0)
+	Set item = doc.Replaceitemvalue("id", uniqueID)
+	Set item = doc.Replaceitemvalue("RecordUNID", uniqueID)
+	Set item = doc.Replaceitemvalue("ApplicationId", appID)
+	Set item = doc.Replaceitemvalue("SubmissionId", yearVal &amp;ctNum)
+
+	Set item = doc.Replaceitemvalue("SponsorID", sponsorID)
+	Call SetApplicationDocumentAuditNSecurity(doc)
+	Call doc.Save(True, True)
+	
+exitGracefully:
+	Exit Function
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	Resume exitGracefully
+End Function
+
+</lotusscript></code><code event='findDosageForm'><lotusscript>%REM
+	Function findDosageForm
+	Description: Comments for Function
+%END REM
+Function findDosageForm(doc As NotesDocument, dosageLabel As String, item As Variant)
+	On Error Goto errorHandler
+	Const scriptElement = "findDosageForm"
+	
+	Dim dosagedoc As NotesDocument
+	Dim dosagedocs As NotesDocumentCollection
+	Dim searchString As String
+	searchString = "W~DOSAGE~" 'might change to N~DOSAGE~ when dosage data placed in dev
+	Dim dosageForm As String, dosageCode As String
+	Dim flag As Integer
+	
+	Set dosagedocs = ludosageformview.Getalldocumentsbykey(searchString, False)
+	Set dosagedoc = dosagedocs.Getfirstdocument()
+	
+	flag = 0
+	While Not dosagedoc Is Nothing
+		Forall f In dosagedoc.Items
+			If f.Name = "ShortDescription" And Trim(Lcase(f.Text)) = Trim(Lcase(dosageLabel)) Then
+				dosageForm = f.Text
+				flag = 1
+			End If
+
+			If f.Name = "Code" Then 'And flag = 1 Then
+				dosageCode = f.Text
+			End If
+			
+			If flag = 1 Then 
+				Set item = doc.Replaceitemvalue("DosageForm", dosageCode)
+				Goto Finish
+			Else
+				Set item = doc.Replaceitemvalue("DosageForm", "")
+			End If
+			
+		End Forall
+		
+		flag = 0
+		Set dosagedoc = dosagedocs.Getnextdocument(dosagedoc)
+	Wend
+
+Finish:
+	Exit Function
+	
+exitGracefully:
+	Exit Function
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	Resume exitGracefully
+End Function
+
+</lotusscript></code><code event='Findreplace'><lotusscript>Function Findreplace(Byval wholestring As Variant, find As String, ireplace As String) As String
+	
+	Dim checkstring As Variant, saveleft As String, n As String, leftString As String, rightString As String
+	
+	checkstring=wholestring
+	saveleft=""
+	
+	While Instr(1, checkstring, find)&lt;&gt;0 
+		n=Instr(1, checkstring, find)
+		leftstring = Left(checkstring, n-1)
+		rightstring=Right(checkstring, Len(checkstring)-n-Len(find)+1)
+		saveleft=saveleft+leftstring+ireplace
+		checkstring=rightstring
+	Wend
+	FindReplace= saveleft+checkstring
+End Function
+
+</lotusscript></code><code event='UUID'><lotusscript>Function UUID (length As Integer, radix As Integer) As String
+ 	'Private array of chars to use
+	Dim chars As Variant
+	Chars = Split("0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z", ",")
+	Dim i As Integer
+	
+	Dim theuuid(36) As String
+	
+	If length&gt;0 Then 
+		'Compact form
+		
+		If radix=0 Then radix = Ubound(chars)
+		
+		For i = 1 To length
+			theuuid(i) = chars(Rnd()*(radix-1))
+		Next
+		
+	Else
+		'RFC4122, version 4 form
+		Dim r As Double
+		
+      		'rfc4122 requires these characters
+		
+		theuuid(9) = "-"
+		theuuid(14) = "-"
+		theuuid(19) = "-"
+		theuuid(24) = "-"
+		
+		theuuid(15) = "4"
+		
+		'Fill in random data.  At i=20 set the high bits of clock sequence as
+	     	'per rfc4122, sec. 4.1.5
+		For i = 1 To 36
+			If theuuid(i)="" Then
+				r = Round(Rnd()*15,0)
+				
+				If i=20 Then
+					theuuid(i) = chars( ( r And &amp;H3 ) Or &amp;H8 )
+				Else
+					theuuid(i) = chars( r And &amp;HF )
+				End If
+			End If
+		Next
+	End If
+	
+	UUID = Join(theuuid, "")
+End Function
+
+
+
+</lotusscript></code><code event='SetApplicationDocumentAuditNSecurity'><lotusscript
+>Sub SetApplicationDocumentAuditNSecurity(doc As NotesDocument)
+	'Update UpdateAudit Log
+	Dim itmCreatedBy As NotesItem 
+	Dim itmCreatedOn As NotesItem
+	Dim itmUpdatedBy As NotesItem 
+	Dim itmUpdatedOn As NotesItem
+
+	Dim itmReaders As NotesItem
+	Dim itmAuthors As NotesItem 
+	Dim clientID As Variant 
+	Dim SecurityEntries As Variant 
+	
+	With doc
+		If .hasItem("LastEditor") Then
+			Set itmUpdatedBy = .getFirstItem("LastEditor")
+		Else
+			Set itmUpdatedBy = New NotesItem(doc, "LastEditor", "", NAMES)
+		End If
+		
+		If .hasItem("LastEdited") Then
+			Set itmUpdatedOn = .getFirstItem("LastEdited")
+		Else
+			Set itmUpdatedOn = New NotesItem(doc, "LastEdited", "")
+		End If
+		
+		If  (.IsNewNote) Then
+			Set itmCreatedBy = New NotesItem(doc, "CreatedBy", Evaluate(|@UserName|, doc), NAMES)
+			Set itmCreatedOn = New NotesItem(doc, "CreatedOn", Now)
+		Else
+			itmUpdatedBy.Values = Evaluate(|@Trim(@UserName : LastEditor)|, doc)
+			itmUpdatedOn.Values = Evaluate(|@If(@IsNull(LastEdited);@Now;@Now : LastEdited)|, doc)
+		End If
+		
+		'Update Security
+		clientID = Evaluate(|@Text(@DbLookup( "" : "NoCache" ; "" : "| + UserManagerDBName + |" ; "LULM" ; @Name( [CN] ; @UserName ) ; "ClientID" ;[FAILSILENT]))|)
+		If clientID(0) &lt;&gt; "" Then
+			clientID(0) = "SIME" + clientID(0) 
+		End If
+		
+		SecurityEntries = Evaluate(|@Trim("SIME|+ doc.SponsorID(0)+|":"[Admin]" : "[TGA]" : "LocalDomainServers" : "OtherDomainServers")|)
+		
+		Set itmReaders = New NotesItem(doc, "WebReaders", SecurityEntries, READERS)
+		Set itmAuthors = New NotesItem(doc, "WebAuthors", SecurityEntries, AUTHORS)
+	End With
+	
+	Call doc.Replaceitemvalue("IsNotes", 1)
+End Sub
+
+</lotusscript></code><code event='findStrengthUnit'><lotusscript>%REM
+	Function findStrengthUnit
+	Description: Comments for Function
+%END REM
+Function findStrengthUnit(strengthUoP As String, session As NotesSession, doc As NotesDocument, xlSheet As Variant, row As Long,_
+ item As Variant, rows As Long, cols As Integer)
+	
+	On Error Goto errorHandler
+	Const scriptElement = "findStrengthUnit"
+	
+	Dim UoPdoc As NotesDocument
+	Dim UoPdocs As NotesDocumentCollection
+	Dim searchString As String
+	searchString = "N~UNITSPROP~"
+	Dim UoPForm As String, UoPCode As String
+	Dim flag As Integer
+
+
+	'Set UoPdocs = luUoPformview.Getalldocumentsbykey(searchString &amp;strengthUoP, True)
+	Set UoPdocs = ludosageformview.Getalldocumentsbykey(searchString &amp;strengthUoP, True)
+	
+	Set UoPdoc = UoPdocs.Getfirstdocument()
+	
+	flag = 0
+	While Not UoPdoc Is Nothing
+		Forall f In UoPdoc.Items			
+			If f.Name = "Code" And Trim(Lcase(f.Text)) = Trim(Lcase(strengthUoP)) Then
+				UoPCode = f.Text
+				flag = 1
+			End If
+			
+			If f.Name = "ShortDescription" Then
+				flag = 2
+				UoPForm = f.Text
+			End If
+			
+			If flag = 1 Then 
+				findStrengthUnit = UoPCode
+			Elseif flag = 2 Then
+				productStrengthUnitLabel = UoPForm
+			Else
+				findStrengthUnit = ""
+				flag = 0
+			End If
+			
+		End Forall
+	
+		flag = 0
+		Set UoPdoc = UoPdocs.Getnextdocument(UoPdoc)
+	Wend
+	
+exitGracefully:
+	Exit Function
+	
+errorHandler:
+	Print scriptElement + " error : " + Cstr(Error(Err)) + " at line " + Cstr(Erl)
+	Resume exitGracefully
+End Function</lotusscript></code>
+<item name='$POID'><datetime>20160620T120205,61+10</datetime></item></agent>
+

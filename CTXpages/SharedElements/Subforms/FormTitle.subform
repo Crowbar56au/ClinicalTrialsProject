@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<subform name='FormTitle' xmlns='http://www.lotus.com/dxl' version='9.0' maintenanceversion='1.0'
+ replicaid='CA257FDB001B5780' designerversion='7' comment='Manages the Form Header for Notes UI Forms'
+ renderpassthrough='true'>
+<noteinfo noteid='2be' unid='5E3C5B60E6325E1DCA257FD8000B2733' sequence='14'>
+<created><datetime>20160620T120149,31+10</datetime></created>
+<modified><datetime>20160628T151504,55+10</datetime></modified>
+<revised><datetime>20160628T151504,54+10</datetime></revised>
+<lastaccessed><datetime>20160628T151504,54+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152009,71+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<body><richtext>
+<pardef id='1' leftmargin='0.7868in' spacebefore='1.5' hide='notes web mobile'/>
+<par def='1'><run><font style='bold italic' color='red'/>Subform: </run><run
+><font style='bold italic' color='red'/>FormTitle</run></par>
+<table widthtype='fitwindow' leftmargin='0.7875in' refwidth='11.6292in'><border
+ style='inset' width='2px' color='gray' dropshadow='true' dropshadowwidth='0px'/><tablecolumn
+ width='100%'/>
+<tablerow>
+<tablecell valign='center' bgcolor='navy'>
+<pardef id='3' spacebefore='1.5' hide='notes web mobile' keepwithnext='true'
+ keeptogether='true'/>
+<par def='3'/>
+<table widthtype='fitmargins' leftmargin='0.0104in' rowspacing='0.0493in'
+ columnspacing='0.0493in' refwidth='11.6188in'><tablecolumn width='1.5306in'/><tablecolumn
+ width='38.8125%'/><tablecolumn width='61.1875%'/><tablecolumn width='1in'/>
+<tablerow>
+<tablecell valign='center' borderwidth='0px'>
+<pardef id='5' leftmargin='0.2833in' rightmargin='100%' keepwithnext='true'
+ keeptogether='true'/>
+<par def='5'><run><font size='18pt' style='bold' name='Arial' pitch='variable'
+ truetype='true' familyid='20' color='white'/>TGA eBS</run></par></tablecell>
+<tablecell valign='center' borderwidth='0px'>
+<pardef id='6' rightmargin='100%' keepwithnext='true' keeptogether='true'/>
+<par def='6'><run><font size='8pt' name='Arial' pitch='variable' truetype='true'
+ familyid='20' color='white'/></run><run><font size='14pt' name='Verdana'
+ pitch='variable' truetype='true' familyid='20' color='white'/><computedtext
+><code event='value'><formula>@If(FormTitle="";@ProperCase(Form);FormTitle)</formula></code></computedtext></run><run
+><font size='8pt' name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='white'/></run></par></tablecell>
+<tablecell valign='center' borderwidth='0px'>
+<pardef id='7' align='right' leftmargin='0%' rightmargin='100%' keepwithnext='true'
+ keeptogether='true'/>
+<par def='7'><run><font size='8pt' name='Arial' pitch='variable' truetype='true'
+ familyid='20' color='white'/></run><run><font size='14pt' style='bold' name='Verdana'
+ pitch='variable' truetype='true' familyid='20' color='white'/><computedtext
+><code event='value'><formula>ApplicationStatus</formula></code></computedtext></run><run
+><font size='8pt' name='Arial' pitch='variable' truetype='true' familyid='20'
+ color='white'/></run></par></tablecell>
+<tablecell borderwidth='0px'>
+<pardef id='8' keepwithnext='true' keeptogether='true'/>
+<par def='8'><run><font size='8pt' name='Arial' pitch='variable' truetype='true'
+ familyid='20' color='white'/></run></par></tablecell></tablerow></table></tablecell></tablerow></table>
+<pardef id='9' leftmargin='0.7500in' hide='read edit copy preview previewedit notes web mobile'/>
+<par def='9'/></richtext></body>
+<item name='$$ScriptName' summary='false' sign='true'><text>FormTitle</text></item></subform>
+

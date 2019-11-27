@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='Administration\Edit System Profile' alias='Administration_EditSystemProfile'
+ xmlns='http://www.lotus.com/dxl' version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780'
+ hide='v3' publicaccess='false' designerversion='5'>
+<noteinfo noteid='182' unid='1A52F23774B85D9DCA257F77000709DF' sequence='13'>
+<created><datetime dst='true'>20160315T121652,79+11</datetime></created>
+<modified><datetime>20160628T151503,18+10</datetime></modified>
+<revised><datetime>20160628T151503,17+10</datetime></revised>
+<lastaccessed><datetime>20160628T151503,17+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152008,64+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<designchange><datetime>20160628T151503,23+10</datetime></designchange>
+<trigger type='actionsmenu'/>
+<documentset type='runonce'/><code event='action'>
+<simpleaction action='runformula'><formula>@Command([EditProfile];"System Profile Document") ;SELECT
+@All</formula></simpleaction></code>
+<rundata processeddocs='0' exitcode='0'>
+<agentmodified><datetime>20160628T151503,18+10</datetime></agentmodified>
+<agentrun><datetime dst='true'>20171011T122102,61+11</datetime></agentrun>
+<runlog>Started running agent 'Administration\Edit System Profile|Administration_EditSystemProfile' on 11/10/2017 12:21:02 PM
+1 document(s) were modified by formula
+Done running agent 'Administration\Edit System Profile|Administration_EditSystemProfile' on 11/10/2017 12:21:02 PM
+</runlog></rundata>
+<item name='$POID'><datetime>20160620T120205,81+10</datetime></item></agent>
+

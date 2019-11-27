@@ -1,0 +1,165 @@
+<?xml version='1.0' encoding='utf-8'?>
+<view name='Search View' alias='SearchView' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='web mobile'
+ showinmenu='false' publicaccess='false' designerversion='8.5.3' unreadmarks='none'
+ onopengoto='lastopened' onrefresh='displayindicator' headers='beveled' opencollapsed='false'
+ showresponsehierarchy='false' showmargin='true' shrinkrows='true' extendlastcolumn='false'
+ showhierarchies='false' unreadcolor='black' rowlinecount='9' headerlinecount='1'
+ rowspacing='1' bgcolor='white' altrowcolor='#e0f1ff' totalscolor='black'
+ headerbgcolor='white' boldunreadrows='false' evaluateactions='false' allownewdocuments='false'
+ allowcustomizations='false' hidemarginborder='false' marginwidth='0px' marginbgcolor='white'
+ uniquekeys='false'>
+<noteinfo noteid='39a' unid='959B81CDA0B8D84FCA257F8B008144E2' sequence='12'>
+<created><datetime>20160405T093157,78+10</datetime></created>
+<modified><datetime>20160628T151505,42+10</datetime></modified>
+<revised><datetime>20160628T151505,41+10</datetime></revised>
+<lastaccessed><datetime>20160904T020405,51+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152010,24+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby><code
+ event='selection'><formula>SELECT !@IsAvailable($Conflict)</formula></code><code
+ event='postopen'><formula>@Command( [ViewShowSearchBar]; "1")</formula></code>
+<column sort='ascending' hidedetailrows='false' itemname='$4' width='14' resizable='true'
+ separatemultiplevalues='true' sortnoaccent='false' sortnocase='true' showaslinks='false'><font
+ style='bold'/><columnheader title='ApplicationID'><font size='9pt' style='bold'/></columnheader><code
+ event='value'><formula>ApplicationID + @DocDescendants(""; ""; "  (%)")</formula></code></column>
+<column sort='ascending' hidedetailrows='false' itemname='Form' width='20.8750'
+ resizable='true' separatemultiplevalues='false' sortnoaccent='false' sortnocase='true'
+ showaslinks='false'><columnheader title='Form'><font size='9pt' style='bold'/></columnheader></column>
+<column sort='ascending' hidedetailrows='false' itemname='ApplicationVersion'
+ width='5.7500' resizable='true' separatemultiplevalues='false' sortnoaccent='true'
+ sortnocase='true' showaslinks='false'><font name='Verdana' pitch='variable'
+ truetype='true' familyid='20'/><columnheader title='Version'><font size='9pt'
+ style='bold' name='Verdana' pitch='variable' truetype='true' familyid='20'/></columnheader></column>
+<column resort='both' resort2='ascending' resort2column='0' hidedetailrows='false'
+ itemname='SubmissionId' width='15' resizable='true' separatemultiplevalues='false'
+ sortnoaccent='false' sortnocase='true' showaslinks='false'><font name='Verdana'
+ pitch='variable' truetype='true' familyid='20'/><columnheader title='Submission ID'><font
+ size='9pt' style='bold' name='Verdana' pitch='variable' truetype='true' familyid='20'/></columnheader></column>
+<column resort='both' resort2='ascending' resort2column='0' hidedetailrows='false'
+ itemname='SponsorName' width='30' resizable='true' separatemultiplevalues='false'
+ sortnoaccent='false' sortnocase='true' showaslinks='false'><font name='Verdana'
+ pitch='variable' truetype='true' familyid='20'/><columnheader title='Sponsor Name'><font
+ size='9pt' style='bold' name='Verdana' pitch='variable' truetype='true' familyid='20'/></columnheader></column>
+<column resort='both' resort2='ascending' resort2column='0' hidedetailrows='false'
+ listseparator='newline' itemname='$0' width='40' resizable='true' separatemultiplevalues='false'
+ sortnoaccent='false' sortnocase='true' showaslinks='false'><font name='Verdana'
+ pitch='variable' truetype='true' familyid='20'/><columnheader title='Details'><font
+ size='9pt' style='bold' name='Verdana' pitch='variable' truetype='true' familyid='20'/></columnheader><code
+ event='value'><formula>@If(
+	Form = "ADR";
+		ADR_SuspectDrugs;
+	Form = "AnimalExcipient";
+		@Trim(ProductName +
+			@Text(@If(
+				@Trim(AnimalOrigin_Label : AnimalPart_Label : AnimalPreparation_Label) != "";
+					" (" + @Implode(@Trim(AnimalOrigin_Label : AnimalPart_Label : AnimalPreparation_Label); " - ") + ")";
+				"")
+			)) : @Trim(Country_Label);
+	
+
+	Form = "Application";
+		titleofstudy;
+	Form = "Biological";
+		@If(
+			@Trim(LabelName) != "";
+				LabelName;
+			@Trim(ProductName) != "";
+				ProductName;
+			TradeCodeName
+		);
+	Form = "BiologicalIngredient";
+		@If(
+			@Trim(Name) != "" &amp; @Trim(@Text(Quantity)) != "";
+				Name + " (" + @Trim(@Text(Quantity) + " " + Unit_Label) + ")";
+			@Trim(Name) != "";
+				Name;
+			@Trim(@Text(Quantity) + " " + Unit_Label)
+		);
+	Form = "Completion";
+		@If(
+			@Trim(CompletionReason) != "";
+				CompletionReason;
+			CompletionDetails
+		);
+	Form = "Device";
+		@If(
+			@Trim(ProductName) != "";
+				ProductName;
+			@Trim(Description) != "";
+				Description;
+			@Trim(Manufacturer) != "";
+				Manufacturer;
+			Manufacturer_Label
+		);
+	@LowerCase(Form) = "ct";
+		ClientReference;
+	Form = "IBP";
+		@If(
+			@Trim(IBP_MedicalOfficer) != "";
+				IBP_MedicalOfficer;
+			@Trim(IBP_OtherInformation) != "";
+				IBP_OtherInformation;
+			S31no
+		);
+	Form = "Medicine";
+		@If(
+			@Trim(TradeCodeName) != "";
+				TradeCodeName;
+			@Trim(ActiveName) != "";
+				ActiveName;
+			@Trim(TradeName	) != "";
+				TradeName	;
+			CodeName
+		) +
+		@If(
+			@Trim(DosageForm_Label : RouteOfAdmin_Label) != "";
+				" (" + @Implode(DosageForm_Label : RouteOfAdmin_Label; " - ") + ")";
+			""
+		);
+	Form = "MedicineIngredient";
+		@If(
+			@Trim(Name) != "" &amp; @Trim(@Text(Quantity) : Unit_Label) != "";
+				Name + " (" + @Trim(@Text(Quantity) + " " + Unit_Label) + ")";
+			@Trim(Name) != "";
+				Name;
+			@Trim(@Text(Quantity) + " " + Unit_Label)
+		);
+	Form = "Part1";
+		@If(
+			@Trim(ProtocolNumber) != "";
+				"Protocol number: " + ProtocolNumber;
+			@Trim(@Text(TrialStartDate)) != "" &amp; @Trim(@Text(ExpectedCompletionDate)) != "";
+				@Word(TrialStartDate; "-"; 3) + "/" + @Word(TrialStartDate; "-"; 2) + "/" + @Word(TrialStartDate; "-"; 1) + " - " + @Word(ExpectedCompletionDate; "-"; 3) + "/" + @Word(ExpectedCompletionDate; "-"; 2) + "/" + @Word(ExpectedCompletionDate; "-"; 1);
+			@Trim(@Text(TrialStartDate)) != "";
+				@Word(TrialStartDate; "-"; 3) + "/" + @Word(TrialStartDate; "-"; 2) + "/" + @Word(TrialStartDate; "-"; 1);
+			@Trim(@Text(ExpectedCompletionDate)) != "";
+				@Word(ExpectedCompletionDate; "-"; 3) + "/" + @Word(ExpectedCompletionDate; "-"; 2) + "/" + @Word(ExpectedCompletionDate; "-"; 1);
+			@Trim(TrialTherapeuticArea) != "";
+				TrialTherapeuticArea;
+			""
+		);
+	Form = "Placebo";
+		@If(
+			@Trim(ProductName) != "";
+				ProductName;
+			PlaceboDescription
+		);
+	Form = "Site";
+		TrialSite;
+	Form = "UpdateDetails";
+		@Implode(@Trim(ContactName : @LowerCase(ContactEmail)); " - ");
+	Form = "TrialConductedInCountry";
+		@If(
+			@Trim(TrialConductedInCountry_Label) != "";
+				TrialConductedInCountry_Label;
+			TrialConductedInCountry
+		);
+	""
+)</formula></code></column>
+<column resort='both' resort2='ascending' resort2column='0' hidedetailrows='false'
+ itemname='ApplicationStatus' width='10' resizable='true' separatemultiplevalues='false'
+ sortnoaccent='false' sortnocase='true' showaslinks='false'><font name='Verdana'
+ pitch='variable' truetype='true' familyid='20'/><columnheader title='Status'><font
+ size='9pt' style='bold' name='Verdana' pitch='variable' truetype='true' familyid='20'/></columnheader></column></view>
+

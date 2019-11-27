@@ -1,0 +1,223 @@
+.hiddenField {
+	/* Hidden fields */
+	color:red;
+	display:none;
+}
+
+.dijitNumberTextBox{
+	/* Set maximum visible width of number text box */
+	width: 80px;
+}
+
+.dijitDialogPaneContent input.radio, .dijitDialogPaneContent input[type="radio"], 
+.dijitDialogPaneContent input.checkbox, 
+.dijitDialogPaneContent input[type="checkbox"],
+.xspRadioButton, .xspCheckBox,
+.xspPanelViewColumnHeader {
+	/* Prevent white space (in labels) from wrapping in radio buttons and checkboxes */
+	white-space:nowrap !important;
+}
+
+.xspRadioButton, .xspCheckBox, 
+.dijitDialogPaneContent input.radio, .dijitDialogPaneContent input[type="radio"] {	
+	/* Set margins only on the right of radio buttons to ensure consistent alignment with labels */
+	margin: 0px 3px 0px 0px;
+}
+
+.dijitDialogPaneContent .dijitButton {
+	/* Remove margin from button to ensure correct alignment with input objects */
+	margin-top: 0px;
+}
+
+.dijitDialogPaneContent .xspComboBox {
+	/* Set maximum width of a combobox in a dialog window */
+	max-width: 400px;
+}
+
+.dijitDialogPaneContent .xspDataTableViewPanel {
+	/* Control width of embedded view in a dialog window. In Internet Explorer the width was automatically
+	   changing to the width of the screen */
+	width: 250px;
+}
+
+fieldset.xspCheckBoxViewColumn, .xspCheckBoxViewColumn[style]  {
+	/* Formatting for checkbox in repeating view data grid custom control */ 
+	border: 0px none #ffffff;
+	min-width: 1px;
+	padding: 0px;
+	margin: 0px 4px 0px 0px !important;
+}
+
+table.xspDataTable td,
+.xspPanelViewColumnHeader, table.xspDataTable th,
+td.xspColumnViewStart, td.xspColumnViewEnd,
+table.xspCheckBoxViewColumn td input.checkbox, table.xspCheckBoxViewColumn td input[type="checkbox"],
+.xspDataTableViewPanel table table.xspCheckBoxViewColumn td,
+table.xspRadioButton label {
+	/* Removing left-padding from view column header, radio buttons, checkboxes */
+	padding-left: 0px !important;
+	margin-left: 0px !important;
+	margin-right: 5px !important;
+}
+
+table.xspDataTable td.xspColumnViewCustomAfterCheckbox {
+	/* Padding for column which appears after the checkbox column */
+	padding-left: 4px !important;
+}
+
+input[type=radio]:first-child  {
+	/* Padding & margin for the first radio button in a group */
+	padding-left: 0px !important;
+	margin-left: 0px !important;
+}
+
+table.xspCheckBoxViewColumn td input.checkbox, table.xspCheckBoxViewColumn td input[type="checkbox"],
+.xspDataTableViewPanel table table.xspCheckBoxViewColumn td,
+td.xspColumnViewStart, td.xspColumnViewEnd {
+	/* Remove right margin from checkbox view column header and checkbox controls */
+	margin-right: 0px !important;
+	padding-right: 2px !important;
+}
+
+.xspDataTableViewPanel table table.xspCheckBoxViewColumn td {
+	/* Settings for checkbox column in standard view control */
+	padding-left: 0px !important;
+	border: 0px none #ffffff;
+}
+
+.xspDataTableViewPanel table table.xspCheckBoxViewColumnCustom td {
+	/* Settings for checkbox column in custom view control */
+	padding-right: 0px !important;
+}
+
+.xspColumnViewStartCustomCheckBox, .xspCheckBoxViewColumnCustom {
+	/* Settings for checkbox in custom view control */
+	width: 13px;
+	max-width: 13px;
+	margin-right: 0px;
+}
+
+.xspDataTable tbody tr td.xspColumnViewStartCustomCheckBox {
+	/* Right-hand padding on checkbox column for custom view control */
+	padding-right: 2px !important;
+}
+
+.labelCell {
+	/* Force cell to be specified width. Without this cell was being resized in dialog boxes */
+	min-width: 80px;
+}
+
+.labelCellSmall {
+	/* Force cell to be specified width. Without this cell was being resized in dialog boxes */
+	min-width: 40px;
+}
+
+.labelCellMedium {
+	/* Force cell to be specified width. Without this cell was being resized in dialog boxes */
+	min-width: 140px;
+}
+
+.labelCellLarge {
+	/* Force cell to be specified width. Without this cell was being resized in dialog boxes */
+	min-width: 200px;
+}
+
+.validationCell {
+	/* Force cell to be specified width. Without this cell was being resized in dialog boxes */
+	min-width: 6px;
+}
+
+.cellVeryLarge {
+	/* Force cell to be specified width. Without this cell was being resized in dialog boxes */
+	max-width: 500px;
+}
+
+.helperCell {
+	/* Force cell to be specified width. Without this cell was being resized in dialog boxes */
+	min-width: 32px;
+}
+
+.dijitButton, .dijitButtonNode {
+	/* Ensure left-aligned buttons correctly align with input controls in a table */
+	margin-left: 0px;	
+}
+
+.conditionalMandatory {
+	/* Color of conditional mandatory icon */
+	color: #909090;
+}
+
+.dijitPlaceHolder  {
+	/* Placeholder styling */
+	font-size: 0.75em;
+	font-size: 0.90em;
+}
+
+[aria-invalid=true], [aria-invalid="true"] {
+	/* Highlight field with invalid data */	
+	 background-color: #fee !important;
+	 border-color: red !important;
+}
+
+.dijitComboBoxWidthLarge{
+	/* Set width for dropdown comboboxes that require a wider rendering */ 
+	width: 30em;
+}
+
+.xspInputFieldEditBox {
+	/* Set input fields to auto-height so they match height of other elements */ 
+    height: auto;
+}
+
+.xspInputFieldEditBoxLarge {
+	/* Set input fields to auto-height so they match height of other elements */ 
+    width: 30em;
+}
+
+.validationInformationGrid {
+	/* Settings for validation information grid */
+	height:250px !important;
+	width:100% !important;
+}
+
+.tabNavButtons {
+	/* Styling for Previous / Next buttons to navigate through tabs on application page */
+	float:left !important;
+}
+
+.dijitDialogPaneActionBar {
+	/* Prevent buttons on action bar from wrapping */
+	white-space:nowrap;
+}
+
+.dijitTabCheckedFocused .tabLabel, .dijitButtonFocused .dijitButtonContents, .dijitButtonContents:focus,
+ input[type="checkbox"]:focus, input[type="radio"]:focus, a:focus {
+	/* Accessibility - focus outline on selectable components */
+    outline: #000000 dotted thin !important;
+}
+
+input:focus {
+	/* Disable focus for input boxes */
+	outline: #ffffff none !important;
+}
+
+.hideField{
+	display: none
+}
+
+td.sectionHeader{
+	font-style: italic;	
+	font-size: 100%;
+	color: #333333;
+	font-weight: bold;
+	padding-left: 10px;
+}
+
+.twoColumnCheckboxGroup { display: inline; }
+.twoColumnCheckboxGroup td { float: left; width: 50%; }
+
+/* dummy classes used to disable html objects*/
+/*
+.canbedisabledbtn, .canbedisabledtextbox, .canbedisabledtextarea, .canbedisabledcombo{	
+};
+*/

@@ -1,0 +1,341 @@
+<?xml version='1.0' encoding='utf-8'?>
+<agent name='(Push Back)' alias='Push Back' xmlns='http://www.lotus.com/dxl'
+ version='9.0' maintenanceversion='1.0' replicaid='CA257FDB001B5780' hide='v3'
+ runaswebuser='true' publicaccess='false' designerversion='8.5.3'>
+<noteinfo noteid='5a6' unid='F1D986D6C62FEA9ECA257F7700070BD5' sequence='14'>
+<created><datetime dst='true'>20160315T121657,81+11</datetime></created>
+<modified><datetime>20160628T151506,93+10</datetime></modified>
+<revised><datetime>20160628T151506,92+10</datetime></revised>
+<lastaccessed><datetime>20160628T151506,92+10</datetime></lastaccessed>
+<addedtofile><datetime>20160623T152011,38+10</datetime></addedtofile></noteinfo>
+<updatedby><name>CN=Srinivas Prasad/OU=DEVELOPER/O=TGADEV</name><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></updatedby>
+<wassignedby><name>CN=Bruce Langner/OU=DEVELOPER/O=TGADEV</name></wassignedby>
+<designchange><datetime>20160628T151506,98+10</datetime></designchange>
+<trigger type='agentlist'/>
+<documentset type='runonce'/><code event='options'><lotusscript>Option Public
+Option Declare
+Use "MIMEJSONDataInterface"
+Use "IDsAndSequences"
+Use "GetDatabases"
+
+</lotusscript></code><code event='declarations'><lotusscript>Const ERR_PRIMARYARGUMENTSMISSING = 1001
+Const ERR_INVALIDDOCUMENTID = 1002
+Const ERR_EMPTYJSONSTORE = 1003
+Dim appID As String, appVer As Integer
+
+</lotusscript></code><code event='initialize'><lotusscript>Sub Initialize
+	'/ Modified by WP - 26022015 - to fix the Pushback Problem which is not occuring when we click Pushback button in WM Database.
+	On Error Goto ErrorHandler
+	Dim Ses As New NotesSession
+	Dim dbThis As NotesDatabase, dbArchive As NotesDatabase,dbWM As NotesDatabase
+	Dim sourceDocument As NotesDocument, luDocument As NotesDocument, wmappdoc As NotesDocument
+	Dim AppJSONEntryStore As MIMEJSONEntryStore
+	Dim unid As String, strID As String, strLU As String
+	Dim newRecordUNID As String , oldRecordUNID As String 
+	Dim JSONEntry As JSONObject 
+	Dim EmptyJSONArray As New JSONArray 
+	Dim agent As NotesAgent
+	Dim vwThis As NotesView
+	Dim vwApp As NotesView
+	Dim pushbackReason As String, nitem As NotesItem '/ INC65783 - WP June 
+	
+	Set dbThis = Ses.CurrentDatabase
+	Set dbArchive = fdbGetDatabase("CTA_Path")
+	Set dbWM = fdbGetDatabase("DWM_Path")
+	Set agent = Ses.CurrentAgent
+	Set vwThis = dbThis.GetView("JSONApplication")
+	Set vwApp = dbWM.GetView("LUAppStubByID")
+	
+	unid = agent.ParameterDocID
+	Set luDocument = dbThis.GetDocumentByID(unid)
+	
+	 '/ INC65783 - WP June - Added code so it will not when opening task in Work Management and looking up for PUSHBACK field
+	If luDocument.Hasitem("PUSHBACKREASON") Then
+		Set nitem = luDocument.Getfirstitem("PUSHBACKREASON")
+		If Not nitem Is Nothing Then
+			pushbackReason = nitem.Text
+		End If
+	End If
+	
+	appVer = Cint(luDocument.ApplicationVersion(0))
+	appID = luDocument.ApplicationId(0)
+	
+	Set sourceDocument = vwThis.GetDocumentByKey(appID)
+	Set wmappdoc = vwApp.GetDocumentByKey(appID)
+	
+	Call sourceDocument.ReplaceItemValue("ValidationStatus", "0")
+	Call sourceDocument.ReplaceItemValue("IsValid", "0")
+	Call sourceDocument.AppendItemValue("PushBackTriggerDates", Cstr(Now))
+	Call sourceDocument.ReplaceItemValue("IsPushBackTriggered", "1")
+	Call sourceDocument.ReplaceItemValue("IsPushBackSubmittedBack", "")
+	Call sourceDocument.ReplaceItemValue("ApplicationVersion", Cstr(appVer + 1))
+	Call sourceDocument.ReplaceItemValue("ApplicationStatus", "Draft")
+	Call sourceDocument.ReplaceItemValue("ApplicationStatusCode", "DRAFT")
+	
+	Call sourceDocument.ReplaceItemValue("IsSubmitted", "0") '/ Fixed for Pushback problem to set this field to "0" so it will be appear in Draft view again.
+	
+	Set AppJSONEntryStore = New MIMEJSONEntryStore(sourceDocument, "JSONMIMEFILE" ,"JSON.txt")
+	If Not AppJSONEntryStore.IsEmptyStore Then
+		Set JSONEntry = AppJSONEntryStore.GetFirstJSONEntry
+		
+		While Not (JSONEntry Is Nothing)
+			If AppJSONEntryStore.GetItemFirstValue(JSONEntry, "Type") = "Application" Then
+				Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ApplicationStatus", "Draft")				
+				Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ApplicationStatusCode", "DRAFT")				
+				Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ValidationStatus", "0")
+				Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "IsValid", "0")
+				Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "IsSubmitted", "0")
+				Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "IsPushBackTriggered", "1")
+				Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "IsPushBackSubmittedBack", "")
+				Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "PushBackTriggerDates", Cstr(Now))
+				Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "WMID_Review", luDocument.WMID_Review(0))		
+				Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "WMID_Application", luDocument.WMID_Application(0))	
+				
+				'/INC65783 - WP June
+				Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "PUSHBACKREASON", pushbackReason)
+				 	
+			End If
+			
+			oldRecordUNID =  AppJSONEntryStore.GetItemFirstValue(JSONEntry, "RecordUNID")
+			
+			strID = Cstr(Strright(Strright(oldRecordUNID,"~"),"~"))			
+			Print "the strID value = " &amp; strID
+			If Cint(Instr(strID,"~")) &gt; 0 Or ( Cint(Instr(strID,"~")) = 0 And Len(strID) &gt; 0 ) Then
+				strID = "~"+strID
+			End If
+			
+			newRecordUNID = appID +  "~" + Cstr(appVer+1) + strID
+			
+			Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "IsActiveVersion", "1")	
+			Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "ApplicationVersion", Cstr(appVer+1))	
+			Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "RecordUNID", newRecordUNID)
+			Call AppJSONEntryStore.ReplaceItemValue(JSONEntry, "id", newRecordUNID)
+			
+			'now update the keys at this top level
+			'/ INC65783 - PushBack problem - hide these 2 lines which causing an error, which we don't need  
+			'Call updateKeyIDs(AppJSONEntryStore, JSONEntry )   'hide by WP - 1 june 2015 - error in server log	and we don't need this as we have javascript to fix the Key and Ids
+			'Call updateTopLevelIDs(AppJSONEntryStore, JSONEntry)  'hide by WP - 1 june 2015 - error in server log	and we don't need this as we have javascript to fix the Key and Ids
+		
+			
+			Set JSONEntry = AppJSONEntryStore.GetNextJSONEntry
+			
+		Wend
+		
+		Call AppJSONEntryStore.SaveJSONToMime()
+		Call sourceDocument.save( True, False)
+		
+		strLU = appID+"~"+Cstr(appVer)
+		Call archiveApp(strLU, dbArchive)
+		Call updateAttachmentIDs(strLU)
+		Call resetWMIDs(wmappdoc, dbThis)  '/ INC65783 - PushBack problem - replace with dbThis than dbArchive
+		
+	Else
+		Error ERR_EMPTYJSONSTORE , "Empty source JSON Structure retrieved from source UNID:" + unid
+	End If
+	
+ExitSub:
+	Exit Sub
+ErrorHandler:
+	Print "Push Back agent error: Error - "; Err(); " at line "; Erl(); ", "; Error()
+	Resume ExitSub
+End Sub
+
+</lotusscript></code><code event='updateTopLevelIDs'><lotusscript>Function updateTopLevelIDs(AppJSONEntryStore As MIMEJSONEntryStore, JSONEntry As JSONObject)
+	Dim keyEntries As Variant, keyEntry As JSONObject , oldID As String, newID As String, strID As String
+	
+	Dim aSearchItems(7) As String
+	
+	aSearchItems(0) = "TrialConductedInCountries"
+	aSearchItems(1) ="AnimalExcipients"
+	aSearchItems(2) ="Biologicals"
+	aSearchItems(3) ="Medicines"
+	aSearchItems(4) ="Placebos"
+	aSearchItems(5) ="Comparators"
+	aSearchItems(6) ="Devices"
+	aSearchItems(7) ="Sites"
+	
+	Forall items In aSearchItems
+		
+	'need to cleanup all key values
+		If  AppJSONEntryStore.HasItem(JSONEntry , items) Then
+			Set keyEntry =  AppJSONEntryStore.GetItemValue(JSONEntry , items)
+			
+			If Not(keyEntry Is Nothing) Then
+				oldID =  AppJSONEntryStore.GetItemFirstValue(keyEntry, "id")
+				strID = Cstr(Strright(Strright(oldID,"~"),"~"))			
+				
+				If Cint(Instr(strID,"~")) &gt; 0 Or ( Cint(Instr(strID,"~")) = 0 And Len(strID) &gt; 0 ) Then
+					strID = "~"+strID
+				End If
+				
+				newID = appID +  "~" + Cstr(appVer+1) + strID
+				
+				Call AppJSONEntryStore.ReplaceItemValue(keyEntry, "ApplicationVersion", Cstr(appVer+1))	
+				Call AppJSONEntryStore.ReplaceItemValue(keyEntry, "id", newID)
+				
+			'now update the keys
+				Call updateKeyIDs(AppJSONEntryStore, keyEntry )
+			End If
+		End If
+		
+	End Forall
+	
+End Function
+
+</lotusscript></code><code event='updateKeyIDs'><lotusscript>Function updateKeyIDs(AppJSONEntryStore As MIMEJSONEntryStore, JSONEntry As JSONObject )
+	Dim keyEntries As Variant, keyEntry As JSONObject , oldID As String, newID As String, strID As String
+	
+	'need to cleanup all key values
+	If  AppJSONEntryStore.HasItem(JSONEntry , "Key") Then
+		Set keyEntry =  AppJSONEntryStore.GetItemValue(JSONEntry , "Key")
+		
+		oldID =  AppJSONEntryStore.GetItemFirstValue(keyEntry, "id")
+		strID = Cstr(Strright(Strright(oldID,"~"),"~"))			
+		
+		If Cint(Instr(strID,"~")) &gt; 0 Or ( Cint(Instr(strID,"~")) = 0 And Len(strID) &gt; 0 ) Then
+			strID = "~"+strID
+		End If
+		
+		newID = appID +  "~" + Cstr(appVer+1) + strID
+		
+		Call AppJSONEntryStore.ReplaceItemValue(keyEntry, "ApplicationVersion", Cstr(appVer+1))	
+		Call AppJSONEntryStore.ReplaceItemValue(keyEntry, "id", newID)
+		
+	End If
+End Function
+
+</lotusscript></code><code event='resetWMIDs'><lotusscript>Function resetWMIDs(doc As NotesDocument, dbThis  As NotesDatabase)
+	Dim ApplicationID As String
+	Dim dbCTArchive As NotesDatabase
+	
+	'/ INC65783 - PushBack problem - it shoudl refer to current database not archive
+	'/ Hide this dbCTArvhice code and replace with tbThis
+	'Set dbCTArchive = fdbGetDatabase("CTA_Path")
+	'Call UpdateWMIDfields(dbCTArchive, "AppsByApplicationId", doc, appID)
+	
+	Call UpdateWMIDfields(dbThis, "AppsByApplicationId", doc, appID)
+	
+End Function
+
+</lotusscript></code><code event='UpdateWMIDfields'><lotusscript>Function UpdateWMIDfields(db As NotesDatabase, viewName As String, sourcedoc As NotesDocument, UNID As String) As Variant
+	Dim view As NotesView
+	Dim dc As notesdocumentcollection
+	Dim doc As NotesDocument
+	Dim docRef As NotesDocument
+	Dim ver As Integer
+	
+	UpdateWMIDfields = False
+	
+	Set view = db.GetView(viewName)
+	If Not view Is Nothing Then
+		Set dc = view.GetAllDocumentsByKey(UNID)
+		Set doc = dc.GetFirstDocument	
+		
+		ver% = 1
+		If Not doc Is Nothing Then
+			If dc.count &gt; 1 Then
+				While Not doc Is Nothing
+					If Cint(doc.ApplicationVersion(0)) &gt; ver% Then
+						Set docRef = doc
+						ver% = Cint(doc.ApplicationVersion(0))
+					End If
+					
+					Set doc = dc.GetNextDocument(doc)
+					
+				Wend
+			Else
+				Set docRef = doc
+			End If
+			
+			If docRef Is Nothing Then
+				Set docRef = dc.GetFirstDocument		
+			End If
+			
+			sourcedoc.WMID_TargetDatabase = Db.ReplicaID	
+			sourcedoc.WMID_TargetDoc = docRef.UniversalID
+			Call sourcedoc.save(True,False)
+			UpdateWMIDfields = True
+		End If
+	End If
+	
+End Function
+
+</lotusscript></code><code event='updateAttachmentIDs'><lotusscript>Function updateAttachmentIDs(luKey As String)
+	Dim s As New notessession
+	Dim db As NotesDatabase
+	Dim dc As NotesDocumentCollection
+	Dim doc As NotesDocument
+	Dim vwLookup As NotesView
+	Dim oldID As String, newID As String, strID As String
+	
+	Set db = fdbGetDatabase("CTF_Path")
+	Set vwLookup = db.GetView("LookupAllByApplicationID")
+	Set dc = vwLookup.GetAllDocumentsByKey(luKey)
+	Set doc = dc.GetFirstDocument
+	
+	While Not doc Is Nothing
+		
+		oldID =  doc.AttachmentContext(0)
+		strID = Cstr(Strright(Strright(oldID,"~"),"~"))			
+		
+		If Cint(Instr(strID,"~")) &gt; 0 Or ( Cint(Instr(strID,"~")) = 0 And Len(strID) &gt; 0 ) Then
+			strID = "~"+strID
+		End If
+		
+		newID = appID +  "~" + Cstr(appVer+1) + strID
+		
+		Call doc.ReplaceItemValue("AttachmentContext",newID)
+		Call doc.ReplaceItemValue("LinkedSourceVersionNumbers",Cint(appVer+1))
+		Call doc.Save(True,True)
+		
+		Set doc = dc.GetNextDocument(doc)
+		
+	Wend
+	
+End Function
+
+</lotusscript></code><code event='archiveApp'><lotusscript>Function archiveApp(luKey As String, dbArchive As NotesDatabase)
+	Dim s As New NotesSession
+	Dim db As NotesDatabase
+	Dim dc As NotesDocumentCollection
+	Dim doc As NotesDocument
+	Dim vwLookup As NotesView
+	Dim tmpdoc As NotesDocument
+	
+	Set db = s.CurrentDatabase
+	Set vwLookup = db.GetView("LookupAllByApplicationID")
+	Set dc = vwLookup.GetAllDocumentsByKey(luKey)
+	Set doc = dc.GetFirstDocument
+	
+	While Not doc Is Nothing
+		doc.isArchived = "1"		
+		Call doc.ReplaceItemValue("ValidationStatus", "0")
+		Call doc.ReplaceItemValue("IsValid", "0")
+		Call doc.AppendItemValue("PushBackTriggerDates", Cstr(Now))
+		Call doc.ReplaceItemValue("IsPushBackTriggered", "1")
+		Call doc.ReplaceItemValue("ApplicationStatus", "Archived")
+		Call doc.ReplaceItemValue("ApplicationStatusCode", "Archived")
+		Call doc.Save( True ,False)
+		
+		'/ INC 63195
+		If Lcase(doc.Form(0)) = "ct" Then
+			Set tmpdoc = doc
+		End If
+		
+		Call doc.CopyToDatabase(dbArchive)
+		Set doc = dc.GetNextDocument(doc)
+	Wend
+	
+	'/ So now we have to remove CT form from the collection, because we need it to Vary, NextStage or Complete action from CTRepository
+	'/ INC 63195
+	If Not (tmpdoc Is Nothing) Then
+		Call dc.Deletedocument(tmpdoc)	
+	End If
+	
+	If dc.Count &gt; 0 Then
+		Call dc.RemoveAll(True)
+	End If
+	
+End Function</lotusscript></code>
+<item name='$POID'><datetime>20160620T120208,07+10</datetime></item></agent>
+
